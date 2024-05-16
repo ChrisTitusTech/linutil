@@ -28,7 +28,7 @@ fn main() -> Result<()> {
             let area = frame.size();
             let list = List::new(items)
                 .block(Block::default().title("List").borders(Borders::ALL))
-                .highlight_style(Style::new().bg(Color::Blue))
+                .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
                 .highlight_symbol(">>")
                 .repeat_highlight_symbol(true);
 
@@ -36,8 +36,7 @@ fn main() -> Result<()> {
             frame.render_stateful_widget(list, area, &mut state);
             frame.render_widget(
                 Paragraph::new("The Linux Toolbox (press 'q' to quit)")
-                    .white()
-                    .on_black(),
+                    .style(Style::default().bg(Color::Blue).fg(Color::White).add_modifier(Modifier::BOLD)),
                 area,
             );
         })?;
