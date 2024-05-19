@@ -87,6 +87,7 @@ fn main() -> Result<()> {
                                     }
                                     "Quit" => {
                                         // Handle the "Quit" item selected.
+                                        break;
                                     }
                                     _ => (),
                                 }
