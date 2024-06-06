@@ -40,11 +40,11 @@ impl CustomList {
         } => {
             ListNode {
                 name: "Setup Bash Prompt",
-                command: "bash <(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)"
+                command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
             },
             ListNode {
                 name: "Setup Neovim",
-                command: "bash <(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)"
+                command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
             },
             // ListNode {
             //     name: "Just ls, nothing special, trust me",
