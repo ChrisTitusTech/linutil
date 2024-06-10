@@ -20,7 +20,7 @@ checkEnv() {
     fi
 
     ## Check Package Handeler
-    PACKAGEMANAGER='apt yum dnf pacman zypper'
+    PACKAGEMANAGER='apt yum dnf pacman zypper emerge xbps-install nix-env'
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
@@ -64,11 +64,11 @@ installDepend() {
     if [[ $PACKAGER == "pacman" ]]; then
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            sudo ${PACKAGER} --noconfirm -S base-devel
+            ${PACKAGER} --noconfirm -S base-devel
             cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
-            echo "Aur helper already installed"
+            echo "AUR helper already installed"
         fi
         if command_exists yay; then
             AUR_HELPER="yay"
@@ -79,8 +79,14 @@ installDepend() {
             exit 1
         fi
         ${AUR_HELPER} --noconfirm -S ${DEPENDENCIES}
+    elif [[ $PACKAGER == "emerge" ]]; then
+        ${PACKAGER} -v app-shells/bash app-shells/bash-completion app-arch/tar app-editors/neovim sys-apps/bat app-text/tree app-text/multitail app-misc/fastfetch
+    elif [[ $PACKAGER == "xbps-install" ]]; then
+        ${PACKAGER} -v ${DEPENDENCIES}
+    elif [[ $PACKAGER == "nix-env" ]]; then
+        ${PACKAGER} -iA nixos.bash nixos.bash-completion nixos.gnutar nixos.neovim nixos.bat nixos.tree nixos.multitail nixos.fastfetch
     else
-        sudo ${PACKAGER} install -yq ${DEPENDENCIES}
+        ${PACKAGER} install -yq ${DEPENDENCIES}
     fi
 }
 
