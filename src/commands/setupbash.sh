@@ -33,6 +33,16 @@ checkEnv() {
         exit 1
     fi
 
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
+    fi
+
+    echo "Using ${SUDO_CMD} as privilege escalation software"
+    
     ## Check if the current directory is writable.
     GITPATH="$(dirname "$(realpath "$0")")"
     if [[ ! -w ${GITPATH} ]]; then
@@ -64,8 +74,8 @@ installDepend() {
     if [[ $PACKAGER == "pacman" ]]; then
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            sudo ${PACKAGER} --noconfirm -S base-devel
-            cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
+            ${SUDO_CMD} ${PACKAGER} --noconfirm -S base-devel
+            cd /opt && ${SUDO_CMD} git clone https://aur.archlinux.org/yay-git.git && ${SUDO_CMD} chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
             echo "AUR helper already installed"
@@ -86,7 +96,7 @@ installDepend() {
     elif [[ $PACKAGER == "nix-env" ]]; then
         ${PACKAGER} -iA nixos.bash nixos.bash-completion nixos.gnutar nixos.neovim nixos.bat nixos.tree nixos.multitail nixos.fastfetch
     else
-        sudo ${PACKAGER} install -yq ${DEPENDENCIES}
+        ${SUDO_CMD} ${PACKAGER} install -yq ${DEPENDENCIES}
     fi
 }
 
@@ -121,8 +131,8 @@ installZoxide() {
 }
 
 install_additional_dependencies() {
-   sudo apt update
-   sudo apt install -y trash-cli bat meld jpico
+   ${SUDO_CMD} apt update
+   ${SUDO_CMD} apt install -y trash-cli bat meld jpico
 }
 
 linkConfig() {
