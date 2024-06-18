@@ -86,7 +86,7 @@ installDepend() {
     elif [[ $PACKAGER == "nix-env" ]]; then
         ${PACKAGER} -iA nixos.bash nixos.bash-completion nixos.gnutar nixos.neovim nixos.bat nixos.tree nixos.multitail nixos.fastfetch
     else
-        ${PACKAGER} install -yq ${DEPENDENCIES}
+        sudo ${PACKAGER} install -yq ${DEPENDENCIES}
     fi
 }
 
