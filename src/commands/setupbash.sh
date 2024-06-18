@@ -64,7 +64,7 @@ installDepend() {
     if [[ $PACKAGER == "pacman" ]]; then
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            ${PACKAGER} --noconfirm -S base-devel
+            sudo ${PACKAGER} --noconfirm -S base-devel
             cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
