@@ -1,8 +1,7 @@
-## Introduction
-+ A toolbox of utilities for linux - https://www.youtube.com/@christitustech
-## How to use
+## Chris Titus Tech's Linux Utilty
+![pv](https://i.imgur.com/quoAwXf.png)
+## Usage
++ Open your terminal and paste this command
 ```bash
-git clone https://github.com/ChrisTitusTech/linutil
-cd linutil
-./linutil
+git clone https://github.com/ChrisTitusTech/linutil && cd linutil && ./linutil
 ```
