@@ -3,5 +3,5 @@
 ## Usage
 Open your terminal and paste this command
 ```bash
-bash <(wget -qO- raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh)
+bash <(curl -L https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh)
 ```
