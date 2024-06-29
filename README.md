@@ -1,4 +1,4 @@
-## Chris Titus Tech's Linux Utilty
+## Chris Titus Tech's Linux Utility
 ![pv](https://i.imgur.com/quoAwXf.png)
 ## Usage
 + Open your terminal and paste this command
