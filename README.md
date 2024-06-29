@@ -3,5 +3,5 @@
 ## Usage
 Open your terminal and paste this command
 ```bash
-wget https://github.com/ChrisTitusTech/linutil/raw/main/linutil && ./linutil
+bash <(wget -qO- raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh)
 ```
