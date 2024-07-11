@@ -1,15 +1,17 @@
 use std::{
+    io::Write,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
 
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
     layout::Size,
-    style::{Color, Style, Styled, Stylize},
+    style::{Color, Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders},
     Frame,
@@ -21,26 +23,30 @@ use tui_term::{
 
 use crate::{float::floating_window, theme::get_theme};
 
-// This is a struct for stoaring everything connected to a running command
+/// This is a struct for storing everything connected to a running command
 // Create a new instance on every new command you want to run
 pub struct RunningCommand {
-    buffer: Arc<Mutex<Vec<u8>>>, // A buffer to save all the command output (accumulates, untill the command
-    // exits)
-    command_thread: Option<JoinHandle<ExitStatus>>, // the tread where the command is being executed
-    child_killer: Option<Receiver<Box<dyn ChildKiller + Send + Sync>>>, // This is a thing that
-    // will allow us to kill the running command on Ctrl-C
-    // Also, don't mind the name :)
+    /// A buffer to save all the command output (accumulates, untill the command exits)
+    buffer: Arc<Mutex<Vec<u8>>>,
 
-    //It is an option, because we want to be able to .join it, without
-    // moving the whole RunningCommand struct, (we want to have the exit code, and still have acess
-    // to the buffer, to render the terminal output)
-    _reader_thread: JoinHandle<()>, // The thread that reads the command output, and sends it to us
-    // by writing to the buffer. We need another thread, because the reader may block, and we want
-    // our UI to stay responsive.
-    pty_master: Box<dyn MasterPty + Send>, // This is a master handle of the emulated terminal, we
-    // will use it to resize the emulated terminal
-    status: Option<ExitStatus>, // We want to be able to get the exit status more then once, and
-                                // this is a nice place to store it. We will put it here, after joining the reader_tread
+    /// A handle of the tread where the command is being executed
+    command_thread: Option<JoinHandle<ExitStatus>>, 
+
+    /// A handle to kill the running process, it's an option because it can only be used once
+    child_killer: Option<Receiver<Box<dyn ChildKiller + Send + Sync>>>,
+
+    /// A join handle for the thread that is reading all the command output and sending it to the
+    /// main thread
+    _reader_thread: JoinHandle<()>,
+
+    /// Virtual terminal (pty) handle, used for resizing the pty
+    pty_master: Box<dyn MasterPty + Send>,
+
+    /// Used for sending keys to the emulated terminal
+    writer: Box<dyn Write + Send>,
+
+    /// Only set after the process has ended
+    status: Option<ExitStatus>,
 }
 
 impl RunningCommand {
@@ -72,19 +78,15 @@ impl RunningCommand {
         });
 
         let mut reader = pair.master.try_clone_reader().unwrap(); // This is a reader, this is where we
-                                                                  // are reading the command output from
 
-        // This is a bit complicated, but I will try my best to explain :)
-        // Arc<Mutex<>> Means that this object is an Async Reference Count (Arc) Mutex lock. We
-        // need the ark part, because when all references holding that ark go out of scope, we want
-        // the memory to get freed. Mutex is to allow us to write and read to the memory from
-        // different threads, without fear that some thread will be reading when other is writing
+        // A buffer, shared between the thread that reads the command output, and the main tread.
+        // The main thread only reads the contents
         let command_buffer: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
         let reader_handle = {
             // Arc is just a reference, so we can create an owned copy without any problem
             let command_buffer = command_buffer.clone();
             // The closure below moves all variables used into it, so we can no longer use them,
-            // thats why command_buffer.clone(), because we need to use command_buffer later
+            // that's why command_buffer.clone(), because we need to use command_buffer later
             std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
                 loop {
@@ -100,12 +102,15 @@ impl RunningCommand {
                 }
             })
         };
+
+        let writer = pair.master.take_writer().unwrap();
         Self {
             buffer: command_buffer,
             command_thread: Some(command_handle),
             child_killer: Some(rx),
             _reader_thread: reader_handle,
             pty_master: pair.master,
+            writer,
             status: None,
         }
     }
@@ -121,7 +126,7 @@ impl RunningCommand {
             .unwrap();
 
         // Process the buffer with a parser with the current screen size
-        // We don't actually need to create a new parser every time, but it is so much easyer this
+        // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
         let mut parser = vt100::Parser::new(size.height, size.width, 0);
         let mutex = self.buffer.lock();
@@ -150,7 +155,6 @@ impl RunningCommand {
 
     pub fn draw(&mut self, frame: &mut Frame) {
         {
-
             let theme = get_theme();
             // Funny name
             let floater = floating_window(frame.size());
@@ -202,12 +206,77 @@ impl RunningCommand {
             frame.render_widget(pseudo_term, floater);
         }
     }
-    /// From what I observed this sends SIGHUB signal, *not* SIGKILL or SIGTERM, so the process
-    /// doesn't get a chance to clean up. If neccesary, I can look into sending SIGTERM directly
+    /// Send SIGHUB signal, *not* SIGKILL or SIGTERM, to the child process
     pub fn kill_child(&mut self) {
         if !self.is_finished() {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
         }
+    }
+
+    /// Handle key events of the running command "window". Returns true when the "window" should be
+    /// closed
+    pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        match key.code {
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.kill_child()
+            }
+
+            KeyCode::Enter if self.is_finished() => {
+                return true;
+            }
+            _ => self.handle_passthrough_key_event(key),
+        };
+        false
+    }
+
+    /// Convert the KeyEvent to pty key codes, and send them to the virtual terminal
+    fn handle_passthrough_key_event(&mut self, key: &KeyEvent) {
+        let input_bytes = match key.code {
+            KeyCode::Char(ch) => {
+                let mut send = vec![ch as u8];
+                let upper = ch.to_ascii_uppercase();
+                if key.modifiers == KeyModifiers::CONTROL {
+                    match upper {
+                        // https://github.com/fyne-io/terminal/blob/master/input.go
+                        // https://gist.github.com/ConnerWill/d4b6c776b509add763e17f9f113fd25b
+                        '2' | '@' | ' ' => send = vec![0],
+                        '3' | '[' => send = vec![27],
+                        '4' | '\\' => send = vec![28],
+                        '5' | ']' => send = vec![29],
+                        '6' | '^' => send = vec![30],
+                        '7' | '-' | '_' => send = vec![31],
+                        char if ('A'..='_').contains(&char) => {
+                            // Since A == 65,
+                            // we can safely subtract 64 to get
+                            // the corresponding control character
+                            let ascii_val = char as u8;
+                            let ascii_to_send = ascii_val - 64;
+                            send = vec![ascii_to_send];
+                        }
+                        _ => {}
+                    }
+                }
+                send
+            }
+            KeyCode::Enter => vec![b'\n'],
+            KeyCode::Backspace => vec![8],
+            KeyCode::Left => vec![27, 91, 68],
+            KeyCode::Right => vec![27, 91, 67],
+            KeyCode::Up => vec![27, 91, 65],
+            KeyCode::Down => vec![27, 91, 66],
+            KeyCode::Tab => vec![9],
+            KeyCode::Home => vec![27, 91, 72],
+            KeyCode::End => vec![27, 91, 70],
+            KeyCode::PageUp => vec![27, 91, 53, 126],
+            KeyCode::PageDown => vec![27, 91, 54, 126],
+            KeyCode::BackTab => vec![27, 91, 90],
+            KeyCode::Delete => vec![27, 91, 51, 126],
+            KeyCode::Insert => vec![27, 91, 50, 126],
+            KeyCode::Esc => vec![27],
+            _ => return,
+        };
+        // Send the keycodes to the virtual terminal
+        let _ = self.writer.write_all(&input_bytes);
     }
 }
