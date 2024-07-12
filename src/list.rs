@@ -1,4 +1,3 @@
-
 use crate::theme::*;
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
@@ -29,8 +28,6 @@ pub struct CustomList {
 }
 
 impl CustomList {
-    /// It's really easy to make this accept a tree, and make it reusable, but rn its only called
-    /// once, so I didn't bother, and it gets initialized here
     pub fn new() -> Self {
         // When a function call ends with an exclamation mark, it means it's a macro, like in this
         // case the tree! macro expands to `ego-tree::tree` data structure
@@ -38,6 +35,14 @@ impl CustomList {
             name: "root",
             command: ""
         } => {
+            ListNode {
+                name: "Full bash",
+                command: "bash"
+            },
+            ListNode {
+                name: "Full zsh",
+                command: "zsh"
+            },
             ListNode {
                 name: "Setup Bash Prompt",
                 command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
