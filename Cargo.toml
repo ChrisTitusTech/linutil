@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.4", features = ["derive"] }
+clap = { version = "4.5.9", features = ["derive"] }
 crossterm = "0.27.0"
 ego-tree = "0.6.2"
 oneshot = "0.1.8"
