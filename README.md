@@ -6,4 +6,4 @@ Open your terminal and paste this command
 curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh | sh
 ```
 ## Credits
-Rust Shell written by @JustLinuxUser
+Rust Shell written by [@JustLinuxUser](https://github.com/JustLinuxUser)
