@@ -36,10 +36,6 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - name: Set execute permissions for build script
-      run: chmod +x target/debug/build/libc-*/build-script-build
-    - name: Clean the build directory
-      run: cargo clean
     - name: Build
       run: cargo build --verbose
     - name: Upload build artifacts
