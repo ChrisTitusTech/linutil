@@ -70,7 +70,17 @@ impl CustomList {
                 ListNode {
                     name: "Recursion?",
                     command: "cargo run"
+                }
+            },
+            ListNode {
+                name: "Titus Dotfiles",
+                command: ""
+            } => {
+                ListNode {
+                    name: "Rofi Setup",
+                    command: include_str!("commands/rofi-setup.sh"),
                 },
+
             }
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
