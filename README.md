@@ -5,3 +5,5 @@ Open your terminal and paste this command
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh | sh
 ```
+## Credits
+Rust Shell written by @JustLinuxUser
