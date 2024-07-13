@@ -55,33 +55,28 @@ checkEnv() {
 	fi
 }
 
-setupRofi() {
-    echo "Install Rofi if not already installed..."
-    if ! command_exists rofi; then
+setupKitty() {
+    echo "Install Kitty if not already installed..."
+    if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
-                sudo ${PACKAGER} -S --noconfirm rofi
+                sudo ${PACKAGER} -S --noconfirm kitty
                 ;;
             *)
-                sudo ${PACKAGER} install -y rofi
+                sudo ${PACKAGER} install -y kitty
                 ;;
         esac
     else
-        echo "Rofi is already installed."
+        echo "Kitty is already installed."
     fi
-    echo "Copy Rofi config files"
-    if [ -d "${HOME}/.config/rofi" ]; then
-        cp -r ${HOME}/.config/rofi ${HOME}/.config/rofi.bak
+    echo "Copy Kitty config files"
+    if [ -d "${HOME}/.config/kitty" ]; then
+        cp -r ${HOME}/.config/kitty {HOME}/.config/kitty-bak
     fi
-    mkdir -p ${HOME}/.config/rofi
-    wget -O ${HOME}/.config/rofi/powermenu.sh https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/powermenu.sh
-    chmod +x ${HOME}/.config/rofi/powermenu.sh
-    wget -O ${HOME}/.config/rofi/config.rasi https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/config.rasi
-    mkdir -p ${HOME}/.config/rofi/themes
-    wget -O ${HOME}/.config/rofi/themes/nord.rasi https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/nord.rasi
-    wget -O ${HOME}/.config/rofi/themes/sidetab-nord.rasi https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/sidetab-nord.rasi
-    wget -O ${HOME}/.config/rofi/themes/powermenu.rasi https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/powermenu.rasi
+    mkdir -p ${HOME}/.config/kitty/
+    wget -O ${HOME}/.config/kitty/kitty.conf https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/kitty.conf
+    wget -O ${HOME}/.config/kitty/nord.conf https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/nord.conf
 }
 
 checkEnv
-setupRofi
+setupKitty
