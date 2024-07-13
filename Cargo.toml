@@ -7,7 +7,7 @@ edition = "2021"
 clap = { version = "4.5.4", features = ["derive"] }
 crossterm = "0.27.0"
 ego-tree = "0.6.2"
-oneshot = "0.1.6"
+oneshot = "0.1.8"
 portable-pty = "0.8.1"
 ratatui = "0.26.2"
 tui-term = "0.1.11"
