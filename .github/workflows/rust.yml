@@ -33,6 +33,8 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+    - name: Clean the build directory
+      run: cargo clean
     - name: Build
       run: cargo build --verbose
     - name: Upload build artifacts
