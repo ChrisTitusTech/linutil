@@ -48,11 +48,11 @@ checkEnv() {
 
 
     DTYPE="unknown"  # Default to unknown
-	# Use /etc/os-release for modern distro identification
-	if [ -f /etc/os-release ]; then
-		source /etc/os-release
-		DTYPE=$ID
-	fi
+    # Use /etc/os-release for modern distro identification
+    if [ -f /etc/os-release ]; then
+            source /etc/os-release
+            DTYPE=$ID
+    fi
 
 }
 
@@ -77,7 +77,13 @@ fastUpdate() {
             fi
             ${AUR_HELPER} --noconfirm -S rate-mirrors-bin
             sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-            sudo rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${DTYPE}
+            
+            # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
+            local dtype_local=${DTYPE}
+            if $DTYPE == "unknown"; then
+                dtype_local="arch"
+            fi
+            sudo rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
             ;;
         apt-get|nala)
             sudo apt-get update
