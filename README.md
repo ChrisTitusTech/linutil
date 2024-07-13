@@ -3,5 +3,5 @@
 ## Usage
 Open your terminal and paste this command
 ```bash
-bash <(curl -L https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh)
+curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh | sh
 ```
