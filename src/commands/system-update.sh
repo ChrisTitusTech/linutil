@@ -80,7 +80,7 @@ fastUpdate() {
             
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
             local dtype_local=${DTYPE}
-            if $DTYPE == "unknown"; then
+            if [ ${DTYPE} == "unknown" ]; then
                 dtype_local="arch"
             fi
             sudo rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
