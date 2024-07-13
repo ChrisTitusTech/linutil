@@ -40,8 +40,8 @@ impl CustomList {
                 command: "bash"
             },
             ListNode {
-                name: "Full zsh",
-                command: "zsh"
+                name: "Full System Update",
+                command: "bash -c \"sudo pacman -Syu\""
             },
             ListNode {
                 name: "Setup Bash Prompt",
@@ -56,16 +56,16 @@ impl CustomList {
             //     command: include_str!("commands/special_ls.sh"),
             // },
             ListNode {
-                name: "Test Category",
+                name: "System Setup",
                 command: ""
             } => {
                 ListNode {
-                    name: "sleep, eza, sleep, eza",
-                    command: "sleep 1 && eza -la && sleep 1 && eza -la && echo Bonus eza comming... && sleep 1 && eza -la"
+                    name: "Build Prerequisites",
+                    command: include_str!("commands/system-setup/1-compile-setup.sh"),
                 },
                 ListNode {
-                    name: "Just open neovim :), because I can",
-                    command: "nvim"
+                    name: "Gaming Dependencies",
+                    command: include_str!("commands/system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
                     name: "Recursion?",
