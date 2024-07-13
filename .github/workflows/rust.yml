@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -33,6 +36,8 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+    - name: Set execute permissions for build script
+      run: chmod +x target/debug/build/libc-*/build-script-build
     - name: Clean the build directory
       run: cargo clean
     - name: Build
