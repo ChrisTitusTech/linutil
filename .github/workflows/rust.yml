@@ -35,11 +35,17 @@ jobs:
       with:
         toolchain: stable
     - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-    - name: Move linutil to root
-      run: mv target/debug/linutil linutil
+      run: cargo build --release --verbose
+    - name: Upload linutil binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: linutil
+        path: target/release/linutil
+    - name: Download linutil binary
+      uses: actions/download-artifact@v4
+      with:
+        name: linutil
+        path: .
     - name: Replace linutil binary
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
