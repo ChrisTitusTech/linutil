@@ -36,7 +36,7 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: target/debug/linutil
