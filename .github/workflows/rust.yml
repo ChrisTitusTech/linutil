@@ -72,5 +72,11 @@ jobs:
         path: target/debug
     - name: Run tests
       run: cargo test --verbose
+    - name: Move linutil to root
+      run: mv target/debug/linutil linutil
     - name: Replace linutil binary
-      run: cp target/debug/linutil ./linutil
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "Replace linutil binary"
+        file_pattern: linutil
+        commit_options: "--allow-empty --no-verify"
