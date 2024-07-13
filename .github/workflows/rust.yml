@@ -36,19 +36,9 @@ jobs:
         toolchain: stable
     - name: Build
       run: cargo build --release --verbose
-    - name: Upload linutil binary
-      uses: actions/upload-artifact@v4
-      with:
-        name: linutil
-        path: target/release/linutil
-    - name: Download linutil binary
-      uses: actions/download-artifact@v4
-      with:
-        name: linutil
-        path: .
     - name: Replace linutil binary
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "Replace linutil binary"
-        file_pattern: linutil
+        file_pattern: /target/release/linutil
         commit_options: "--allow-empty --no-verify"
