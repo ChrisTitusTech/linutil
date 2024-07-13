@@ -35,6 +35,11 @@ jobs:
         toolchain: stable
     - name: Build
       run: cargo build --verbose
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: target/debug/linutil
 
   test:
     runs-on: ubuntu-latest
@@ -60,6 +65,11 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-artifacts
+        path: target/debug
     - name: Run tests
       run: cargo test --verbose
     - name: Replace linutil binary
