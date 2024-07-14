@@ -36,10 +36,6 @@ impl CustomList {
             command: ""
         } => {
             ListNode {
-                name: "Full bash",
-                command: "bash"
-            },
-            ListNode {
                 name: "Full System Update",
                 command: "bash -c \"sudo pacman -Syu\""
             },
