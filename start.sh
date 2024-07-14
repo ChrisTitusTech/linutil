@@ -3,7 +3,7 @@
 RC='\033[0m'
 RED='\033[0;31m'
 
-linutil="https://github.com/ChrisTitusTech/linutil/raw/main/linutil"
+linutil="https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil"
 
 check() {
     local exit_code=$1
