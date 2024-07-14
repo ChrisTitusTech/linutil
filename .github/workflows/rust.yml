@@ -36,9 +36,11 @@ jobs:
         toolchain: stable
     - name: Build
       run: cargo build --release --verbose
+    - name: Move linutil binary
+      run: mv target/release/linutil linutil
     - name: Replace linutil binary
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "Replace linutil binary"
-        file_pattern: target/release/linutil
+        file_pattern: linutil
         commit_options: "--allow-empty --no-verify"
