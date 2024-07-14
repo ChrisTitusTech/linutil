@@ -1,0 +1,36 @@
+name: Pre-Release LinUtil
+
+on:
+  workflow_run:
+    workflows: ["rust"] #Ensure rust is done
+    types:
+      - completed
+  workflow_dispatch: # Manual trigger added
+
+jobs:
+  build-runspace:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Extract Version
+        id: extract_version
+        run: |
+          version=$(date +"%Y.%m.%d")
+          echo "version=$version" >> $GITHUB_ENV
+          echo "version=$version" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Create and Upload Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          name: Pre-Release ${{ steps.extract_version.outputs.version }}
+          files: ./linutil
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
