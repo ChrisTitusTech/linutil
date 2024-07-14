@@ -3,7 +3,7 @@
 ## Usage
 Open your terminal and paste this command
 ```bash
-curl -fsSL https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil | sh
+curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/start.sh | sh
 ```
 ## Credits
 Rust Shell written by [@JustLinuxUser](https://github.com/JustLinuxUser)
