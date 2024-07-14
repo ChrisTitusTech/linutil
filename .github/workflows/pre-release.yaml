@@ -34,7 +34,9 @@ jobs:
         with:
           tag_name: ${{ steps.extract_version.outputs.version }}
           name: Pre-Release ${{ steps.extract_version.outputs.version }}
-          files: ./linutil
+          files: |
+            ./linutil
+            ./start.sh
           generate_release_notes: true
           prerelease: true
         env:
