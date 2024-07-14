@@ -1,5 +1,9 @@
 name: Pre-Release LinUtil
 
+permissions:
+  contents: write  # Grant write permissions to contents
+  packages: write  # Grant write permissions to packages
+
 on:
   workflow_run:
     workflows: ["rust"] #Ensure rust is done
