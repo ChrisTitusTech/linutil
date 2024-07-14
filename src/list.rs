@@ -37,7 +37,7 @@ impl CustomList {
         } => {
             ListNode {
                 name: "Full System Update",
-                command: "bash -c \"sudo pacman -Syu\""
+                command: include_str!("commands/system-update.sh"),
             },
             ListNode {
                 name: "Setup Bash Prompt",
