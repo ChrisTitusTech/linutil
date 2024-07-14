@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 RC='\e[0m'
 RED='\e[31m'
@@ -32,8 +32,8 @@ checkEnv() {
     fi
 
     ## Check if the current directory is writable.
-    GITPATH="$(dirname "$(realpath "$0")")"
-    if [[ ! -w ${GITPATH} ]]; then
+    GITPATH="$(dirname "$(readlink -f "$0")")"
+    if [ ! -w ${GITPATH} ]; then
         echo -e "${RED}Can't write to ${GITPATH}${RC}"
         exit 1
     fi
@@ -58,7 +58,7 @@ checkEnv() {
 installDepend() {
     ## Check for dependencies.
     echo -e "${YELLOW}Installing dependencies...${RC}"
-    if [[ $PACKAGER == "pacman" ]]; then
+    if [ "$PACKAGER" = "pacman" ]; then
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
             echo "[multilib]" | sudo tee -a /etc/pacman.conf
             echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
@@ -88,10 +88,10 @@ lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjp
 sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama \
 ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 \
 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader
-    elif [[ $PACKAGER == "apt-get" ]]; then
+    elif [ "$PACKAGER" = "apt-get" ]; then
         sudo ${PACKAGER} update
         sudo ${PACKAGER} install -y wine64 wine32 libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386
-    elif [[ $PACKAGER == "dnf|zypper" ]]; then
+    elif [ "$PACKAGER" = "dnf" ] || [ "$PACKAGER" = "zypper" ]; then
         sudo ${PACKAGER} install -y wine
     else
         sudo ${PACKAGER} install -y ${DEPENDENCIES}
@@ -99,7 +99,7 @@ lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader l
 }
 
 install_additional_dependencies() {
-    case $(command -v apt-get || command -v zypper || command -v dnf || command -v pacman) in
+    case $(which apt-get || which zypper || which dnf || which pacman) in
         *apt-get)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
