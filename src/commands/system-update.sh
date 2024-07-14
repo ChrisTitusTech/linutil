@@ -17,9 +17,8 @@ checkEnv() {
             exit 1
         fi
     done
-
     ## Check Package Handler
-    PACKAGEMANAGER='apt-get dnf pacman zypper'
+    PACKAGEMANAGER='apt-get nala dnf pacman zypper yum'
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
@@ -62,9 +61,9 @@ fastUpdate() {
         pacman)
             if ! command_exists yay && ! command_exists paru; then
                 printf "Installing yay as AUR helper...\n"
-                sudo ${PACKAGER} --noconfirm -S base-devel
+                sudo ${PACKAGER} --noconfirm -S base-devel || { printf "${RED}Failed to install base-devel${RC}\n"; exit 1; }
                 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
-                cd yay-git && makepkg --noconfirm -si
+                cd yay-git && makepkg --noconfirm -si || { printf "${RED}Failed to install yay${RC}\n"; exit 1; }
             else
                 printf "Aur helper already installed\n"
             fi
@@ -88,15 +87,26 @@ fastUpdate() {
             ;;
         apt-get|nala)
             sudo apt-get update
-            sudo apt-get install -y nala
-            sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
-            sudo nala update
-            PACKAGER="nala"
+            if ! command_exists nala; then
+                sudo apt-get install -y nala || { printf "${YELLOW}Falling back to apt-get${RC}\n"; PACKAGER="apt-get"; }
+            fi
+            if [ "${PACKAGER}" = "nala" ]; then
+                sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                sudo nala update
+                PACKAGER="nala"
+            fi
             sudo ${PACKAGER} upgrade -y
             ;;
         dnf)
+            sudo ${PACKAGER} update -y
             ;;
         zypper)
+            sudo ${PACKAGER} refresh
+            sudo ${PACKAGER} update -y
+            ;;
+        yum)
+            sudo ${PACKAGER} update -y
+            sudo ${PACKAGER} upgrade -y
             ;;
         *)
             printf "${RED}Unsupported package manager: ${PACKAGER}${RC}\n"
@@ -108,15 +118,11 @@ fastUpdate() {
 updateSystem() {
     printf "${GREEN}Updating system${RC}\n"
     case ${PACKAGER} in
-        nala)
+        nala|apt-get)
             sudo ${PACKAGER} update -y
             sudo ${PACKAGER} upgrade -y
             ;;
-        yum)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
-            ;;
-        dnf)
+        yum|dnf)
             sudo ${PACKAGER} update -y
             sudo ${PACKAGER} upgrade -y
             ;;
