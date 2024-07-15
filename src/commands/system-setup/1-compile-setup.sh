@@ -1,9 +1,6 @@
 #!/bin/bash -e
 
-RC='\033[0m'
-RED='\033[31m'
-YELLOW='\033[33m'
-GREEN='\033[32m'
+. ../common-script.sh
 
 # Check if the home directory and linuxtoolbox folder exist, create them if they don't
 LINUXTOOLBOXDIR="$HOME/linuxtoolbox"

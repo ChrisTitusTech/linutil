@@ -1,13 +1,6 @@
 #!/bin/bash -e
 
-RC='\e[0m'
-RED='\e[31m'
-YELLOW='\e[33m'
-GREEN='\e[32m'
-
-command_exists() {
-    command -v $1 >/dev/null 2>&1
-}
+. ../common-script.sh
 
 checkEnv() {
     ## Check for requirements.
