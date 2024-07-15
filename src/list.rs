@@ -1,4 +1,6 @@
-use crate::theme::*;
+use std::usize;
+
+use crate::{float::floating_window, theme::*};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
@@ -25,6 +27,24 @@ pub struct CustomList {
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     list_state: ListState,
+    /// This stores the preview windows state. If it is None, it will not be displayed.
+    /// If it is Some, we show it with the content of the selected item
+    preview_window_state: Option<PreviewWindowState>,
+}
+
+/// This struct stores the preview window state
+struct PreviewWindowState {
+    /// The text inside the window
+    text: Vec<String>,
+    /// The current line scroll
+    scroll: usize,
+}
+
+impl PreviewWindowState {
+    /// Create a new PreviewWindowState
+    pub fn new(text: Vec<String>) -> Self {
+        Self { text, scroll: 0 }
+    }
 }
 
 impl CustomList {
@@ -89,6 +109,8 @@ impl CustomList {
             inner_tree: tree,
             visit_stack: vec![root_id],
             list_state: ListState::default().with_selected(Some(0)),
+            // By default the PreviewWindowState is set to None, so it is not being shown
+            preview_window_state: None,
         }
     }
 
@@ -135,6 +157,33 @@ impl CustomList {
 
         // Render it
         frame.render_stateful_widget(list, area, &mut self.list_state);
+
+        // Draw the preview window if it's active
+        if let Some(pw_state) = &self.preview_window_state {
+            // Set the window to be floating
+            let floating_area = floating_window(area);
+
+            // Draw the preview windows lines
+            let lines: Vec<Line> = pw_state
+                .text
+                .iter()
+                .skip(pw_state.scroll)
+                .take(floating_area.height as usize)
+                .map(|line| Line::from(line.as_str()))
+                .collect();
+
+            // Create list widget
+            let list = List::new(lines)
+                .block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .title("Action preview"),
+                )
+                .highlight_style(Style::default().reversed());
+
+            // Finally render the preview window
+            frame.render_widget(list, floating_area);
+        }
     }
 
     /// Handle key events, we are only interested in `Press` and `Repeat` events
@@ -145,15 +194,60 @@ impl CustomList {
         match event.code {
             // Damm you Up arrow, use vim lol
             KeyCode::Char('j') | KeyCode::Down => {
+                // If the preview window is active, scroll down and consume the scroll action,
+                // so the scroll does not happen in the main window as well
+                if self.preview_window_state.is_some() {
+                    self.scroll_preview_window_down();
+                    return None;
+                }
+
                 self.try_scroll_down();
                 None
             }
             KeyCode::Char('k') | KeyCode::Up => {
+                // If the preview window is active, scroll up and consume the scroll action,
+                // so the scroll does not happen in the main window as well
+                if self.preview_window_state.is_some() {
+                    self.scroll_preview_window_up();
+                    return None;
+                }
+
                 self.try_scroll_up();
+                None
+            }
+            // The 'p' key toggles the preview on and off
+            KeyCode::Char('p') => {
+                self.toggle_preview_window();
                 None
             }
             KeyCode::Enter => self.handle_enter(),
             _ => None,
+        }
+    }
+    fn toggle_preview_window(&mut self) {
+        // If the preview window is active, disable it
+        if self.preview_window_state.is_some() {
+            self.preview_window_state = None;
+        } else {
+            // If the preview windows is not active, show it
+
+            // Get the selected command
+            if let Some(selected_command) = self.get_selected_command() {
+                // If command is a folder, we don't display a preview
+                if selected_command == "" {
+                    return;
+                }
+
+                // Reconstruct the line breaks and file formatting after the
+                // 'include_str!()' call in the node
+                let lines: Vec<String> = selected_command
+                    .lines()
+                    .map(|line| line.to_string())
+                    .collect();
+
+                // Show the preview window with the text lines
+                self.preview_window_state = Some(PreviewWindowState::new(lines));
+            }
         }
     }
     fn try_scroll_up(&mut self) {
@@ -178,6 +272,52 @@ impl CustomList {
             self.list_state
                 .select(Some((curr_selection + 1).min(count)));
         }
+    }
+
+    /// Scroll the preview window down
+    fn scroll_preview_window_down(&mut self) {
+        if let Some(pw_state) = &mut self.preview_window_state {
+            if pw_state.scroll + 1 < pw_state.text.len() {
+                pw_state.scroll += 1;
+            }
+        }
+    }
+
+    /// Scroll the preview window up
+    fn scroll_preview_window_up(&mut self) {
+        if let Some(pw_state) = &mut self.preview_window_state {
+            if pw_state.scroll > 0 {
+                pw_state.scroll = pw_state.scroll.saturating_sub(1);
+            }
+        }
+    }
+
+    /// This method return the currently selected command, or None if no command is selected.
+    /// It was extracted from the 'handle_enter()'
+    ///
+    /// This could probably be integrated into the 'handle_enter()' method as to avoid code
+    /// duplication, but I don't want to make too major changes to the codebase.
+    fn get_selected_command(&self) -> Option<&'static str> {
+        let curr = self
+            .inner_tree
+            .get(*self.visit_stack.last().unwrap())
+            .unwrap();
+        let selected = self.list_state.selected().unwrap();
+
+        // If we are not at the root and the first item is selected, it's the `..` item
+        if !self.at_root() && selected == 0 {
+            return None;
+        }
+
+        for (mut idx, node) in curr.children().enumerate() {
+            if !self.at_root() {
+                idx += 1;
+            }
+            if idx == selected {
+                return Some(node.value().command);
+            }
+        }
+        None
     }
 
     /// Handles the <Enter> key. This key can do 3 things:
