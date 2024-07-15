@@ -8,6 +8,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
     Frame,
 };
+use std::process::Command;
 
 struct ListNode {
     name: &'static str,
@@ -80,7 +81,11 @@ impl CustomList {
                     name: "Rofi Setup",
                     command: include_str!("commands/rofi-setup.sh"),
                 },
-            }
+            },
+            ListNode {
+                name: "Exit",
+                command: "exit",
+            },
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
         // paintfull to manage
@@ -200,10 +205,9 @@ impl CustomList {
             self.list_state.select(Some(0));
             return None;
         }
-
+        // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
+        // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
         for (mut idx, node) in curr.children().enumerate() {
-            // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
-            // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
             if !self.at_root() {
                 idx += 1;
             }
@@ -213,12 +217,22 @@ impl CustomList {
                     self.list_state.select(Some(0));
                     return None;
                 } else {
-                    return Some(node.value().command);
+                    let command = node.value().command;
+                    if command == "exit" {
+                        // Run the clear command
+                        //using reset instead of clear due to terminal buffer
+                        Command::new("reset").status().expect("Failed to clear terminal");
+                        // Exit the application
+                        std::process::exit(0);
+                    } else {
+                        return Some(command);
+                    }
                 }
             }
         }
         None
     }
+
 
     /// Checks weather the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
