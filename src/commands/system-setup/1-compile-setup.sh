@@ -13,8 +13,7 @@ fi
 
 if [ ! -d "$LINUXTOOLBOXDIR/linux-setup" ]; then
     echo "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
-    git clone https://github.com/ChrisTitusTech/linux-setup "$LINUXTOOLBOXDIR/linux-setup"
-    if [ $? -eq 0 ]; then
+    if git clone https://github.com/ChrisTitusTech/linux-setup "$LINUXTOOLBOXDIR/linux-setup"; then
         echo "${GREEN}Successfully cloned linux-setup repository${RC}"
     else
         echo "${RED}Failed to clone linux-setup repository${RC}"
@@ -24,57 +23,11 @@ fi
 
 cd "$LINUXTOOLBOXDIR/linux-setup" || exit
 
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
 checkEnv() {
-    ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
-    for req in $REQUIREMENTS; do
-        if ! command_exists "$req"; then
-            echo "${RED}To run me, you need: $REQUIREMENTS${RC}"
-            exit 1
-        fi
-    done
-
-    ## Check Package Manager
-    PACKAGEMANAGER='apt yum dnf pacman zypper'
-    for pgm in $PACKAGEMANAGER; do
-        if command_exists "$pgm"; then
-            PACKAGER="$pgm"
-            echo "Using $pgm"
-            break
-        fi
-    done
-
-    if [ -z "$PACKAGER" ]; then
-        echo "${RED}Can't find a supported package manager${RC}"
-        exit 1
-    fi
-
-    ## Check if the current directory is writable.
-    GITPATH="$(dirname "$(realpath "$0")")"
-    if [ ! -w "$GITPATH" ]; then
-        echo "${RED}Can't write to $GITPATH${RC}"
-        exit 1
-    fi
-
-    ## Check SuperUser Group
-    SUPERUSERGROUP='wheel sudo root'
-    for sug in $SUPERUSERGROUP; do
-        if groups | grep -q "$sug"; then
-            SUGROUP="$sug"
-            echo "Super user group $SUGROUP"
-            break
-        fi
-    done
-
-    ## Check if member of the sudo group.
-    if ! groups | grep -q "$SUGROUP"; then
-        echo "${RED}You need to be a member of the sudo group to run me!${RC}"
-        exit 1
-    fi
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageHandler 'apt yum dnf pacman zypper'
+    checkCurrentDirectoryWritable
+    checkSuperUser
 }
 
 installDepend() {
@@ -106,30 +59,30 @@ installDepend() {
                 echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
-            "$AUR_HELPER" --noconfirm -S $DEPENDENCIES
+            "$AUR_HELPER" --noconfirm -S "$DEPENDENCIES"
             ;;
         apt)
             COMPILEDEPS='build-essential'
             sudo "$PACKAGER" update
             sudo dpkg --add-architecture i386
             sudo "$PACKAGER" update
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS 
+            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS 
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
             sudo "$PACKAGER" update
             sudo "$PACKAGER" config-manager --set-enabled powertools
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS
             sudo "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             sudo "$PACKAGER" refresh 
-            sudo "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
+            sudo "$PACKAGER" --non-interactive install "$DEPENDENCIES" $COMPILEDEPS
             sudo "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            sudo "$PACKAGER" install -y $DEPENDENCIES
+            sudo "$PACKAGER" install -y "$DEPENDENCIES"
             ;;
     esac
 }

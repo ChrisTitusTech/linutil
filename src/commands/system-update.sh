@@ -3,51 +3,10 @@
 . ./common-script.sh
 
 checkEnv() {
-    ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
-    for req in ${REQUIREMENTS}; do
-        if ! command_exists ${req}; then
-            printf "${RED}To run me, you need: ${REQUIREMENTS}${RC}\n"
-            exit 1
-        fi
-    done
-    ## Check Package Handler
-    PACKAGEMANAGER='apt-get nala dnf pacman zypper yum'
-    for pgm in ${PACKAGEMANAGER}; do
-        if command_exists ${pgm}; then
-            PACKAGER=${pgm}
-            printf "Using ${pgm}\n"
-            break
-        fi
-    done
-
-    if [ -z "${PACKAGER}" ]; then
-        printf "${RED}Can't find a supported package manager${RC}\n"
-        exit 1
-    fi
-
-    ## Check SuperUser Group
-    SUPERUSERGROUP='wheel sudo root'
-    for sug in ${SUPERUSERGROUP}; do
-        if groups | grep ${sug} >/dev/null; then
-            SUGROUP=${sug}
-            printf "Super user group ${SUGROUP}\n"
-            break
-        fi
-    done
-
-    ## Check if member of the sudo group.
-    if ! groups | grep ${SUGROUP} >/dev/null; then
-        printf "${RED}You need to be a member of the sudo group to run me!${RC}\n"
-        exit 1
-    fi
-
-    DTYPE="unknown"  # Default to unknown
-    # Use /etc/os-release for modern distro identification
-    if [ -f /etc/os-release ]; then
-        . /etc/os-release
-        DTYPE=$ID
-    fi
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get nala dnf pacman zypper yum'
+    checkSuperUser
+    checkDistro
 }
 
 fastUpdate() {
@@ -113,19 +72,19 @@ updateSystem() {
     printf "${GREEN}Updating system${RC}\n"
     case ${PACKAGER} in
         nala|apt-get)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
+            sudo "${PACKAGER}" update -y
+            sudo "${PACKAGER}" upgrade -y
             ;;
         yum|dnf)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
+            sudo "${PACKAGER}" update -y
+            sudo "${PACKAGER}" upgrade -y
             ;;
         pacman)
-            sudo ${PACKAGER} -Syu --noconfirm
+            sudo "${PACKAGER}" -Syu --noconfirm
             ;;
         zypper)
-            sudo ${PACKAGER} refresh
-            sudo ${PACKAGER} update -y
+            sudo "${PACKAGER}" refresh
+            sudo "${PACKAGER}" update -y
             ;;
         *)
             printf "${RED}Unsupported package manager: ${PACKAGER}${RC}\n"

@@ -3,49 +3,10 @@
 . ../common-script.sh
 
 checkEnv() {
-    ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
-    if ! command_exists ${REQUIREMENTS}; then
-        echo -e "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
-        exit 1
-    fi
-
-    ## Check Package Handeler
-    PACKAGEMANAGER='apt-get yum dnf pacman zypper'
-    for pgm in ${PACKAGEMANAGER}; do
-        if command_exists ${pgm}; then
-            PACKAGER=${pgm}
-            echo -e "Using ${pgm}"
-        fi
-    done
-
-    if [ -z "${PACKAGER}" ]; then
-        echo -e "${RED}Can't find a supported package manager"
-        exit 1
-    fi
-
-    ## Check if the current directory is writable.
-    GITPATH="$(dirname "$(readlink -f "$0")")"
-    if [ ! -w ${GITPATH} ]; then
-        echo -e "${RED}Can't write to ${GITPATH}${RC}"
-        exit 1
-    fi
-
-    ## Check SuperUser Group
-    SUPERUSERGROUP='wheel sudo root'
-    for sug in ${SUPERUSERGROUP}; do
-        if groups | grep ${sug}; then
-            SUGROUP=${sug}
-            echo -e "Super user group ${SUGROUP}"
-        fi
-    done
-
-    ## Check if member of the sudo group.
-    if ! groups | grep ${SUGROUP} >/dev/null; then
-        echo -e "${RED}You need to be a member of the sudo group to run me!"
-        exit 1
-    fi
-
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get yum dnf pacman zypper'
+    checkCurrentDirectoryWritable
+    checkSuperUser
 }
 
 installDepend() {
