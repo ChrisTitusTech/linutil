@@ -22,6 +22,13 @@ fi
 
 cd "$LINUXTOOLBOXDIR/linux-setup" || exit
 
+checkEnv() {
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageHandler 'apt yum dnf pacman zypper'
+    checkCurrentDirectoryWritable
+    checkSuperUser
+}
+
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
@@ -51,30 +58,30 @@ installDepend() {
                 echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
-            "$AUR_HELPER" --noconfirm -S $DEPENDENCIES
+            "$AUR_HELPER" --noconfirm -S "$DEPENDENCIES"
             ;;
         apt)
             COMPILEDEPS='build-essential'
             sudo "$PACKAGER" update
             sudo dpkg --add-architecture i386
             sudo "$PACKAGER" update
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS 
+            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS 
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
             sudo "$PACKAGER" update
             sudo "$PACKAGER" config-manager --set-enabled powertools
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS
             sudo "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             sudo "$PACKAGER" refresh 
-            sudo "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
+            sudo "$PACKAGER" --non-interactive install "$DEPENDENCIES" $COMPILEDEPS
             sudo "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            sudo "$PACKAGER" install -y $DEPENDENCIES
+            sudo "$PACKAGER" install -y "$DEPENDENCIES"
             ;;
     esac
 }

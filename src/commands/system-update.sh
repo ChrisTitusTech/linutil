@@ -1,5 +1,12 @@
 #!/bin/sh -e
 
+checkEnv() {
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install'
+    checkSuperUser
+    checkDistro
+}
+
 fastUpdate() {
     case ${PACKAGER} in
         pacman)
@@ -68,15 +75,15 @@ updateSystem() {
     echo -e "${GREEN}Updating system${RC}"
     case ${PACKAGER} in
         nala|apt-get)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
+            sudo "${PACKAGER}" update -y
+            sudo "${PACKAGER}" upgrade -y
             ;;
         yum|dnf)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
+            sudo "${PACKAGER}" update -y
+            sudo "${PACKAGER}" upgrade -y
             ;;
         pacman)
-            sudo ${PACKAGER} -Syu --noconfirm
+            sudo "${PACKAGER}" -Syu --noconfirm
             ;;
         zypper)
             sudo ${PACKAGER} ref

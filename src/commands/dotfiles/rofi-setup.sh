@@ -1,5 +1,12 @@
 #!/bin/sh -e
 
+checkEnv() {
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get dnf pacman zypper'
+    checkSuperUser
+    checkDistro
+}
+
 setupRofi() {
     echo "Install Rofi if not already installed..."
     if ! command_exists rofi; then

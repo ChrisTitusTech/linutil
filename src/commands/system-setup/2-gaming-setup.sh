@@ -1,5 +1,12 @@
 #!/bin/sh -e
 
+checkEnv() {
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get yum dnf pacman zypper'
+    checkCurrentDirectoryWritable
+    checkSuperUser
+}
+
 installDepend() {
     ## Check for dependencies.
     echo -e "${YELLOW}Installing dependencies...${RC}"
