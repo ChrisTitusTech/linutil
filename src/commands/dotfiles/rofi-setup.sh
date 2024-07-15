@@ -14,7 +14,7 @@ checkEnv() {
     REQUIREMENTS='curl groups sudo'
     for req in $REQUIREMENTS; do
         if ! command_exists "$req"; then
-            printf "${RED}To run me, you need: %s${RC}\n" "$REQUIREMENTS"
+            echo -e "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
             exit 1
         fi
     done
@@ -24,13 +24,13 @@ checkEnv() {
     for pgm in $PACKAGEMANAGER; do
         if command_exists "$pgm"; then
             PACKAGER="$pgm"
-            printf "Using %s\n" "$pgm"
+            echo "Using $pgm"
             break
         fi
     done
 
     if [ -z "$PACKAGER" ]; then
-        printf "${RED}Can't find a supported package manager${RC}\n"
+        echo -e "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
 
@@ -39,14 +39,14 @@ checkEnv() {
     for sug in $SUPERUSERGROUP; do
         if groups | grep -q "$sug"; then
             SUGROUP="$sug"
-            printf "Super user group %s\n" "$SUGROUP"
+            echo "Super user group $SUGROUP"
             break
         fi
     done
 
     ## Check if member of the sudo group.
     if ! groups | grep -q "$SUGROUP"; then
-        printf "${RED}You need to be a member of the sudo group to run me!${RC}\n"
+        echo -e "${RED}You need to be a member of the sudo group to run me!${RC}\n"
         exit 1
     fi
 
