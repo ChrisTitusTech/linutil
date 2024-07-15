@@ -19,7 +19,7 @@ checkEnv() {
     done
 
     ## Check Package Handler
-    PACKAGEMANAGER='apt-get dnf pacman zypper'
+    PACKAGEMANAGER='apt-get dnf pacman zypper nix-env'
     for pgm in $PACKAGEMANAGER; do
         if command_exists "$pgm"; then
             PACKAGER="$pgm"
@@ -63,6 +63,9 @@ setupRofi() {
         case "$PACKAGER" in
             pacman)
                 sudo "$PACKAGER" -S --noconfirm rofi
+                ;;
+            nix-env)
+                sudo "$PACKAGER" -iA nixos.rofi
                 ;;
             *)
                 sudo "$PACKAGER" install -y rofi
