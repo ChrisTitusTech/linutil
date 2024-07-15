@@ -73,12 +73,16 @@ impl CustomList {
                 command: ""
             } => {
                 ListNode {
+                    name: "Alacritty Setup",
+                    command: include_str!("commands/dotfiles/alacritty-setup.sh"),
+                },
+                ListNode {
                     name: "Kitty Setup",
-                    command: include_str!("commands/kitty-setup.sh"),
+                    command: include_str!("commands/dotfiles/kitty-setup.sh"),
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: include_str!("commands/rofi-setup.sh"),
+                    command: include_str!("commands/dotfiles/rofi-setup.sh"),
                 },
             }
         });

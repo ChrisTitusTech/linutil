@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 RC='\e[0m'
 RED='\e[31m'
