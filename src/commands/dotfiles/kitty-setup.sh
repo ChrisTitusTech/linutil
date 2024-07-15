@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 RC='\033[0m'
 RED='\033[31m'
