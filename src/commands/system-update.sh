@@ -19,7 +19,7 @@ checkEnv() {
         fi
     done
     ## Check Package Handler
-    PACKAGEMANAGER='apt-get nala dnf pacman zypper yum'
+    PACKAGEMANAGER='apt-get nala dnf pacman zypper yum xbps-install'
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
@@ -109,6 +109,9 @@ fastUpdate() {
             sudo ${PACKAGER} update -y
             sudo ${PACKAGER} upgrade -y
             ;;
+        xbps-install)
+            sudo ${PACKAGER} -Syu
+            ;;
         *)
             printf "${RED}Unsupported package manager: ${PACKAGER}${RC}\n"
             exit 1
@@ -133,6 +136,9 @@ updateSystem() {
         zypper)
             sudo ${PACKAGER} refresh
             sudo ${PACKAGER} update -y
+            ;;
+        xbps-install)
+            sudo ${PACKAGER} -Syu
             ;;
         *)
             printf "${RED}Unsupported package manager: ${PACKAGER}${RC}\n"
