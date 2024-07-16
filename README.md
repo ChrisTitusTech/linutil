@@ -48,7 +48,7 @@ ListNode {
 
 where [ENTRY NAME] is displayed on the main menu (e.g. Full System Update)
 
-and [COMMAND] is ran when that entry is ran (e.g. apt-get full-upgrade -y)
+and [COMMAND] is ran when that entry is selected (e.g. apt-get full-upgrade -y)
 
 ### Adding a script to run for your entry
 
@@ -67,6 +67,8 @@ curl -s https://[LINK_TO_YOUR_SCRIPT].sh | sh
 ```
 
 where [LINK_TO_YOUR_SCRIPT] takes you to your script in raw format. Run the command without the "| sh" at the end to make sure it's correct.
+
+We also include a [common-script.sh](https://github.com/ChrisTitusTech/linutil/blob/main/src/commands/common-script.sh) file which contains a basic template to get started.
 
 ## Credits
 
