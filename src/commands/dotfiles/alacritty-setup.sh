@@ -11,7 +11,7 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
+    REQUIREMENTS='curl groups'
     for req in ${REQUIREMENTS}; do
         if ! command_exists ${req}; then
             echo "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
@@ -33,6 +33,16 @@ checkEnv() {
         echo "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
+
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
+    fi
+
+    echo "Using $SUDO_CMD as privilege escalation software"
 
     ## Check SuperUser Group
     SUPERUSERGROUP='wheel sudo root'
@@ -63,10 +73,10 @@ setupAlacritty() {
     if ! command_exists alacritty; then
         case ${PACKAGER} in
             pacman)
-                sudo ${PACKAGER} -S --noconfirm alacritty
+                ${SUDO_CMD} ${PACKAGER} -S --noconfirm alacritty
                 ;;
             *)
-                sudo ${PACKAGER} install -y alacritty
+                ${SUDO_CMD} ${PACKAGER} install -y alacritty
                 ;;
         esac
     else
