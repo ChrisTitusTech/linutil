@@ -42,6 +42,8 @@ checkEnv() {
         SUDO_CMD="su -c"
     fi
 
+    echo "Using $SUDO_CMD as privilege escalation software"
+
     ## Check SuperUser Group
     SUPERUSERGROUP='wheel sudo root'
     for sug in ${SUPERUSERGROUP}; do
