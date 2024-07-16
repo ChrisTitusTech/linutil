@@ -11,7 +11,7 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
+    REQUIREMENTS='curl groups'
     for req in ${REQUIREMENTS}; do
         if ! command_exists ${req}; then
             echo "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
@@ -20,7 +20,7 @@ checkEnv() {
     done
 
     ## Check Package Handler
-    PACKAGEMANAGER='apt-get dnf pacman zypper'
+    PACKAGEMANAGER='apt-get nala dnf pacman zypper xbps-install emerge nix-env slackpkg apk eopkg yum rad kiss'
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
@@ -32,6 +32,14 @@ checkEnv() {
     if [ -z "${PACKAGER}" ]; then
         echo "${RED}Can't find a supported package manager${RC}"
         exit 1
+    fi
+
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
     fi
 
     ## Check SuperUser Group
