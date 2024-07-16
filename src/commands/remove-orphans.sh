@@ -1,0 +1,100 @@
+#!/bin/sh -e
+
+RC='\033[0m'
+RED='\033[31m'
+YELLOW='\033[33m'
+GREEN='\033[32m'
+
+command_exists() {
+    which $1 >/dev/null 2>&1
+}
+
+checkEnv() {
+    ## Check for requirements.
+    REQUIREMENTS='curl groups'
+    for req in ${REQUIREMENTS}; do
+        if ! command_exists ${req}; then
+            printf "${RED}To run me, you need: ${REQUIREMENTS}${RC}\n"
+            exit 1
+        fi
+    done
+    ## Check Package Handler
+    PACKAGEMANAGER='apt-get dnf pacman zypper emerge xbps-install nix-env slackpkg apk'
+    for pgm in ${PACKAGEMANAGER}; do
+        if command_exists ${pgm}; then
+            PACKAGER=${pgm}
+            printf "Using ${pgm}\n"
+            break
+        fi
+    done
+
+    if [ -z "${PACKAGER}" ]; then
+        printf "${RED}Can't find a supported package manager${RC}\n"
+        exit 1
+    fi
+
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
+    fi
+
+    echo "Using $SUDO_CMD as privilege escalation software"
+
+    ## Check SuperUser Group
+    SUPERUSERGROUP='wheel sudo root'
+    for sug in ${SUPERUSERGROUP}; do
+        if groups | grep ${sug} >/dev/null; then
+            SUGROUP=${sug}
+            printf "Super user group ${SUGROUP}\n"
+            break
+        fi
+    done
+
+    ## Check if member of the sudo group.
+    if ! groups | grep ${SUGROUP} >/dev/null; then
+        printf "${RED}You need to be a member of the sudo group to run me!${RC}\n"
+        exit 1
+    fi
+}
+
+removeOrphans() {
+    case ${PACKAGER} in
+        pacman)
+            ${SUDO_CMD} ${PACKAGER} -Qdtq | ${SUDO_CMD} ${PACKAGER} -Rns --noconfirm -
+            ;;
+        apt-get)
+            ${SUDO_CMD} ${PACKAGER} autoremove --purge -y
+            ;;
+        dnf)
+            ${SUDO_CMD} ${PACKAGER} dnf autoremove --assumeyes
+            ;;
+        zypper)
+            ${SUDO_CMD} ${PACKAGER} remove --clean-deps
+            ;;
+        emerge)
+            ${SUDO_CMD} ${PACKAGER} --depclean -v
+            ;;
+        xbps-install)
+            ${SUDO_CMD} xbps-remove -o --yes
+            ;;
+        nix-env)
+            ${SUDO_CMD} nix-collect-garbage -d
+            ;;
+        slackpkg)
+            ${SUDO_CMD} ${PACKAGER} clean-system
+            ;;
+        apk)
+            ${SUDO_CMD} ${PACKAGER} del --no-cache --purge $(apk info --no-cache --purge --orphans)
+            ;;
+        *)
+            printf "${RED}Unsupported package manager: ${PACKAGER}${RC}\n"
+            exit 1
+            ;;
+    esac
+}
+
+checkEnv
+removeOrphans
