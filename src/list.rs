@@ -64,6 +64,10 @@ impl CustomList {
                     command: include_str!("commands/system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
+                    name: "Toggle Bitmap Font Rendering",
+                    command: include_str!("commands/system-setup/3-toggle-bitmap-font-rendering.sh"),
+                },            
+                ListNode {
                     name: "Recursion?",
                     command: "cargo run"
                 }
