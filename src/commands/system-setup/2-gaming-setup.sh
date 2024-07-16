@@ -11,7 +11,7 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
+    REQUIREMENTS='curl groups'
     if ! command_exists ${REQUIREMENTS}; then
         echo -e "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
         exit 1
@@ -30,6 +30,16 @@ checkEnv() {
         echo -e "${RED}Can't find a supported package manager"
         exit 1
     fi
+
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
+    fi
+
+    echo "Using $SUDO_CMD as privilege escalation software"
 
     ## Check if the current directory is writable.
     GITPATH="$(dirname "$(readlink -f "$0")")"
@@ -60,16 +70,16 @@ installDepend() {
     echo -e "${YELLOW}Installing dependencies...${RC}"
     if [ "$PACKAGER" = "pacman" ]; then
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
-            echo "[multilib]" | sudo tee -a /etc/pacman.conf
-            echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
-            sudo ${PACKAGER} -Sy
+            echo "[multilib]" | ${SUDO_CMD} tee -a /etc/pacman.conf
+            echo "Include = /etc/pacman.d/mirrorlist" | ${SUDO_CMD} tee -a /etc/pacman.conf
+            ${SUDO_CMD} ${PACKAGER} -Sy
         else
             echo "Multilib is already enabled."
         fi
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            sudo ${PACKAGER} --noconfirm -S base-devel
-            cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
+            ${SUDO_CMD} ${PACKAGER} --noconfirm -S base-devel
+            cd /opt && ${SUDO_CMD} git clone https://aur.archlinux.org/yay-git.git && ${SUDO_CMD} chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
             echo "Aur helper already installed"
@@ -89,12 +99,12 @@ sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcryp
 ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 \
 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader
     elif [ "$PACKAGER" = "apt-get" ]; then
-        sudo ${PACKAGER} update
-        sudo ${PACKAGER} install -y wine64 wine32 libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386
+        ${SUDO_CMD} ${PACKAGER} update
+        ${SUDO_CMD} ${PACKAGER} install -y wine64 wine32 libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386
     elif [ "$PACKAGER" = "dnf" ] || [ "$PACKAGER" = "zypper" ]; then
-        sudo ${PACKAGER} install -y wine
+        ${SUDO_CMD} ${PACKAGER} install -y wine
     else
-        sudo ${PACKAGER} install -y ${DEPENDENCIES}
+        ${SUDO_CMD} ${PACKAGER} install -y ${DEPENDENCIES}
     fi
 }
 
@@ -111,15 +121,15 @@ install_additional_dependencies() {
 
             # Install the downloaded .deb package using apt-get
             echo "Installing lutris_${version_no_v}_all.deb"
-            sudo apt-get update
-            sudo apt-get install ./lutris_${version_no_v}_all.deb
+            ${SUDO_CMD} apt-get update
+            ${SUDO_CMD} apt-get install ./lutris_${version_no_v}_all.deb
 
             # Clean up the downloaded .deb file
             rm lutris_${version_no_v}_all.deb
 
             echo "Lutris Installation complete."
             echo "Installing steam..."
-            sudo apt-get install -y steam
+            ${SUDO_CMD} apt-get install -y steam
             ;;
         *zypper)
             
