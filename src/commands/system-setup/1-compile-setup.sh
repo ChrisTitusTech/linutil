@@ -33,7 +33,7 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
+    REQUIREMENTS='curl groups'
     for req in $REQUIREMENTS; do
         if ! command_exists "$req"; then
             echo "${RED}To run me, you need: $REQUIREMENTS${RC}"
@@ -55,6 +55,16 @@ checkEnv() {
         echo "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
+
+    if command_exists sudo; then
+        SUDO_CMD="sudo"
+    elif command_exists doas && [ -f "/etc/doas.conf" ]; then
+        SUDO_CMD="doas"
+    else
+        SUDO_CMD="su -c"
+    fi
+
+    echo "Using $SUDO_CMD as privilege escalation software"
 
     ## Check if the current directory is writable.
     GITPATH="$(dirname "$(realpath "$0")")"
@@ -87,19 +97,19 @@ installDepend() {
     case $PACKAGER in
         pacman)
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
-                echo "[multilib]" | sudo tee -a /etc/pacman.conf
-                echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
-                sudo "$PACKAGER" -Sy
+                echo "[multilib]" | ${SUDO_CMD} tee -a /etc/pacman.conf
+                echo "Include = /etc/pacman.d/mirrorlist" | ${SUDO_CMD} tee -a /etc/pacman.conf
+                ${SUDO_CMD} "$PACKAGER" -Sy
             else
                 echo "Multilib is already enabled."
             fi
             if ! command_exists yay && ! command_exists paru; then
                 echo "Installing yay as AUR helper..."
-                sudo "$PACKAGER" --noconfirm -S base-devel
-                cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R "$USER":"$USER" ./yay-git
+                ${SUDO_CMD} "$PACKAGER" --noconfirm -S base-devel
+                cd /opt && ${SUDO_CMD} git clone https://aur.archlinux.org/yay-git.git && ${SUDO_CMD} chown -R "$USER":"$USER" ./yay-git
                 cd yay-git && makepkg --noconfirm -si
             else
-                echo "Aur helper already installed"
+                echo "AUR helper already installed"
             fi
             if command_exists yay; then
                 AUR_HELPER="yay"
@@ -113,26 +123,26 @@ installDepend() {
             ;;
         apt)
             COMPILEDEPS='build-essential'
-            sudo "$PACKAGER" update
-            sudo dpkg --add-architecture i386
-            sudo "$PACKAGER" update
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS 
+            ${SUDO_CMD} "$PACKAGER" update
+            ${SUDO_CMD} dpkg --add-architecture i386
+            ${SUDO_CMD} "$PACKAGER" update
+            ${SUDO_CMD} "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS 
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
-            sudo "$PACKAGER" update
-            sudo "$PACKAGER" config-manager --set-enabled powertools
-            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
-            sudo "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
+            ${SUDO_CMD} "$PACKAGER" update
+            ${SUDO_CMD} "$PACKAGER" config-manager --set-enabled powertools
+            ${SUDO_CMD} "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            ${SUDO_CMD} "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
-            sudo "$PACKAGER" refresh 
-            sudo "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
-            sudo "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
+            ${SUDO_CMD} "$PACKAGER" refresh 
+            ${SUDO_CMD} "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
+            ${SUDO_CMD} "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            sudo "$PACKAGER" install -y $DEPENDENCIES
+            ${SUDO_CMD} "$PACKAGER" install -y $DEPENDENCIES
             ;;
     esac
 }
