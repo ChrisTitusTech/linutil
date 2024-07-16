@@ -6,7 +6,7 @@
 
 Open your terminal and paste this command
 ```bash
-curl -fsSL https://github.com/ChrisTitusTech/linutil/releases/latest/download/start.sh | sh
+bash <(wget -qO- https://christitus.com/linux)
 ```
 
 ## Credits
