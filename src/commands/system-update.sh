@@ -11,7 +11,7 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
+    REQUIREMENTS='curl groups'
     for req in ${REQUIREMENTS}; do
         if ! command_exists ${req}; then
             printf "${RED}To run me, you need: ${REQUIREMENTS}${RC}\n"
