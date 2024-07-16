@@ -82,7 +82,7 @@ installDepend() {
             cd /opt && ${SUDO_CMD} git clone https://aur.archlinux.org/yay-git.git && ${SUDO_CMD} chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
-            echo "Aur helper already installed"
+            echo "AUR helper already installed"
         fi
         if command_exists yay; then
             AUR_HELPER="yay"
