@@ -20,18 +20,18 @@ curl -fsSL https://github.com/ChrisTitusTech/linutil/releases/latest/download/st
 
 Linutil itself should run perfectly on most Linux systems with Rust installed. However, some specific features may rely on distribution-specific components (e.g. package manager).
 
-- Debian (100% supported)
-- Fedora 22+ (100% supported)
-- Arch Linux (100% supported)
-- OpenSUSE (100% supported)
-- Red Hat Enterprise Linux (RHEL) and Fedora versions prior to 22 (43% supported)
-- Gentoo (29% supported)
-- Void Linux (29% supported)
-- NixOS and other systems with Nix (29% supported)
-- Slackware (29% supported)
-- Alpine Linux (29% supported)
+- [Debian](https://debian.org/) (100% supported)
+- [Fedora](https://fedoraproject.org/) 22+ (100% supported)
+- [Arch Linux](https://archlinux.org/) (100% supported)
+- [OpenSUSE](https://opensuse.org/) (100% supported)
+- [Red Hat Enterprise Linux](https://redhat.com/) (RHEL) and [Fedora](https://fedoraproject.org/) versions prior to 22 (43% supported)
+- [Gentoo](https://gentoo.org/) (29% supported)
+- [Void Linux](https://voidlinux.or/) (29% supported)
+- [NixOS](https://nixos.org/) and other systems with Nix (29% supported)
+- [Slackware](http://www.slackware.com/) (29% supported)
+- [Alpine Linux](https://alpinelinux.org/) (29% supported)
 
-Derivatives of these distributions are included as long as they use the same package manager. Debian works with both APT and Nala, however around 86% of features use APT.
+Derivatives of these distributions are included as long as they use the same package manager. Debian works with both APT and [Nala](https://github.com/volitank/nala), however around 86% of features use APT.
 
 ## Contributing
 
