@@ -30,7 +30,7 @@ pub struct RunningCommand {
     buffer: Arc<Mutex<Vec<u8>>>,
 
     /// A handle of the tread where the command is being executed
-    command_thread: Option<JoinHandle<ExitStatus>>, 
+    command_thread: Option<JoinHandle<ExitStatus>>,
 
     /// A handle to kill the running process, it's an option because it can only be used once
     child_killer: Option<Receiver<Box<dyn ChildKiller + Send + Sync>>>,
@@ -280,3 +280,4 @@ impl RunningCommand {
         let _ = self.writer.write_all(&input_bytes);
     }
 }
+

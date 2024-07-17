@@ -9,66 +9,20 @@ command_exists() {
     command -v $1 >/dev/null 2>&1
 }
 
-checkEnv() {
-    ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
-    if ! command_exists ${REQUIREMENTS}; then
-        echo -e "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
-        exit 1
-    fi
-
-    ## Check Package Handeler
-    PACKAGEMANAGER='apt-get yum dnf pacman zypper'
-    for pgm in ${PACKAGEMANAGER}; do
-        if command_exists ${pgm}; then
-            PACKAGER=${pgm}
-            echo -e "Using ${pgm}"
-        fi
-    done
-
-    if [ -z "${PACKAGER}" ]; then
-        echo -e "${RED}Can't find a supported package manager"
-        exit 1
-    fi
-
-    ## Check if the current directory is writable.
-    GITPATH="$(dirname "$(readlink -f "$0")")"
-    if [ ! -w ${GITPATH} ]; then
-        echo -e "${RED}Can't write to ${GITPATH}${RC}"
-        exit 1
-    fi
-
-    ## Check SuperUser Group
-    SUPERUSERGROUP='wheel sudo root'
-    for sug in ${SUPERUSERGROUP}; do
-        if groups | grep ${sug}; then
-            SUGROUP=${sug}
-            echo -e "Super user group ${SUGROUP}"
-        fi
-    done
-
-    ## Check if member of the sudo group.
-    if ! groups | grep ${SUGROUP} >/dev/null; then
-        echo -e "${RED}You need to be a member of the sudo group to run me!"
-        exit 1
-    fi
-
-}
-
 installDepend() {
     ## Check for dependencies.
     echo -e "${YELLOW}Installing dependencies...${RC}"
-    if [ "$PACKAGER" = "pacman" ]; then
+    if [ "$PKGR" = "pacman" ]; then
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
             echo "[multilib]" | sudo tee -a /etc/pacman.conf
             echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
-            sudo ${PACKAGER} -Sy
+            sudo ${PKGR} -Sy
         else
             echo "Multilib is already enabled."
         fi
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            sudo ${PACKAGER} --noconfirm -S base-devel
+            sudo ${PKGR} --noconfirm -S base-devel
             cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
@@ -88,18 +42,18 @@ lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjp
 sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama \
 ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 \
 lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader
-    elif [ "$PACKAGER" = "apt-get" ]; then
-        sudo ${PACKAGER} update
-        sudo ${PACKAGER} install -y wine64 wine32 libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386
-    elif [ "$PACKAGER" = "dnf" ] || [ "$PACKAGER" = "zypper" ]; then
-        sudo ${PACKAGER} install -y wine
+    elif [ "$PKGR" = "apt-get" ]; then
+        sudo ${PKGR} update
+        sudo ${PKGR} install -y wine64 wine32 libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386
+    elif [ "$PKGR" = "dnf" ] || [ "$PKGR" = "zypper" ]; then
+        sudo ${PKGR} install -y wine
     else
-        sudo ${PACKAGER} install -y ${DEPENDENCIES}
+        sudo ${PKGR} install -y ${DEPENDENCIES}
     fi
 }
 
 install_additional_dependencies() {
-    case $(which apt-get || which zypper || which dnf || which pacman) in
+    case "$PKGR" in
         *apt-get)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
@@ -122,16 +76,16 @@ install_additional_dependencies() {
             sudo apt-get install -y steam
             ;;
         *zypper)
-            
+
             ;;
         *dnf)
-            
+
             ;;
         *pacman)
-            
+
             ;;
         *)
-            
+
             ;;
     esac
 }
