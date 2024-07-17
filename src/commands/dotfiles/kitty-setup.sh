@@ -32,5 +32,4 @@ setupKitty() {
     wget -O ${HOME}/.config/kitty/nord.conf https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/nord.conf
 }
 
-checkEnv
 setupKitty

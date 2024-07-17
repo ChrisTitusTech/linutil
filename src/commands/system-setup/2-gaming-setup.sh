@@ -90,6 +90,5 @@ install_additional_dependencies() {
     esac
 }
 
-checkEnv
 installDepend
 install_additional_dependencies

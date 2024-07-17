@@ -94,6 +94,5 @@ updateSystem() {
     esac
 }
 
-checkEnv
 fastUpdate
 updateSystem

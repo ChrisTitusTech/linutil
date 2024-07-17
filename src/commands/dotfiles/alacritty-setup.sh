@@ -32,5 +32,4 @@ setupAlacritty() {
     wget -O "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
 }
 
-checkEnv
 setupAlacritty
