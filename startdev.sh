@@ -101,8 +101,6 @@ checkEnv
 if [[ "$ISLOCAL" == "true" ]]; then
     PKGR="$PACKAGER" DT="$DTYPE" cargo run
 else
-    echo "oh no"
-    exit 0
     redirect_to_latest_pre_release
 
     TMPFILE=$(mktemp)

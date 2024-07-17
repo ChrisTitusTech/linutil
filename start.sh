@@ -68,7 +68,7 @@ check() {
 }
 
 checkEnv
-exit 0
+
 TMPFILE=$(mktemp)
 check $? "Creating the temporary file"
 

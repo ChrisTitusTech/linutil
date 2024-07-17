@@ -37,7 +37,4 @@ setupRofi() {
     wget -O "$HOME/.config/rofi/themes/powermenu.rasi" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/powermenu.rasi
 }
 
-# checkEnv
-echo $PKGR
-echo $DT
-# setupRofi
+setupRofi
