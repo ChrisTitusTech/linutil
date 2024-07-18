@@ -18,15 +18,15 @@ jobs:
         id: extract_version
         run: |
           version=$(date +"%Y.%m.%d")
-          echo "version=$version" >> $env:GITHUB_ENV
+          echo "version=$version" >> GITHUB_ENV
         shell: bash
 
       - name: Create and Upload Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.VERSION }}
-          name: Pre-Release ${{ env.VERSION }}
+          tag_name: ${{ env.version }}
+          name: Pre-Release ${{ env.version }}
           body: "![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.VERSION }}/linutil)"
           append_body: false
           files: |
