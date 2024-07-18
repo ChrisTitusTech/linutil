@@ -156,7 +156,7 @@ impl CustomList {
         // node
         let list = List::new(items)
             .highlight_style(Style::default().reversed())
-            .block(Block::default().borders(Borders::ALL).title("List"))
+            .block(Block::default().borders(Borders::ALL).title(format!("Linux Toolbox - {}", chrono::Local::now().format("%Y-%m-%d"))))
             .scroll_padding(1);
 
         // Render it
