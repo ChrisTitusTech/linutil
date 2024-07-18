@@ -18,7 +18,7 @@ redirect_to_latest_pre_release() {
   local latest_release
   latest_release=$(get_latest_release)
   if [ -n "$latest_release" ]; then
-    url="https://raw.githubusercontent.com/ChrisTitusTech/linutil/$latest_release/linutil"
+    url="https://github.com/ChrisTitusTech/linutil/releases/download/$latest_release/linutil"
   else
     echo 'Unable to determine latest pre-release version.' >&2
     echo "Using latest Full Release"
