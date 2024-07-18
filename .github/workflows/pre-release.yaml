@@ -31,7 +31,6 @@ jobs:
           append_body: false
           files: |
             ./build/release/linutil
-            ./start.sh
           prerelease: true
           generate_release_notes: true
         env:
