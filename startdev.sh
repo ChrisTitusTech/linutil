@@ -5,8 +5,7 @@ RED='\033[0;31m'
 
 # Function to fetch the latest release tag from the GitHub API
 get_latest_release() {
-  local latest_release
-  latest_release=$(curl -s https://api.github.com/repos/ChrisTitusTech/linutil/releases | jq -r 'map(select(.prerelease == true)) | .tag_name')
+  latest_release=$(curl -s https://api.github.com/repos/ChrisTitusTech/linutil/releases | jq -r 'map(select(.prerelease == true)) | .[0].tag_name')
   if [ -z "$latest_release" ]; then
     echo "Error fetching release data" >&2
     return 1
