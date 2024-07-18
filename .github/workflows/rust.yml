@@ -42,5 +42,5 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "Replace linutil binary"
-        file_pattern: linutil
+        file_pattern: ./linutil
         commit_options: "--allow-empty --no-verify"

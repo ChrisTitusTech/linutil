@@ -77,7 +77,9 @@ fastUpdate() {
                 exit 1
             fi
             ${AUR_HELPER} --noconfirm -S rate-mirrors-bin
-            sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+            if [ -s /etc/pacman.d/mirrorlist ]; then
+                sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+            fi
             
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
             dtype_local=${DTYPE}
