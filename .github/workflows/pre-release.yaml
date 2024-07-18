@@ -25,8 +25,8 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.version }}
-          name: Pre-Release ${{ env.version }}
+          tag_name: $version
+          name: Pre-Release $version
           body: "![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.VERSION }}/linutil)"
           append_body: false
           files: |
