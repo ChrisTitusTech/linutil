@@ -18,7 +18,7 @@ jobs:
         id: extract_version
         run: |
           version=$(date +"%Y.%m.%d")
-          echo "version=$version" >> GITHUB_ENV
+          echo "version=$version" >> $GITHUB_ENV
         shell: bash
 
       - name: Create and Upload Release
