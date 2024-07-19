@@ -9,11 +9,12 @@ env:
 
 jobs:
   cargo_check:
+    name: Cargo Check
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout sources
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
 
     - name: Cache Cargo registry
       uses: actions/cache@v4
@@ -36,11 +37,12 @@ jobs:
       run: cargo check
 
   lints:
+    name: Lints
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout sources
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
