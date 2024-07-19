@@ -6,7 +6,7 @@
 
 Open your terminal and paste this command
 ```bash
-bash <(wget -qO- https://christitus.com/linux)
+curl -fsSL https://christitus.com/linux | sh
 ```
 
 ## Credits
