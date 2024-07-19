@@ -9,18 +9,18 @@ GREEN='\033[32m'
 LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
 
 if [ ! -d "$LINUXTOOLBOXDIR" ]; then
-    echo "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
+    echo -e "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
     mkdir -p "$LINUXTOOLBOXDIR"
-    echo "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
+    echo -e "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
 fi
 
 if [ ! -d "$LINUXTOOLBOXDIR/linux-setup" ]; then
-    echo "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
+    echo -e "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
     git clone https://github.com/ChrisTitusTech/linux-setup "$LINUXTOOLBOXDIR/linux-setup"
     if [ $? -eq 0 ]; then
-        echo "${GREEN}Successfully cloned linux-setup repository${RC}"
+        echo -e "${GREEN}Successfully cloned linux-setup repository${RC}"
     else
-        echo "${RED}Failed to clone linux-setup repository${RC}"
+        echo -e "${RED}Failed to clone linux-setup repository${RC}"
         exit 1
     fi
 fi
@@ -36,7 +36,7 @@ checkEnv() {
     REQUIREMENTS='curl groups sudo'
     for req in $REQUIREMENTS; do
         if ! command_exists "$req"; then
-            echo "${RED}To run me, you need: $REQUIREMENTS${RC}"
+            echo -e "${RED}To run me, you need: $REQUIREMENTS${RC}"
             exit 1
         fi
     done
@@ -52,14 +52,14 @@ checkEnv() {
     done
 
     if [ -z "$PACKAGER" ]; then
-        echo "${RED}Can't find a supported package manager${RC}"
+        echo -e "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
 
     ## Check if the current directory is writable.
     GITPATH="$(dirname "$(realpath "$0")")"
     if [ ! -w "$GITPATH" ]; then
-        echo "${RED}Can't write to $GITPATH${RC}"
+        echo -e "${RED}Can't write to $GITPATH${RC}"
         exit 1
     fi
 
@@ -75,7 +75,7 @@ checkEnv() {
 
     ## Check if member of the sudo group.
     if ! groups | grep -q "$SUGROUP"; then
-        echo "${RED}You need to be a member of the sudo group to run me!${RC}"
+        echo -e "${RED}You need to be a member of the sudo group to run me!${RC}"
         exit 1
     fi
 }
@@ -83,7 +83,7 @@ checkEnv() {
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
-    echo "${YELLOW}Installing dependencies...${RC}"
+    echo -e "${YELLOW}Installing dependencies...${RC}"
     case $PACKAGER in
         pacman)
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then

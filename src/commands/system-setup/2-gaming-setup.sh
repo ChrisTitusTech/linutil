@@ -22,7 +22,7 @@ checkEnv() {
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
-            echo -e "Using ${pgm}"
+            echo "Using ${pgm}"
         fi
     done
 
@@ -43,7 +43,7 @@ checkEnv() {
     for sug in ${SUPERUSERGROUP}; do
         if groups | grep ${sug}; then
             SUGROUP=${sug}
-            echo -e "Super user group ${SUGROUP}"
+            echo "Super user group ${SUGROUP}"
         fi
     done
 
