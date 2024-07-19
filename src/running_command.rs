@@ -186,7 +186,7 @@ impl RunningCommand {
                     Line::from(
                         Span::default()
                             .content("FAILED!")
-                            .style(Style::default().fg(Color::Rgb(199, 55, 44)).reversed()),
+                            .style(Style::default().fg(theme.fail_color).reversed()),
                     )
                 };
 

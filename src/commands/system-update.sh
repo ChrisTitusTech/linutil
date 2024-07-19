@@ -9,7 +9,6 @@ command_exists() {
     which $1 >/dev/null 2>&1
 }
 
-
 fastUpdate() {
     case ${PKGR} in
         pacman)
@@ -17,21 +16,23 @@ fastUpdate() {
                 printf "Installing yay as AUR helper...\n"
                 sudo ${PKGR} --noconfirm -S base-devel || { printf "${RED}Failed to install base-devel${RC}\n"; exit 1; }
                 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
-                cd yay-git && makepkg --noconfirm -si || { printf "${RED}Failed to install yay${RC}\n"; exit 1; }
+                cd yay-git && makepkg --noconfirm -si || { echo -e "${RED}Failed to install yay${RC}"; exit 1; }
             else
-                printf "Aur helper already installed\n"
+                echo "Aur helper already installed"
             fi
             if command_exists yay; then
                 AUR_HELPER="yay"
             elif command_exists paru; then
                 AUR_HELPER="paru"
             else
-                printf "No AUR helper found. Please install yay or paru.\n"
+                echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
             ${AUR_HELPER} --noconfirm -S rate-mirrors-bin
-            sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-
+            if [ -s /etc/pacman.d/mirrorlist ]; then
+                sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+            fi
+            
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
             dtype_local=${DT}
             if [ "${DT}" = "unknown" ]; then
@@ -55,12 +56,15 @@ fastUpdate() {
             sudo ${PKGR} update -y
             ;;
         zypper)
-            sudo ${PKGR} refresh
-            sudo ${PKGR} update -y
+            sudo ${PKGR} ref
+            sudo ${PKGR} --non-interactive dup
             ;;
         yum)
             sudo ${PKGR} update -y
             sudo ${PKGR} upgrade -y
+            ;;
+        xbps-install)
+            sudo ${PACKAGER} -Syu
             ;;
         *)
             printf "${RED}Unsupported package manager: ${PKGR}${RC}\n"
@@ -84,11 +88,14 @@ updateSystem() {
             sudo ${PKGR} -Syu --noconfirm
             ;;
         zypper)
-            sudo ${PKGR} refresh
-            sudo ${PKGR} update -y
+            sudo ${PKGR} ref
+            sudo ${PKGR} --non-interactive dup
+            ;;
+        xbps-install)
+            sudo ${PKGR} -Syu
             ;;
         *)
-            printf "${RED}Unsupported package manager: ${PKGR}${RC}\n"
+            echo -e "${RED}Unsupported package manager: ${PACKAGER}${RC}"
             exit 1
             ;;
     esac

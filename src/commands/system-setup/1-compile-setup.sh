@@ -9,18 +9,18 @@ GREEN='\033[32m'
 LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
 
 if [ ! -d "$LINUXTOOLBOXDIR" ]; then
-    echo "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
+    echo -e "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
     mkdir -p "$LINUXTOOLBOXDIR"
-    echo "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
+    echo -e "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
 fi
 
 if [ ! -d "$LINUXTOOLBOXDIR/linux-setup" ]; then
-    echo "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
+    echo -e "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
     git clone https://github.com/ChrisTitusTech/linux-setup "$LINUXTOOLBOXDIR/linux-setup"
     if [ $? -eq 0 ]; then
-        echo "${GREEN}Successfully cloned linux-setup repository${RC}"
+        echo -e "${GREEN}Successfully cloned linux-setup repository${RC}"
     else
-        echo "${RED}Failed to clone linux-setup repository${RC}"
+        echo -e "${RED}Failed to clone linux-setup repository${RC}"
         exit 1
     fi
 fi
