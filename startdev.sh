@@ -5,8 +5,7 @@ RED='\033[0;31m'
 
 # Function to fetch the latest release tag from the GitHub API
 get_latest_release() {
-  local latest_release
-  latest_release=$(curl -s https://api.github.com/repos/ChrisTitusTech/linutil/releases | jq -r 'map(select(.prerelease == true)) | .tag_name')
+  latest_release=$(curl -s https://api.github.com/repos/ChrisTitusTech/linutil/releases | jq -r 'map(select(.prerelease == true)) | .[0].tag_name')
   if [ -z "$latest_release" ]; then
     echo "Error fetching release data" >&2
     return 1
@@ -19,7 +18,7 @@ redirect_to_latest_pre_release() {
   local latest_release
   latest_release=$(get_latest_release)
   if [ -n "$latest_release" ]; then
-    url="https://raw.githubusercontent.com/ChrisTitusTech/linutil/$latest_release/linutil"
+    url="https://github.com/ChrisTitusTech/linutil/releases/download/$latest_release/linutil"
   else
     echo 'Unable to determine latest pre-release version.' >&2
     echo "Using latest Full Release"
@@ -33,7 +32,7 @@ check() {
     local message=$2
 
     if [ $exit_code -ne 0 ]; then
-        echo "${RED}ERROR: $message${RC}"
+        echo -e "${RED}ERROR: $message${RC}"
         exit 1
     fi
 }
