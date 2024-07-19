@@ -1,19 +1,14 @@
-name: Rust
+name: Rust Check
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-permissions:
-  contents: write
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  cargo_check:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,10 +30,4 @@ jobs:
       with:
         toolchain: stable
     - name: Build
-      run: cargo build --target-dir=build --release --verbose
-    - uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: Commit Linutil
-        file_pattern: 'build/release/linutil'
-      if: success()
-    
+      run: cargo check
