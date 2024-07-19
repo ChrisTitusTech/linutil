@@ -104,8 +104,8 @@ fastUpdate() {
             sudo ${PACKAGER} update -y
             ;;
         zypper)
-            sudo ${PACKAGER} refresh
-            sudo ${PACKAGER} update -y
+            sudo ${PACKAGER} ref
+            sudo ${PACKAGER} --non-interactive dup
             ;;
         yum)
             sudo ${PACKAGER} update -y
@@ -133,8 +133,8 @@ updateSystem() {
             sudo ${PACKAGER} -Syu --noconfirm
             ;;
         zypper)
-            sudo ${PACKAGER} refresh
-            sudo ${PACKAGER} update -y
+            sudo ${PACKAGER} ref
+            sudo ${PACKAGER} --non-interactive dup
             ;;
         *)
             echo -e "${RED}Unsupported package manager: ${PACKAGER}${RC}"
