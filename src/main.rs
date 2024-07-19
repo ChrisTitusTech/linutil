@@ -95,6 +95,5 @@ fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                 }
             }
         }
-
     }
 }
