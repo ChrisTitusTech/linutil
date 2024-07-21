@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC2034
+
 RC='\033[0m'
 RED='\033[31m'
 YELLOW='\033[33m'
