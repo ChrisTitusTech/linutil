@@ -78,7 +78,7 @@ checkDistro() {
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageHandler 'apt-get dnf pacman zypper'
+    checkPackageManager 'apt-get dnf pacman zypper'
     checkSuperUser
     checkDistro
 }

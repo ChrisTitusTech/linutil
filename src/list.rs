@@ -93,6 +93,10 @@ impl CustomList {
                     command: with_common_script!("commands/system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
+                    name: "Global Theme",
+                    command: with_common_script!("commands/system-setup/3-global-theme.sh"),
+                },
+                ListNode {
                     name: "Recursion?",
                     command: "cargo run"
                 }
