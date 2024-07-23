@@ -9,18 +9,18 @@ if [ ! -d "$LINUXTOOLBOXDIR" ]; then
     echo -e "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
 fi
 
-if [ ! -d "$LINUXTOOLBOXDIR/linux-setup" ]; then
-    echo -e "${YELLOW}Cloning linux-setup repository into: $LINUXTOOLBOXDIR/linux-setup${RC}"
-    git clone https://github.com/ChrisTitusTech/linux-setup "$LINUXTOOLBOXDIR/linux-setup"
+if [ ! -d "$LINUXTOOLBOXDIR/linutil" ]; then
+    echo -e "${YELLOW}Cloning linutil repository into: $LINUXTOOLBOXDIR/linutil${RC}"
+    git clone https://github.com/ChrisTitusTech/linutil "$LINUXTOOLBOXDIR/linutil"
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Successfully cloned linux-setup repository${RC}"
+        echo -e "${GREEN}Successfully cloned linutil repository${RC}"
     else
-        echo -e "${RED}Failed to clone linux-setup repository${RC}"
+        echo -e "${RED}Failed to clone linutil repository${RC}"
         exit 1
     fi
 fi
 
-cd "$LINUXTOOLBOXDIR/linux-setup" || exit
+cd "$LINUXTOOLBOXDIR/linutil" || exit
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
