@@ -17,7 +17,7 @@ curl -fsSL https://christitus.com/linux | sh
 ## 🏅 Thanks to all Contributors
 Thanks a lot for spending your time helping Winutil grow. Thanks a lot! Keep rocking 🍻.
 
-[![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/linutil)](https://github.com/ChrisTitusTech/winutil/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/linutil)](https://github.com/ChrisTitusTech/linutil/graphs/contributors)
 
 ## Credits
 Rust Shell written by [@JustLinuxUser](https://github.com/JustLinuxUser)
