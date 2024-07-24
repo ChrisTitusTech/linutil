@@ -11,7 +11,7 @@ setupKitty() {
     echo "Install Kitty if not already installed..."
     if ! command_exists kitty; then
         case ${PACKAGER} in
-           pacman)
+            pacman)
                 sudo $"{PACKAGER}" -S --noconfirm kitty
                 ;;
             nix-env)
