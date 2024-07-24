@@ -31,9 +31,9 @@ pub const THEMES: [Theme; 2] = [
 ];
 
 pub fn get_theme() -> &'static Theme {
-    &THEMES[unsafe { THEME_IDX } ]
+    &THEMES[unsafe { THEME_IDX }]
 }
 
-pub fn set_theme(idx: usize){
+pub fn set_theme(idx: usize) {
     unsafe { THEME_IDX = idx };
 }
