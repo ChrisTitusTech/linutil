@@ -12,10 +12,10 @@ setupKitty() {
     if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
-                sudo $"{PACKAGER}" -S --noconfirm kitty
+                sudo "${PACKAGER}" -S --noconfirm kitty
                 ;;
             nix-env)
-                sudo $"{PACKAGER}" -iA nixos.kitty
+                sudo "${PACKAGER}" -iA nixos.kitty
                 ;;
             *)
                 sudo "${PACKAGER}" install -y kitty
