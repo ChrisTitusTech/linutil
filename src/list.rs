@@ -8,6 +8,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
     Frame,
 };
+use std::process::Command;
 
 macro_rules! with_common_script {
     ($command:expr) => {
@@ -114,8 +115,13 @@ impl CustomList {
                 ListNode {
                     name: "Rofi Setup",
                     command: with_common_script!("commands/dotfiles/rofi-setup.sh"),
-                },
-            }
+                }
+            },
+            ListNode {
+                name: "Exit",
+                command: "exit",
+            },
+
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
         // paintfull to manage
@@ -371,7 +377,16 @@ impl CustomList {
                     self.list_state.select(Some(0));
                     return None;
                 } else {
-                    return Some(node.value().command);
+                    let command = node.value().command;
+                    if command == "exit" {
+                        // Run the clear command
+                        //using reset instead of clear due to terminal buffer
+                        Command::new("reset").status().expect("Failed to clear terminal");
+                        // Exit the application
+                        std::process::exit(0);
+                    } else {
+                        return Some(command);
+                    }
                 }
             }
         }
