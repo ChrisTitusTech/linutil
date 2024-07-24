@@ -10,6 +10,10 @@ command_exists() {
 }
 
 checkEnv() {
+    checkCommandRequirements 'curl groups sudo'
+    checkPackageManager 'apt-get dnf pacman zypper nix-env'
+    checkSuperUser
+    checkDistro
     ## Check for requirements.
     REQUIREMENTS='curl groups sudo'
     for req in ${REQUIREMENTS}; do
