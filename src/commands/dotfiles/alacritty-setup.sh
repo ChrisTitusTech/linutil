@@ -2,7 +2,7 @@
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get dnf pacman zypper'
+    checkPackageManager 'apt-get dnf pacman zypper nix-env'
     checkSuperUser
     checkDistro
 }
@@ -13,6 +13,9 @@ setupAlacritty() {
         case ${PACKAGER} in
             pacman)
                 sudo ${PACKAGER} -S --noconfirm alacritty
+                ;;
+            nix-env)
+                sudo ${PACKAGER} -iA nixos.alacritty
                 ;;
             *)
                 sudo ${PACKAGER} install -y alacritty

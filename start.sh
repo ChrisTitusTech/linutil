@@ -27,8 +27,14 @@ check $? "Downloading linutil"
 chmod +x "$temp_file"
 check $? "Making linutil executable"
 
-"$temp_file"
-check $? "Executing linutil"
+#if the script is being run on NixOS
+if [ -f /etc/NIXOS ]; then
+    ./nixos_start.sh "$temp_file"
+    check $? "Executing linutil on NixOS"
+else
+    "$temp_file"
+    check $? "Executing linutil"
+fi
 
 rm -f "$temp_file"
 check $? "Deleting the temporary file"
