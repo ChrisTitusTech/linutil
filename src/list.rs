@@ -1,5 +1,3 @@
-use std::usize;
-
 use crate::{float::floating_window, theme::*};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
@@ -10,6 +8,15 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
     Frame,
 };
+
+macro_rules! with_common_script {
+    ($command:expr) => {
+        concat!(
+            include_str!("commands/common-script.sh"),
+            include_str!($command)
+        )
+    };
+}
 
 struct ListNode {
     name: &'static str,
@@ -57,7 +64,7 @@ impl CustomList {
         } => {
             ListNode {
                 name: "Full System Update",
-                command: include_str!("commands/system-update.sh"),
+                command: with_common_script!("commands/system-update.sh"),
             },
             ListNode {
                 name: "Setup Bash Prompt",
@@ -77,11 +84,15 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "Build Prerequisites",
-                    command: include_str!("commands/system-setup/1-compile-setup.sh"),
+                    command: with_common_script!("commands/system-setup/1-compile-setup.sh"),
                 },
                 ListNode {
                     name: "Gaming Dependencies",
-                    command: include_str!("commands/system-setup/2-gaming-setup.sh"),
+                    command: with_common_script!("commands/system-setup/2-gaming-setup.sh"),
+                },
+                ListNode {
+                    name: "Global Theme",
+                    command: with_common_script!("commands/system-setup/3-global-theme.sh"),
                 },
                 ListNode {
                     name: "Recursion?",
@@ -94,15 +105,15 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "Alacritty Setup",
-                    command: include_str!("commands/dotfiles/alacritty-setup.sh"),
+                    command: with_common_script!("commands/dotfiles/alacritty-setup.sh"),
                 },
                 ListNode {
                     name: "Kitty Setup",
-                    command: include_str!("commands/dotfiles/kitty-setup.sh"),
+                    command: with_common_script!("commands/dotfiles/kitty-setup.sh"),
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: include_str!("commands/dotfiles/rofi-setup.sh"),
+                    command: with_common_script!("commands/dotfiles/rofi-setup.sh"),
                 },
             }
         });
@@ -156,7 +167,10 @@ impl CustomList {
         // node
         let list = List::new(items)
             .highlight_style(Style::default().reversed())
-            .block(Block::default().borders(Borders::ALL).title(format!("Linux Toolbox - {}", chrono::Local::now().format("%Y-%m-%d"))))
+            .block(Block::default().borders(Borders::ALL).title(format!(
+                "Linux Toolbox - {}",
+                chrono::Local::now().format("%Y-%m-%d")
+            )))
             .scroll_padding(1);
 
         // Render it
@@ -238,7 +252,7 @@ impl CustomList {
             // Get the selected command
             if let Some(selected_command) = self.get_selected_command() {
                 // If command is a folder, we don't display a preview
-                if selected_command == "" {
+                if selected_command.is_empty() {
                     return;
                 }
 

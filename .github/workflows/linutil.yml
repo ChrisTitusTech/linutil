@@ -30,9 +30,7 @@ jobs:
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-index-
     - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
+      uses: dtolnay/rust-toolchain@stable
     - name: Build
       run: cargo build --target-dir=build --release --verbose
     - uses: stefanzweifel/git-auto-commit-action@v5
