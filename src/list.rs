@@ -74,6 +74,10 @@ impl CustomList {
                 name: "Setup Neovim",
                 command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
             },
+            ListNode {
+                name: "Setup Zsh and Prompt",
+                command: with_common_script!("commands/install-zsh.sh"),
+            },
             // ListNode {
             //     name: "Just ls, nothing special, trust me",
             //     command: include_str!("commands/special_ls.sh"),
