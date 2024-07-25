@@ -2,7 +2,7 @@
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get dnf pacman zypper'
+    checkPackageManager 'apt-get dnf pacman zypper nix-env'
     checkSuperUser
     checkDistro
 }
@@ -13,6 +13,9 @@ setupKitty() {
         case ${PACKAGER} in
             pacman)
                 sudo "${PACKAGER}" -S --noconfirm kitty
+                ;;
+            nix-env)
+                sudo "${PACKAGER}" -iA nixos.kitty
                 ;;
             *)
                 sudo "${PACKAGER}" install -y kitty
