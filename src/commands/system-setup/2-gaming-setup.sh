@@ -71,7 +71,22 @@ install_additional_dependencies() {
 
             echo "Lutris Installation complete."
             echo "Installing steam..."
-            sudo apt-get install -y steam
+
+            #Install steam on Ubuntu
+            if (lsb_release -i  | grep -qi Debian); then
+                #Enable i386 repos
+                sudo dpkg --add-architecture i386
+                # Install software-properties-common to be able to add repos
+                sudo apt-get install -y software-properties-common 
+                # Add repos necessary for installing steam
+                apt-add-repository contrib -y
+                apt-add-repository non-free -y
+                #Install steam
+                sudo apt-get install steam-installer -y
+            else
+            #Install steam on Ubuntu
+                sudo apt-get install -y steam
+            fi
             ;;
         *zypper)
             
