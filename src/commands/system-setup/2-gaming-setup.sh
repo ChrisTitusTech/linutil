@@ -79,8 +79,8 @@ install_additional_dependencies() {
                 # Install software-properties-common to be able to add repos
                 sudo apt-get install -y software-properties-common 
                 # Add repos necessary for installing steam
-                apt-add-repository contrib -y
-                apt-add-repository non-free -y
+                sudo apt-add-repository contrib -y
+                sudo apt-add-repository non-free -y
                 #Install steam
                 sudo apt-get install steam-installer -y
             else
