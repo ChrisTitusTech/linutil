@@ -22,13 +22,6 @@ fi
 
 cd "$LINUXTOOLBOXDIR/linutil" || exit
 
-checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
-    checkPackageHandler 'apt yum dnf pacman zypper'
-    checkCurrentDirectoryWritable
-    checkSuperUser
-}
-
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'

@@ -1,12 +1,5 @@
 #!/bin/sh -e
 
-checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get dnf pacman zypper'
-    checkSuperUser
-    checkDistro
-}
-
 setupAlacritty() {
     echo "Install Alacritty if not already installed..."
     if ! command_exists alacritty; then

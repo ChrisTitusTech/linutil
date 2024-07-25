@@ -1,12 +1,5 @@
 #!/bin/sh -e
 
-checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install'
-    checkSuperUser
-    checkDistro
-}
-
 fastUpdate() {
     case ${PACKAGER} in
         pacman)
