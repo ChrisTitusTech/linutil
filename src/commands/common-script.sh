@@ -78,7 +78,8 @@ checkDistro() {
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get dnf pacman zypper'
+    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+    checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
 }

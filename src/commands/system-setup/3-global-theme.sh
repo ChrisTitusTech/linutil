@@ -4,15 +4,15 @@
 LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
 
 if [ ! -d "$LINUXTOOLBOXDIR" ]; then
-    echo -e "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
+    printf "${YELLOW}Creating linuxtoolbox directory: %s${RC}\n" "$LINUXTOOLBOXDIR"
     mkdir -p "$LINUXTOOLBOXDIR"
-    echo -e "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
+    printf "${GREEN}linuxtoolbox directory created: %s${RC}\n" "$LINUXTOOLBOXDIR"
 fi
 
 cd "$LINUXTOOLBOXDIR" || exit
 
 install_theme_tools() {
-    echo -e "${YELLOW}Installing theme tools (qt6ct and kvantum)...${RC}"
+    printf "${YELLOW}Installing theme tools (qt6ct and kvantum)...${RC}\n"
     case $PACKAGER in
         apt-get)
             sudo apt-get update
@@ -31,14 +31,14 @@ install_theme_tools() {
             sudo pacman --noconfirm -S qt6ct kvantum
             ;;
         *)
-            echo -e "${RED}Unsupported package manager. Please install qt6ct and kvantum manually.${RC}"
+            printf "${RED}Unsupported package manager. Please install qt6ct and kvantum manually.${RC}\n"
             exit 1
             ;;
     esac
 }
 
 configure_qt6ct() {
-    echo -e "${YELLOW}Configuring qt6ct...${RC}"
+    printf "${YELLOW}Configuring qt6ct...${RC}\n"
     mkdir -p "$HOME/.config/qt6ct"
     cat <<EOF > "$HOME/.config/qt6ct/qt6ct.conf"
 [Appearance]
@@ -46,17 +46,26 @@ style=kvantum
 color_scheme=default
 icon_theme=breeze
 EOF
-    echo -e "${GREEN}qt6ct configured successfully.${RC}"
+    printf "${GREEN}qt6ct configured successfully.${RC}\n"
+
+    # Add QT_QPA_PLATFORMTHEME to /etc/environment
+    if ! grep -q "QT_QPA_PLATFORMTHEME=qt6ct" /etc/environment; then
+        printf "${YELLOW}Adding QT_QPA_PLATFORMTHEME to /etc/environment...${RC}\n"
+        echo "QT_QPA_PLATFORMTHEME=qt6ct" | sudo tee -a /etc/environment > /dev/null
+        printf "${GREEN}QT_QPA_PLATFORMTHEME added to /etc/environment.${RC}\n"
+    else
+        printf "${GREEN}QT_QPA_PLATFORMTHEME already set in /etc/environment.${RC}\n"
+    fi
 }
 
 configure_kvantum() {
-    echo -e "${YELLOW}Configuring Kvantum...${RC}"
+    printf "${YELLOW}Configuring Kvantum...${RC}\n"
     mkdir -p "$HOME/.config/Kvantum"
     cat <<EOF > "$HOME/.config/Kvantum/kvantum.kvconfig"
 [General]
 theme=Breeze
 EOF
-    echo -e "${GREEN}Kvantum configured successfully.${RC}"
+    printf "${GREEN}Kvantum configured successfully.${RC}\n"
 }
 
 checkEnv
