@@ -72,7 +72,7 @@ install_additional_dependencies() {
             echo "Lutris Installation complete."
             echo "Installing steam..."
 
-            #Install steam on Ubuntu
+            #Install steam on Debian
             if (lsb_release -i  | grep -qi Debian); then
                 #Enable i386 repos
                 sudo dpkg --add-architecture i386
