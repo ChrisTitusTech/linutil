@@ -136,7 +136,7 @@ impl CustomList {
             filtered_items: vec![],
         }
     }
-    
+
     /// Draw our custom widget to the frame
     pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String) {
         let theme = get_theme();
