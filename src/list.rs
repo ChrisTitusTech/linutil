@@ -18,6 +18,7 @@ macro_rules! with_common_script {
     };
 }
 
+#[derive(Clone)]
 struct ListNode {
     name: &'static str,
     command: &'static str,
@@ -37,6 +38,10 @@ pub struct CustomList {
     /// This stores the preview windows state. If it is None, it will not be displayed.
     /// If it is Some, we show it with the content of the selected item
     preview_window_state: Option<PreviewWindowState>,
+    // This stores the current search query
+    filter_query: String,
+    // This stores the filtered tree
+    filtered_items: Vec<ListNode>,
 }
 
 /// This struct stores the preview window state
@@ -62,18 +67,6 @@ impl CustomList {
             name: "root",
             command: ""
         } => {
-            ListNode {
-                name: "Full System Update",
-                command: with_common_script!("commands/system-update.sh"),
-            },
-            ListNode {
-                name: "Setup Bash Prompt",
-                command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
-            },
-            ListNode {
-                name: "Setup Neovim",
-                command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
-            },
             // ListNode {
             //     name: "Just ls, nothing special, trust me",
             //     command: include_str!("commands/special_ls.sh"),
@@ -100,22 +93,35 @@ impl CustomList {
                 }
             },
             ListNode {
-                name: "Titus Dotfiles",
+                name: "Applications Setup",
                 command: ""
             } => {
                 ListNode {
                     name: "Alacritty Setup",
-                    command: with_common_script!("commands/dotfiles/alacritty-setup.sh"),
+                    command: with_common_script!("commands/applications-setup/alacritty-setup.sh"),
+
                 },
                 ListNode {
                     name: "Kitty Setup",
-                    command: with_common_script!("commands/dotfiles/kitty-setup.sh"),
+                    command: with_common_script!("commands/applications-setup/kitty-setup.sh"),
+                },
+                ListNode {
+                    name: "Bash Prompt Setup",
+                    command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
+                },
+                ListNode {
+                    name: "Neovim Setup",
+                    command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: with_common_script!("commands/dotfiles/rofi-setup.sh"),
+                    command: with_common_script!("commands/applications-setup/rofi-setup.sh"),
                 },
-            }
+            },
+            ListNode {
+                name: "Full System Update",
+                command: with_common_script!("commands/system-update.sh"),
+            },
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
         // paintfull to manage
@@ -126,46 +132,59 @@ impl CustomList {
             list_state: ListState::default().with_selected(Some(0)),
             // By default the PreviewWindowState is set to None, so it is not being shown
             preview_window_state: None,
+            filter_query: String::new(),
+            filtered_items: vec![],
         }
     }
-
+    
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        // Get the last element in the `visit_stack` vec
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String) {
         let theme = get_theme();
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
-        let mut items = vec![];
+        self.filter(filter);
 
-        // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
-        // to go up the tree
-        // icons:   
-        if !self.at_root() {
-            items.push(Line::from(format!("{}  ..", theme.dir_icon)).style(theme.dir_color));
-        }
-
-        // Iterate through all the children
-        for node in curr.children() {
-            // The difference between a "directory" and a "command" is simple: if it has children,
-            // it's a directory and will be handled as such
-            if node.has_children() {
-                items.push(
-                    Line::from(format!("{}  {}", theme.dir_icon, node.value().name))
-                        .style(theme.dir_color),
-                );
-            } else {
-                items.push(
-                    Line::from(format!("{}  {}", theme.cmd_icon, node.value().name))
-                        .style(theme.cmd_color),
-                );
+        let item_list: Vec<Line> = if self.filter_query.is_empty() {
+            let mut items: Vec<Line> = vec![];
+            // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
+            // to go up the tree
+            // icons:   
+            if !self.at_root() {
+                items.push(Line::from(format!("{}  ..", theme.dir_icon)).style(theme.dir_color));
             }
-        }
+            // Get the last element in the `visit_stack` vec
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
+
+            // Iterate through all the children
+            for node in curr.children() {
+                // The difference between a "directory" and a "command" is simple: if it has children,
+                // it's a directory and will be handled as such
+                if node.has_children() {
+                    items.push(
+                        Line::from(format!("{}  {}", theme.dir_icon, node.value().name))
+                            .style(theme.dir_color),
+                    );
+                } else {
+                    items.push(
+                        Line::from(format!("{}  {}", theme.cmd_icon, node.value().name))
+                            .style(theme.cmd_color),
+                    );
+                }
+            }
+            items
+        } else {
+            self.filtered_items
+                .iter()
+                .map(|node| {
+                    Line::from(format!("{}  {}", theme.cmd_icon, node.name)).style(theme.cmd_color)
+                })
+                .collect()
+        };
 
         // create the normal list widget containing only item in our "working directory" / tree
         // node
-        let list = List::new(items)
+        let list = List::new(item_list)
             .highlight_style(Style::default().reversed())
             .block(Block::default().borders(Borders::ALL).title(format!(
                 "Linux Toolbox - {}",
@@ -201,6 +220,26 @@ impl CustomList {
 
             // Finally render the preview window
             frame.render_widget(list, floating_area);
+        }
+    }
+
+    pub fn filter(&mut self, query: String) {
+        self.filter_query.clone_from(&query);
+        self.filtered_items.clear();
+
+        let query_lower = query.to_lowercase();
+        let mut stack = vec![self.inner_tree.root().id()];
+
+        while let Some(node_id) = stack.pop() {
+            let node = self.inner_tree.get(node_id).unwrap();
+
+            if node.value().name.to_lowercase().contains(&query_lower) && !node.has_children() {
+                self.filtered_items.push(node.value().clone());
+            }
+
+            for child in node.children() {
+                stack.push(child.id());
+            }
         }
     }
 
@@ -268,18 +307,22 @@ impl CustomList {
             }
         }
     }
+
     fn try_scroll_up(&mut self) {
         self.list_state
             .select(Some(self.list_state.selected().unwrap().saturating_sub(1)));
     }
+
     fn try_scroll_down(&mut self) {
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
-
-        let count = curr.children().count();
-
+        let count = if self.filter_query.is_empty() {
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
+            curr.children().count()
+        } else {
+            self.filtered_items.len()
+        };
         let curr_selection = self.list_state.selected().unwrap();
         if self.at_root() {
             self.list_state
