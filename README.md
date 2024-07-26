@@ -5,9 +5,9 @@
 
 ![Preview](docs/assets/preview.png)
 
-A distro-agnostic* toolbox which allows to do everyday Linux tasks with ease, setup applications, setting up system and customize the workflow with my dotfiles! Written with Rust 🦀
+A distro-agnostic* toolbox which helps with everyday Linux tasks. It can help you set up applications, and set up your system for specific use cases! Written with Rust 🦀
 
-\* — The project is in active development, so there could be some issues, please, consider to [give as a feedback](https://github.com/ChrisTitusTech/linutil/issues)
+\* — The project is in active development, so there could be some issues, please, consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues)
 
 ## 💡 Usage
 
