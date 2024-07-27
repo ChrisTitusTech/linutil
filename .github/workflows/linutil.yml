@@ -2,7 +2,7 @@ name: LinUtil Release
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: write
@@ -16,25 +16,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Cache Cargo registry
-      uses: actions/cache@v4
-      with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: ${{ runner.os }}-cargo-registry-
-    - name: Cache Cargo index
-      uses: actions/cache@v4
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: ${{ runner.os }}-cargo-index-
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-    - name: Build
-      run: cargo build --target-dir=build --release --verbose
-    - uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: Commit Linutil
-        file_pattern: 'build/release/linutil'
-      if: success()
+      - uses: actions/checkout@v4
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+      - name: Cache Cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-index-
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+      - name: Build
+        run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit Linutil
+          file_pattern: "build/x86_64-unknown-linux-musl/release/linutil"
+        if: success()
