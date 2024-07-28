@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     env, fs,
     io::{Read, Write},
     path::{Path, PathBuf},
@@ -40,15 +41,25 @@ fn complete_scripts(files: Vec<PathBuf>, out_dir: PathBuf) {
         println!("cargo:rerun-if-changed={}", file.display());
 
         let mut out_file = create_out_file(&file, out_dir.clone());
-        let new_file = replace_source(&file);
+        let mut map = HashMap::new();
+        let new_file = replace_source(file, &mut map);
 
         out_file.write_all(new_file.as_bytes()).unwrap()
     }
 }
 
-fn replace_source(file: &Path) -> String {
-    let contents = fs::read_to_string(file).unwrap();
+fn replace_source(file: PathBuf, used_paths: &mut HashMap<PathBuf, usize>) -> String {
+    let contents = fs::read_to_string(&file).unwrap();
     let filedir = file.parent().unwrap();
+
+    let count = used_paths.entry(file.clone()).or_insert(0);
+    *count += 1;
+    if *count > 5 {
+        panic!(
+            "Sourced {} too many times. Check for circular dependencies",
+            file.canonicalize().unwrap_or(file).display()
+        );
+    }
 
     contents
         .lines()
@@ -59,7 +70,7 @@ fn replace_source(file: &Path) -> String {
                 if !(sourced_file.exists() && has_shell_ext(&sourced_file)) {
                     return line.to_string();
                 }
-                replace_source(&sourced_file)
+                replace_source(sourced_file, used_paths)
             } else {
                 line.to_string()
             }
