@@ -1,6 +1,7 @@
 mod float;
 mod list;
 mod running_command;
+pub mod state;
 mod theme;
 
 use std::{
@@ -22,7 +23,8 @@ use ratatui::{
     Terminal,
 };
 use running_command::RunningCommand;
-use theme::set_theme;
+use state::AppState;
+use theme::THEMES;
 
 /// This is a binary :), Chris, change this to update the documentation on -h
 #[derive(Debug, Parser)]
@@ -34,16 +36,23 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    if args.compat {
-        set_theme(0);
-    }
+
+    let theme = if args.compat {
+        THEMES[0].clone()
+    } else {
+        THEMES[1].clone()
+    };
+
+    let state = AppState {
+        theme,
+    };
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    run(&mut terminal)?;
+    run(&mut terminal, &state)?;
 
     // restore terminal
     disable_raw_mode()?;
@@ -55,7 +64,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<()> {
     let mut command_opt: Option<RunningCommand> = None;
 
     let mut custom_list = CustomList::new();
@@ -63,9 +72,9 @@ fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
         // Always redraw
         terminal
             .draw(|frame| {
-                custom_list.draw(frame, frame.size());
+                custom_list.draw(frame, frame.size(), state);
                 if let Some(ref mut command) = &mut command_opt {
-                    command.draw(frame);
+                    command.draw(frame, state);
                 }
             })
             .unwrap();

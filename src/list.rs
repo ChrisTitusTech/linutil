@@ -1,4 +1,4 @@
-use crate::{float::floating_window, theme::*};
+use crate::{float::floating_window, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
@@ -130,9 +130,8 @@ impl CustomList {
     }
 
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect) {
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, state: &AppState) {
         // Get the last element in the `visit_stack` vec
-        let theme = get_theme();
         let curr = self
             .inner_tree
             .get(*self.visit_stack.last().unwrap())
@@ -143,7 +142,7 @@ impl CustomList {
         // to go up the tree
         // icons:   
         if !self.at_root() {
-            items.push(Line::from(format!("{}  ..", theme.dir_icon)).style(theme.dir_color));
+            items.push(Line::from(format!("{}  ..", state.theme.dir_icon)).style(state.theme.dir_color));
         }
 
         // Iterate through all the children
@@ -152,13 +151,13 @@ impl CustomList {
             // it's a directory and will be handled as such
             if node.has_children() {
                 items.push(
-                    Line::from(format!("{}  {}", theme.dir_icon, node.value().name))
-                        .style(theme.dir_color),
+                    Line::from(format!("{}  {}", state.theme.dir_icon, node.value().name))
+                        .style(state.theme.dir_color),
                 );
             } else {
                 items.push(
-                    Line::from(format!("{}  {}", theme.cmd_icon, node.value().name))
-                        .style(theme.cmd_color),
+                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name))
+                        .style(state.theme.cmd_color),
                 );
             }
         }
