@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
 fastUpdate() {
     case ${PACKAGER} in
         pacman)

@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
 setupAlacritty() {
     echo "Install Alacritty if not already installed..."
     if ! command_exists alacritty; then

@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
 setupRofi() {
     echo "Install Rofi if not already installed..."
     if ! command_exists rofi; then
