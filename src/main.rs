@@ -17,6 +17,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
+use include_dir::include_dir;
 use list::CustomList;
 use ratatui::{
     backend::{Backend, CrosstermBackend},
@@ -24,6 +25,7 @@ use ratatui::{
 };
 use running_command::RunningCommand;
 use state::AppState;
+use tempdir::TempDir;
 use theme::THEMES;
 
 /// This is a binary :), Chris, change this to update the documentation on -h
@@ -42,9 +44,15 @@ fn main() -> std::io::Result<()> {
     } else {
         THEMES[1].clone()
     };
+    let commands_dir = include_dir!("src/commands");
+    let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
+    commands_dir
+        .extract(temp_dir.path())
+        .expect("Failed to extract the saved directory");
 
     let state = AppState {
         theme,
+        temp_path: temp_dir.path().to_owned(),
     };
 
     stdout().execute(EnterAlternateScreen)?;
@@ -99,8 +107,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 if key.code == KeyCode::Char('q') {
                     return Ok(());
                 }
-                if let Some(cmd) = custom_list.handle_key(key) {
-                    command_opt = Some(RunningCommand::new(cmd));
+                if let Some(cmd) = custom_list.handle_key(key, state) {
+                    command_opt = Some(RunningCommand::new(cmd, state));
                 }
             }
         }
