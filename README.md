@@ -15,7 +15,7 @@ curl -fsSL https://christitus.com/linux | sh
 - To morally and mentally support the project, make sure to leave a ⭐️!
 
 ## 🏅 Thanks to all Contributors
-Thanks a lot for spending your time helping Winutil grow. Thanks a lot! Keep rocking 🍻.
+Thanks a lot for spending your time helping Linutil grow. Thanks a lot! Keep rocking 🍻.
 
 [![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/linutil)](https://github.com/ChrisTitusTech/linutil/graphs/contributors)
 
