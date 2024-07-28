@@ -27,8 +27,7 @@ fn get_script_list(path: &Path) -> Vec<PathBuf> {
             if entry.file_type().map_or(false, |f| f.is_dir()) {
                 get_script_list(&path).into()
             } else {
-                let is_script = has_shell_ext(&path) && starts_with_shebang(&path);
-                is_script.then_some(vec![path])
+                is_script(&path).then_some(vec![path])
             }
         })
         .flatten()
@@ -41,31 +40,32 @@ fn complete_scripts(files: Vec<PathBuf>, out_dir: PathBuf) {
         println!("cargo:rerun-if-changed={}", file.display());
 
         let mut out_file = create_out_file(&file, out_dir.clone());
-        let new_file = replace_source(&file).unwrap();
+        let new_file = replace_source(&file);
 
         out_file.write_all(new_file.as_bytes()).unwrap()
     }
 }
 
-fn replace_source(file: &Path) -> Result<String, std::io::Error> {
-    let contents = fs::read_to_string(file)?;
+fn replace_source(file: &Path) -> String {
+    let contents = fs::read_to_string(file).unwrap();
     let filedir = file.parent().unwrap();
 
-    let new_contents = contents
+    contents
         .lines()
         .map(|line| {
             if line.starts_with(". ") || line.starts_with("source ") {
                 let (_, sourced_file) = line.split_once(' ').unwrap();
                 let sourced_file = filedir.join(sourced_file);
-                replace_source(&sourced_file).unwrap_or(line.to_string())
+                if !(sourced_file.exists() && is_script(&sourced_file)) {
+                    return line.to_string();
+                }
+                replace_source(&sourced_file)
             } else {
                 line.to_string()
             }
         })
         .collect::<Vec<_>>()
-        .join("\n");
-
-    Ok(new_contents)
+        .join("\n")
 }
 
 fn create_out_file(file: &Path, out_dir: PathBuf) -> fs::File {
@@ -73,6 +73,10 @@ fn create_out_file(file: &Path, out_dir: PathBuf) -> fs::File {
     let out_file_parent = out_file.parent().unwrap();
     std::fs::create_dir_all(out_file_parent).unwrap();
     fs::File::create(out_file).unwrap()
+}
+
+fn is_script(file: &Path) -> bool {
+    has_shell_ext(file) && starts_with_shebang(file)
 }
 
 fn has_shell_ext(file: &Path) -> bool {
