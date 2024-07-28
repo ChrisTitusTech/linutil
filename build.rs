@@ -55,7 +55,7 @@ fn replace_source(file: &Path) -> String {
         .map(|line| {
             if line.starts_with(". ") || line.starts_with("source ") {
                 let (_, sourced_file) = line.split_once(' ').unwrap();
-                let sourced_file = filedir.join(sourced_file);
+                let sourced_file = filedir.join(sourced_file.trim_start());
                 if !(sourced_file.exists() && has_shell_ext(&sourced_file)) {
                     return line.to_string();
                 }
