@@ -9,10 +9,11 @@ const SCRIPT_PATH: &str = "src/commands/";
 fn main() {
     // Rerun build step if the build script is modified
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed={}", SCRIPT_PATH);
 
     let out_dir = env::var("OUT_DIR").unwrap();
     let file_list = get_script_list(Path::new(SCRIPT_PATH));
-    replace_source(file_list, out_dir.into());
+    complete_scripts(file_list, out_dir.into());
 }
 
 fn get_script_list(path: &Path) -> Vec<PathBuf> {
@@ -34,31 +35,35 @@ fn get_script_list(path: &Path) -> Vec<PathBuf> {
         .collect()
 }
 
-fn replace_source(files: Vec<PathBuf>, out_dir: PathBuf) {
+fn complete_scripts(files: Vec<PathBuf>, out_dir: PathBuf) {
     for file in files {
         // Rerun build step if any script is modified
         println!("cargo:rerun-if-changed={}", file.display());
 
         let mut out_file = create_out_file(&file, out_dir.clone());
-        let contents = fs::read_to_string(&file).unwrap();
-        let filedir = file.parent().unwrap();
-
-        let new_file = contents
-            .lines()
-            .map(|line| {
-                if line.starts_with(". ") || line.starts_with("source ") {
-                    let (_, sourced_file) = line.split_once(' ').unwrap();
-                    let sourced_file = filedir.join(sourced_file);
-                    std::fs::read_to_string(&sourced_file).unwrap()
-                } else {
-                    line.to_string()
-                }
-            })
-            .collect::<Vec<_>>()
-            .join("\n");
+        let new_file = replace_source(&file);
 
         out_file.write_all(new_file.as_bytes()).unwrap()
     }
+}
+
+fn replace_source(file: &Path) -> String {
+    let contents = fs::read_to_string(file).unwrap();
+    let filedir = file.parent().unwrap();
+
+    contents
+        .lines()
+        .map(|line| {
+            if line.starts_with(". ") || line.starts_with("source ") {
+                let (_, sourced_file) = line.split_once(' ').unwrap();
+                let sourced_file = filedir.join(sourced_file);
+                replace_source(&sourced_file)
+            } else {
+                line.to_string()
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn create_out_file(file: &Path, out_dir: PathBuf) -> fs::File {
