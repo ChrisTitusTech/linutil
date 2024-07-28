@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ../common-script.sh
+
 installDepend() {
     ## Check for dependencies.
     echo -e "${YELLOW}Installing dependencies...${RC}"
@@ -70,7 +72,7 @@ install_additional_dependencies() {
                 #Enable i386 repos
                 sudo dpkg --add-architecture i386
                 # Install software-properties-common to be able to add repos
-                sudo apt-get install -y software-properties-common 
+                sudo apt-get install -y software-properties-common
                 # Add repos necessary for installing steam
                 sudo apt-add-repository contrib -y
                 sudo apt-add-repository non-free -y
@@ -82,16 +84,16 @@ install_additional_dependencies() {
             fi
             ;;
         *zypper)
-            
+
             ;;
         *dnf)
-            
+
             ;;
         *pacman)
-            
+
             ;;
         *)
-            
+
             ;;
     esac
 }

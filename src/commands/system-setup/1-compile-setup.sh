@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ../common-script.sh
+
 # Check if the home directory and linuxtoolbox folder exist, create them if they don't
 LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
 
@@ -58,7 +60,7 @@ installDepend() {
             sudo "$PACKAGER" update
             sudo dpkg --add-architecture i386
             sudo "$PACKAGER" update
-            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS 
+            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
@@ -69,7 +71,7 @@ installDepend() {
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
-            sudo "$PACKAGER" refresh 
+            sudo "$PACKAGER" refresh
             sudo "$PACKAGER" --non-interactive install "$DEPENDENCIES" $COMPILEDEPS
             sudo "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;

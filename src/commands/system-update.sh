@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. common-script.sh
+
 fastUpdate() {
     case ${PACKAGER} in
         pacman)
@@ -23,7 +25,7 @@ fastUpdate() {
             if [ -s /etc/pacman.d/mirrorlist ]; then
                 sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
             fi
-            
+
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
             dtype_local=${DTYPE}
             if [ "${DTYPE}" = "unknown" ]; then
