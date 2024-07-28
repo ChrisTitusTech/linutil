@@ -41,29 +41,31 @@ fn complete_scripts(files: Vec<PathBuf>, out_dir: PathBuf) {
         println!("cargo:rerun-if-changed={}", file.display());
 
         let mut out_file = create_out_file(&file, out_dir.clone());
-        let new_file = replace_source(&file);
+        let new_file = replace_source(&file).unwrap();
 
         out_file.write_all(new_file.as_bytes()).unwrap()
     }
 }
 
-fn replace_source(file: &Path) -> String {
-    let contents = fs::read_to_string(file).unwrap();
+fn replace_source(file: &Path) -> Result<String, std::io::Error> {
+    let contents = fs::read_to_string(file)?;
     let filedir = file.parent().unwrap();
 
-    contents
+    let new_contents = contents
         .lines()
         .map(|line| {
             if line.starts_with(". ") || line.starts_with("source ") {
                 let (_, sourced_file) = line.split_once(' ').unwrap();
                 let sourced_file = filedir.join(sourced_file);
-                replace_source(&sourced_file)
+                replace_source(&sourced_file).unwrap_or(line.to_string())
             } else {
                 line.to_string()
             }
         })
         .collect::<Vec<_>>()
-        .join("\n")
+        .join("\n");
+
+    Ok(new_contents)
 }
 
 fn create_out_file(file: &Path, out_dir: PathBuf) -> fs::File {
