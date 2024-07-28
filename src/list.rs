@@ -9,12 +9,9 @@ use ratatui::{
     Frame,
 };
 
-macro_rules! with_common_script {
+macro_rules! include_script {
     ($command:expr) => {
-        concat!(
-            include_str!("commands/common-script.sh"),
-            include_str!($command)
-        )
+        include_str!(concat!(env!("OUT_DIR"), "/src/", $command))
     };
 }
 
@@ -64,7 +61,7 @@ impl CustomList {
         } => {
             ListNode {
                 name: "Full System Update",
-                command: with_common_script!("commands/system-update.sh"),
+                command: include_script!("commands/system-update.sh"),
             },
             ListNode {
                 name: "Setup Bash Prompt",
@@ -84,15 +81,15 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "Build Prerequisites",
-                    command: with_common_script!("commands/system-setup/1-compile-setup.sh"),
+                    command: include_script!("commands/system-setup/1-compile-setup.sh"),
                 },
                 ListNode {
                     name: "Gaming Dependencies",
-                    command: with_common_script!("commands/system-setup/2-gaming-setup.sh"),
+                    command: include_script!("commands/system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
                     name: "Global Theme",
-                    command: with_common_script!("commands/system-setup/3-global-theme.sh"),
+                    command: include_script!("commands/system-setup/3-global-theme.sh"),
                 },
                 ListNode {
                     name: "Recursion?",
@@ -105,15 +102,15 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "Alacritty Setup",
-                    command: with_common_script!("commands/dotfiles/alacritty-setup.sh"),
+                    command: include_script!("commands/dotfiles/alacritty-setup.sh"),
                 },
                 ListNode {
                     name: "Kitty Setup",
-                    command: with_common_script!("commands/dotfiles/kitty-setup.sh"),
+                    command: include_script!("commands/dotfiles/kitty-setup.sh"),
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: with_common_script!("commands/dotfiles/rofi-setup.sh"),
+                    command: include_script!("commands/dotfiles/rofi-setup.sh"),
                 },
             }
         });
