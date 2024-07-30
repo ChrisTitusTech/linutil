@@ -10,7 +10,7 @@ install_zsh() {
   elif command -v dnf >/dev/null 2>&1; then
     sudo dnf install -y zsh
   elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Sy zsh
+    sudo pacman -Syu zsh
   elif command -v zypper >/dev/null 2>&1; then
     sudo zypper install -y zsh
   else
