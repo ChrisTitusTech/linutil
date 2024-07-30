@@ -9,6 +9,7 @@ use ratatui::{
     Frame,
 };
 
+#[derive(Clone)]
 struct ListNode {
     name: &'static str,
     command: Command,
@@ -28,6 +29,10 @@ pub struct CustomList {
     /// This stores the preview windows state. If it is None, it will not be displayed.
     /// If it is Some, we show it with the content of the selected item
     preview_window_state: Option<PreviewWindowState>,
+    // This stores the current search query
+    filter_query: String,
+    // This stores the filtered tree
+    filtered_items: Vec<ListNode>,
 }
 
 /// This struct stores the preview window state
@@ -54,18 +59,6 @@ impl CustomList {
             command: Command::None,
         } => {
             ListNode {
-                name: "Full System Update",
-                command: Command::LocalFile("system-update.sh"),
-            },
-            ListNode {
-                name: "Setup Bash Prompt",
-                command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
-            },
-            ListNode {
-                name: "Setup Neovim",
-                command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
-            },
-            ListNode {
                 name: "System Setup",
                 command: Command::None,
             } => {
@@ -84,52 +77,42 @@ impl CustomList {
             },
             ListNode {
                 name: "Security",
-                command: ""
+                command: Command::None
             } => {
                 ListNode {
                     name: "Firewall Baselines (CTT)",
-                    command: with_common_script!("commands/security/firewall-baselines.sh"),
+                    command: Command::LocalFile("security/firewall-baselines.sh"),
                 }
             },
             ListNode {
-                name: "Titus Dotfiles",
+                name: "Applications Setup",
                 command: Command::None
             } => {
                 ListNode {
                     name: "Alacritty Setup",
-                    command: Command::LocalFile("dotfiles/alacritty-setup.sh"),
+                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                },
+                ListNode {
+                    name: "Bash Prompt Setup",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
                 },
                 ListNode {
                     name: "Kitty Setup",
-                    command: Command::LocalFile("dotfiles/kitty-setup.sh"),
+                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
+                },
+                ListNode {
+                    name: "Neovim Setup",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: Command::LocalFile("dotfiles/rofi-setup.sh"),
+                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
                 },
             },
-
             ListNode {
-                name: "Testing category",
-                command: Command::None,
-            } => {
-                ListNode {
-                    name: "Complex command",
-                    command: Command::Raw("sleep 1 && ls -la && sleep 1 && ls -la && echo Bonus eza comming... && sleep 1 && ls -la"),
-                },
-                ListNode {
-                    name: "Neovim",
-                    command: Command::Raw("nvim"),
-                },
-                ListNode {
-                    name: "Full bash",
-                    command: Command::Raw("bash"),
-                },
-                ListNode {
-                    name: "Running file with `source`",
-                    command: Command::LocalFile("test/main.sh"),
-                },
-            }
+                name: "Full System Update",
+                command: Command::LocalFile("system-update.sh"),
+            },
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
         // paintfull to manage
@@ -140,46 +123,63 @@ impl CustomList {
             list_state: ListState::default().with_selected(Some(0)),
             // By default the PreviewWindowState is set to None, so it is not being shown
             preview_window_state: None,
+            filter_query: String::new(),
+            filtered_items: vec![],
         }
     }
 
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect, state: &AppState) {
-        // Get the last element in the `visit_stack` vec
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
-        let mut items = vec![];
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String, state: &AppState) {
+        self.filter(filter);
 
-        // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
-        // to go up the tree
-        if !self.at_root() {
-            items.push(
-                Line::from(format!("{}  ..", state.theme.dir_icon)).style(state.theme.dir_color),
-            );
-        }
-
-        // Iterate through all the children
-        for node in curr.children() {
-            // The difference between a "directory" and a "command" is simple: if it has children,
-            // it's a directory and will be handled as such
-            if node.has_children() {
+        let item_list: Vec<Line> = if self.filter_query.is_empty() {
+            let mut items: Vec<Line> = vec![];
+            // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
+            // to go up the tree
+            // icons:   
+            if !self.at_root() {
                 items.push(
-                    Line::from(format!("{}  {}", state.theme.dir_icon, node.value().name))
+                    Line::from(format!("{}  ..", state.theme.dir_icon))
                         .style(state.theme.dir_color),
                 );
-            } else {
-                items.push(
-                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name))
-                        .style(state.theme.cmd_color),
-                );
             }
-        }
+
+            // Get the last element in the `visit_stack` vec
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
+
+            // Iterate through all the children
+            for node in curr.children() {
+                // The difference between a "directory" and a "command" is simple: if it has children,
+                // it's a directory and will be handled as such
+                if node.has_children() {
+                    items.push(
+                        Line::from(format!("{}  {}", state.theme.dir_icon, node.value().name))
+                            .style(state.theme.dir_color),
+                    );
+                } else {
+                    items.push(
+                        Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name))
+                            .style(state.theme.cmd_color),
+                    );
+                }
+            }
+            items
+        } else {
+            self.filtered_items
+                .iter()
+                .map(|node| {
+                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
+                        .style(state.theme.cmd_color)
+                })
+                .collect()
+        };
 
         // create the normal list widget containing only item in our "working directory" / tree
         // node
-        let list = List::new(items)
+        let list = List::new(item_list)
             .highlight_style(Style::default().reversed())
             .block(Block::default().borders(Borders::ALL).title(format!(
                 "Linux Toolbox - {}",
@@ -215,6 +215,26 @@ impl CustomList {
 
             // Finally render the preview window
             frame.render_widget(list, floating_area);
+        }
+    }
+
+    pub fn filter(&mut self, query: String) {
+        self.filter_query.clone_from(&query);
+        self.filtered_items.clear();
+
+        let query_lower = query.to_lowercase();
+        let mut stack = vec![self.inner_tree.root().id()];
+
+        while let Some(node_id) = stack.pop() {
+            let node = self.inner_tree.get(node_id).unwrap();
+
+            if node.value().name.to_lowercase().contains(&query_lower) && !node.has_children() {
+                self.filtered_items.push(node.value().clone());
+            }
+
+            for child in node.children() {
+                stack.push(child.id());
+            }
         }
     }
 
@@ -288,27 +308,35 @@ impl CustomList {
             }
         }
     }
+
     fn try_scroll_up(&mut self) {
         self.list_state
             .select(Some(self.list_state.selected().unwrap().saturating_sub(1)));
     }
+
     fn try_scroll_down(&mut self) {
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
-
-        let count = curr.children().count();
-
-        let curr_selection = self.list_state.selected().unwrap();
-        if self.at_root() {
-            self.list_state
-                .select(Some((curr_selection + 1).min(count - 1)));
+        let count = if self.filter_query.is_empty() {
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
+            curr.children().count()
         } else {
-            // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
-            // the count is 1 bigger (select is 0 based, because it's an index)
-            self.list_state
-                .select(Some((curr_selection + 1).min(count)));
+            self.filtered_items.len()
+        };
+
+        if let Some(curr_selection) = self.list_state.selected() {
+            if self.at_root() {
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count - 1)));
+            } else {
+                // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
+                // the count is 1 bigger (select is 0 based, because it's an index)
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count)));
+            }
+        } else if count > 0 {
+            self.list_state.select(Some(0));
         }
     }
 
@@ -330,29 +358,38 @@ impl CustomList {
         }
     }
 
-    /// This method return the currently selected command, or None if no command is selected.
+    /// This method returns the currently selected command, or None if no command is selected.
     /// It was extracted from the 'handle_enter()'
     ///
-    /// This could probably be integrated into the 'handle_enter()' method as to avoid code
+    /// This could probably be integrated into the 'handle_enter()' method to avoid code
     /// duplication, but I don't want to make too major changes to the codebase.
     fn get_selected_command(&self) -> Option<Command> {
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
         let selected = self.list_state.selected().unwrap();
 
-        // If we are not at the root and the first item is selected, it's the `..` item
-        if !self.at_root() && selected == 0 {
-            return None;
-        }
+        if self.filter_query.is_empty() {
+            // No filter query, use the regular tree navigation
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
 
-        for (mut idx, node) in curr.children().enumerate() {
-            if !self.at_root() {
-                idx += 1;
+            // If we are not at the root and the first item is selected, it's the `..` item
+            if !self.at_root() && selected == 0 {
+                return None;
             }
-            if idx == selected {
-                return Some(node.value().command.clone());
+
+            for (mut idx, node) in curr.children().enumerate() {
+                if !self.at_root() {
+                    idx += 1;
+                }
+                if idx == selected {
+                    return Some(node.value().command.clone());
+                }
+            }
+        } else {
+            // Filter query is active, use the filtered items
+            if let Some(filtered_node) = self.filtered_items.get(selected) {
+                return Some(filtered_node.command.clone());
             }
         }
         None
@@ -365,35 +402,49 @@ impl CustomList {
     ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
     fn handle_enter(&mut self) -> Option<Command> {
-        // Get the current node (current directory)
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
-        let selected = self.list_state.selected().unwrap();
-
-        // if we are not at the root, and the first element is selected,
-        // we can be sure it's '..', so we go up the directory
-        if !self.at_root() && selected == 0 {
-            self.visit_stack.pop();
+        // Ensure an item is selected if none is selected
+        if self.list_state.selected().is_none() {
             self.list_state.select(Some(0));
-            return None;
         }
 
-        for (mut idx, node) in curr.children().enumerate() {
-            // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
-            // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
-            if !self.at_root() {
-                idx += 1;
+        // Get the selected index
+        let selected = self.list_state.selected().unwrap();
+
+        if self.filter_query.is_empty() {
+            // No filter query, use the regular tree navigation
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
+
+            // if we are not at the root, and the first element is selected,
+            // we can be sure it's '..', so we go up the directory
+            if !self.at_root() && selected == 0 {
+                self.visit_stack.pop();
+                self.list_state.select(Some(0));
+                return None;
             }
-            if idx == selected {
-                if node.has_children() {
-                    self.visit_stack.push(node.id());
-                    self.list_state.select(Some(0));
-                    return None;
-                } else {
-                    return Some(node.value().command.clone());
+
+            for (mut idx, node) in curr.children().enumerate() {
+                // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
+                // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
+                if !self.at_root() {
+                    idx += 1;
                 }
+                if idx == selected {
+                    if node.has_children() {
+                        self.visit_stack.push(node.id());
+                        self.list_state.select(Some(0));
+                        return None;
+                    } else {
+                        return Some(node.value().command.clone());
+                    }
+                }
+            }
+        } else {
+            // Filter query is active, use the filtered items
+            if let Some(filtered_node) = self.filtered_items.get(selected) {
+                return Some(filtered_node.command.clone());
             }
         }
         None
