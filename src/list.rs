@@ -108,6 +108,10 @@ impl CustomList {
                     name: "Rofi Setup",
                     command: Command::LocalFile("applications-setup/rofi-setup.sh"),
                 },
+                ListNode {
+                    name: "DWM-Titus Setup (Install)",
+                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
+                }
             },
             ListNode {
                 name: "Full System Update",
