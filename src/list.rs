@@ -242,6 +242,8 @@ impl CustomList {
     pub fn reset_selection(&mut self) {
         if !self.filtered_items.is_empty() {
             self.list_state.select(Some(0));
+        } else {
+            self.list_state.select(None);
         }
     }
 
@@ -317,8 +319,11 @@ impl CustomList {
     }
 
     fn try_scroll_up(&mut self) {
-        self.list_state
-            .select(Some(self.list_state.selected().unwrap().saturating_sub(1)));
+        if let Some(selected) = self.list_state.selected() {
+            if selected > 0 {
+                self.list_state.select(Some(selected.saturating_sub(1)));
+            }
+        }
     }
 
     fn try_scroll_down(&mut self) {
@@ -332,15 +337,16 @@ impl CustomList {
             self.filtered_items.len()
         };
 
-        let curr_selection = self.list_state.selected().unwrap();
-        if self.at_root() {
-            self.list_state
-                .select(Some((curr_selection + 1).min(count - 1)));
-        } else {
-            // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
-            // the count is 1 bigger (select is 0 based, because it's an index)
-            self.list_state
-                .select(Some((curr_selection + 1).min(count)));
+        if let Some(curr_selection) = self.list_state.selected() {
+            if self.at_root() {
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count - 1)));
+            } else {
+                // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
+                // the count is 1 bigger (select is 0 based, because it's an index)
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count)));
+            }
         }
     }
 
