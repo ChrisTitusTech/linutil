@@ -168,7 +168,9 @@ impl CustomList {
             }
             items
         } else {
-            self.filtered_items
+            let mut sorted_items = self.filtered_items.clone();
+            sorted_items.sort_by(|a, b| a.name.cmp(b.name));
+            sorted_items
                 .iter()
                 .map(|node| {
                     Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
@@ -235,6 +237,15 @@ impl CustomList {
             for child in node.children() {
                 stack.push(child.id());
             }
+        }
+    }
+
+    /// Resets the selection to the first item
+    pub fn reset_selection(&mut self) {
+        if !self.filtered_items.is_empty() {
+            self.list_state.select(Some(0));
+        } else {
+            self.list_state.select(None);
         }
     }
 
@@ -317,8 +328,11 @@ impl CustomList {
     }
 
     fn try_scroll_up(&mut self) {
-        self.list_state
-            .select(Some(self.list_state.selected().unwrap().saturating_sub(1)));
+        if let Some(selected) = self.list_state.selected() {
+            if selected > 0 {
+                self.list_state.select(Some(selected.saturating_sub(1)));
+            }
+        }
     }
 
     fn try_scroll_down(&mut self) {
@@ -342,8 +356,6 @@ impl CustomList {
                 self.list_state
                     .select(Some((curr_selection + 1).min(count)));
             }
-        } else if count > 0 {
-            self.list_state.select(Some(0));
         }
     }
 
