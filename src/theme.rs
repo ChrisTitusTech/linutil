@@ -1,7 +1,6 @@
 use ratatui::style::Color;
 
-pub static mut THEME_IDX: usize = 1;
-
+#[derive(Clone)]
 pub struct Theme {
     pub dir_color: Color,
     pub cmd_color: Color,
@@ -29,11 +28,3 @@ pub const THEMES: [Theme; 2] = [
         success_color: Color::Rgb(5, 255, 55),
     },
 ];
-
-pub fn get_theme() -> &'static Theme {
-    &THEMES[unsafe { THEME_IDX }]
-}
-
-pub fn set_theme(idx: usize) {
-    unsafe { THEME_IDX = idx };
-}
