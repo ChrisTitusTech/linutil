@@ -1,4 +1,4 @@
-use crate::{float::floating_window, theme::*};
+use crate::{float::floating_window, running_command::Command, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
@@ -9,19 +9,9 @@ use ratatui::{
     Frame,
 };
 
-macro_rules! with_common_script {
-    ($command:expr) => {
-        concat!(
-            include_str!("commands/common-script.sh"),
-            include_str!($command)
-        )
-    };
-}
-
-#[derive(Clone)]
 struct ListNode {
     name: &'static str,
-    command: &'static str,
+    command: Command,
 }
 
 /// This is a data structure that has everything necessary to draw and manage a menu of commands
@@ -65,62 +55,53 @@ impl CustomList {
         // case the tree! macro expands to `ego-tree::tree` data structure
         let tree = tree!(ListNode {
             name: "root",
-            command: ""
+            command: Command::None,
         } => {
-            // ListNode {
-            //     name: "Just ls, nothing special, trust me",
-            //     command: include_str!("commands/special_ls.sh"),
-            // },
             ListNode {
                 name: "System Setup",
-                command: ""
+                command: Command::None,
             } => {
                 ListNode {
                     name: "Build Prerequisites",
-                    command: with_common_script!("commands/system-setup/1-compile-setup.sh"),
+                    command: Command::LocalFile("system-setup/1-compile-setup.sh"),
                 },
                 ListNode {
                     name: "Gaming Dependencies",
-                    command: with_common_script!("commands/system-setup/2-gaming-setup.sh"),
+                    command: Command::LocalFile("system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
                     name: "Global Theme",
-                    command: with_common_script!("commands/system-setup/3-global-theme.sh"),
+                    command: Command::LocalFile("system-setup/3-global-theme.sh"),
                 },
-                ListNode {
-                    name: "Recursion?",
-                    command: "cargo run"
-                }
             },
             ListNode {
                 name: "Applications Setup",
-                command: ""
+                command: Command::None
             } => {
                 ListNode {
                     name: "Alacritty Setup",
-                    command: with_common_script!("commands/applications-setup/alacritty-setup.sh"),
-
-                },
-                ListNode {
-                    name: "Kitty Setup",
-                    command: with_common_script!("commands/applications-setup/kitty-setup.sh"),
+                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
                 },
                 ListNode {
                     name: "Bash Prompt Setup",
-                    command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "Kitty Setup",
+                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
                 },
                 ListNode {
                     name: "Neovim Setup",
-                    command: "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
                 },
                 ListNode {
                     name: "Rofi Setup",
-                    command: with_common_script!("commands/applications-setup/rofi-setup.sh"),
+                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
                 },
             },
             ListNode {
                 name: "Full System Update",
-                command: with_common_script!("commands/system-update.sh"),
+                command: Command::LocalFile("system-update.sh"),
             },
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
@@ -138,8 +119,7 @@ impl CustomList {
     }
 
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String) {
-        let theme = get_theme();
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String, state: &AppState) {
         self.filter(filter);
 
         let item_list: Vec<Line> = if self.filter_query.is_empty() {
@@ -148,8 +128,12 @@ impl CustomList {
             // to go up the tree
             // icons:   
             if !self.at_root() {
-                items.push(Line::from(format!("{}  ..", theme.dir_icon)).style(theme.dir_color));
+                items.push(
+                    Line::from(format!("{}  ..", state.theme.dir_icon))
+                        .style(state.theme.dir_color),
+                );
             }
+
             // Get the last element in the `visit_stack` vec
             let curr = self
                 .inner_tree
@@ -162,13 +146,13 @@ impl CustomList {
                 // it's a directory and will be handled as such
                 if node.has_children() {
                     items.push(
-                        Line::from(format!("{}  {}", theme.dir_icon, node.value().name))
-                            .style(theme.dir_color),
+                        Line::from(format!("{}  {}", state.theme.dir_icon, node.value().name))
+                            .style(state.theme.dir_color),
                     );
                 } else {
                     items.push(
-                        Line::from(format!("{}  {}", theme.cmd_icon, node.value().name))
-                            .style(theme.cmd_color),
+                        Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name))
+                            .style(state.theme.cmd_color),
                     );
                 }
             }
@@ -177,7 +161,7 @@ impl CustomList {
             self.filtered_items
                 .iter()
                 .map(|node| {
-                    Line::from(format!("{}  {}", theme.cmd_icon, node.name)).style(theme.cmd_color)
+                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name)).style(state.theme.cmd_color)
                 })
                 .collect()
         };
@@ -244,7 +228,7 @@ impl CustomList {
     }
 
     /// Handle key events, we are only interested in `Press` and `Repeat` events
-    pub fn handle_key(&mut self, event: KeyEvent) -> Option<&'static str> {
+    pub fn handle_key(&mut self, event: KeyEvent, state: &AppState) -> Option<Command> {
         if event.kind == KeyEventKind::Release {
             return None;
         }
@@ -274,14 +258,14 @@ impl CustomList {
             }
             // The 'p' key toggles the preview on and off
             KeyCode::Char('p') => {
-                self.toggle_preview_window();
+                self.toggle_preview_window(state);
                 None
             }
             KeyCode::Enter => self.handle_enter(),
             _ => None,
         }
     }
-    fn toggle_preview_window(&mut self) {
+    fn toggle_preview_window(&mut self, state: &AppState) {
         // If the preview window is active, disable it
         if self.preview_window_state.is_some() {
             self.preview_window_state = None;
@@ -290,17 +274,23 @@ impl CustomList {
 
             // Get the selected command
             if let Some(selected_command) = self.get_selected_command() {
-                // If command is a folder, we don't display a preview
-                if selected_command.is_empty() {
-                    return;
-                }
-
-                // Reconstruct the line breaks and file formatting after the
-                // 'include_str!()' call in the node
-                let lines: Vec<String> = selected_command
-                    .lines()
-                    .map(|line| line.to_string())
-                    .collect();
+                let lines = match selected_command {
+                    Command::Raw(cmd) => {
+                        // Reconstruct the line breaks and file formatting after the
+                        // 'include_str!()' call in the node
+                        cmd.lines().map(|line| line.to_string()).collect()
+                    }
+                    Command::LocalFile(file_path) => {
+                        let mut full_path = state.temp_path.clone();
+                        full_path.push(file_path);
+                        let file_contents = std::fs::read_to_string(&full_path)
+                            .map_err(|_| format!("File not found: {:?}", &full_path))
+                            .unwrap();
+                        file_contents.lines().map(|line| line.to_string()).collect()
+                    }
+                    // If command is a folder, we don't display a preview
+                    Command::None => return,
+                };
 
                 // Show the preview window with the text lines
                 self.preview_window_state = Some(PreviewWindowState::new(lines));
@@ -358,7 +348,7 @@ impl CustomList {
     ///
     /// This could probably be integrated into the 'handle_enter()' method as to avoid code
     /// duplication, but I don't want to make too major changes to the codebase.
-    fn get_selected_command(&self) -> Option<&'static str> {
+    fn get_selected_command(&self) -> Option<Command> {
         let curr = self
             .inner_tree
             .get(*self.visit_stack.last().unwrap())
@@ -375,7 +365,7 @@ impl CustomList {
                 idx += 1;
             }
             if idx == selected {
-                return Some(node.value().command);
+                return Some(node.value().command.clone());
             }
         }
         None
@@ -385,8 +375,9 @@ impl CustomList {
     /// - Run a command, if it is the currently selected item,
     /// - Go up a directory
     /// - Go down into a directory
+    ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
-    fn handle_enter(&mut self) -> Option<&'static str> {
+    fn handle_enter(&mut self) -> Option<Command> {
         // Get the current node (current directory)
         let curr = self
             .inner_tree
@@ -414,7 +405,7 @@ impl CustomList {
                     self.list_state.select(Some(0));
                     return None;
                 } else {
-                    return Some(node.value().command);
+                    return Some(node.value().command.clone());
                 }
             }
         }

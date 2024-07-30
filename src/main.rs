@@ -1,6 +1,7 @@
 mod float;
 mod list;
 mod running_command;
+pub mod state;
 mod theme;
 
 use std::{
@@ -16,6 +17,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
+use include_dir::include_dir;
 use list::CustomList;
 use ratatui::{
     backend::{Backend, CrosstermBackend},
@@ -26,7 +28,9 @@ use ratatui::{
     Terminal,
 };
 use running_command::RunningCommand;
-use theme::set_theme;
+use state::AppState;
+use tempdir::TempDir;
+use theme::THEMES;
 
 /// This is a binary :), Chris, change this to update the documentation on -h
 #[derive(Debug, Parser)]
@@ -38,16 +42,29 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    if args.compat {
-        set_theme(0);
-    }
+
+    let theme = if args.compat {
+        THEMES[0].clone()
+    } else {
+        THEMES[1].clone()
+    };
+    let commands_dir = include_dir!("src/commands");
+    let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
+    commands_dir
+        .extract(temp_dir.path())
+        .expect("Failed to extract the saved directory");
+
+    let state = AppState {
+        theme,
+        temp_path: temp_dir.path().to_owned(),
+    };
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    run(&mut terminal)?;
+    run(&mut terminal, &state)?;
 
     // restore terminal
     disable_raw_mode()?;
@@ -59,7 +76,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<()> {
     let mut command_opt: Option<RunningCommand> = None;
     let mut custom_list = CustomList::new();
     let mut search_input = String::new();
@@ -100,10 +117,10 @@ fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                 //Render the search bar (First chunk of the screen)
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
-                custom_list.draw(frame, chunks[1], search_input.clone());
+                custom_list.draw(frame, chunks[1], search_input.clone(),state);
 
                 if let Some(ref mut command) = &mut command_opt {
-                    command.draw(frame);
+                    command.draw(frame, state);
                 }
             })
             .unwrap();
@@ -128,28 +145,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
                 if key.code == KeyCode::Char('q') {
                     return Ok(());
                 }
-                //Activate search mode if the forward slash key gets pressed
-                if key.code == KeyCode::Char('/') {
-                    // Enter search mode
-                    in_search_mode = true;
-                    continue;
-                }
-                //Insert user input into the search bar
-                if in_search_mode {
-                    match key.code {
-                        KeyCode::Char(c) => search_input.push(c),
-                        KeyCode::Backspace => {
-                            search_input.pop();
-                        }
-                        KeyCode::Esc => {
-                            search_input = String::new();
-                            in_search_mode = false
-                        }
-                        KeyCode::Enter => in_search_mode = false,
-                        _ => {}
-                    }
-                } else if let Some(cmd) = custom_list.handle_key(key) {
-                    command_opt = Some(RunningCommand::new(cmd));
+                if let Some(cmd) = custom_list.handle_key(key, state) {
+                    command_opt = Some(RunningCommand::new(cmd, state));
                 }
             }
         }

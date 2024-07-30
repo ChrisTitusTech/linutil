@@ -11,7 +11,7 @@ use portable_pty::{
 };
 use ratatui::{
     layout::Size,
-    style::{Color, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders},
     Frame,
@@ -21,7 +21,14 @@ use tui_term::{
     widget::PseudoTerminal,
 };
 
-use crate::{float::floating_window, theme::get_theme};
+use crate::{float::floating_window, state::AppState};
+
+#[derive(Clone)]
+pub enum Command {
+    Raw(&'static str),
+    LocalFile(&'static str),
+    None, // Directory
+}
 
 /// This is a struct for storing everything connected to a running command
 // Create a new instance on every new command you want to run
@@ -50,14 +57,22 @@ pub struct RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(command: &str) -> Self {
+    pub fn new(command: Command, state: &AppState) -> Self {
         let pty_system = NativePtySystem::default();
-        let mut cmd = CommandBuilder::new("sh");
-        cmd.arg("-c");
-        cmd.arg(command);
 
-        let cwd = std::env::current_dir().unwrap();
-        cmd.cwd(cwd);
+        let mut cmd = CommandBuilder::new("sh");
+        match command {
+            Command::Raw(prompt) => {
+                cmd.arg("-c");
+                cmd.arg(prompt);
+            }
+            Command::LocalFile(file) => {
+                cmd.arg(file);
+            }
+            Command::None => panic!("Command::None was treated as a command"),
+        }
+
+        cmd.cwd(&state.temp_path);
 
         let pair = pty_system
             .openpty(PtySize {
@@ -153,59 +168,57 @@ impl RunningCommand {
         }
     }
 
-    pub fn draw(&mut self, frame: &mut Frame) {
-        {
-            let theme = get_theme();
-            // Funny name
-            let floater = floating_window(frame.size());
+    pub fn draw(&mut self, frame: &mut Frame, state: &AppState) {
+        // Funny name
+        let floater = floating_window(frame.size());
 
-            let inner_size = Size {
-                width: floater.width - 2, // Because we add a `Block` with a border
-                height: floater.height - 2,
-            };
+        let inner_size = Size {
+            width: floater.width - 2, // Because we add a `Block` with a border
+            height: floater.height - 2,
+        };
 
-            // When the command is running
-            let term_border = if !self.is_finished() {
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title_top(Line::from("Running the command....").centered())
-                    .title_style(Style::default().reversed())
-                    .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
-            } else {
-                // This portion is just for pretty colors.
-                // You can use multiple `Span`s with different styles each, to construct a line,
-                // which can be used as a list item, or in this case a `Block` title
+        // When the command is running
+        let term_border = if !self.is_finished() {
+            Block::default()
+                .borders(Borders::ALL)
+                .title_top(Line::from("Running the command....").centered())
+                .title_style(Style::default().reversed())
+                .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
+        } else {
+            // This portion is just for pretty colors.
+            // You can use multiple `Span`s with different styles each, to construct a line,
+            // which can be used as a list item, or in this case a `Block` title
 
-                let mut title_line = if self.get_exit_status().success() {
-                    Line::from(
-                        Span::default()
-                            .content("SUCCESS!")
-                            .style(Style::default().fg(theme.success_color).reversed()),
-                    )
-                } else {
-                    Line::from(
-                        Span::default()
-                            .content("FAILED!")
-                            .style(Style::default().fg(theme.fail_color).reversed()),
-                    )
-                };
-
-                title_line.push_span(
+            let mut title_line = if self.get_exit_status().success() {
+                Line::from(
                     Span::default()
-                        .content(" press <ENTER> to close this window ")
-                        .style(Style::default()),
-                );
-
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title_top(title_line.centered())
+                        .content("SUCCESS!")
+                        .style(Style::default().fg(state.theme.success_color).reversed()),
+                )
+            } else {
+                Line::from(
+                    Span::default()
+                        .content("FAILED!")
+                        .style(Style::default().fg(state.theme.fail_color).reversed()),
+                )
             };
-            let screen = self.screen(inner_size); // when the terminal is changing a lot, there
-                                                  // will be 1 frame of lag on resizing
-            let pseudo_term = PseudoTerminal::new(&screen).block(term_border);
-            frame.render_widget(pseudo_term, floater);
-        }
+
+            title_line.push_span(
+                Span::default()
+                    .content(" press <ENTER> to close this window ")
+                    .style(Style::default()),
+            );
+
+            Block::default()
+                .borders(Borders::ALL)
+                .title_top(title_line.centered())
+        };
+        let screen = self.screen(inner_size); // when the terminal is changing a lot, there
+                                              // will be 1 frame of lag on resizing
+        let pseudo_term = PseudoTerminal::new(&screen).block(term_border);
+        frame.render_widget(pseudo_term, floater);
     }
+
     /// Send SIGHUB signal, *not* SIGKILL or SIGTERM, to the child process
     pub fn kill_child(&mut self) {
         if !self.is_finished() {

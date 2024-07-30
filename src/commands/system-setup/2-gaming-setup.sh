@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
 installDepend() {
     ## Check for dependencies.
     echo -e "${YELLOW}Installing dependencies...${RC}"
