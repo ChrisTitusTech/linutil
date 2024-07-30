@@ -162,7 +162,10 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                             search_input = String::new();
                             in_search_mode = false
                         }
-                        KeyCode::Enter => in_search_mode = false,
+                        KeyCode::Enter => {
+                            in_search_mode = false;
+                            custom_list.reset_selection();
+                        }
                         _ => {}
                     }
                 } else if let Some(cmd) = custom_list.handle_key(key, state) {
