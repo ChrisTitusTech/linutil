@@ -117,7 +117,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 //Render the search bar (First chunk of the screen)
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
-                custom_list.draw(frame, chunks[1], search_input.clone(),state);
+                custom_list.draw(frame, chunks[1], search_input.clone(), state);
 
                 if let Some(ref mut command) = &mut command_opt {
                     command.draw(frame, state);
@@ -145,7 +145,27 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 if key.code == KeyCode::Char('q') {
                     return Ok(());
                 }
-                if let Some(cmd) = custom_list.handle_key(key, state) {
+                //Activate search mode if the forward slash key gets pressed
+                if key.code == KeyCode::Char('/') {
+                    // Enter search mode
+                    in_search_mode = true;
+                    continue;
+                }
+                //Insert user input into the search bar
+                if in_search_mode {
+                    match key.code {
+                        KeyCode::Char(c) => search_input.push(c),
+                        KeyCode::Backspace => {
+                            search_input.pop();
+                        }
+                        KeyCode::Esc => {
+                            search_input = String::new();
+                            in_search_mode = false
+                        }
+                        KeyCode::Enter => in_search_mode = false,
+                        _ => {}
+                    }
+                } else if let Some(cmd) = custom_list.handle_key(key, state) {
                     command_opt = Some(RunningCommand::new(cmd, state));
                 }
             }

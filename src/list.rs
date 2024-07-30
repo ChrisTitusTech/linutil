@@ -9,6 +9,7 @@ use ratatui::{
     Frame,
 };
 
+#[derive(Clone)]
 struct ListNode {
     name: &'static str,
     command: Command,
@@ -161,7 +162,8 @@ impl CustomList {
             self.filtered_items
                 .iter()
                 .map(|node| {
-                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name)).style(state.theme.cmd_color)
+                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
+                        .style(state.theme.cmd_color)
                 })
                 .collect()
         };
@@ -313,6 +315,7 @@ impl CustomList {
         } else {
             self.filtered_items.len()
         };
+
         let curr_selection = self.list_state.selected().unwrap();
         if self.at_root() {
             self.list_state
@@ -378,35 +381,44 @@ impl CustomList {
     ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
     fn handle_enter(&mut self) -> Option<Command> {
-        // Get the current node (current directory)
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
+        // Get the selected index
         let selected = self.list_state.selected().unwrap();
 
-        // if we are not at the root, and the first element is selected,
-        // we can be sure it's '..', so we go up the directory
-        if !self.at_root() && selected == 0 {
-            self.visit_stack.pop();
-            self.list_state.select(Some(0));
-            return None;
-        }
+        if self.filter_query.is_empty() {
+            // No filter query, use the regular tree navigation
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
 
-        for (mut idx, node) in curr.children().enumerate() {
-            // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
-            // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
-            if !self.at_root() {
-                idx += 1;
+            // if we are not at the root, and the first element is selected,
+            // we can be sure it's '..', so we go up the directory
+            if !self.at_root() && selected == 0 {
+                self.visit_stack.pop();
+                self.list_state.select(Some(0));
+                return None;
             }
-            if idx == selected {
-                if node.has_children() {
-                    self.visit_stack.push(node.id());
-                    self.list_state.select(Some(0));
-                    return None;
-                } else {
-                    return Some(node.value().command.clone());
+
+            for (mut idx, node) in curr.children().enumerate() {
+                // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
+                // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
+                if !self.at_root() {
+                    idx += 1;
                 }
+                if idx == selected {
+                    if node.has_children() {
+                        self.visit_stack.push(node.id());
+                        self.list_state.select(Some(0));
+                        return None;
+                    } else {
+                        return Some(node.value().command.clone());
+                    }
+                }
+            }
+        } else {
+            // Filter query is active, use the filtered items
+            if let Some(filtered_node) = self.filtered_items.get(selected) {
+                return Some(filtered_node.command.clone());
             }
         }
         None
