@@ -24,6 +24,7 @@ redirect_to_latest_pre_release() {
     echo "Using latest Full Release"
     url="https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil"
   fi
+  addArch
   echo "Using URL: $url"  # Log the URL being used
 }
 
@@ -37,6 +38,22 @@ check() {
     fi
 }
 
+addArch() {
+    case "${arch}" in
+        x86_64);;
+        *) url="${url}-${arch}";;
+    esac
+}
+
+findArch() {
+    case "$(uname -m)" in
+        x86_64|amd64) arch="x86_64" ;;
+        aarch64|arm64) arch="aarch64" ;;
+        *) check 1 "Unsupported architecture"
+    esac
+}
+
+findArch
 redirect_to_latest_pre_release
 
 TMPFILE=$(mktemp)
