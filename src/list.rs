@@ -325,15 +325,18 @@ impl CustomList {
             self.filtered_items.len()
         };
 
-        let curr_selection = self.list_state.selected().unwrap();
-        if self.at_root() {
-            self.list_state
-                .select(Some((curr_selection + 1).min(count - 1)));
-        } else {
-            // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
-            // the count is 1 bigger (select is 0 based, because it's an index)
-            self.list_state
-                .select(Some((curr_selection + 1).min(count)));
+        if let Some(curr_selection) = self.list_state.selected() {
+            if self.at_root() {
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count - 1)));
+            } else {
+                // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
+                // the count is 1 bigger (select is 0 based, because it's an index)
+                self.list_state
+                    .select(Some((curr_selection + 1).min(count)));
+            }
+        } else if count > 0 {
+            self.list_state.select(Some(0));
         }
     }
 
@@ -355,29 +358,38 @@ impl CustomList {
         }
     }
 
-    /// This method return the currently selected command, or None if no command is selected.
+    /// This method returns the currently selected command, or None if no command is selected.
     /// It was extracted from the 'handle_enter()'
     ///
-    /// This could probably be integrated into the 'handle_enter()' method as to avoid code
+    /// This could probably be integrated into the 'handle_enter()' method to avoid code
     /// duplication, but I don't want to make too major changes to the codebase.
     fn get_selected_command(&self) -> Option<Command> {
-        let curr = self
-            .inner_tree
-            .get(*self.visit_stack.last().unwrap())
-            .unwrap();
         let selected = self.list_state.selected().unwrap();
 
-        // If we are not at the root and the first item is selected, it's the `..` item
-        if !self.at_root() && selected == 0 {
-            return None;
-        }
+        if self.filter_query.is_empty() {
+            // No filter query, use the regular tree navigation
+            let curr = self
+                .inner_tree
+                .get(*self.visit_stack.last().unwrap())
+                .unwrap();
 
-        for (mut idx, node) in curr.children().enumerate() {
-            if !self.at_root() {
-                idx += 1;
+            // If we are not at the root and the first item is selected, it's the `..` item
+            if !self.at_root() && selected == 0 {
+                return None;
             }
-            if idx == selected {
-                return Some(node.value().command.clone());
+
+            for (mut idx, node) in curr.children().enumerate() {
+                if !self.at_root() {
+                    idx += 1;
+                }
+                if idx == selected {
+                    return Some(node.value().command.clone());
+                }
+            }
+        } else {
+            // Filter query is active, use the filtered items
+            if let Some(filtered_node) = self.filtered_items.get(selected) {
+                return Some(filtered_node.command.clone());
             }
         }
         None
@@ -390,6 +402,11 @@ impl CustomList {
     ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
     fn handle_enter(&mut self) -> Option<Command> {
+        // Ensure an item is selected if none is selected
+        if self.list_state.selected().is_none() {
+            self.list_state.select(Some(0));
+        }
+
         // Get the selected index
         let selected = self.list_state.selected().unwrap();
 
