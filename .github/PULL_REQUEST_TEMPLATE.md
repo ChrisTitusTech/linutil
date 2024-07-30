@@ -6,7 +6,7 @@
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix
-- [ ] Documentation Update (Due to be added!)
+- [ ] Documentation Update
 - [ ] Refactoring
 - [ ] Hotfix
 - [ ] Security patch
