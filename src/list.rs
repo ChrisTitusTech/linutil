@@ -50,19 +50,6 @@ impl PreviewWindowState {
     }
 }
 
-use std::fs::OpenOptions;
-use std::io::Write;
-
-fn log_debug_info(info: &str) {
-    let mut file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open("debug.log")
-        .unwrap();
-
-    writeln!(file, "{}", info).unwrap();
-}
-
 impl CustomList {
     pub fn new() -> Self {
         // When a function call ends with an exclamation mark, it means it's a macro, like in this
