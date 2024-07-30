@@ -8,3 +8,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+ignore:
+  - dependency-name: "actions/stale"
+    versions: '>= 9'
+  - dependency-name: "actions/setup-python"
+    versions: '> 4'
