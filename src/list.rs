@@ -77,15 +77,15 @@ impl CustomList {
             },
             ListNode {
                 name: "Security",
-                command: ""
+                command: Command::None
             } => {
                 ListNode {
                     name: "Firewall Baselines (CTT)",
-                    command: with_common_script!("commands/security/firewall-baselines.sh"),
+                    command: Command::LocalFile("security/firewall-baselines.sh"),
                 }
             },
             ListNode {
-                name: "Titus Dotfiles",
+                name: "Applications Setup",
                 command: Command::None
             } => {
                 ListNode {
