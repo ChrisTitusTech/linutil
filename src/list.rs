@@ -259,10 +259,10 @@ impl CustomList {
                 // so the scroll does not happen in the main window as well
                 if self.preview_window_state.is_some() {
                     self.scroll_preview_window_down();
-                    return None;
+                } else {
+                    self.list_state.select_next();
                 }
 
-                self.list_state.select_next();
                 None
             }
             KeyCode::Char('k') | KeyCode::Up => {
@@ -270,10 +270,10 @@ impl CustomList {
                 // so the scroll does not happen in the main window as well
                 if self.preview_window_state.is_some() {
                     self.scroll_preview_window_up();
-                    return None;
+                } else {
+                    self.list_state.select_previous();
                 }
 
-                self.list_state.select_previous();
                 None
             }
             // The 'p' key toggles the preview on and off
@@ -281,14 +281,7 @@ impl CustomList {
                 self.toggle_preview_window(state);
                 None
             }
-
-            KeyCode::Enter => {
-                if self.preview_window_state.is_none() {
-                    self.handle_enter()
-                } else {
-                    None
-                }
-            }
+            KeyCode::Enter if self.preview_window_state.is_none() => self.handle_enter(),
             _ => None,
         }
     }
