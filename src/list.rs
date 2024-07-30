@@ -414,11 +414,6 @@ impl CustomList {
     ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
     fn handle_enter(&mut self) -> Option<Command> {
-        // Ensure an item is selected if none is selected
-        if self.list_state.selected().is_none() {
-            self.list_state.select(Some(0));
-        }
-
         // Get the selected index
         let selected = self.list_state.selected().unwrap();
 
