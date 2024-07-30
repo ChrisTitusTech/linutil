@@ -115,6 +115,10 @@ impl CustomList {
                     name: "Rofi Setup",
                     command: with_common_script!("commands/dotfiles/rofi-setup.sh"),
                 },
+                ListNode {
+                    name: "DWM-Titus Setup (Install)",
+                    command: with_common_script!("commands/dotfiles/dwmtitus-setup.sh"),
+                },
             }
         });
         // We don't get a reference, but rather an id, because references are siginficantly more
