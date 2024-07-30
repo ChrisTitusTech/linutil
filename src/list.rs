@@ -168,7 +168,9 @@ impl CustomList {
             }
             items
         } else {
-            self.filtered_items
+            let mut sorted_items = self.filtered_items.clone();
+            sorted_items.sort_by(|a, b| a.name.cmp(b.name));
+            sorted_items
                 .iter()
                 .map(|node| {
                     Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
