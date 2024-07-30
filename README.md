@@ -16,6 +16,9 @@ Open your terminal and paste this command:
 curl -fsSL https://christitus.com/linux | sh
 ```
 
+## 🎓 Documentation
+### [WinUtil Official Documentation](https://christitustech.github.io/linutil/)
+
 ## 💖 Support
 - To morally and mentally support the project, make sure to leave a ⭐️!
 
