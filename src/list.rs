@@ -84,11 +84,11 @@ impl CustomList {
             },
             ListNode {
                 name: "Security",
-                command: ""
+                command: Command::None
             } => {
                 ListNode {
                     name: "Firewall Baselines (CTT)",
-                    command: with_common_script!("commands/security/firewall-baselines.sh"),
+                    command: Command::LocalFile("commands/security/firewall-baselines.sh"),
                 }
             },
             ListNode {
