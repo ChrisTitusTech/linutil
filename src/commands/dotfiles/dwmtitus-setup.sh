@@ -7,7 +7,7 @@ setupDWM() {
             sudo "$PACKAGER" -S --noconfirm --needed base-devel libx11 libxinerama libxft imlib2
             ;;
         *)
-            sudo "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimblib2-dev
+            sudo "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev
             ;;
     esac
    cd $HOME && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
