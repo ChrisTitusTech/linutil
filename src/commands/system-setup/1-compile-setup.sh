@@ -55,12 +55,12 @@ installDepend() {
             fi
             "$AUR_HELPER" --noconfirm -S "$DEPENDENCIES"
             ;;
-        apt)
+        apt-get|nala)
             COMPILEDEPS='build-essential'
             sudo "$PACKAGER" update
             sudo dpkg --add-architecture i386
             sudo "$PACKAGER" update
-            sudo "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS 
+            sudo "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS 
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
@@ -76,7 +76,7 @@ installDepend() {
             sudo "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            sudo "$PACKAGER" install -y "$DEPENDENCIES"
+            sudo "$PACKAGER" install -y $DEPENDENCIES # Fixed bug where no packages found on debian-based
             ;;
     esac
 }
