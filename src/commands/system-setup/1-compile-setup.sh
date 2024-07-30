@@ -53,7 +53,7 @@ installDepend() {
             fi
             "$AUR_HELPER" --noconfirm -S "$DEPENDENCIES"
             ;;
-        apt|apt-get|nala)
+        apt-get|nala)
             COMPILEDEPS='build-essential'
             sudo "$PACKAGER" update
             sudo dpkg --add-architecture i386
