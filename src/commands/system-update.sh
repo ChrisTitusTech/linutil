@@ -76,7 +76,8 @@ updateSystem() {
             sudo "${PACKAGER}" upgrade -y
             ;;
         pacman)
-            sudo "${PACKAGER}" -Syu --noconfirm
+            sudo "${PACKAGER}" -Sy --noconfirm --needed archlinux-keyring
+            sudo "${PACKAGER}" -Su --noconfirm
             ;;
         zypper)
             sudo ${PACKAGER} ref
