@@ -95,6 +95,13 @@ updateSystem() {
     esac
 }
 
+updateFlatpaks() {
+    if command_exists flatpak; then
+        flatpak update -y
+    fi
+}
+
 checkEnv
 fastUpdate
 updateSystem
+updateFlatpaks
