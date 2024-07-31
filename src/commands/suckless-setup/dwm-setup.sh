@@ -25,7 +25,7 @@ setupDWM() {
             ;;
          *)
             # Dependencies
-            sudo ${PACKAGER} install -y dmenu freetype2 libx11 libxft libxinerama
+            sudo ${PACKAGER} install -S dmenu libx11-dev libx11-xcb-dev libxcb-res0-dev libxinerama-dev libxft-dev libimlib2-dev
             curl -S "https://dl.suckless.org/st/st-0.9.2.tar.gz" --output app-src/st.tar.gz
             tar -xvf app-src/st.tar.gz
             sudo make clean install -C app-src/st
