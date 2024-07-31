@@ -132,7 +132,10 @@ impl CustomList {
                         name: "Scale Monitors",
                         command: Command::LocalFile("utils/monitor-control/scale_monitor.sh"),
                     },
-
+                    ListNode {
+                        name: "Reset Scaling",
+                        command: Command::LocalFile("utils/monitor-control/reset_scaling.sh"),
+                    },
                 },
             },
             ListNode {
