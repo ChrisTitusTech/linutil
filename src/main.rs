@@ -117,7 +117,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 //Render the search bar (First chunk of the screen)
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
-                custom_list.draw(frame, chunks[1], search_input.clone(), state);
+                custom_list.draw(frame, chunks[1], state);
 
                 if let Some(ref mut command) = &mut command_opt {
                     command.draw(frame, state);
@@ -154,12 +154,17 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 //Insert user input into the search bar
                 if in_search_mode {
                     match key.code {
-                        KeyCode::Char(c) => search_input.push(c),
+                        KeyCode::Char(c) => {
+                            search_input.push(c);
+                            custom_list.filter(search_input.clone());
+                        }
                         KeyCode::Backspace => {
                             search_input.pop();
+                            custom_list.filter(search_input.clone());
                         }
                         KeyCode::Esc => {
                             search_input = String::new();
+                            custom_list.filter(search_input.clone());
                             in_search_mode = false
                         }
                         KeyCode::Enter => {

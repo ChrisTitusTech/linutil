@@ -129,9 +129,7 @@ impl CustomList {
     }
 
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String, state: &AppState) {
-        self.filter(filter);
-
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, state: &AppState) {
         let item_list: Vec<Line> = if self.filter_query.is_empty() {
             let mut items: Vec<Line> = vec![];
             // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
@@ -168,9 +166,7 @@ impl CustomList {
             }
             items
         } else {
-            let mut sorted_items = self.filtered_items.clone();
-            sorted_items.sort_by(|a, b| a.name.cmp(b.name));
-            sorted_items
+            self.filtered_items
                 .iter()
                 .map(|node| {
                     Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
@@ -225,6 +221,7 @@ impl CustomList {
         self.filtered_items.clear();
 
         let query_lower = query.to_lowercase();
+
         let mut stack = vec![self.inner_tree.root().id()];
 
         while let Some(node_id) = stack.pop() {
@@ -238,6 +235,7 @@ impl CustomList {
                 stack.push(child.id());
             }
         }
+        self.filtered_items.sort_by(|a, b| a.name.cmp(b.name));
     }
 
     /// Resets the selection to the first item
@@ -264,7 +262,7 @@ impl CustomList {
                     return None;
                 }
 
-                self.try_scroll_down();
+                self.list_state.select_next();
                 None
             }
             KeyCode::Char('k') | KeyCode::Up => {
@@ -275,7 +273,7 @@ impl CustomList {
                     return None;
                 }
 
-                self.try_scroll_up();
+                self.list_state.select_previous();
                 None
             }
             // The 'p' key toggles the preview on and off
@@ -284,7 +282,7 @@ impl CustomList {
                 None
             }
 
-            KeyCode::Enter => { 
+            KeyCode::Enter => {
                 if self.preview_window_state.is_none() {
                     self.handle_enter()
                 } else {
@@ -327,38 +325,6 @@ impl CustomList {
         }
     }
 
-    fn try_scroll_up(&mut self) {
-        if let Some(selected) = self.list_state.selected() {
-            if selected > 0 {
-                self.list_state.select(Some(selected.saturating_sub(1)));
-            }
-        }
-    }
-
-    fn try_scroll_down(&mut self) {
-        let count = if self.filter_query.is_empty() {
-            let curr = self
-                .inner_tree
-                .get(*self.visit_stack.last().unwrap())
-                .unwrap();
-            curr.children().count()
-        } else {
-            self.filtered_items.len()
-        };
-
-        if let Some(curr_selection) = self.list_state.selected() {
-            if self.at_root() {
-                self.list_state
-                    .select(Some((curr_selection + 1).min(count - 1)));
-            } else {
-                // When we are not at the root, we have to account for 1 more "virtual" node, `..`. So
-                // the count is 1 bigger (select is 0 based, because it's an index)
-                self.list_state
-                    .select(Some((curr_selection + 1).min(count)));
-            }
-        }
-    }
-
     /// Scroll the preview window down
     fn scroll_preview_window_down(&mut self) {
         if let Some(pw_state) = &mut self.preview_window_state {
@@ -383,7 +349,8 @@ impl CustomList {
     /// This could probably be integrated into the 'handle_enter()' method to avoid code
     /// duplication, but I don't want to make too major changes to the codebase.
     fn get_selected_command(&self) -> Option<Command> {
-        let selected = self.list_state.selected().unwrap();
+        let selected_index = self.list_state.selected().unwrap_or(0);
+        println!("Selected Index: {}", selected_index);
 
         if self.filter_query.is_empty() {
             // No filter query, use the regular tree navigation
@@ -392,25 +359,28 @@ impl CustomList {
                 .get(*self.visit_stack.last().unwrap())
                 .unwrap();
 
-            // If we are not at the root and the first item is selected, it's the `..` item
-            if !self.at_root() && selected == 0 {
+            if !self.at_root() && selected_index == 0 {
                 return None;
             }
 
-            for (mut idx, node) in curr.children().enumerate() {
-                if !self.at_root() {
-                    idx += 1;
-                }
-                if idx == selected {
+            let mut actual_index = selected_index;
+            if !self.at_root() {
+                actual_index -= 1; // Adjust for the ".." item if not at root
+            }
+
+            for (idx, node) in curr.children().enumerate() {
+                if idx == actual_index {
                     return Some(node.value().command.clone());
                 }
             }
         } else {
             // Filter query is active, use the filtered items
-            if let Some(filtered_node) = self.filtered_items.get(selected) {
+            if let Some(filtered_node) = self.filtered_items.get(selected_index) {
+                println!("Filtered Node Name: {}", filtered_node.name);
                 return Some(filtered_node.command.clone());
             }
         }
+
         None
     }
 
@@ -421,13 +391,7 @@ impl CustomList {
     ///
     /// Returns `Some(command)` when command is selected, othervise we returns `None`
     fn handle_enter(&mut self) -> Option<Command> {
-        // Ensure an item is selected if none is selected
-        if self.list_state.selected().is_none() {
-            self.list_state.select(Some(0));
-        }
-
-        // Get the selected index
-        let selected = self.list_state.selected().unwrap();
+        let selected_index = self.list_state.selected().unwrap_or(0);
 
         if self.filter_query.is_empty() {
             // No filter query, use the regular tree navigation
@@ -436,21 +400,19 @@ impl CustomList {
                 .get(*self.visit_stack.last().unwrap())
                 .unwrap();
 
-            // if we are not at the root, and the first element is selected,
-            // we can be sure it's '..', so we go up the directory
-            if !self.at_root() && selected == 0 {
+            if !self.at_root() && selected_index == 0 {
                 self.visit_stack.pop();
                 self.list_state.select(Some(0));
                 return None;
             }
 
-            for (mut idx, node) in curr.children().enumerate() {
-                // at this point, we know that we are not on the .. item, and our indexes of the items never had ..
-                // item. so to balance it out, in case the selection index contains .., se add 1 to our node index
-                if !self.at_root() {
-                    idx += 1;
-                }
-                if idx == selected {
+            let mut actual_index = selected_index;
+            if !self.at_root() {
+                actual_index -= 1; // Adjust for the ".." item if not at root
+            }
+
+            for (idx, node) in curr.children().enumerate() {
+                if idx == actual_index {
                     if node.has_children() {
                         self.visit_stack.push(node.id());
                         self.list_state.select(Some(0));
@@ -462,10 +424,11 @@ impl CustomList {
             }
         } else {
             // Filter query is active, use the filtered items
-            if let Some(filtered_node) = self.filtered_items.get(selected) {
+            if let Some(filtered_node) = self.filtered_items.get(selected_index) {
                 return Some(filtered_node.command.clone());
             }
         }
+
         None
     }
 
