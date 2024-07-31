@@ -33,10 +33,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-unknown-linux-musl
-      - name: Build
+      - name: Install cross-rs for cross-compilation
+        run: cargo install cross
+      - name: Build x86_64 binary
         run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl
+      - name: Build aarch64 binary
+        run: cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
-          file_pattern: "build/x86_64-unknown-linux-musl/release/linutil"
+          file_pattern: "build/x86_64-unknown-linux-musl/release/linutil build/aarch64-unknown-linux-musl/release/linutil"
         if: success()

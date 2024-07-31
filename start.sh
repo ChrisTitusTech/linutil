@@ -3,8 +3,6 @@
 rc='\033[0m'
 red='\033[0;31m'
 
-binary_url="https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil"
-
 check() {
     exit_code=$1
     message=$2
@@ -18,10 +16,26 @@ check() {
 	unset message
 }
 
+findArch() {
+    case "$(uname -m)" in
+        x86_64|amd64) arch="x86_64" ;;
+        aarch64|arm64) arch="aarch64" ;;
+        *) check 1 "Unsupported architecture"
+    esac
+}
+
+getUrl() {
+    case "${arch}" in
+        x86_64) echo "https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil";;
+        *) echo "https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil-${arch}";;
+    esac
+}
+
+findArch
 temp_file=$(mktemp)
 check $? "Creating the temporary file"
 
-curl -fsL "$binary_url" -o "$temp_file"
+curl -fsL "$(getUrl)" -o "$temp_file"
 check $? "Downloading linutil"
 
 chmod +x "$temp_file"
