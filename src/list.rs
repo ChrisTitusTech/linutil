@@ -282,7 +282,7 @@ impl CustomList {
                 None
             }
 
-            KeyCode::Enter => { 
+            KeyCode::Enter => {
                 if self.preview_window_state.is_none() {
                     self.handle_enter()
                 } else {
