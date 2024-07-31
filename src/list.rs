@@ -90,7 +90,7 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "MonitorControl(xorg)",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/guruswarupa/MonitorControlBash/main/main.sh)\""),
+                    command: Command::LocalFile("utils/monitor-control.sh"),
                 }
             },
             ListNode {
