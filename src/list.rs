@@ -129,8 +129,7 @@ impl CustomList {
     }
 
     /// Draw our custom widget to the frame
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect, filter: String, state: &AppState) {
-        self.filter(filter);
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, state: &AppState) {
 
         let item_list: Vec<Line> = if self.filter_query.is_empty() {
             let mut items: Vec<Line> = vec![];
@@ -168,9 +167,7 @@ impl CustomList {
             }
             items
         } else {
-            let mut sorted_items = self.filtered_items.clone();
-            sorted_items.sort_by(|a, b| a.name.cmp(b.name));
-            sorted_items
+            self.filtered_items
                 .iter()
                 .map(|node| {
                     Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
@@ -225,6 +222,7 @@ impl CustomList {
         self.filtered_items.clear();
 
         let query_lower = query.to_lowercase();
+
         let mut stack = vec![self.inner_tree.root().id()];
 
         while let Some(node_id) = stack.pop() {
@@ -238,6 +236,7 @@ impl CustomList {
                 stack.push(child.id());
             }
         }
+        self.filtered_items.sort_by(|a, b| a.name.cmp(b.name));
     }
 
     /// Resets the selection to the first item
@@ -345,6 +344,7 @@ impl CustomList {
     /// duplication, but I don't want to make too major changes to the codebase.
     fn get_selected_command(&self) -> Option<Command> {
         let selected_index = self.list_state.selected().unwrap_or(0);
+        println!("Selected Index: {}", selected_index);
 
         if self.filter_query.is_empty() {
             // No filter query, use the regular tree navigation
@@ -370,6 +370,7 @@ impl CustomList {
         } else {
             // Filter query is active, use the filtered items
             if let Some(filtered_node) = self.filtered_items.get(selected_index) {
+                println!("Filtered Node Name: {}", filtered_node.name);
                 return Some(filtered_node.command.clone());
             }
         }
