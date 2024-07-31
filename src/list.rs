@@ -85,6 +85,15 @@ impl CustomList {
                 }
             },
             ListNode {
+                name: "Utilities",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "MonitorControl(xorg)",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/guruswarupa/MonitorControlBash/main/main.sh)\""),
+                }
+            },
+            ListNode {
                 name: "Applications Setup",
                 command: Command::None
             } => {
