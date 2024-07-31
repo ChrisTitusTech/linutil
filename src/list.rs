@@ -281,7 +281,14 @@ impl CustomList {
                 self.toggle_preview_window(state);
                 None
             }
-            KeyCode::Enter => self.handle_enter(),
+
+            KeyCode::Enter => { 
+                if self.preview_window_state.is_none() {
+                    self.handle_enter()
+                } else {
+                    None
+                }
+            }
             _ => None,
         }
     }
