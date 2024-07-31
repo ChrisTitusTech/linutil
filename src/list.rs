@@ -90,8 +90,33 @@ impl CustomList {
             } => {
                 ListNode {
                     name: "MonitorControl(xorg)",
-                    command: Command::LocalFile("utils/monitor-control.sh"),
-                }
+                    command: Command::None,
+                } => {
+                    ListNode {
+                        name: "Set Resolution",
+                        command: Command::LocalFile("utils/monitor-control/set_resolutions.sh"),
+                    },
+                    ListNode {
+                        name: "Duplicate Displays",
+                        command: Command::LocalFile("utils/monitor-control/duplicate_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Extend Displays",
+                        command: Command::LocalFile("utils/monitor-control/extend_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Auto Detect Displays",
+                        command: Command::LocalFile("utils/monitor-control/auto_detect_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Enable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/enable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Disable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/disable_monitor.sh"),
+                    },
+                },
             },
             ListNode {
                 name: "Applications Setup",
