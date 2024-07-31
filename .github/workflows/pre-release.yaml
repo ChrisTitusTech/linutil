@@ -21,9 +21,6 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
         shell: bash
 
-      - name: Rename aarch64 binary for release
-        run: mv ./build/aarch64-unknown-linux-musl/release/linutil ./build/aarch64-unknown-linux-musl/release/linutil-aarch64
-
       - name: Create and Upload Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -33,8 +30,8 @@ jobs:
           body: "![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)"
           append_body: false
           files: |
-            ./build/x86_64-unknown-linux-musl/release/linutil
-            ./build/aarch64-unknown-linux-musl/release/linutil-aarch64
+            ./build/linutil
+            ./build/linutil-aarch64
           prerelease: true
           generate_release_notes: true
         env:
