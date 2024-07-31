@@ -76,6 +76,23 @@ impl CustomList {
                 },
             },
             ListNode {
+                name: "Suckless Setup (Default)",
+                command: Command::None,
+            } => {
+                ListNode {
+                    name: "DWM (ST and Dmenu Included)",
+                    command: Command::LocalFile("suckless-setup/dwm-setup.sh"),
+                },
+                ListNode {
+                    name: "ST",
+                    command: Command::LocalFile("suckless-setup/st-setup.sh"),
+                },
+                ListNode {
+                    name: "Dmenu",
+                    command: Command::LocalFile("suckless-setup/dmenu-setup.sh"),
+                },
+            },
+            ListNode {
                 name: "Security",
                 command: Command::None
             } => {
