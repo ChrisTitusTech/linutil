@@ -157,7 +157,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                         KeyCode::Char(c) => {
                             search_input.push(c);
                             custom_list.filter(search_input.clone());
-                        },
+                        }
                         KeyCode::Backspace => {
                             search_input.pop();
                             custom_list.filter(search_input.clone());

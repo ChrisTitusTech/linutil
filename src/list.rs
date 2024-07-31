@@ -130,7 +130,6 @@ impl CustomList {
 
     /// Draw our custom widget to the frame
     pub fn draw(&mut self, frame: &mut Frame, area: Rect, state: &AppState) {
-
         let item_list: Vec<Line> = if self.filter_query.is_empty() {
             let mut items: Vec<Line> = vec![];
             // If we are not at the root of our filesystem tree, we need to add `..` path, to be able
