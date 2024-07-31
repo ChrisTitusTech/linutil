@@ -43,6 +43,10 @@ jobs:
         run: |
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
           mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
+      - name: Fetch latest changes
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
