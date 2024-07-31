@@ -116,6 +116,23 @@ impl CustomList {
                         name: "Disable Monitor",
                         command: Command::LocalFile("utils/monitor-control/disable_monitor.sh"),
                     },
+                    ListNode {
+                        name: "Set Primary Monitor",
+                        command: Command::LocalFile("utils/monitor-control/set_primary_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Change Orientation",
+                        command: Command::LocalFile("utils/monitor-control/change_orientation.sh"),
+                    },
+                    ListNode {
+                        name: "Manage Arrangement",
+                        command: Command::LocalFile("utils/monitor-control/manage_arrangement.sh"),
+                    },
+                    ListNode {
+                        name: "Scale Monitors",
+                        command: Command::LocalFile("utils/monitor-control/scale_monitor.sh"),
+                    },
+
                 },
             },
             ListNode {
