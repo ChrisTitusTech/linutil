@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
 installPkg() {
     echo "Install UFW if not already installed..."
     if ! command_exists ufw; then
