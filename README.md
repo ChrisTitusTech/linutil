@@ -5,9 +5,9 @@
 
 ![Preview](docs/assets/preview.png)
 
-A distro-agnostic* toolbox which helps with everyday Linux tasks. It can help you set up applications, and set up your system for specific use cases! Written with Rust 🦀
+A distro-agnostic* toolbox which helps with everyday Linux tasks. It can help you set up applications and your system for specific use cases! Written with Rust 🦀
 
-\* — The project is in active development, so there could be some issues, please, consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues)
+\* — The project is in active development, so there could be some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues).
 
 ## 💡 Usage
 
@@ -20,7 +20,7 @@ curl -fsSL https://christitus.com/linux | sh
 ### [LinUtil Official Documentation](https://christitustech.github.io/linutil/)
 
 ## 💖 Support
-- To morally and mentally support the project, make sure to leave a ⭐️!
+To morally and mentally support the project, make sure to leave a ⭐️!
 
 ## 🏅 Thanks to all Contributors
 Thanks a lot for spending your time helping Linutil grow. Thanks a lot! Keep rocking 🍻.
