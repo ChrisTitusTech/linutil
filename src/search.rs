@@ -36,12 +36,8 @@ impl SearchBar {
 
     pub fn draw(&self, frame: &mut Frame, area: Rect, state: &AppState) {
         //Set the search bar text (If empty use the placeholder)
-        let display_text = if self.search_input.is_empty() {
-            if self.in_search_mode {
-                Span::raw("")
-            } else {
-                Span::raw("Press / to search")
-            }
+        let display_text = if !self.in_search_mode && self.search_input.is_empty() {
+            Span::raw("Press / to search")
         } else {
             Span::raw(&self.search_input)
         };
