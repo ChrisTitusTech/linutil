@@ -102,6 +102,6 @@ updateFlatpaks() {
 }
 
 checkEnv
-fastUpdate
 updateSystem
+fastUpdate
 updateFlatpaks
