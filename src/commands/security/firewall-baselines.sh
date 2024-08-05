@@ -39,8 +39,8 @@ configureUFW() {
     echo "Allowing Outcoming Packets by Default(UFW)"
     sudo ufw default allow outgoing
 
-    echo -e "${GREEN}Enabled Firewall with Baselines!${RC}"
     sudo ufw enable
+    echo -e "${GREEN}Enabled Firewall with Baselines!${RC}"
 }
 
 checkEnv
