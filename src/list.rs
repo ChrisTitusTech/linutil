@@ -89,6 +89,14 @@ impl CustomList {
                 command: Command::None
             } => {
                 ListNode {
+                    name: "Wifi Manager",
+                    command: Command::LocalFile("utils/wifi-control.sh"),
+                },
+                ListNode {
+                    name: "Bluetooth Manager",
+                    command: Command::LocalFile("utils/bluetooth-control.sh"),
+                },
+                ListNode {
                     name: "MonitorControl(xorg)",
                     command: Command::None,
                 } => {
