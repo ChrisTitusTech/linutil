@@ -167,7 +167,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 } else if let Some(cmd) = custom_list.handle_key(key, state) {
                     command_opt = Some(RunningCommand::new(cmd, state));
                 } else {
-
                     // Handle keys while not in search mode
                     match key.code {
                         // Exit the program
@@ -176,7 +175,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                         KeyCode::Char('/') => {
                             in_search_mode = true;
                             continue;
-                        },
+                        }
                         _ => {}
                     }
                 }
