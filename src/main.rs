@@ -1,5 +1,6 @@
 mod float;
 mod list;
+mod preview_content;
 mod running_command;
 pub mod state;
 mod theme;
@@ -17,6 +18,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
+use float::Float;
 use include_dir::include_dir;
 use list::CustomList;
 use ratatui::{
@@ -77,9 +79,12 @@ fn main() -> std::io::Result<()> {
 }
 
 fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<()> {
-    let mut command_opt: Option<RunningCommand> = None;
-    let mut custom_list = CustomList::new();
+    //Create the search field
     let mut search_input = String::new();
+    //Create the command list
+    let mut custom_list = CustomList::new();
+    //Create the float to hold command output
+    let mut command_float = Float::new(60, 60);
     let mut in_search_mode = false;
 
     loop {
@@ -118,10 +123,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
                 custom_list.draw(frame, chunks[1], state);
-
-                if let Some(ref mut command) = &mut command_opt {
-                    command.draw(frame, state);
-                }
+                //Render the command float in the custom_list chunk
+                command_float.draw(frame, chunks[1]);
             })
             .unwrap();
 
