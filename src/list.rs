@@ -282,14 +282,14 @@ impl CustomList {
                 None
             }
 
-            KeyCode::Enter | KeyCode::Char('l') => {
+            KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
                 if self.preview_window_state.is_none() {
                     self.handle_enter()
                 } else {
                     None
                 }
             }
-            KeyCode::Char('h') if !self.at_root() => self.enter_parent_directory(),
+            KeyCode::Left | KeyCode::Char('h') if !self.at_root() => self.enter_parent_directory(),
             _ => None,
         }
     }
