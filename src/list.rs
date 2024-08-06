@@ -282,13 +282,14 @@ impl CustomList {
                 None
             }
 
-            KeyCode::Enter => {
+            KeyCode::Enter | KeyCode::Char('l') => {
                 if self.preview_window_state.is_none() {
                     self.handle_enter()
                 } else {
                     None
                 }
             }
+            KeyCode::Char('h') if !self.at_root() => self.enter_parent_directory(),
             _ => None,
         }
     }
@@ -384,6 +385,12 @@ impl CustomList {
         None
     }
 
+    fn enter_parent_directory(&mut self) -> Option<Command> {
+        self.visit_stack.pop();
+        self.list_state.select(Some(0));
+        None
+    }
+
     /// Handles the <Enter> key. This key can do 3 things:
     /// - Run a command, if it is the currently selected item,
     /// - Go up a directory
@@ -401,9 +408,7 @@ impl CustomList {
                 .unwrap();
 
             if !self.at_root() && selected_index == 0 {
-                self.visit_stack.pop();
-                self.list_state.select(Some(0));
-                return None;
+                return self.enter_parent_directory();
             }
 
             let mut actual_index = selected_index;
