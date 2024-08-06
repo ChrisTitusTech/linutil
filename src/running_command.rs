@@ -4,6 +4,7 @@ use std::{
     thread::JoinHandle,
 };
 
+use super::systeminfo::System;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -67,6 +68,9 @@ impl RunningCommand {
                 cmd.arg(prompt);
             }
             Command::LocalFile(file) => {
+                // Export useful variables before running
+                export_env(&mut cmd);
+                // Run the script
                 cmd.arg(file);
             }
             Command::None => panic!("Command::None was treated as a command"),
@@ -129,6 +133,7 @@ impl RunningCommand {
             status: None,
         }
     }
+
     fn screen(&mut self, size: Size) -> Screen {
         // Resize the emulated pty
         self.pty_master
@@ -292,4 +297,15 @@ impl RunningCommand {
         // Send the keycodes to the virtual terminal
         let _ = self.writer.write_all(&input_bytes);
     }
+}
+
+fn export_env(cmd: &mut CommandBuilder) {
+    let sys: System = System::info();
+
+    cmd.env("SYS_ID", sys.id);
+    cmd.env("SYS_NAME", sys.pretty_name);
+    cmd.env("INSTALL_COMMAND", sys.install_command);
+    cmd.env("UNINSTALL_COMMAND", sys.uninstall_command);
+    cmd.env("UPDATE_COMMAND", sys.update_command);
+    cmd.env("PACKAGE_MANAGER", sys.package_manager);
 }

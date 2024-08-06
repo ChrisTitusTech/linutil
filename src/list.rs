@@ -59,6 +59,10 @@ impl CustomList {
             command: Command::None,
         } => {
             ListNode {
+                name: "System info",
+                command: Command::LocalFile("info.sh"),
+            },
+            ListNode {
                 name: "System Setup",
                 command: Command::None,
             } => {

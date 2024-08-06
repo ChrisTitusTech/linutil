@@ -1,0 +1,6 @@
+echo "Distro name: $SYS_NAME"
+echo "ID: $SYS_ID"
+echo "Package manager: $PACKAGE_MANAGER"
+echo "Install command: $INSTALL_COMMAND"
+echo "Uninstall command: $UNINSTALL_COMMAND"
+echo "Update command: $UPDATE_COMMAND"
