@@ -1,8 +1,8 @@
 mod float;
 mod list;
 mod running_command;
-mod systeminfo;
 pub mod state;
+mod systeminfo;
 mod theme;
 
 use std::{

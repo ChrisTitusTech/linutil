@@ -1,98 +1,63 @@
+use packagemanagers::PackageManager;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
 
 pub mod packagemanagers;
 
 pub struct System {
-    pub id: String,
-    pub pretty_name: String,
-    pub package_manager: String,
-    pub install_command: String,
-    pub uninstall_command: String,
-    pub update_command: String
+    pub id: Box<str>,
+    pub pretty_name: Box<str>,
+    pub package_manager: Option<PackageManager>,
 }
 
 impl System {
     pub fn info() -> System {
-        let (distro, pretty_name): (String, String) = get_distribution();
-        let package_manager: String = get_package_manager(&distro);
-        
-        let pm: packagemanagers::PackageManager;
+        let (id, pretty_name) = get_distribution();
 
-        match packagemanagers::get(package_manager) {
-            Some(value) => pm = value,
-            None => panic!("Could not find a suitable package manager")
-        }
-    
-        let s: System = System {
-            id: distro,
-            pretty_name: pretty_name,
-            package_manager: pm.name.to_string(),
-            install_command: pm.install_command.to_string(),
-            uninstall_command: pm.uninstall_command.to_string(),
-            update_command: pm.update_command.to_string(),
-        };
+        let package_manager =
+            get_package_manager(id.as_ref()).and_then(|name| packagemanagers::get(name));
 
-        return s;
-    }
-}
-
-fn get_package_manager(distro: &String) -> String {
-    // Package manager map
-    let mut map: HashMap<String, String> = HashMap::new();
-    map.insert("fedora".to_string(), "dnf".to_string());
-    map.insert("debian".to_string(), "apt".to_string());
-    map.insert("arch".to_string(), "pacman".to_string());
-    map.insert("opensuse".to_string(), "zypper".to_string());
-
-    match map.get(&distro.to_string()) {
-        Some(val) => return val.to_string(),
-        None => panic!("Could not find a suitable package manager for your system")
-    }
-}
-
-fn get_distribution() -> (String, String) {
-    let info: HashMap<String, String> = get_os_info();
-
-    // Retrieve the value for the key
-    let id: String;
-    let pretty_name: String;
-    match info.get(&"id".to_string()) {
-        Some(value) => id = value.to_string(),
-        None => id = "unknown".to_string(),
-    }
-
-    match info.get(&"pretty_name".to_string()) {
-        Some(value) => pretty_name = value.to_string(),
-        None => pretty_name = "unknown".to_string(),
-    }
-
-    return (id, pretty_name);
-}
-
-fn get_os_info() -> HashMap<String, String> {
-    let mut map: HashMap<String, String> = HashMap::new();
-
-    if let Ok(lines) = read_lines("/etc/os-release") {
-        // Consumes the iterator, returns an (Optional) String
-        for line in lines.flatten() {
-            let vals: Vec<&str> = line.split("=").collect();
-            let key = vals[0];
-            let value = vals[1];
-
-            map.insert(key.to_string().to_lowercase(), value.to_string());
+        Self {
+            id,
+            pretty_name,
+            package_manager,
         }
     }
-
-    return map;
 }
 
-// The output is wrapped in a Result to allow matching on errors.
-// Returns an Iterator to the Reader of the lines of the file.
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+fn get_package_manager(distro: &str) -> Option<&'static str> {
+    let package_managers = [
+        ("fedora", "dnf"),
+        ("debian", "apt-get"),
+        ("arch", "pacman"),
+        ("opensuse", "zypper"),
+    ];
+
+    package_managers
+        .into_iter()
+        .find(|(key, _)| key == &distro)
+        .map(|(_, value)| value)
+}
+
+fn get_distribution() -> (Box<str>, Box<str>) {
+    let mut info = get_os_info();
+
+    let id = info.remove("id").unwrap_or("unknown".into());
+    let pretty_name = info.remove("pretty_name").unwrap_or("unknown".into());
+
+    (id, pretty_name)
+}
+
+fn get_os_info() -> HashMap<Box<str>, Box<str>> {
+    // os-release existing is a precondition which should be required. Therefore, we'll use expect() to specify why we expect this always to return an Ok value
+    let contents = std::fs::read_to_string("/etc/os-release")
+        .expect("os-release should exist on all Linux systems.");
+
+    contents
+        .lines()
+        .filter_map(|line| {
+            line.split_once('=')
+                .map(|(key, value)| (key.to_lowercase().into(), value.trim_matches('"').into()))
+        })
+        // The return type is implied, so we don't need to specify it to collect() in this case.
+        .collect()
 }

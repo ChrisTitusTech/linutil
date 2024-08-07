@@ -302,10 +302,13 @@ impl RunningCommand {
 fn export_env(cmd: &mut CommandBuilder) {
     let sys: System = System::info();
 
-    cmd.env("SYS_ID", sys.id);
-    cmd.env("SYS_NAME", sys.pretty_name);
-    cmd.env("INSTALL_COMMAND", sys.install_command);
-    cmd.env("UNINSTALL_COMMAND", sys.uninstall_command);
-    cmd.env("UPDATE_COMMAND", sys.update_command);
-    cmd.env("PACKAGE_MANAGER", sys.package_manager);
+    cmd.env("SYS_ID", sys.id.as_ref());
+    cmd.env("SYS_NAME", sys.pretty_name.as_ref());
+
+    if let Some(package_manager) = sys.package_manager {
+        cmd.env("PACKAGE_MANAGER", package_manager.name);
+        cmd.env("INSTALL_COMMAND", package_manager.install_command);
+        cmd.env("UNINSTALL_COMMAND", package_manager.uninstall_command);
+        cmd.env("UPDATE_COMMAND", package_manager.update_command);
+    }
 }
