@@ -41,10 +41,6 @@ const PACKAGE_MANAGERS: [PackageManager; 5] = [
     },
 ];
 
-// Good practice is to take in a pointer whenever you don't need ownership.
 pub fn get(name: &str) -> Option<PackageManager> {
-    // Iterators are typically preferred to traditional for loops in Rust.
-    // This line should be pretty self explanatory. We turn the package managers into an iterator of owned values (with into_iter()), then find the first one that matches the name string slice.
-    // find() returns an optional value, so we can return it directly (with an implicit return)
     PACKAGE_MANAGERS.into_iter().find(|p| p.name == name)
 }
