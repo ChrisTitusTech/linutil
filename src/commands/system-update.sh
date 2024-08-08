@@ -1,11 +1,6 @@
 #!/bin/sh -e
 
-checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install'
-    checkSuperUser
-    checkDistro
-}
+. ./common-script.sh
 
 fastUpdate() {
     case ${PACKAGER} in
@@ -83,7 +78,8 @@ updateSystem() {
             sudo "${PACKAGER}" upgrade -y
             ;;
         pacman)
-            sudo "${PACKAGER}" -Syu --noconfirm
+            sudo "${PACKAGER}" -Sy --noconfirm --needed archlinux-keyring
+            sudo "${PACKAGER}" -Su --noconfirm
             ;;
         zypper)
             sudo ${PACKAGER} ref
@@ -99,6 +95,13 @@ updateSystem() {
     esac
 }
 
+updateFlatpaks() {
+    if command_exists flatpak; then
+        flatpak update -y
+    fi
+}
+
 checkEnv
 fastUpdate
 updateSystem
+updateFlatpaks

@@ -1,11 +1,6 @@
 #!/bin/sh -e
 
-checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get yum dnf pacman zypper'
-    checkCurrentDirectoryWritable
-    checkSuperUser
-}
+. ./common-script.sh
 
 installDepend() {
     ## Check for dependencies.
