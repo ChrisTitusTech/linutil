@@ -117,6 +117,10 @@ impl CustomList {
                     name: "Global Theme",
                     command: Command::LocalFile("system-setup/3-global-theme.sh"),
                 },
+                ListNode {
+                    name: "Remove Snaps",
+                    command: Command::LocalFile("system-setup/4-remove-snaps.sh"),
+                },
             },
             ListNode {
                 name: "Utilities",
