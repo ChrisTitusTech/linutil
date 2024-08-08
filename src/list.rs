@@ -307,7 +307,7 @@ impl CustomList {
             }
 
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
-                if self.preview_window_state.is_none() {
+                if self.preview_float.get_content().is_none() {
                     self.handle_enter()
                 } else {
                     None
