@@ -116,7 +116,7 @@ impl CustomList {
                     name: "ZSH Prompt",
                     command: Command::LocalFile("applications-setup/zsh-setup.sh"),
                 }
-                
+
             },
             ListNode {
                 name: "Full System Update",
