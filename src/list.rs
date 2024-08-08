@@ -85,6 +85,68 @@ impl CustomList {
                 }
             },
             ListNode {
+                name: "Utilities",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Wifi Manager",
+                    command: Command::LocalFile("utils/wifi-control.sh"),
+                },
+                ListNode {
+                    name: "Bluetooth Manager",
+                    command: Command::LocalFile("utils/bluetooth-control.sh"),
+                },
+                ListNode {
+                    name: "MonitorControl(xorg)",
+                    command: Command::None,
+                } => {
+                    ListNode {
+                        name: "Set Resolution",
+                        command: Command::LocalFile("utils/monitor-control/set_resolutions.sh"),
+                    },
+                    ListNode {
+                        name: "Duplicate Displays",
+                        command: Command::LocalFile("utils/monitor-control/duplicate_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Extend Displays",
+                        command: Command::LocalFile("utils/monitor-control/extend_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Auto Detect Displays",
+                        command: Command::LocalFile("utils/monitor-control/auto_detect_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Enable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/enable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Disable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/disable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Set Primary Monitor",
+                        command: Command::LocalFile("utils/monitor-control/set_primary_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Change Orientation",
+                        command: Command::LocalFile("utils/monitor-control/change_orientation.sh"),
+                    },
+                    ListNode {
+                        name: "Manage Arrangement",
+                        command: Command::LocalFile("utils/monitor-control/manage_arrangement.sh"),
+                    },
+                    ListNode {
+                        name: "Scale Monitors",
+                        command: Command::LocalFile("utils/monitor-control/scale_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Reset Scaling",
+                        command: Command::LocalFile("utils/monitor-control/reset_scaling.sh"),
+                    },
+                },
+            },
+            ListNode {
                 name: "Applications Setup",
                 command: Command::None
             } => {
