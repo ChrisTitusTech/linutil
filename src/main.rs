@@ -142,7 +142,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                     command_opt = None;
                 }
             } else {
-                if key.code == KeyCode::Char('q') {
+                if key.code == KeyCode::Char('q') || key.code == KeyCode::Esc {
+                      // Exit the application if 'q' or 'Esc' is pressed
                     return Ok(());
                 }
                 //Activate search mode if the forward slash key gets pressed
