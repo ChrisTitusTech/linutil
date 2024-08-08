@@ -1,6 +1,6 @@
 mod float;
+mod floating_text;
 mod list;
-mod preview_content;
 mod running_command;
 pub mod state;
 mod theme;
@@ -140,11 +140,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
             if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
                 continue;
             }
-            if let Some(ref mut command) = command_opt {
-                if command.handle_key_event(&key) {
-                    command_opt = None;
-                }
-            } else {
+
+            //Send the key to the float
+            //If we receive true, then the float processed the input
+            //If that's the case, don't propagate input to other widgets
+            if !command_float.handle_key_event(&key) {
                 //Insert user input into the search bar
                 if in_search_mode {
                     match key.code {
@@ -168,7 +168,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                         _ => {}
                     }
                 } else if let Some(cmd) = custom_list.handle_key(key, state) {
-                    command_opt = Some(RunningCommand::new(cmd, state));
+                    command_float.set_content(Some(RunningCommand::new(cmd, state)));
                 } else {
                     // Handle keys while not in search mode
                     match key.code {

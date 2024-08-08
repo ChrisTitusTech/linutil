@@ -1,6 +1,4 @@
-use crate::{
-    float::Float, preview_content::FloatingText, running_command::Command, state::AppState,
-};
+use crate::{float::Float, floating_text::FloatingText, running_command::Command, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
