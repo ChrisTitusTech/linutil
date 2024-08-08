@@ -111,8 +111,12 @@ impl CustomList {
                 ListNode {
                     name: "Rofi",
                     command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                },
+                ListNode {
+                    name: "ZSH Prompt",
+                    command: Command::LocalFile("applications-setup/zsh-setup.sh"),
                 }
-                
+
             },
             ListNode {
                 name: "Full System Update",
