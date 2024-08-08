@@ -142,15 +142,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                     command_opt = None;
                 }
             } else {
-                if key.code == KeyCode::Char('q') {
-                    return Ok(());
-                }
-                //Activate search mode if the forward slash key gets pressed
-                if key.code == KeyCode::Char('/') {
-                    // Enter search mode
-                    in_search_mode = true;
-                    continue;
-                }
                 //Insert user input into the search bar
                 if in_search_mode {
                     match key.code {
@@ -175,6 +166,18 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                     }
                 } else if let Some(cmd) = custom_list.handle_key(key, state) {
                     command_opt = Some(RunningCommand::new(cmd, state));
+                } else {
+                    // Handle keys while not in search mode
+                    match key.code {
+                        // Exit the program
+                        KeyCode::Char('q') => return Ok(()),
+                        //Activate search mode if the forward slash key gets pressed
+                        KeyCode::Char('/') => {
+                            in_search_mode = true;
+                            continue;
+                        }
+                        _ => {}
+                    }
                 }
             }
         }

@@ -59,6 +59,49 @@ impl CustomList {
             command: Command::None,
         } => {
             ListNode {
+                name: "Applications Setup",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Alacritty",
+                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                },
+                ListNode {
+                    name: "Bash Prompt",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "DWM-Titus",
+                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
+                },
+                ListNode {
+                    name: "Kitty",
+                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
+                },
+                ListNode {
+                    name: "Neovim",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "Rofi",
+                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                },
+                ListNode {
+                    name: "ZSH Prompt",
+                    command: Command::LocalFile("applications-setup/zsh-setup.sh"),
+                }
+
+            },
+            ListNode {
+                name: "Security",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Firewall Baselines (CTT)",
+                    command: Command::LocalFile("security/firewall-baselines.sh"),
+                }
+            },
+            ListNode {
                 name: "System Setup",
                 command: Command::None,
             } => {
@@ -74,39 +117,71 @@ impl CustomList {
                     name: "Global Theme",
                     command: Command::LocalFile("system-setup/3-global-theme.sh"),
                 },
+                ListNode {
+                    name: "Remove Snaps",
+                    command: Command::LocalFile("system-setup/4-remove-snaps.sh"),
+                },
             },
             ListNode {
-                name: "Security",
+                name: "Utilities",
                 command: Command::None
             } => {
                 ListNode {
-                    name: "Firewall Baselines (CTT)",
-                    command: Command::LocalFile("security/firewall-baselines.sh"),
-                }
-            },
-            ListNode {
-                name: "Applications Setup",
-                command: Command::None
-            } => {
-                ListNode {
-                    name: "Alacritty Setup",
-                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                    name: "Wifi Manager",
+                    command: Command::LocalFile("utils/wifi-control.sh"),
                 },
                 ListNode {
-                    name: "Bash Prompt Setup",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                    name: "Bluetooth Manager",
+                    command: Command::LocalFile("utils/bluetooth-control.sh"),
                 },
                 ListNode {
-                    name: "Kitty Setup",
-                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
-                },
-                ListNode {
-                    name: "Neovim Setup",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
-                },
-                ListNode {
-                    name: "Rofi Setup",
-                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                    name: "MonitorControl(xorg)",
+                    command: Command::None,
+                } => {
+                    ListNode {
+                        name: "Set Resolution",
+                        command: Command::LocalFile("utils/monitor-control/set_resolutions.sh"),
+                    },
+                    ListNode {
+                        name: "Duplicate Displays",
+                        command: Command::LocalFile("utils/monitor-control/duplicate_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Extend Displays",
+                        command: Command::LocalFile("utils/monitor-control/extend_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Auto Detect Displays",
+                        command: Command::LocalFile("utils/monitor-control/auto_detect_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Enable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/enable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Disable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/disable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Set Primary Monitor",
+                        command: Command::LocalFile("utils/monitor-control/set_primary_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Change Orientation",
+                        command: Command::LocalFile("utils/monitor-control/change_orientation.sh"),
+                    },
+                    ListNode {
+                        name: "Manage Arrangement",
+                        command: Command::LocalFile("utils/monitor-control/manage_arrangement.sh"),
+                    },
+                    ListNode {
+                        name: "Scale Monitors",
+                        command: Command::LocalFile("utils/monitor-control/scale_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Reset Scaling",
+                        command: Command::LocalFile("utils/monitor-control/reset_scaling.sh"),
+                    },
                 },
             },
             ListNode {
@@ -259,10 +334,10 @@ impl CustomList {
                 // so the scroll does not happen in the main window as well
                 if self.preview_window_state.is_some() {
                     self.scroll_preview_window_down();
-                    return None;
+                } else {
+                    self.list_state.select_next();
                 }
 
-                self.list_state.select_next();
                 None
             }
             KeyCode::Char('k') | KeyCode::Up => {
@@ -270,10 +345,10 @@ impl CustomList {
                 // so the scroll does not happen in the main window as well
                 if self.preview_window_state.is_some() {
                     self.scroll_preview_window_up();
-                    return None;
+                } else {
+                    self.list_state.select_previous();
                 }
 
-                self.list_state.select_previous();
                 None
             }
             // The 'p' key toggles the preview on and off
