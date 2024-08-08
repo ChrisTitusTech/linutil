@@ -8,7 +8,7 @@ install_zsh() {
     if ! command_exists zsh; then
         case "$PACKAGER" in
             pacman)
-                sudo "$PACKAGER" -S --noconfirm zsh
+                sudo "$PACKAGER" -Sy --noconfirm zsh
                 ;;
             *)
                 sudo "$PACKAGER" install -y zsh
