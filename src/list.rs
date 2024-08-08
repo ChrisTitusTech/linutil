@@ -59,6 +59,49 @@ impl CustomList {
             command: Command::None,
         } => {
             ListNode {
+                name: "Applications Setup",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Alacritty",
+                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                },
+                ListNode {
+                    name: "Bash Prompt",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "DWM-Titus",
+                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
+                },
+                ListNode {
+                    name: "Kitty",
+                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
+                },
+                ListNode {
+                    name: "Neovim",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "Rofi",
+                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                },
+                ListNode {
+                    name: "ZSH Prompt",
+                    command: Command::LocalFile("applications-setup/zsh-setup.sh"),
+                }
+
+            },
+            ListNode {
+                name: "Security",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Firewall Baselines (CTT)",
+                    command: Command::LocalFile("security/firewall-baselines.sh"),
+                }
+            },
+            ListNode {
                 name: "System Setup",
                 command: Command::None,
             } => {
@@ -74,15 +117,6 @@ impl CustomList {
                     name: "Global Theme",
                     command: Command::LocalFile("system-setup/3-global-theme.sh"),
                 },
-            },
-            ListNode {
-                name: "Security",
-                command: Command::None
-            } => {
-                ListNode {
-                    name: "Firewall Baselines (CTT)",
-                    command: Command::LocalFile("security/firewall-baselines.sh"),
-                }
             },
             ListNode {
                 name: "Utilities",
@@ -145,40 +179,6 @@ impl CustomList {
                         command: Command::LocalFile("utils/monitor-control/reset_scaling.sh"),
                     },
                 },
-            },
-            ListNode {
-                name: "Applications Setup",
-                command: Command::None
-            } => {
-                ListNode {
-                    name: "Alacritty",
-                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
-                },
-                ListNode {
-                    name: "Bash Prompt",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
-                },
-                ListNode {
-                    name: "DWM-Titus",
-                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
-                },
-                ListNode {
-                    name: "Kitty",
-                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
-                },
-                ListNode {
-                    name: "Neovim",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
-                },
-                ListNode {
-                    name: "Rofi",
-                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
-                },
-                ListNode {
-                    name: "ZSH Prompt",
-                    command: Command::LocalFile("applications-setup/zsh-setup.sh"),
-                }
-
             },
             ListNode {
                 name: "Full System Update",
