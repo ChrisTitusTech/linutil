@@ -1,5 +1,5 @@
 use crate::{
-    float::Float, preview_content::PreviewContent, running_command::Command, state::AppState,
+    float::Float, preview_content::FloatingText, running_command::Command, state::AppState,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
@@ -33,7 +33,7 @@ pub struct CustomList {
     // This stores the filtered tree
     filtered_items: Vec<ListNode>,
     // This is the preview window for the commands
-    preview_float: Float<PreviewContent>,
+    preview_float: Float<FloatingText>,
 }
 
 impl CustomList {
@@ -416,7 +416,7 @@ impl CustomList {
                 };
 
                 self.preview_float
-                    .set_content(Some(PreviewContent::new(lines)));
+                    .set_content(Some(FloatingText::new(lines)));
             }
         }
     }
