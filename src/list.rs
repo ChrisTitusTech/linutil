@@ -89,29 +89,30 @@ impl CustomList {
                 command: Command::None
             } => {
                 ListNode {
-                    name: "Alacritty Setup",
+                    name: "Alacritty",
                     command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
                 },
                 ListNode {
-                    name: "Bash Prompt Setup",
+                    name: "Bash Prompt",
                     command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
                 },
                 ListNode {
-                    name: "Kitty Setup",
+                    name: "DWM-Titus",
+                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
+                },
+                ListNode {
+                    name: "Kitty",
                     command: Command::LocalFile("applications-setup/kitty-setup.sh")
                 },
                 ListNode {
-                    name: "Neovim Setup",
+                    name: "Neovim",
                     command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
                 },
                 ListNode {
-                    name: "Rofi Setup",
+                    name: "Rofi",
                     command: Command::LocalFile("applications-setup/rofi-setup.sh"),
-                },
-                ListNode {
-                    name: "DWM-Titus Setup (Install)",
-                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
                 }
+                
             },
             ListNode {
                 name: "Full System Update",
