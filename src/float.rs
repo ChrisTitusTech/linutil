@@ -1,59 +1,91 @@
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use crossterm::event::{KeyCode, KeyEvent};
+use ratatui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    Frame,
+};
 
-/// This function just makes a given area smaller by 20 % in each direction, creating a kind of
-/// "floating window". And you don't actually need all the constraints, and layouts to do that, its
-/// very easy to calculate it directly, but I chose to use the ratatui API
-pub fn floating_window(size: Rect) -> Rect {
-    // If the terminal window is small enough, just take up all the space for the command
-    if size.width < 85 || size.height < 25 {
-        return size;
-    }
-    let hor_float = Layout::default()
-        .constraints([
-            Constraint::Percentage(20),
-            Constraint::Percentage(60),
-            Constraint::Percentage(20),
-        ])
-        .direction(Direction::Horizontal)
-        .split(size)[1];
-    Layout::default()
-        .constraints([
-            Constraint::Percentage(20),
-            Constraint::Percentage(60),
-            Constraint::Percentage(20),
-        ])
-        .direction(Direction::Vertical)
-        .split(hor_float)[1]
+pub trait FloatContent {
+    fn draw(&mut self, frame: &mut Frame, area: Rect);
+    fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
+    fn is_finished(&self) -> bool;
 }
 
-/// Here is how would a purely math based function look like:
-/// But it might break on smaller numbers
-fn _unused_manual_floating_window(size: Rect) -> Rect {
-    // If the terminal window is small enough, just take up all the space for the command
-    if size.width < 85 || size.height < 25 {
-        return size;
-    }
-    let new_width = size.width * 60 / 100;
-    let new_height = size.height * 60 / 100;
-    let new_x = size.x + size.width * 20 / 100;
-    let new_y = size.y + size.height * 20 / 100;
-    Rect {
-        width: new_width,
-        height: new_height,
-        x: new_x,
-        y: new_y,
-    }
+pub struct Float<T: FloatContent> {
+    content: Option<T>,
+    width_percent: u16,
+    height_percent: u16,
 }
 
-#[test]
-fn test_floating() {
-    let rect = Rect {
-        x: 10,
-        y: 2,
-        width: 100,
-        height: 200,
-    };
-    let res1 = floating_window(rect);
-    let res2 = floating_window(rect);
-    assert_eq!(res1, res2);
+impl<T: FloatContent> Float<T> {
+    pub fn new(width_percent: u16, height_percent: u16) -> Self {
+        Self {
+            content: None,
+            width_percent,
+            height_percent,
+        }
+    }
+
+    fn floating_window(&self, size: Rect) -> Rect {
+        let hor_float = Layout::default()
+            .constraints([
+                Constraint::Percentage((100 - self.width_percent) / 2),
+                Constraint::Percentage(self.width_percent),
+                Constraint::Percentage((100 - self.width_percent) / 2),
+            ])
+            .direction(Direction::Horizontal)
+            .split(size)[1];
+
+        Layout::default()
+            .constraints([
+                Constraint::Percentage((100 - self.height_percent) / 2),
+                Constraint::Percentage(self.height_percent),
+                Constraint::Percentage((100 - self.height_percent) / 2),
+            ])
+            .direction(Direction::Vertical)
+            .split(hor_float)[1]
+    }
+
+    pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect) {
+        let popup_area = self.floating_window(parent_area);
+
+        if let Some(content) = &mut self.content {
+            let content_area = Rect {
+                x: popup_area.x,
+                y: popup_area.y,
+                width: popup_area.width,
+                height: popup_area.height,
+            };
+
+            content.draw(frame, content_area);
+        }
+    }
+
+    // Returns true if the key was processed by this Float.
+    pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        if let Some(content) = &mut self.content {
+            match key.code {
+                KeyCode::Enter | KeyCode::Char('p') | KeyCode::Esc | KeyCode::Char('q') => {
+                    if content.is_finished() {
+                        self.content = None;
+                    } else {
+                        content.handle_key_event(key);
+                    }
+                }
+                _ => {
+                    content.handle_key_event(key);
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_content(&self) -> &Option<T> {
+        &self.content
+    }
+
+    pub fn set_content(&mut self, content: Option<T>) {
+        self.content = content;
+    }
 }

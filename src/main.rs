@@ -1,4 +1,5 @@
 mod float;
+mod floating_text;
 mod list;
 mod running_command;
 pub mod state;
@@ -17,6 +18,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
+use float::Float;
 use include_dir::include_dir;
 use list::CustomList;
 use ratatui::{
@@ -77,9 +79,12 @@ fn main() -> std::io::Result<()> {
 }
 
 fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<()> {
-    let mut command_opt: Option<RunningCommand> = None;
-    let mut custom_list = CustomList::new();
+    //Create the search field
     let mut search_input = String::new();
+    //Create the command list
+    let mut custom_list = CustomList::new();
+    //Create the float to hold command output
+    let mut command_float = Float::new(60, 60);
     let mut in_search_mode = false;
 
     loop {
@@ -118,10 +123,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
                 custom_list.draw(frame, chunks[1], state);
-
-                if let Some(ref mut command) = &mut command_opt {
-                    command.draw(frame, state);
-                }
+                //Render the command float in the custom_list chunk
+                command_float.draw(frame, chunks[1]);
             })
             .unwrap();
 
@@ -137,11 +140,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
             if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
                 continue;
             }
-            if let Some(ref mut command) = command_opt {
-                if command.handle_key_event(&key) {
-                    command_opt = None;
-                }
-            } else {
+
+            //Send the key to the float
+            //If we receive true, then the float processed the input
+            //If that's the case, don't propagate input to other widgets
+            if !command_float.handle_key_event(&key) {
                 //Insert user input into the search bar
                 if in_search_mode {
                     match key.code {
@@ -165,7 +168,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                         _ => {}
                     }
                 } else if let Some(cmd) = custom_list.handle_key(key, state) {
-                    command_opt = Some(RunningCommand::new(cmd, state));
+                    command_float.set_content(Some(RunningCommand::new(cmd, state)));
                 } else {
                     // Handle keys while not in search mode
                     match key.code {
