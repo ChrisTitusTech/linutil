@@ -111,6 +111,10 @@ impl CustomList {
                 command: Command::None
             } => {
                 ListNode {
+                    name: "System info",
+                    command: Command::LocalFile("utils/info.sh"),
+                },
+                ListNode {
                     name: "Wifi Manager",
                     command: Command::LocalFile("utils/wifi-control.sh"),
                 },

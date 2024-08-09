@@ -1,3 +1,4 @@
+use super::systeminfo::System;
 use crate::{float::FloatContent, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use oneshot::{channel, Receiver};
