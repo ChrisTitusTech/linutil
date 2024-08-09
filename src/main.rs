@@ -18,7 +18,6 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use float::Float;
 use include_dir::include_dir;
 use list::CustomList;
 use ratatui::{
@@ -29,7 +28,6 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
     Terminal,
 };
-use running_command::RunningCommand;
 use state::AppState;
 use tempdir::TempDir;
 use theme::THEMES;
@@ -83,8 +81,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
     let mut search_input = String::new();
     //Create the command list
     let mut custom_list = CustomList::new();
-    //Create the float to hold command output
-    let mut command_float = Float::new(60, 60);
     let mut in_search_mode = false;
 
     loop {
@@ -123,8 +119,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 frame.render_widget(search_bar, chunks[0]);
                 //Render the command list (Second chunk of the screen)
                 custom_list.draw(frame, chunks[1], state);
-                //Render the command float in the custom_list chunk
-                command_float.draw(frame, chunks[1]);
             })
             .unwrap();
 
@@ -141,46 +135,44 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 continue;
             }
 
-            //Send the key to the float
-            //If we receive true, then the float processed the input
-            //If that's the case, don't propagate input to other widgets
-            if !command_float.handle_key_event(&key) {
-                //Insert user input into the search bar
-                if in_search_mode {
-                    match key.code {
-                        KeyCode::Char(c) => {
-                            search_input.push(c);
-                            custom_list.filter(search_input.clone());
-                        }
-                        KeyCode::Backspace => {
-                            search_input.pop();
-                            custom_list.filter(search_input.clone());
-                        }
-                        KeyCode::Esc => {
-                            search_input = String::new();
-                            custom_list.filter(search_input.clone());
-                            in_search_mode = false
-                        }
-                        KeyCode::Enter => {
-                            in_search_mode = false;
-                            custom_list.reset_selection();
-                        }
-                        _ => {}
+            //Here we now only have 3 options
+            //1 - Send the input to the search bar
+            //2 - Send the input to the commands list
+            //3 - Use the input ourselves
+
+            //Insert user input into the search bar
+            if in_search_mode {
+                match key.code {
+                    KeyCode::Char(c) => {
+                        search_input.push(c);
+                        custom_list.filter(search_input.clone());
                     }
-                } else if let Some(cmd) = custom_list.handle_key(key, state) {
-                    command_float.set_content(Some(RunningCommand::new(cmd, state)));
-                } else {
-                    // Handle keys while not in search mode
-                    match key.code {
-                        // Exit the program
-                        KeyCode::Char('q') => return Ok(()),
-                        //Activate search mode if the forward slash key gets pressed
-                        KeyCode::Char('/') => {
-                            in_search_mode = true;
-                            continue;
-                        }
-                        _ => {}
+                    KeyCode::Backspace => {
+                        search_input.pop();
+                        custom_list.filter(search_input.clone());
                     }
+                    KeyCode::Esc => {
+                        search_input = String::new();
+                        custom_list.filter(search_input.clone());
+                        in_search_mode = false
+                    }
+                    KeyCode::Enter => {
+                        in_search_mode = false;
+                        custom_list.reset_selection();
+                    }
+                    _ => {}
+                }
+            } else if !custom_list.handle_key(key, state) {
+                // Handle keys while not in search mode
+                match key.code {
+                    // Exit the program
+                    KeyCode::Char('q') => return Ok(()),
+                    //Activate search mode if the forward slash key gets pressed
+                    KeyCode::Char('/') => {
+                        in_search_mode = true;
+                        continue;
+                    }
+                    _ => {}
                 }
             }
         }

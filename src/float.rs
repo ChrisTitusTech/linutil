@@ -7,6 +7,10 @@ use ratatui::{
 pub trait FloatContent {
     fn draw(&mut self, frame: &mut Frame, area: Rect);
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
+    // Lets the float know if it's content has finished.
+    // This is used to know if we can close the float.
+    // The running_command only returns true after the command has finished.
+    // The preview command always returns true.
     fn is_finished(&self) -> bool;
 }
 

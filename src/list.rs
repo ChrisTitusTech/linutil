@@ -1,4 +1,9 @@
-use crate::{float::Float, floating_text::FloatingText, running_command::Command, state::AppState};
+use crate::{
+    float::Float,
+    floating_text::FloatingText,
+    running_command::{Command, RunningCommand},
+    state::AppState,
+};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
@@ -30,8 +35,10 @@ pub struct CustomList {
     filter_query: String,
     // This stores the filtered tree
     filtered_items: Vec<ListNode>,
-    // This is the preview window for the commands
-    preview_float: Float<FloatingText>,
+    // This float holds the contents of the script
+    preview_command_float: Float<FloatingText>,
+    // This float holds the output of the script being ran.
+    command_output_float: Float<RunningCommand>,
 }
 
 impl CustomList {
@@ -182,7 +189,8 @@ impl CustomList {
             list_state: ListState::default().with_selected(Some(0)),
             filter_query: String::new(),
             filtered_items: vec![],
-            preview_float: Float::new(80, 80),
+            preview_command_float: Float::new(80, 80),
+            command_output_float: Float::new(80, 80),
         }
     }
 
@@ -246,8 +254,11 @@ impl CustomList {
         // Render it
         frame.render_stateful_widget(list, area, &mut self.list_state);
 
-        //Render the preview window
-        self.preview_float.draw(frame, area);
+        //Render the command preview float
+        self.preview_command_float.draw(frame, area);
+
+        //Render the command output float
+        self.command_output_float.draw(frame, area);
     }
 
     pub fn filter(&mut self, query: String) {
@@ -282,39 +293,55 @@ impl CustomList {
     }
 
     /// Handle key events, we are only interested in `Press` and `Repeat` events
-    pub fn handle_key(&mut self, event: KeyEvent, state: &AppState) -> Option<Command> {
+    /// We return true if we used the user's input, otherwise we return false.
+    pub fn handle_key(&mut self, event: KeyEvent, state: &AppState) -> bool {
         if event.kind == KeyEventKind::Release {
-            return None;
+            return false;
         }
 
-        if self.preview_float.handle_key_event(&event) {
-            return None; // If the key event was handled by the preview, don't propagate it further
+        if self.preview_command_float.handle_key_event(&event) {
+            return true; // If the key event was handled by the preview, don't propagate it further
+        }
+
+        if self.command_output_float.handle_key_event(&event) {
+            return true; // If the key event was handled by the command, don't propagate it further
         }
 
         match event.code {
             // Damm you Up arrow, use vim lol
             KeyCode::Char('j') | KeyCode::Down => {
                 self.list_state.select_next();
-                None
+                true
             }
             KeyCode::Char('k') | KeyCode::Up => {
                 self.list_state.select_previous();
-                None
+                true
             }
             KeyCode::Char('p') => {
                 self.toggle_preview_window(state);
-                None
+                true
             }
 
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
-                if self.preview_float.get_content().is_none() {
-                    self.handle_enter()
+                // Check if there is any command running
+                if self.command_output_float.get_content().is_some() {
+                    //Don't allow use to run a command if one is alreayd running
+                    false
                 } else {
-                    None
+                    // Get the command the user clicks on
+                    if let Some(cmd) = self.handle_enter() {
+                        // Make the float show the output of the selected command
+                        self.command_output_float
+                            .set_content(Some(RunningCommand::new(cmd, state)));
+                    }
+                    true
                 }
             }
-            KeyCode::Left | KeyCode::Char('h') if !self.at_root() => self.enter_parent_directory(),
-            _ => None,
+            KeyCode::Left | KeyCode::Char('h') if !self.at_root() => {
+                self.enter_parent_directory();
+                true
+            }
+            _ => false,
         }
     }
 
@@ -405,9 +432,9 @@ impl CustomList {
     }
 
     fn toggle_preview_window(&mut self, state: &AppState) {
-        if self.preview_float.get_content().is_some() {
+        if self.preview_command_float.get_content().is_some() {
             // If the preview window is active, disable it
-            self.preview_float.set_content(None);
+            self.preview_command_float.set_content(None);
         } else {
             // If the preview window is not active, show it
 
@@ -429,7 +456,7 @@ impl CustomList {
                     Command::None => return,
                 };
 
-                self.preview_float
+                self.preview_command_float
                     .set_content(Some(FloatingText::new(lines)));
             }
         }
