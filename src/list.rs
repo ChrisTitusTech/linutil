@@ -98,14 +98,20 @@ impl CustomList {
                     command: Command::LocalFile("system-setup/2-gaming-setup.sh"),
                 },
                 ListNode {
-                    name: "Global Theme",
-                    command: Command::LocalFile("system-setup/3-global-theme.sh"),
+                name: "Global Theme(Avoid Using With Desktop Environments)",
+                command: Command::None,
+                } => {
+                ListNode {
+                    name: "Catppuccin",
+                    command: Command::LocalFile("system-setup/global-themes/catppuccin.sh"),
                 },
+            },            
                 ListNode {
                     name: "Remove Snaps",
                     command: Command::LocalFile("system-setup/4-remove-snaps.sh"),
                 },
             },
+
             ListNode {
                 name: "Utilities",
                 command: Command::None
