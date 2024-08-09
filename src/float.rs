@@ -10,16 +10,16 @@ pub trait FloatContent {
     fn is_finished(&self) -> bool;
 }
 
-pub struct Float<T: FloatContent> {
-    content: Option<T>,
+pub struct Float {
+    content: Box<dyn FloatContent>,
     width_percent: u16,
     height_percent: u16,
 }
 
-impl<T: FloatContent> Float<T> {
-    pub fn new(width_percent: u16, height_percent: u16) -> Self {
+impl Float {
+    pub fn new(content: Box<dyn FloatContent>, width_percent: u16, height_percent: u16) -> Self {
         Self {
-            content: None,
+            content,
             width_percent,
             height_percent,
         }
@@ -48,44 +48,25 @@ impl<T: FloatContent> Float<T> {
     pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect) {
         let popup_area = self.floating_window(parent_area);
 
-        if let Some(content) = &mut self.content {
-            let content_area = Rect {
-                x: popup_area.x,
-                y: popup_area.y,
-                width: popup_area.width,
-                height: popup_area.height,
-            };
+        let content_area = Rect {
+            x: popup_area.x,
+            y: popup_area.y,
+            width: popup_area.width,
+            height: popup_area.height,
+        };
 
-            content.draw(frame, content_area);
-        }
+        self.content.draw(frame, content_area);
     }
 
-    // Returns true if the key was processed by this Float.
+    // Returns true if the floating window is finished.
     pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        if let Some(content) = &mut self.content {
-            match key.code {
-                KeyCode::Enter | KeyCode::Char('p') | KeyCode::Esc | KeyCode::Char('q') => {
-                    if content.is_finished() {
-                        self.content = None;
-                    } else {
-                        content.handle_key_event(key);
-                    }
-                }
-                _ => {
-                    content.handle_key_event(key);
-                }
+        match key.code {
+            KeyCode::Enter | KeyCode::Char('p') | KeyCode::Esc | KeyCode::Char('q')
+                if self.content.is_finished() =>
+            {
+                true
             }
-            true
-        } else {
-            false
+            _ => self.content.handle_key_event(key),
         }
-    }
-
-    pub fn get_content(&self) -> &Option<T> {
-        &self.content
-    }
-
-    pub fn set_content(&mut self, content: Option<T>) {
-        self.content = content;
     }
 }
