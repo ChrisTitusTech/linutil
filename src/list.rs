@@ -1,4 +1,4 @@
-use crate::{float::floating_window, running_command::Command, state::AppState};
+use crate::{float::Float, floating_text::FloatingText, running_command::Command, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::{tree, NodeId};
 use ratatui::{
@@ -26,28 +26,12 @@ pub struct CustomList {
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     list_state: ListState,
-    /// This stores the preview windows state. If it is None, it will not be displayed.
-    /// If it is Some, we show it with the content of the selected item
-    preview_window_state: Option<PreviewWindowState>,
     // This stores the current search query
     filter_query: String,
     // This stores the filtered tree
     filtered_items: Vec<ListNode>,
-}
-
-/// This struct stores the preview window state
-struct PreviewWindowState {
-    /// The text inside the window
-    text: Vec<String>,
-    /// The current line scroll
-    scroll: usize,
-}
-
-impl PreviewWindowState {
-    /// Create a new PreviewWindowState
-    pub fn new(text: Vec<String>) -> Self {
-        Self { text, scroll: 0 }
-    }
+    // This is the preview window for the commands
+    preview_float: Float<FloatingText>,
 }
 
 impl CustomList {
@@ -59,8 +43,47 @@ impl CustomList {
             command: Command::None,
         } => {
             ListNode {
-                name: "System info",
-                command: Command::LocalFile("info.sh"),
+                name: "Applications Setup",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Alacritty",
+                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                },
+                ListNode {
+                    name: "Bash Prompt",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "DWM-Titus",
+                    command: Command::LocalFile("applications-setup/dwmtitus-setup.sh")
+                },
+                ListNode {
+                    name: "Kitty",
+                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
+                },
+                ListNode {
+                    name: "Neovim",
+                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
+                },
+                ListNode {
+                    name: "Rofi",
+                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                },
+                ListNode {
+                    name: "ZSH Prompt",
+                    command: Command::LocalFile("applications-setup/zsh-setup.sh"),
+                }
+
+            },
+            ListNode {
+                name: "Security",
+                command: Command::None
+            } => {
+                ListNode {
+                    name: "Firewall Baselines (CTT)",
+                    command: Command::LocalFile("security/firewall-baselines.sh"),
+                }
             },
             ListNode {
                 name: "System Setup",
@@ -78,39 +101,71 @@ impl CustomList {
                     name: "Global Theme",
                     command: Command::LocalFile("system-setup/3-global-theme.sh"),
                 },
+                ListNode {
+                    name: "Remove Snaps",
+                    command: Command::LocalFile("system-setup/4-remove-snaps.sh"),
+                },
             },
             ListNode {
-                name: "Security",
+                name: "Utilities",
                 command: Command::None
             } => {
                 ListNode {
-                    name: "Firewall Baselines (CTT)",
-                    command: Command::LocalFile("security/firewall-baselines.sh"),
-                }
-            },
-            ListNode {
-                name: "Applications Setup",
-                command: Command::None
-            } => {
-                ListNode {
-                    name: "Alacritty Setup",
-                    command: Command::LocalFile("applications-setup/alacritty-setup.sh"),
+                    name: "Wifi Manager",
+                    command: Command::LocalFile("utils/wifi-control.sh"),
                 },
                 ListNode {
-                    name: "Bash Prompt Setup",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""),
+                    name: "Bluetooth Manager",
+                    command: Command::LocalFile("utils/bluetooth-control.sh"),
                 },
                 ListNode {
-                    name: "Kitty Setup",
-                    command: Command::LocalFile("applications-setup/kitty-setup.sh")
-                },
-                ListNode {
-                    name: "Neovim Setup",
-                    command: Command::Raw("bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""),
-                },
-                ListNode {
-                    name: "Rofi Setup",
-                    command: Command::LocalFile("applications-setup/rofi-setup.sh"),
+                    name: "MonitorControl(xorg)",
+                    command: Command::None,
+                } => {
+                    ListNode {
+                        name: "Set Resolution",
+                        command: Command::LocalFile("utils/monitor-control/set_resolutions.sh"),
+                    },
+                    ListNode {
+                        name: "Duplicate Displays",
+                        command: Command::LocalFile("utils/monitor-control/duplicate_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Extend Displays",
+                        command: Command::LocalFile("utils/monitor-control/extend_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Auto Detect Displays",
+                        command: Command::LocalFile("utils/monitor-control/auto_detect_displays.sh"),
+                    },
+                    ListNode {
+                        name: "Enable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/enable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Disable Monitor",
+                        command: Command::LocalFile("utils/monitor-control/disable_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Set Primary Monitor",
+                        command: Command::LocalFile("utils/monitor-control/set_primary_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Change Orientation",
+                        command: Command::LocalFile("utils/monitor-control/change_orientation.sh"),
+                    },
+                    ListNode {
+                        name: "Manage Arrangement",
+                        command: Command::LocalFile("utils/monitor-control/manage_arrangement.sh"),
+                    },
+                    ListNode {
+                        name: "Scale Monitors",
+                        command: Command::LocalFile("utils/monitor-control/scale_monitor.sh"),
+                    },
+                    ListNode {
+                        name: "Reset Scaling",
+                        command: Command::LocalFile("utils/monitor-control/reset_scaling.sh"),
+                    },
                 },
             },
             ListNode {
@@ -125,10 +180,9 @@ impl CustomList {
             inner_tree: tree,
             visit_stack: vec![root_id],
             list_state: ListState::default().with_selected(Some(0)),
-            // By default the PreviewWindowState is set to None, so it is not being shown
-            preview_window_state: None,
             filter_query: String::new(),
             filtered_items: vec![],
+            preview_float: Float::new(80, 80),
         }
     }
 
@@ -192,32 +246,8 @@ impl CustomList {
         // Render it
         frame.render_stateful_widget(list, area, &mut self.list_state);
 
-        // Draw the preview window if it's active
-        if let Some(pw_state) = &self.preview_window_state {
-            // Set the window to be floating
-            let floating_area = floating_window(area);
-
-            // Draw the preview windows lines
-            let lines: Vec<Line> = pw_state
-                .text
-                .iter()
-                .skip(pw_state.scroll)
-                .take(floating_area.height as usize)
-                .map(|line| Line::from(line.as_str()))
-                .collect();
-
-            // Create list widget
-            let list = List::new(lines)
-                .block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .title("Action preview"),
-                )
-                .highlight_style(Style::default().reversed());
-
-            // Finally render the preview window
-            frame.render_widget(list, floating_area);
-        }
+        //Render the preview window
+        self.preview_float.draw(frame, area);
     }
 
     pub fn filter(&mut self, query: String) {
@@ -256,105 +286,40 @@ impl CustomList {
         if event.kind == KeyEventKind::Release {
             return None;
         }
+
+        if self.preview_float.handle_key_event(&event) {
+            return None; // If the key event was handled by the preview, don't propagate it further
+        }
+
         match event.code {
             // Damm you Up arrow, use vim lol
             KeyCode::Char('j') | KeyCode::Down => {
-                // If the preview window is active, scroll down and consume the scroll action,
-                // so the scroll does not happen in the main window as well
-                if self.preview_window_state.is_some() {
-                    self.scroll_preview_window_down();
-                    return None;
-                }
-
                 self.list_state.select_next();
                 None
             }
             KeyCode::Char('k') | KeyCode::Up => {
-                // If the preview window is active, scroll up and consume the scroll action,
-                // so the scroll does not happen in the main window as well
-                if self.preview_window_state.is_some() {
-                    self.scroll_preview_window_up();
-                    return None;
-                }
-
                 self.list_state.select_previous();
                 None
             }
-            // The 'p' key toggles the preview on and off
             KeyCode::Char('p') => {
                 self.toggle_preview_window(state);
                 None
             }
 
-            KeyCode::Enter => {
-                if self.preview_window_state.is_none() {
+            KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
+                if self.preview_float.get_content().is_none() {
                     self.handle_enter()
                 } else {
                     None
                 }
             }
+            KeyCode::Left | KeyCode::Char('h') if !self.at_root() => self.enter_parent_directory(),
             _ => None,
         }
     }
-    fn toggle_preview_window(&mut self, state: &AppState) {
-        // If the preview window is active, disable it
-        if self.preview_window_state.is_some() {
-            self.preview_window_state = None;
-        } else {
-            // If the preview windows is not active, show it
 
-            // Get the selected command
-            if let Some(selected_command) = self.get_selected_command() {
-                let lines = match selected_command {
-                    Command::Raw(cmd) => {
-                        // Reconstruct the line breaks and file formatting after the
-                        // 'include_str!()' call in the node
-                        cmd.lines().map(|line| line.to_string()).collect()
-                    }
-                    Command::LocalFile(file_path) => {
-                        let mut full_path = state.temp_path.clone();
-                        full_path.push(file_path);
-                        let file_contents = std::fs::read_to_string(&full_path)
-                            .map_err(|_| format!("File not found: {:?}", &full_path))
-                            .unwrap();
-                        file_contents.lines().map(|line| line.to_string()).collect()
-                    }
-                    // If command is a folder, we don't display a preview
-                    Command::None => return,
-                };
-
-                // Show the preview window with the text lines
-                self.preview_window_state = Some(PreviewWindowState::new(lines));
-            }
-        }
-    }
-
-    /// Scroll the preview window down
-    fn scroll_preview_window_down(&mut self) {
-        if let Some(pw_state) = &mut self.preview_window_state {
-            if pw_state.scroll + 1 < pw_state.text.len() {
-                pw_state.scroll += 1;
-            }
-        }
-    }
-
-    /// Scroll the preview window up
-    fn scroll_preview_window_up(&mut self) {
-        if let Some(pw_state) = &mut self.preview_window_state {
-            if pw_state.scroll > 0 {
-                pw_state.scroll = pw_state.scroll.saturating_sub(1);
-            }
-        }
-    }
-
-    /// This method returns the currently selected command, or None if no command is selected.
-    /// It was extracted from the 'handle_enter()'
-    ///
-    /// This could probably be integrated into the 'handle_enter()' method to avoid code
-    /// duplication, but I don't want to make too major changes to the codebase.
     fn get_selected_command(&self) -> Option<Command> {
         let selected_index = self.list_state.selected().unwrap_or(0);
-        println!("Selected Index: {}", selected_index);
 
         if self.filter_query.is_empty() {
             // No filter query, use the regular tree navigation
@@ -380,11 +345,16 @@ impl CustomList {
         } else {
             // Filter query is active, use the filtered items
             if let Some(filtered_node) = self.filtered_items.get(selected_index) {
-                println!("Filtered Node Name: {}", filtered_node.name);
                 return Some(filtered_node.command.clone());
             }
         }
 
+        None
+    }
+
+    fn enter_parent_directory(&mut self) -> Option<Command> {
+        self.visit_stack.pop();
+        self.list_state.select(Some(0));
         None
     }
 
@@ -405,9 +375,7 @@ impl CustomList {
                 .unwrap();
 
             if !self.at_root() && selected_index == 0 {
-                self.visit_stack.pop();
-                self.list_state.select(Some(0));
-                return None;
+                return self.enter_parent_directory();
             }
 
             let mut actual_index = selected_index;
@@ -434,6 +402,37 @@ impl CustomList {
         }
 
         None
+    }
+
+    fn toggle_preview_window(&mut self, state: &AppState) {
+        if self.preview_float.get_content().is_some() {
+            // If the preview window is active, disable it
+            self.preview_float.set_content(None);
+        } else {
+            // If the preview window is not active, show it
+
+            // Get the selected command
+            if let Some(selected_command) = self.get_selected_command() {
+                let lines = match selected_command {
+                    Command::Raw(cmd) => cmd.lines().map(|line| line.to_string()).collect(),
+                    Command::LocalFile(file_path) => {
+                        if file_path.is_empty() {
+                            return;
+                        }
+                        let mut full_path = state.temp_path.clone();
+                        full_path.push(file_path);
+                        let file_contents = std::fs::read_to_string(&full_path)
+                            .map_err(|_| format!("File not found: {:?}", &full_path))
+                            .unwrap();
+                        file_contents.lines().map(|line| line.to_string()).collect()
+                    }
+                    Command::None => return,
+                };
+
+                self.preview_float
+                    .set_content(Some(FloatingText::new(lines)));
+            }
+        }
     }
 
     /// Checks weather the current tree node is the root node (can we go up the tree or no)

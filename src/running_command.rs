@@ -1,28 +1,25 @@
-use std::{
-    io::Write,
-    sync::{Arc, Mutex},
-    thread::JoinHandle,
-};
-
-use super::systeminfo::System;
+use crate::{float::FloatContent, state::AppState};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
-    layout::Size,
-    style::{Style, Stylize},
+    layout::{Rect, Size},
+    style::{Color, Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders},
     Frame,
+};
+use std::{
+    io::Write,
+    sync::{Arc, Mutex},
+    thread::JoinHandle,
 };
 use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
-
-use crate::{float::floating_window, state::AppState};
 
 #[derive(Clone)]
 pub enum Command {
@@ -31,36 +28,107 @@ pub enum Command {
     None, // Directory
 }
 
-/// This is a struct for storing everything connected to a running command
-// Create a new instance on every new command you want to run
 pub struct RunningCommand {
-    /// A buffer to save all the command output (accumulates, untill the command exits)
+    /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
-
-    /// A handle of the tread where the command is being executed
+    /// A handle for the thread running the command
     command_thread: Option<JoinHandle<ExitStatus>>,
-
-    /// A handle to kill the running process, it's an option because it can only be used once
+    /// A handle to kill the running process; it's an option because it can only be used once
     child_killer: Option<Receiver<Box<dyn ChildKiller + Send + Sync>>>,
-
-    /// A join handle for the thread that is reading all the command output and sending it to the
-    /// main thread
+    /// A join handle for the thread that reads command output and sends it to the main thread
     _reader_thread: JoinHandle<()>,
-
     /// Virtual terminal (pty) handle, used for resizing the pty
     pty_master: Box<dyn MasterPty + Send>,
-
     /// Used for sending keys to the emulated terminal
     writer: Box<dyn Write + Send>,
-
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+}
+
+impl FloatContent for RunningCommand {
+    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        // Calculate the inner size of the terminal area, considering borders
+        let inner_size = Size {
+            width: area.width - 2, // Adjust for border width
+            height: area.height - 2,
+        };
+
+        // Define the block for the terminal display
+        let block = if !self.is_finished() {
+            // Display a block indicating the command is running
+            Block::default()
+                .borders(Borders::ALL)
+                .title_top(Line::from("Running the command....").centered())
+                .title_style(Style::default().reversed())
+                .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
+        } else {
+            // Display a block with the command's exit status
+            let mut title_line = if self.get_exit_status().success() {
+                Line::from(
+                    Span::default()
+                        .content("SUCCESS!")
+                        .style(Style::default().fg(Color::Green).reversed()),
+                )
+            } else {
+                Line::from(
+                    Span::default()
+                        .content("FAILED!")
+                        .style(Style::default().fg(Color::Red).reversed()),
+                )
+            };
+
+            title_line.push_span(
+                Span::default()
+                    .content(" press <ENTER> to close this window ")
+                    .style(Style::default()),
+            );
+
+            Block::default()
+                .borders(Borders::ALL)
+                .title_top(title_line.centered())
+        };
+
+        // Process the buffer and create the pseudo-terminal widget
+        let screen = self.screen(inner_size);
+        let pseudo_term = PseudoTerminal::new(&screen).block(block);
+
+        // Render the widget on the frame
+        frame.render_widget(pseudo_term, area);
+    }
+
+    /// Handle key events of the running command "window". Returns true when the "window" should be
+    /// closed
+    fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        match key.code {
+            // Handle Ctrl-C to kill the command
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.kill_child();
+            }
+            // Close the window when Enter is pressed and the command is finished
+            KeyCode::Enter if self.is_finished() => {
+                return true;
+            }
+            // Pass other key events to the terminal
+            _ => self.handle_passthrough_key_event(key),
+        }
+        false
+    }
+
+    fn is_finished(&self) -> bool {
+        // Check if the command thread has finished
+        if let Some(command_thread) = &self.command_thread {
+            command_thread.is_finished()
+        } else {
+            true
+        }
+    }
 }
 
 impl RunningCommand {
     pub fn new(command: Command, state: &AppState) -> Self {
         let pty_system = NativePtySystem::default();
 
+        // Build the command based on the provided Command enum variant
         let mut cmd = CommandBuilder::new("sh");
         match command {
             Command::Raw(prompt) => {
@@ -78,10 +146,11 @@ impl RunningCommand {
 
         cmd.cwd(&state.temp_path);
 
+        // Open a pseudo-terminal with initial size
         let pair = pty_system
             .openpty(PtySize {
-                rows: 24, // Set the initial size of the emulated terminal
-                cols: 80, // We will update this later, if resized
+                rows: 24, // Initial number of rows (will be updated dynamically)
+                cols: 80, // Initial number of columns (will be updated dynamically)
                 pixel_width: 0,
                 pixel_height: 0,
             })
@@ -154,13 +223,7 @@ impl RunningCommand {
         parser.process(buffer);
         parser.screen().clone()
     }
-    pub fn is_finished(&mut self) -> bool {
-        if let Some(command_thread) = &self.command_thread {
-            command_thread.is_finished()
-        } else {
-            true
-        }
-    }
+
     /// This function will block if the command is not finished
     fn get_exit_status(&mut self) -> ExitStatus {
         if self.command_thread.is_some() {
@@ -173,79 +236,12 @@ impl RunningCommand {
         }
     }
 
-    pub fn draw(&mut self, frame: &mut Frame, state: &AppState) {
-        // Funny name
-        let floater = floating_window(frame.size());
-
-        let inner_size = Size {
-            width: floater.width - 2, // Because we add a `Block` with a border
-            height: floater.height - 2,
-        };
-
-        // When the command is running
-        let term_border = if !self.is_finished() {
-            Block::default()
-                .borders(Borders::ALL)
-                .title_top(Line::from("Running the command....").centered())
-                .title_style(Style::default().reversed())
-                .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
-        } else {
-            // This portion is just for pretty colors.
-            // You can use multiple `Span`s with different styles each, to construct a line,
-            // which can be used as a list item, or in this case a `Block` title
-
-            let mut title_line = if self.get_exit_status().success() {
-                Line::from(
-                    Span::default()
-                        .content("SUCCESS!")
-                        .style(Style::default().fg(state.theme.success_color).reversed()),
-                )
-            } else {
-                Line::from(
-                    Span::default()
-                        .content("FAILED!")
-                        .style(Style::default().fg(state.theme.fail_color).reversed()),
-                )
-            };
-
-            title_line.push_span(
-                Span::default()
-                    .content(" press <ENTER> to close this window ")
-                    .style(Style::default()),
-            );
-
-            Block::default()
-                .borders(Borders::ALL)
-                .title_top(title_line.centered())
-        };
-        let screen = self.screen(inner_size); // when the terminal is changing a lot, there
-                                              // will be 1 frame of lag on resizing
-        let pseudo_term = PseudoTerminal::new(&screen).block(term_border);
-        frame.render_widget(pseudo_term, floater);
-    }
-
     /// Send SIGHUB signal, *not* SIGKILL or SIGTERM, to the child process
     pub fn kill_child(&mut self) {
         if !self.is_finished() {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
         }
-    }
-
-    /// Handle key events of the running command "window". Returns true when the "window" should be
-    /// closed
-    pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        match key.code {
-            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                self.kill_child()
-            }
-
-            KeyCode::Enter if self.is_finished() => {
-                return true;
-            }
-            _ => self.handle_passthrough_key_event(key),
-        };
-        false
     }
 
     /// Convert the KeyEvent to pty key codes, and send them to the virtual terminal
@@ -265,9 +261,6 @@ impl RunningCommand {
                         '6' | '^' => send = vec![30],
                         '7' | '-' | '_' => send = vec![31],
                         char if ('A'..='_').contains(&char) => {
-                            // Since A == 65,
-                            // we can safely subtract 64 to get
-                            // the corresponding control character
                             let ascii_val = char as u8;
                             let ascii_to_send = ascii_val - 64;
                             send = vec![ascii_to_send];
