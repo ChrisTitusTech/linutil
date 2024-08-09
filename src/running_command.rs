@@ -108,7 +108,7 @@ impl FloatContent for RunningCommand {
             KeyCode::Enter if self.is_finished() => {
                 return true;
             }
-            // do not pass arrow keys, page up/down, home, insert, any function key, or end to the terminal
+            // do not pass arrow keys, page up/down, home, insert, delete, any function key, or end to the terminal
             KeyCode::Down => {}
             KeyCode::Up => {}
             KeyCode::Left => {}
@@ -118,6 +118,7 @@ impl FloatContent for RunningCommand {
             KeyCode::Home => {}
             KeyCode::End => {}
             KeyCode::Insert => {}
+            KeyCode::Delete => {}
             KeyCode::F(_) => {}
             // Pass all other keys to the terminal
             _ => self.handle_passthrough_key_event(key),
