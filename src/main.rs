@@ -39,7 +39,7 @@ use theme::ThemeType;
 struct Args {
     #[arg(short, long, value_enum)]
     #[arg(default_value_t = ThemeType::Default)]
-    #[arg(help = "Set the theme to use in the applicaiton")]
+    #[arg(help = "Set the theme to use in the application")]
     theme: ThemeType,
 }
 
