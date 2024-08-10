@@ -195,8 +195,8 @@ impl CustomList {
             // icons:   
             if !self.at_root() {
                 items.push(
-                    Line::from(format!("{}  ..", state.theme.dir_icon))
-                        .style(state.theme.dir_color),
+                    Line::from(format!("{}  ..", state.theme.dir_icon()))
+                        .style(state.theme.dir_color()),
                 );
             }
 
@@ -212,13 +212,13 @@ impl CustomList {
                 // it's a directory and will be handled as such
                 if node.has_children() {
                     items.push(
-                        Line::from(format!("{}  {}", state.theme.dir_icon, node.value().name))
-                            .style(state.theme.dir_color),
+                        Line::from(format!("{}  {}", state.theme.dir_icon(), node.value().name))
+                            .style(state.theme.dir_color()),
                     );
                 } else {
                     items.push(
-                        Line::from(format!("{}  {}", state.theme.cmd_icon, node.value().name))
-                            .style(state.theme.cmd_color),
+                        Line::from(format!("{}  {}", state.theme.cmd_icon(), node.value().name))
+                            .style(state.theme.cmd_color()),
                     );
                 }
             }
@@ -227,8 +227,8 @@ impl CustomList {
             self.filtered_items
                 .iter()
                 .map(|node| {
-                    Line::from(format!("{}  {}", state.theme.cmd_icon, node.name))
-                        .style(state.theme.cmd_color)
+                    Line::from(format!("{}  {}", state.theme.cmd_icon(), node.name))
+                        .style(state.theme.cmd_color())
                 })
                 .collect()
         };

@@ -32,21 +32,21 @@ use ratatui::{
 use running_command::RunningCommand;
 use state::AppState;
 use tempdir::TempDir;
-use theme::ThemeType;
+use theme::Theme;
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
     #[arg(short, long, value_enum)]
-    #[arg(default_value_t = ThemeType::Default)]
+    #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
-    theme: ThemeType,
+    theme: Theme,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
-    let theme = args.theme.into();
+    let theme = args.theme;
     let commands_dir = include_dir!("src/commands");
     let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
     commands_dir
