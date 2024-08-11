@@ -106,8 +106,10 @@ pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
             ),
         };
         for path_index in 1..script_info.ui_path.len() {
-            let path = script_info.ui_path[..path_index].to_vec();
-            if !paths.contains_key(&path) {
+            let path = &script_info.ui_path[..path_index];
+            // Create tabs and directories which don't yet exist
+            if !paths.contains_key(path) {
+                let path = path.to_vec();
                 let tab_name = script_info.ui_path[0].clone();
                 if path_index == 1 {
                     let tab = Tab {
@@ -175,7 +177,7 @@ fn get_script_list(directory: &Path) -> Vec<(PathBuf, PathBuf)> {
             } else {
                 let is_json = path.extension().map_or(false, |ext| ext == "json");
                 let script = path.with_extension("sh");
-                (is_json).then_some(vec![(path, script)])
+                is_json.then_some(vec![(path, script)])
             }
         })
         .flatten()
