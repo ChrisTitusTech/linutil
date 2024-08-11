@@ -33,6 +33,9 @@ struct Args {
     /// Enable compatibility mode (disable icons and RGB colors)
     #[arg(short, long, default_value_t = false)]
     compat: bool,
+    #[arg(long, default_value_t = false)]
+    #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
+    override_validation: bool,
 }
 
 fn main() -> std::io::Result<()> {
