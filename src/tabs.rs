@@ -1,20 +1,24 @@
 use crate::running_command::Command;
-use ego_tree::{tree, NodeId, Tree};
+use ego_tree::{NodeId, Tree};
 use serde::Deserialize;
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     path::{Path, PathBuf},
-    sync::LazyLock,
 };
 
 #[derive(Deserialize)]
 struct ScriptInfo {
+    // Path to the script file in the UI, formatted as an array of directory names (first of which being the tab)
     ui_path: Vec<String>,
+    #[allow(dead_code)]
     #[serde(default)]
+    // Description: Currently unused field, should be added in the future
     description: String,
     #[serde(default)]
+    // Requirements that must be met for the script to be displayed
     preconditions: Option<Vec<Precondition>>,
     #[serde(default)]
+    // Optional command. This is used for adding "raw" commands to the UI.
     command: Option<String>,
 }
 
