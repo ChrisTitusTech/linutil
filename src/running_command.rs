@@ -13,7 +13,7 @@ use ratatui::{
 };
 use std::{
     io::Write,
-    path::Path,
+    path::{Path, PathBuf},
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -22,10 +22,10 @@ use tui_term::{
     widget::PseudoTerminal,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Hash, Eq, PartialEq)]
 pub enum Command {
-    Raw(&'static str),
-    LocalFile(&'static str),
+    Raw(String),
+    LocalFile(PathBuf),
     None, // Directory
 }
 
