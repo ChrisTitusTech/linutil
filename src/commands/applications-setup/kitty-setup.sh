@@ -7,7 +7,7 @@ setupKitty() {
     if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
-                sudo "${PACKAGER}" -S --noconfirm kitty
+                sudo "${PACKAGER}" -S --needed --noconfirm kitty
                 ;;
             *)
                 sudo "${PACKAGER}" install -y kitty

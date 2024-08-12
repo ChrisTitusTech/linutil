@@ -7,7 +7,7 @@ fastUpdate() {
         pacman)
             if ! command_exists yay && ! command_exists paru; then
                 echo "Installing yay as AUR helper..."
-                sudo ${PACKAGER} --noconfirm -S base-devel || { echo -e "${RED}Failed to install base-devel${RC}"; exit 1; }
+                sudo ${PACKAGER} -S --needed --noconfirm base-devel || { echo -e "${RED}Failed to install base-devel${RC}"; exit 1; }
                 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
                 cd yay-git && makepkg --noconfirm -si || { echo -e "${RED}Failed to install yay${RC}"; exit 1; }
             else
@@ -21,7 +21,7 @@ fastUpdate() {
                 echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
-            ${AUR_HELPER} --noconfirm -S rate-mirrors-bin
+            ${AUR_HELPER} -S --needed --noconfirm rate-mirrors-bin
             if [ -s /etc/pacman.d/mirrorlist ]; then
                 sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
             fi
