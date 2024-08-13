@@ -14,13 +14,11 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
-use std::path::PathBuf;
+use std::path::Path;
 
 pub struct AppState {
     /// Selected theme
     theme: Theme,
-    /// Path to the root of the unpacked files in /tmp
-    temp_path: PathBuf,
     /// Currently focused area
     focus: Focus,
     /// List of tabs
@@ -53,12 +51,11 @@ struct ListEntry {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, temp_path: PathBuf) -> Self {
-        let tabs = crate::tabs::get_tabs(&temp_path, true);
+    pub fn new(theme: Theme, temp_path: &Path, override_validation: bool) -> Self {
+        let tabs = crate::tabs::get_tabs(temp_path, !override_validation);
         let root_id = tabs[0].tree.root().id();
         let mut state = Self {
             theme,
-            temp_path,
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
@@ -304,14 +301,14 @@ impl AppState {
     }
     fn enable_preview(&mut self) {
         if let Some(command) = self.get_selected_command(false) {
-            if let Some(preview) = FloatingText::from_command(&command, self.temp_path.clone()) {
+            if let Some(preview) = FloatingText::from_command(&command) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
     fn handle_enter(&mut self) {
         if let Some(cmd) = self.get_selected_command(true) {
-            let command = RunningCommand::new(cmd, &self.temp_path);
+            let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
         }
     }

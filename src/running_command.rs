@@ -13,7 +13,7 @@ use ratatui::{
 };
 use std::{
     io::Write,
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -126,7 +126,7 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(command: Command, temp_path: &Path) -> Self {
+    pub fn new(command: Command) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -141,8 +141,6 @@ impl RunningCommand {
             }
             Command::None => panic!("Command::None was treated as a command"),
         }
-
-        cmd.cwd(temp_path);
 
         // Open a pseudo-terminal with initial size
         let pair = pty_system

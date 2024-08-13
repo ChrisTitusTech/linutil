@@ -52,7 +52,7 @@ fn main() -> std::io::Result<()> {
         .extract(temp_dir.path())
         .expect("Failed to extract the saved directory");
 
-    let mut state = AppState::new(theme, temp_dir.path().to_owned());
+    let mut state = AppState::new(theme, temp_dir.path(), args.override_validation);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

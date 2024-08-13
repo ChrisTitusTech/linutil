@@ -1,28 +1,36 @@
 use crate::running_command::Command;
-use ego_tree::{NodeId, Tree};
+use ego_tree::{NodeMut, Tree};
 use serde::Deserialize;
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 #[derive(Deserialize)]
-struct ScriptInfo {
-    // Path to the script file in the UI, formatted as an array of directory names (first of which being the tab)
-    ui_path: Vec<String>,
-    #[allow(dead_code)]
-    #[serde(default)]
-    // Description: Currently unused field, should be added in the future
-    description: String,
-    #[serde(default)]
-    // Requirements that must be met for the script to be displayed
-    preconditions: Option<Vec<Precondition>>,
-    #[serde(default)]
-    // Optional command. This is used for adding "raw" commands to the UI.
-    command: Option<String>,
+struct TabEntry {
+    name: String,
+    data: Vec<Entry>,
 }
 
-impl ScriptInfo {
+#[derive(Deserialize)]
+enum Entry {
+    #[serde(rename = "directory")]
+    Directory(EntryData<Vec<Entry>>),
+    #[serde(rename = "command")]
+    Command(EntryData<String>),
+    #[serde(rename = "script")]
+    Script(EntryData<PathBuf>),
+}
+
+#[derive(Deserialize)]
+struct EntryData<T> {
+    name: String,
+    #[allow(dead_code)]
+    #[serde(default)]
+    description: String,
+    data: T,
+    #[serde(default)]
+    preconditions: Option<Vec<Precondition>>,
+}
+
+impl<T> EntryData<T> {
     fn is_supported(&self) -> bool {
         self.preconditions.as_deref().map_or(true, |preconditions| {
             preconditions.iter().all(
@@ -79,107 +87,79 @@ pub struct ListNode {
 }
 
 pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
-    let scripts = get_script_list(command_dir);
+    let tab_files =
+        std::fs::read_to_string(command_dir.join("tabs.json")).expect("Failed to read tabs.json");
+    let tab_files: Vec<PathBuf> =
+        serde_json::from_str(&tab_files).expect("Failed to parse tabs.json");
+    let tabs = tab_files.into_iter().map(|path| {
+        let file = command_dir.join(&path);
+        let directory = file.parent().unwrap().to_owned();
+        let data =
+            std::fs::read_to_string(command_dir.join(path)).expect("Failed to read tab data");
+        let mut tab_data: TabEntry = serde_json::from_str(&data).expect("Failed to parse tab data");
 
-    let mut paths: HashMap<Vec<String>, (String, NodeId)> = HashMap::new();
-    let mut tabs: Vec<Tab> = Vec::new();
+        if validate {
+            filter_entries(&mut tab_data.data);
+        }
+        (tab_data, directory)
+    });
 
-    for (json_file, script) in scripts {
-        let json_text = std::fs::read_to_string(&json_file).unwrap();
-        let script_info: ScriptInfo =
-            serde_json::from_str(&json_text).expect("Unexpected JSON input");
-        if validate && !script_info.is_supported() {
-            continue;
-        }
-        if script_info.ui_path.len() < 2 {
-            panic!(
-                "UI path must contain a tab. Ensure that {} has correct data",
-                json_file.display()
-            );
-        }
-        let command = match script_info.command {
-            Some(command) => Command::Raw(command),
-            None if script.exists() => Command::LocalFile(script),
-            _ => panic!(
-                "Command not specified & matching script does not exist for JSON {}",
-                json_file.display()
-            ),
-        };
-        for path_index in 1..script_info.ui_path.len() {
-            let path = &script_info.ui_path[..path_index];
-            // Create tabs and directories which don't yet exist
-            if !paths.contains_key(path) {
-                let path = path.to_vec();
-                let tab_name = script_info.ui_path[0].clone();
-                if path_index == 1 {
-                    let tab = Tab {
-                        name: tab_name.clone(),
-                        tree: Tree::new(ListNode {
-                            name: "root".to_string(),
-                            command: Command::None,
-                        }),
-                    };
-                    let root_id = tab.tree.root().id();
-                    tabs.push(tab);
-                    paths.insert(path, (tab_name, root_id));
-                } else {
-                    let parent_path = &script_info.ui_path[..path_index - 1];
-                    let (tab, parent_id) = paths.get(parent_path).unwrap();
-                    let tab = tabs
-                        .iter_mut()
-                        .find(|Tab { name, .. }| name == tab)
-                        .unwrap();
-                    let mut parent = tab.tree.get_mut(*parent_id).unwrap();
-                    let new_node = ListNode {
-                        name: script_info.ui_path[path_index - 1].clone(),
-                        command: Command::None,
-                    };
-                    let new_id = parent.append(new_node).id();
-                    paths.insert(path, (tab_name, new_id));
-                }
-            }
-        }
-        let (tab, parent_id) = paths
-            .get(&script_info.ui_path[..script_info.ui_path.len() - 1])
-            .unwrap();
-        let tab = tabs
-            .iter_mut()
-            .find(|Tab { name, .. }| name == tab)
-            .unwrap();
-        let mut parent = tab.tree.get_mut(*parent_id).unwrap();
+    let tabs: Vec<Tab> = tabs
+        .map(|(TabEntry { name, data }, directory)| {
+            let mut tree = Tree::new(ListNode {
+                name: "root".to_string(),
+                command: Command::None,
+            });
+            let mut root = tree.root_mut();
+            create_directory(data, &mut root, &directory);
+            Tab { name, tree }
+        })
+        .collect();
 
-        let command = ListNode {
-            name: script_info.ui_path.last().unwrap().clone(),
-            command,
-        };
-        parent.append(command);
-    }
     if tabs.is_empty() {
-        panic!("No tabs found.");
+        panic!("No tabs found");
     }
     tabs
 }
 
-fn get_script_list(directory: &Path) -> Vec<(PathBuf, PathBuf)> {
-    let mut entries = std::fs::read_dir(directory)
-        .expect("Command directory does not exist.")
-        .flatten()
-        .collect::<Vec<_>>();
-    entries.sort_by_key(|d| d.path());
+fn filter_entries(entries: &mut Vec<Entry>) {
+    entries.retain_mut(|entry| match entry {
+        Entry::Script(entry) => entry.is_supported(),
+        Entry::Command(entry) => entry.is_supported(),
+        Entry::Directory(entry) if !entry.is_supported() => false,
+        Entry::Directory(entry) => {
+            filter_entries(&mut entry.data);
+            !entry.data.is_empty()
+        }
+    });
+}
 
-    entries
-        .into_iter()
-        .filter_map(|entry| {
-            let path = entry.path();
-            // Recursively iterate through directories
-            if entry.file_type().map_or(false, |f| f.is_dir()) {
-                Some(get_script_list(&path))
-            } else {
-                let is_json = path.extension().map_or(false, |ext| ext == "json");
-                let script = path.with_extension("sh");
-                is_json.then_some(vec![(path, script)])
+fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+    for entry in data {
+        match entry {
+            Entry::Directory(entry) => {
+                let mut node = node.append(ListNode {
+                    name: entry.name,
+                    command: Command::None,
+                });
+                create_directory(entry.data, &mut node, command_dir);
             }
-        })
-        .flatten()
-        .collect()
+            Entry::Command(entry) => {
+                node.append(ListNode {
+                    name: entry.name,
+                    command: Command::Raw(entry.data),
+                });
+            }
+            Entry::Script(entry) => {
+                let dir = command_dir.join(entry.data);
+                if !dir.exists() {
+                    panic!("Script {} does not exist", dir.display());
+                }
+                node.append(ListNode {
+                    name: entry.name,
+                    command: Command::LocalFile(dir),
+                });
+            }
+        }
+    }
 }
