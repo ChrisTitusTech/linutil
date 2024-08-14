@@ -1,0 +1,6 @@
+{
+    "name": "Security",
+    "data": [
+        {"script": { "name": "Firewall Baselines (CTT)", "data": "firewall-baselines.sh" }}
+    ]
+}

@@ -1,0 +1,47 @@
+{
+    "name": "Applications Setup",
+    "data": [
+        {
+            "script": {
+                "name": "Alacritty",
+                "data": "alacritty-setup.sh"
+            }
+        },
+        {
+            "command": {
+                "name": "Bash Prompt",
+                "data": "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
+            }
+        },
+        {
+            "script": {
+                "name": "DWM-Titus",
+                "data": "dwmtitus-setup.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "Kitty",
+                "data": "kitty-setup.sh"
+            }
+        },
+        {
+            "command": {
+                "name": "Neovim",
+                "data": "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
+            }
+        },
+        {
+            "script": {
+                "name": "Rofi",
+                "data": "rofi-setup.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "ZSH Prompt",
+                "data": "zsh-setup.sh"
+            }
+        }
+    ]
+}

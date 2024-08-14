@@ -1,0 +1,35 @@
+{
+    "name": "System Setup",
+    "data": [
+        {
+            "script": {
+                "name": "Full System Update",
+                "data": "system-update.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "Build Prerequisites",
+                "data": "1-compile-setup.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "Gaming Dependencies",
+                "data": "2-gaming-setup.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "Global Theme",
+                "data": "3-global-theme.sh"
+            }
+        },
+        {
+            "script": {
+                "name": "Remove Snaps",
+                "data": "4-remove-snaps.sh"
+            }
+        }
+    ]
+}
