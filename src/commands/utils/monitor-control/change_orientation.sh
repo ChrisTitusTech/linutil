@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh -e
+
 source ./utils/monitor-control/utility_functions.sh
 
 # Function to change monitor orientation

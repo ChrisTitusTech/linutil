@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh -e
 
 # Function to display colored text
 colored_echo() {

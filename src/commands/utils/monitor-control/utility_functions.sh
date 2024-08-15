@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh -e
 
 # Function to execute xrandr commands and handle errors
 execute_command() {
