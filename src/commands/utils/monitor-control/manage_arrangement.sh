@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./utils/monitor-control/utility_functions.sh
+source ./utility_functions.sh
 
 # Function to manage monitor arrangement
 manage_arrangement() {

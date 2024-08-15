@@ -137,7 +137,10 @@ impl RunningCommand {
                 cmd.arg(prompt);
             }
             Command::LocalFile(file) => {
-                cmd.arg(file);
+                cmd.arg(&file);
+                if let Some(parent) = file.parent() {
+                    cmd.cwd(parent);
+                }
             }
             Command::None => panic!("Command::None was treated as a command"),
         }

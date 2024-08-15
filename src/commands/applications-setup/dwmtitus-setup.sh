@@ -1,5 +1,5 @@
 #!/bin/sh -e
-. ./common-script.sh
+. ../common-script.sh
 
 makeDWM(){
    cd $HOME && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus

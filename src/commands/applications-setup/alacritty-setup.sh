@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../common-script.sh
 
 setupAlacritty() {
     echo "Install Alacritty if not already installed..."
