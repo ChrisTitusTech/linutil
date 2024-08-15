@@ -28,7 +28,7 @@ impl Theme {
         }
     }
 
-    pub fn tab_color(&self) -> Color{
+    pub fn tab_color(&self) -> Color {
         match self {
             Theme::Default => Color::Rgb(255, 255, 85),
             Theme::Compatible => Color::Yellow,
