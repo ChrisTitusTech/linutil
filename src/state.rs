@@ -18,7 +18,7 @@ use std::path::PathBuf;
 
 pub struct AppState {
     /// Selected theme
-    theme: Theme,
+    pub theme: Theme,
     /// Path to the root of the unpacked files in /tmp
     temp_path: PathBuf,
     /// Currently focused area

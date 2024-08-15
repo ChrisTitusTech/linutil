@@ -1,12 +1,10 @@
 mod float;
 mod floating_text;
 mod running_command;
-mod search;
 pub mod state;
 mod tabs;
 mod theme;
 
-use crate::search::SearchBar;
 use std::{
     io::{self, stdout},
     time::Duration,
