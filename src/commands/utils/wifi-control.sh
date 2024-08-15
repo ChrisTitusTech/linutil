@@ -1,5 +1,37 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
+# Function to check if NetworkManager is installed
+setupNetworkManager() {
+    echo "Install NetworkManger if not already installed..."
+    if ! command_exists nmcli; then
+        case ${PACKAGER} in
+            pacman)
+                sudo "${PACKAGER}" -S --noconfirm networkmanager
+                ;;
+            dnf)
+                sudo "${PACKAGER}" install -y NetworkManager-1
+                ;;
+            *)
+                sudo "${PACKAGER}" install -y network-manager
+                ;;
+        esac
+    else
+        echo "NetworkManager is already installed."
+    fi
+    
+    # Check if NetworkManager service is running
+    if ! systemctl is-active --quiet NetworkManager; then
+        echo "NetworkManager service is not running. Starting it now..."
+        sudo systemctl start NetworkManager
+        
+        if systemctl is-active --quiet NetworkManager; then
+            echo "NetworkManager service started successfully."
+        fi
+    fi
+}
+
 # Function to display colored text
 colored_echo() {
     local color=$1
@@ -165,4 +197,6 @@ remove_network() {
 }
 
 # Initialize
+checkEnv
+setupNetworkManager
 main_menu

@@ -1,5 +1,34 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
+# Function to check bluetoothctl is installed
+setupBluetooth() {
+    echo "Install bluetoothctl if not already installed..."
+    if ! command_exists bluetoothctl; then
+        case ${PACKAGER} in
+            pacman)
+                sudo "${PACKAGER}" -S --noconfirm bluez-utils
+                ;;
+            *)
+                sudo "${PACKAGER}" install -y bluez
+                ;;
+        esac
+    else
+        echo "Bluetoothctl is already installed."
+    fi
+
+    # Check if bluetooth service is running
+    if ! systemctl is-active --quiet bluetooth; then
+        echo "Bluetooth service is not running. Starting it now..."
+        sudo systemctl start bluetooth
+        
+        if systemctl is-active --quiet bluetooth; then
+            echo "bluetooth service started successfully."
+        fi
+    fi
+}
+
 # Function to display colored text
 colored_echo() {
     local color=$1
@@ -128,4 +157,6 @@ remove_device() {
 }
 
 # Initialize
+checkEnv
+setupBluetooth
 main_menu

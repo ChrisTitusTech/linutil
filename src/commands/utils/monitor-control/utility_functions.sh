@@ -1,5 +1,61 @@
 #!/bin/sh -e
 
+. ./common-script.sh
+
+# Function to check bluetoothctl is installed
+setup_xrandr() {
+    echo "Install xrandr if not already installed..."
+    if ! command_exists xrandr; then
+        case ${PACKAGER} in
+            pacman)
+                sudo "${PACKAGER}" -S --noconfirm xorg-xrandr
+                ;;
+            apt-get)
+                sudo "${PACKAGER}" install -y x11-xserver-utils
+                ;;
+            *)
+                sudo "${PACKAGER}" install -y xorg-x11-server-utils
+                ;;
+        esac
+    else
+        echo "xrandr is already installed."
+    fi
+}
+
+# Function to display colored text
+colored_echo() {
+    local color=$1
+    local text=$2
+    case $color in
+        red) echo -e "\033[31m$text\033[0m" ;;
+        green) echo -e "\033[32m$text\033[0m" ;;
+        yellow) echo -e "\033[33m$text\033[0m" ;;
+        blue) echo -e "\033[34m$text\033[0m" ;;
+        *) echo "$text" ;;
+    esac
+}
+
+# Function to check the display server type
+check_display_server() {
+    if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+        colored_echo "red" "You are using Wayland."
+        colored_echo "red" "This script is designed for X11. It may not work correctly on Wayland."
+        read -p "Do you want to continue anyway? (y/n): " response
+
+        if [[ ! "$response" =~ ^[Yy]$ ]]; then
+            echo "Exiting script."
+            exit 1
+        fi
+
+    elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
+        colored_echo "green" "You are using X11 (X-server)."
+        return 0
+    else
+        colored_echo "red" "Unable to determine the display server type."
+        exit 1
+    fi
+}
+
 # Function to execute xrandr commands and handle errors
 execute_command() {
     local command="$1"
@@ -34,3 +90,7 @@ confirm_action() {
         return 1
     fi
 }
+
+checkEnv
+setup_xrandr
+check_display_server
