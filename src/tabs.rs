@@ -4,33 +4,33 @@ use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
 #[derive(Deserialize)]
+struct TabList {
+    directories: Vec<PathBuf>,
+}
+
+#[derive(Deserialize)]
 struct TabEntry {
     name: String,
     data: Vec<Entry>,
 }
 
 #[derive(Deserialize)]
-enum Entry {
-    #[serde(rename = "directory")]
-    Directory(EntryData<Vec<Entry>>),
-    #[serde(rename = "command")]
-    Command(EntryData<String>),
-    #[serde(rename = "script")]
-    Script(EntryData<PathBuf>),
-}
-
-#[derive(Deserialize)]
-struct EntryData<T> {
+struct Entry {
     name: String,
     #[allow(dead_code)]
     #[serde(default)]
     description: String,
-    data: T,
     #[serde(default)]
     preconditions: Option<Vec<Precondition>>,
+    #[serde(default)]
+    entries: Option<Vec<Entry>>,
+    #[serde(default)]
+    command: Option<String>,
+    #[serde(default)]
+    script: Option<PathBuf>,
 }
 
-impl<T> EntryData<T> {
+impl Entry {
     fn is_supported(&self) -> bool {
         self.preconditions.as_deref().map_or(true, |preconditions| {
             preconditions.iter().all(
@@ -87,16 +87,11 @@ pub struct ListNode {
 }
 
 pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
-    let tab_files =
-        std::fs::read_to_string(command_dir.join("tabs.json")).expect("Failed to read tabs.json");
-    let tab_files: Vec<PathBuf> =
-        serde_json::from_str(&tab_files).expect("Failed to parse tabs.json");
+    let tab_files = TabList::get_tabs(command_dir);
     let tabs = tab_files.into_iter().map(|path| {
-        let file = command_dir.join(&path);
-        let directory = file.parent().unwrap().to_owned();
-        let data =
-            std::fs::read_to_string(command_dir.join(path)).expect("Failed to read tab data");
-        let mut tab_data: TabEntry = serde_json::from_str(&data).expect("Failed to parse tab data");
+        let directory = path.parent().unwrap().to_owned();
+        let data = std::fs::read_to_string(path).expect("Failed to read tab data");
+        let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
 
         if validate {
             filter_entries(&mut tab_data.data);
@@ -123,43 +118,68 @@ pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
 }
 
 fn filter_entries(entries: &mut Vec<Entry>) {
-    entries.retain_mut(|entry| match entry {
-        Entry::Script(entry) => entry.is_supported(),
-        Entry::Command(entry) => entry.is_supported(),
-        Entry::Directory(entry) if !entry.is_supported() => false,
-        Entry::Directory(entry) => {
-            filter_entries(&mut entry.data);
-            !entry.data.is_empty()
+    entries.retain_mut(|entry| {
+        if !entry.is_supported() {
+            return false;
+        }
+        if let Some(entries) = &mut entry.entries {
+            filter_entries(entries);
+            !entries.is_empty()
+        } else {
+            true
         }
     });
 }
 
 fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
     for entry in data {
-        match entry {
-            Entry::Directory(entry) => {
-                let mut node = node.append(ListNode {
-                    name: entry.name,
-                    command: Command::None,
-                });
-                create_directory(entry.data, &mut node, command_dir);
-            }
-            Entry::Command(entry) => {
-                node.append(ListNode {
-                    name: entry.name,
-                    command: Command::Raw(entry.data),
-                });
-            }
-            Entry::Script(entry) => {
-                let dir = command_dir.join(entry.data);
-                if !dir.exists() {
-                    panic!("Script {} does not exist", dir.display());
-                }
-                node.append(ListNode {
-                    name: entry.name,
-                    command: Command::LocalFile(dir),
-                });
-            }
+        if [
+            entry.entries.is_some(),
+            entry.command.is_some(),
+            entry.script.is_some(),
+        ]
+        .iter()
+        .filter(|&&x| x)
+        .count()
+            > 1
+        {
+            panic!("Entry must have only one data type");
         }
+
+        if let Some(entries) = entry.entries {
+            let mut node = node.append(ListNode {
+                name: entry.name,
+                command: Command::None,
+            });
+            create_directory(entries, &mut node, command_dir);
+        } else if let Some(command) = entry.command {
+            node.append(ListNode {
+                name: entry.name,
+                command: Command::Raw(command),
+            });
+        } else if let Some(script) = entry.script {
+            let dir = command_dir.join(script);
+            if !dir.exists() {
+                panic!("Script {} does not exist", dir.display());
+            }
+            node.append(ListNode {
+                name: entry.name,
+                command: Command::LocalFile(dir),
+            });
+        } else {
+            panic!("Entry must have data");
+        }
+    }
+}
+impl TabList {
+    fn get_tabs(command_dir: &Path) -> Vec<PathBuf> {
+        let tab_files = std::fs::read_to_string(command_dir.join("tabs.toml"))
+            .expect("Failed to read tabs.toml");
+        let data: Self = toml::from_str(&tab_files).expect("Failed to parse tabs.toml");
+
+        data.directories
+            .into_iter()
+            .map(|path| command_dir.join(path).join("tab_data.toml"))
+            .collect()
     }
 }

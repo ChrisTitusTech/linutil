@@ -1,0 +1,29 @@
+name = "Applications Setup"
+
+[[data]]
+name = "Alacritty"
+script = "alacritty-setup.sh"
+
+[[data]]
+name = "Bash Prompt"
+command = "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
+
+[[data]]
+name = "DWM-Titus"
+script = "dwmtitus-setup.sh"
+
+[[data]]
+name = "Kitty"
+script = "kitty-setup.sh"
+
+[[data]]
+name = "Neovim"
+command = "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
+
+[[data]]
+name = "Rofi"
+script = "rofi-setup.sh"
+
+[[data]]
+name = "ZSH Prompt"
+script = "zsh-setup.sh"
