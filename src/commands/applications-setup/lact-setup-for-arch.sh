@@ -19,7 +19,7 @@ setupLACT() {
             pacman)
                 if ! command_exists paru && ! command_exists yay; then
                     echo "Neither paru nor yay is installed. Installing recommended AUR helper paru..."
-                    sudo "${PACKAGER}" -S --noconfirm --needed git base-devel
+                    sudo pacman-S --noconfirm --needed git base-devel
                     git clone https://aur.archlinux.org/paru.git
                     cd paru
                     makepkg -si
