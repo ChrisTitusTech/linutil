@@ -24,6 +24,19 @@ pub static TABS: LazyLock<Vec<Tab>> = LazyLock::new(|| {
                 command: Command::None,
             } => {
                 ListNode {
+                    name: "Arch Linux",
+                    command: Command::None,
+                } => {
+                    ListNode {
+                        name: "Yay AUR Helper",
+                        command: Command::LocalFile("system-setup/arch/yay-setup.sh"),
+                    },
+                    ListNode {
+                        name: "Paru AUR Helper",
+                        command: Command::LocalFile("system-setup/arch/paru-setup.sh"),
+                    }
+                },
+                ListNode {
                     name: "Full System Update",
                     command: Command::LocalFile("system-update.sh"),
                 },
