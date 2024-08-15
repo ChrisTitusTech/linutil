@@ -10,11 +10,11 @@ script = "bluetooth-control.sh"
 
 [[data]]
 name = "Monitor Control"
-preconditions = [
-    { matches = true, data = { environment = "XDG_SESSION_TYPE" }, values = [
-        "x11",
-    ] },
-]
+
+[[data.preconditions]]
+matches = true
+data = { environment = "XDG_SESSION_TYPE" }
+values = ["x11"]
 
 [[data.entries]]
 name = "Set Resolution"
