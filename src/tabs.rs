@@ -78,6 +78,10 @@ pub static TABS: LazyLock<Vec<Tab>> = LazyLock::new(|| {
                 ListNode {
                     name: "ZSH Prompt",
                     command: Command::LocalFile("applications-setup/zsh-setup.sh"),
+                },
+                ListNode {
+                    name: "LACT",
+                    command: Command::LocalFile("applications-setup/lact-setup-for-arch.sh"),
                 }
             }),
         },
