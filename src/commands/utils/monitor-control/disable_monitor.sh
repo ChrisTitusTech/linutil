@@ -13,7 +13,7 @@ CYAN='\033[36m'
 # Function to disable a monitor
 disable_monitor() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     clear
     echo -e "${BLUE}=========================================${RESET}"

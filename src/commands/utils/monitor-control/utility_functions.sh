@@ -7,15 +7,15 @@ setup_xrandr() {
     echo "Install xrandr if not already installed..."
     if ! command_exists xrandr; then
         case ${PACKAGER} in
-            pacman)
-                sudo "${PACKAGER}" -S --noconfirm xorg-xrandr
-                ;;
-            apt-get)
-                sudo "${PACKAGER}" install -y x11-xserver-utils
-                ;;
-            *)
-                sudo "${PACKAGER}" install -y xorg-x11-server-utils
-                ;;
+        pacman)
+            sudo "${PACKAGER}" -S --noconfirm xorg-xrandr
+            ;;
+        apt-get)
+            sudo "${PACKAGER}" install -y x11-xserver-utils
+            ;;
+        *)
+            sudo "${PACKAGER}" install -y xorg-x11-server-utils
+            ;;
         esac
     else
         echo "xrandr is already installed."
@@ -27,11 +27,11 @@ colored_echo() {
     local color=$1
     local text=$2
     case $color in
-        red) echo -e "\033[31m$text\033[0m" ;;
-        green) echo -e "\033[32m$text\033[0m" ;;
-        yellow) echo -e "\033[33m$text\033[0m" ;;
-        blue) echo -e "\033[34m$text\033[0m" ;;
-        *) echo "$text" ;;
+    red) echo -e "\033[31m$text\033[0m" ;;
+    green) echo -e "\033[32m$text\033[0m" ;;
+    yellow) echo -e "\033[33m$text\033[0m" ;;
+    blue) echo -e "\033[34m$text\033[0m" ;;
+    *) echo "$text" ;;
     esac
 }
 
@@ -40,9 +40,8 @@ check_display_server() {
     if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
         colored_echo "red" "You are using Wayland."
         colored_echo "red" "This script is designed for X11. It may not work correctly on Wayland."
-        read -p "Do you want to continue anyway? (y/n): " response
 
-        if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        if ! confirm_action "Do you want to continue anyway?"; then
             echo "Exiting script."
             exit 1
         fi

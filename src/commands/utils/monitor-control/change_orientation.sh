@@ -5,7 +5,7 @@
 # Function to change monitor orientation
 change_orientation() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     clear
     echo -e "${BLUE}=========================================${RESET}"

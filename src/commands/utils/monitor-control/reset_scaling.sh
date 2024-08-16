@@ -9,7 +9,7 @@ reset_scaling() {
     echo -e "${BLUE}=========================================${RESET}"
 
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     for monitor in "${monitor_array[@]}"; do
         echo -e "${CYAN}Resetting scaling for $monitor to 1x1 (native resolution)${RESET}"

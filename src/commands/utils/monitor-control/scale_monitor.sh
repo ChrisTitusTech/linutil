@@ -9,7 +9,7 @@ scale_monitors() {
     echo -e "${BLUE}=========================================${RESET}"
 
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     # Get the highest resolution among all monitors
     max_width=0
