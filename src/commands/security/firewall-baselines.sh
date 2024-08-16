@@ -7,7 +7,7 @@ installPkg() {
     if ! command_exists ufw; then
         case ${PACKAGER} in
             pacman)
-                sudo "${PACKAGER}" -Sy --noconfirm ufw
+                sudo "${PACKAGER}" -S --needed --noconfirm ufw
                 ;;
             *)
                 sudo "${PACKAGER}" install -y ufw

@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, state::AppState};
+use crate::float::FloatContent;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -13,6 +13,7 @@ use ratatui::{
 };
 use std::{
     io::Write,
+    path::Path,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -125,7 +126,7 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(command: Command, state: &AppState) -> Self {
+    pub fn new(command: Command, temp_path: &Path) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -141,7 +142,7 @@ impl RunningCommand {
             Command::None => panic!("Command::None was treated as a command"),
         }
 
-        cmd.cwd(&state.temp_path);
+        cmd.cwd(temp_path);
 
         // Open a pseudo-terminal with initial size
         let pair = pty_system

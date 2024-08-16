@@ -1,8 +1,8 @@
 mod float;
 mod floating_text;
-mod list;
 mod running_command;
 pub mod state;
+mod tabs;
 mod theme;
 
 use std::{
@@ -13,23 +13,16 @@ use std::{
 use clap::Parser;
 use crossterm::{
     cursor::RestorePosition,
-    event::{self, DisableMouseCapture, Event, KeyCode, KeyEventKind},
+    event::{self, DisableMouseCapture, Event, KeyEventKind},
     style::ResetColor,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use float::Float;
 use include_dir::include_dir;
-use list::CustomList;
 use ratatui::{
     backend::{Backend, CrosstermBackend},
-    layout::{Constraint, Direction, Layout},
-    style::{Color, Style},
-    text::Span,
-    widgets::{Block, Borders, Paragraph},
     Terminal,
 };
-use running_command::RunningCommand;
 use state::AppState;
 use tempdir::TempDir;
 use theme::THEMES;
@@ -56,17 +49,14 @@ fn main() -> std::io::Result<()> {
         .extract(temp_dir.path())
         .expect("Failed to extract the saved directory");
 
-    let state = AppState {
-        theme,
-        temp_path: temp_dir.path().to_owned(),
-    };
+    let mut state = AppState::new(theme, temp_dir.path().to_owned());
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    run(&mut terminal, &state)?;
+    run(&mut terminal, &mut state)?;
 
     // restore terminal
     disable_raw_mode()?;
@@ -78,55 +68,9 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<()> {
-    //Create the search field
-    let mut search_input = String::new();
-    //Create the command list
-    let mut custom_list = CustomList::new();
-    //Create the float to hold command output
-    let mut command_float = Float::new(60, 60);
-    let mut in_search_mode = false;
-
+fn run<B: Backend>(terminal: &mut Terminal<B>, state: &mut AppState) -> io::Result<()> {
     loop {
-        // Always redraw
-        terminal
-            .draw(|frame| {
-                //Split the terminal into 2 vertical chunks
-                //One for the search bar and one for the command list
-                let chunks = Layout::default()
-                    .direction(Direction::Vertical)
-                    .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
-                    .split(frame.size());
-
-                //Set the search bar text (If empty use the placeholder)
-                let display_text = if search_input.is_empty() {
-                    if in_search_mode {
-                        Span::raw("")
-                    } else {
-                        Span::raw("Press / to search")
-                    }
-                } else {
-                    Span::raw(&search_input)
-                };
-
-                //Create the search bar widget
-                let mut search_bar = Paragraph::new(display_text)
-                    .block(Block::default().borders(Borders::ALL).title("Search"))
-                    .style(Style::default().fg(Color::DarkGray));
-
-                //Change the color if in search mode
-                if in_search_mode {
-                    search_bar = search_bar.clone().style(Style::default().fg(Color::Blue));
-                }
-
-                //Render the search bar (First chunk of the screen)
-                frame.render_widget(search_bar, chunks[0]);
-                //Render the command list (Second chunk of the screen)
-                custom_list.draw(frame, chunks[1], state);
-                //Render the command float in the custom_list chunk
-                command_float.draw(frame, chunks[1]);
-            })
-            .unwrap();
+        terminal.draw(|frame| state.draw(frame)).unwrap();
 
         // Wait for an event
         if !event::poll(Duration::from_millis(10))? {
@@ -141,47 +85,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, state: &AppState) -> io::Result<(
                 continue;
             }
 
-            //Send the key to the float
-            //If we receive true, then the float processed the input
-            //If that's the case, don't propagate input to other widgets
-            if !command_float.handle_key_event(&key) {
-                //Insert user input into the search bar
-                if in_search_mode {
-                    match key.code {
-                        KeyCode::Char(c) => {
-                            search_input.push(c);
-                            custom_list.filter(search_input.clone());
-                        }
-                        KeyCode::Backspace => {
-                            search_input.pop();
-                            custom_list.filter(search_input.clone());
-                        }
-                        KeyCode::Esc => {
-                            search_input = String::new();
-                            custom_list.filter(search_input.clone());
-                            in_search_mode = false
-                        }
-                        KeyCode::Enter => {
-                            in_search_mode = false;
-                            custom_list.reset_selection();
-                        }
-                        _ => {}
-                    }
-                } else if let Some(cmd) = custom_list.handle_key(key, state) {
-                    command_float.set_content(Some(RunningCommand::new(cmd, state)));
-                } else {
-                    // Handle keys while not in search mode
-                    match key.code {
-                        // Exit the program
-                        KeyCode::Char('q') => return Ok(()),
-                        //Activate search mode if the forward slash key gets pressed
-                        KeyCode::Char('/') => {
-                            in_search_mode = true;
-                            continue;
-                        }
-                        _ => {}
-                    }
-                }
+            if !state.handle_key(&key) {
+                return Ok(());
             }
         }
     }
