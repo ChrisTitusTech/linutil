@@ -9,13 +9,13 @@ installDepend() {
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
             echo "[multilib]" | sudo tee -a /etc/pacman.conf
             echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
-            sudo ${PACKAGER} -Sy
+            sudo ${PACKAGER} -Syu
         else
             echo "Multilib is already enabled."
         fi
         if ! command_exists yay && ! command_exists paru; then
             echo "Installing yay as AUR helper..."
-            sudo ${PACKAGER} --noconfirm -S base-devel
+            sudo ${PACKAGER} -S --needed --noconfirm base-devel
             cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
             cd yay-git && makepkg --noconfirm -si
         else
@@ -29,7 +29,7 @@ installDepend() {
             echo "No AUR helper found. Please install yay or paru."
             exit 1
         fi
-        ${AUR_HELPER} --noconfirm -S wine giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls \
+        ${AUR_HELPER} -S --needed --noconfirm wine giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls \
 mpg123 lib32-mpg123 openal lib32-openal v4l-utils lib32-v4l-utils libpulse lib32-libpulse libgpg-error \
 lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjpeg-turbo lib32-libjpeg-turbo \
 sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama \

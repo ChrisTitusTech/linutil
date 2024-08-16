@@ -7,7 +7,7 @@ installDepend() {
         pacman)
             if ! command_exists yay; then
                 echo "Installing yay as AUR helper..."
-                sudo "$PACKAGER" --noconfirm -S base-devel
+                sudo "$PACKAGER" -S --needed --noconfirm base-devel
                 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R "$USER": ./yay-git
                 cd yay-git && makepkg --noconfirm -si
                 echo "Yay installed"
