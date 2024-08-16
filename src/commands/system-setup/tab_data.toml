@@ -1,6 +1,17 @@
 name = "System Setup"
 
 [[data]]
+name = "Arch Linux"
+
+[[data.entries]]
+name = "Yay AUR Helper"
+script = "arch/yay-setup.sh"
+
+[[data.entries]]
+name = "Paru AUR Helper"
+script = "arch/paru-setup.sh"
+
+[[data]]
 name = "Full System Update"
 script = "system-update.sh"
 
