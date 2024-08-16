@@ -33,13 +33,13 @@ installDepend() {
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                 echo "[multilib]" | sudo tee -a /etc/pacman.conf
                 echo "Include = /etc/pacman.d/mirrorlist" | sudo tee -a /etc/pacman.conf
-                sudo "$PACKAGER" -Sy
+                sudo "$PACKAGER" -Syu
             else
                 echo "Multilib is already enabled."
             fi
             if ! command_exists yay && ! command_exists paru; then
                 echo "Installing yay as AUR helper..."
-                sudo "$PACKAGER" --noconfirm -S base-devel
+                sudo "$PACKAGER" -S --needed --noconfirm base-devel
                 cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R "$USER":"$USER" ./yay-git
                 cd yay-git && makepkg --noconfirm -si
             else
@@ -53,7 +53,7 @@ installDepend() {
                 echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
-            "$AUR_HELPER" --noconfirm -S "$DEPENDENCIES"
+            "$AUR_HELPER" -S --needed --noconfirm "$DEPENDENCIES"
             ;;
         apt-get|nala)
             COMPILEDEPS='build-essential'

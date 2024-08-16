@@ -101,7 +101,7 @@ prompt_for_network() {
         fi
 
         # Display networks with numbers
-        IFS=$'\n' read -rd '' -a network_list <<<"$networks"
+        IFS=$'\n' read -r -a network_list <<<"$networks"
         for i in "${!network_list[@]}"; do
             ssid=$(echo "${network_list[$i]}" | awk -F: '{print $1}')
             echo "$((i+1)). SSID: $ssid"

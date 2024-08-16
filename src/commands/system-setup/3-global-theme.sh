@@ -29,8 +29,7 @@ install_theme_tools() {
             sudo dnf install -y qt6ct kvantum
             ;;
         pacman)
-            sudo pacman -Sy
-            sudo pacman --noconfirm -S qt6ct kvantum
+            sudo pacman -S --needed --noconfirm qt6ct kvantum
             ;;
         *)
             printf "${RED}Unsupported package manager. Please install qt6ct and kvantum manually.${RC}\n"
