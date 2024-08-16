@@ -3,6 +3,11 @@ name = "System Setup"
 [[data]]
 name = "Arch Linux"
 
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman"]
+
 [[data.entries]]
 name = "Yay AUR Helper"
 script = "arch/yay-setup.sh"
