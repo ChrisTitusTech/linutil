@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-source ./utils/monitor-control/utility_functions.sh
+. ./utils/monitor-control/utility_functions.sh
 
 # Function to change monitor orientation
 change_orientation() {

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-source ./utils/monitor-control/utility_functions.sh
+. ./utils/monitor-control/utility_functions.sh
 
 # Function to reset scaling back to 1 (native resolution) for all monitors
 reset_scaling() {

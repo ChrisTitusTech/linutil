@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-source ./utils/monitor-control/utility_functions.sh
+. ./utils/monitor-control/utility_functions.sh
 
 RESET='\033[0m'
 BOLD='\033[1m'
