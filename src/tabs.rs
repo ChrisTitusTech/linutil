@@ -50,6 +50,9 @@ impl Entry {
                                     == *matches
                             })
                         }
+                        SystemDataType::CommandExists => values
+                            .iter()
+                            .all(|command| which::which(command).is_ok() == *matches),
                     }
                 },
             )
@@ -72,6 +75,8 @@ enum SystemDataType {
     Environment(String),
     #[serde(rename = "file")]
     File(PathBuf),
+    #[serde(rename = "command_exists")]
+    CommandExists,
 }
 
 #[derive(Hash, Eq, PartialEq)]
