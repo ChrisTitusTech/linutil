@@ -10,6 +10,8 @@ pub struct Theme {
     pub tab_icon: &'static str,
     pub success_color: Color,
     pub fail_color: Color,
+    pub focused_color: Color,
+    pub unfocused_color: Color,
 }
 
 pub const THEMES: [Theme; 2] = [
@@ -22,6 +24,8 @@ pub const THEMES: [Theme; 2] = [
         tab_icon: ">>  ",
         success_color: Color::Green,
         fail_color: Color::Red,
+        focused_color: Color::LightBlue,
+        unfocused_color: Color::Gray,
     },
     Theme {
         dir_color: Color::Blue,
@@ -32,5 +36,7 @@ pub const THEMES: [Theme; 2] = [
         tab_icon: "   ",
         fail_color: Color::Rgb(199, 55, 44),
         success_color: Color::Rgb(5, 255, 55),
+        focused_color: Color::LightBlue,
+        unfocused_color: Color::Gray,
     },
 ];

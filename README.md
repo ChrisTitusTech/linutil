@@ -5,27 +5,34 @@
 
 ![Preview](docs/assets/preview.png)
 
-A distro-agnostic* toolbox which helps with everyday Linux tasks. It can help you set up applications and your system for specific use cases! Written with Rust 🦀
+**Linutil** is a distro-agnostic toolbox designed to simplify everyday Linux tasks. It helps you set up applications and optimize your system for specific use cases. The utility is actively developed in Rust 🦀, providing performance and reliability.
 
-\* — The project is in active development, so there could be some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues).
+*Note:* Since the project is still in active development, you may encounter some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues) if you do.
 
 ## 💡 Usage
 
-Open your terminal and paste this command:
+To get started, open your terminal and run the following command:
 ```bash
 curl -fsSL https://christitus.com/linux | sh
 ```
+## 💖 Support
+
+If you find Linutil helpful, please consider giving it a ⭐️ to show your support!
 
 ## 🎓 Documentation
-### [LinUtil Official Documentation](https://christitustech.github.io/linutil/)
 
-## 💖 Support
-To morally and mentally support the project, make sure to leave a ⭐️!
+For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://christitustech.github.io/linutil/).
 
-## 🏅 Thanks to all Contributors
-Thanks a lot for spending your time helping Linutil grow. Keep rocking 🍻.
+## 🛠 Contributing
+
+We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
+
+## 🏅 Thanks to All Contributors
+
+Thank you to everyone who has contributed to the development of Linutil. Your efforts are greatly appreciated, and you’re helping make this tool better for everyone!
 
 [![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/linutil)](https://github.com/ChrisTitusTech/linutil/graphs/contributors)
 
-## Credits
-Rust Shell written by [@JustLinuxUser](https://github.com/JustLinuxUser)
+## 📜 Credits
+
+Linutil’s Rust shell was developed by [@JustLinuxUser](https://github.com/JustLinuxUser).

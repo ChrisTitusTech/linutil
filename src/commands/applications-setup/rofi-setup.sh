@@ -7,7 +7,7 @@ setupRofi() {
     if ! command_exists rofi; then
         case "$PACKAGER" in
             pacman)
-                sudo "$PACKAGER" -S --noconfirm rofi
+                sudo "$PACKAGER" -S --needed --noconfirm rofi
                 ;;
             *)
                 sudo "$PACKAGER" install -y rofi

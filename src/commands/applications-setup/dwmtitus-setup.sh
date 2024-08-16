@@ -13,7 +13,7 @@ setupDWM() {
     echo "Installing DWM-Titus if not already installed"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            sudo "$PACKAGER" -S --noconfirm --needed base-devel libx11 libxinerama libxft imlib2
+            sudo "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2
             ;;
         *)
             sudo "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev
