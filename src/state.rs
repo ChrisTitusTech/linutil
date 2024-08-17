@@ -35,6 +35,8 @@ pub struct AppState {
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
+    // This is the state of the character position in the search bar
+    character_pos: usize,
 }
 
 pub enum Focus {
@@ -62,6 +64,7 @@ impl AppState {
             items: vec![],
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
+            character_pos: 0,
         };
         state.update_items();
         state
@@ -110,6 +113,7 @@ impl AppState {
             _ if !self.search_query.is_empty() => Span::raw(&self.search_query),
             _ => Span::raw("Press / to search"),
         };
+
         let search_bar = Paragraph::new(search_text)
             .block(Block::default().borders(Borders::ALL))
             .style(Style::default().fg(if let Focus::Search = self.focus {
@@ -117,7 +121,17 @@ impl AppState {
             } else {
                 Color::DarkGray
             }));
+
         frame.render_widget(search_bar, chunks[0]);
+
+        // Set the corsor in the search bar when we focus it
+        if let Focus::Search = self.focus {
+            // Set x as the begining of the block + number of characters + 1 for margin
+            let x = chunks[0].x + self.character_pos as u16 + 1;
+            // Set y as the top of the block + 1 to center
+            let y = chunks[0].y + 1;
+            frame.set_cursor(x, y);
+        }
 
         let mut items: Vec<Line> = Vec::new();
         if !self.at_root() {
@@ -167,11 +181,14 @@ impl AppState {
             }
             Focus::Search => {
                 match key.code {
-                    KeyCode::Char(c) => self.search_query.push(c),
-                    KeyCode::Backspace => {
-                        self.search_query.pop();
-                    }
+                    KeyCode::Char(c) => self.insert_char(c),
+                    KeyCode::Backspace => self.remove_previous(),
+                    KeyCode::Delete => self.remove_next(),
+                    KeyCode::Left => self.cursor_left(),
+                    KeyCode::Right => self.cursor_right(),
                     KeyCode::Esc => {
+                        self.character_pos = 0;
+                        self.selection.select(Some(0));
                         self.search_query = String::new();
                         self.exit_search();
                     }
@@ -326,5 +343,47 @@ impl AppState {
         self.visit_stack = vec![TABS[self.current_tab.selected().unwrap()].tree.root().id()];
         self.selection.select(Some(0));
         self.update_items();
+    }
+
+    fn cursor_left(&mut self) {
+        // No need to check if we are at the beginning of the string,
+        // the cursor can't go before that as it's limited to the block
+        self.character_pos = self.character_pos.saturating_sub(1);
+    }
+
+    fn cursor_right(&mut self) {
+        let limit = self.search_query.len();
+        // If we do not do this check, the cursor can go on forever
+        if self.character_pos < limit {
+            self.character_pos = self.character_pos.saturating_add(1);
+        }
+    }
+
+    fn insert_char(&mut self, c: char) {
+        self.search_query.insert(self.character_pos, c);
+        self.cursor_right();
+    }
+
+    fn remove_previous(&mut self) {
+        let current = self.character_pos;
+        if current > 0 {
+            // We use take and skip because those are non panicking methods
+            let previous = current - 1;
+            let before_char = self.search_query.chars().take(previous);
+            let after_char = self.search_query.chars().skip(current);
+
+            self.search_query = before_char.chain(after_char).collect();
+            self.cursor_left();
+        }
+    }
+
+    fn remove_next(&mut self) {
+        let current = self.character_pos;
+        if current < self.search_query.len() {
+            // We use take and skip because those are non panicking methods
+            let after_char = self.search_query.chars().skip(current + 1);
+            let before_char = self.search_query.chars().take(current);
+            self.search_query = before_char.chain(after_char).collect();
+        }
     }
 }
