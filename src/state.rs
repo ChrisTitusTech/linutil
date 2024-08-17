@@ -85,10 +85,16 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)])
             .split(horizontal[0]);
 
-        let tabs = TABS.iter().map(|tab| {
-            Line::from(tab.name)
-                .style(if let Focus::TabList = self.focus { self.theme.tab_color() } else { self.theme.unfocused_color() })
-        }).collect::<Vec<_>>();
+        let tabs = TABS
+            .iter()
+            .map(|tab| {
+                Line::from(tab.name).style(if let Focus::TabList = self.focus {
+                    self.theme.tab_color()
+                } else {
+                    self.theme.unfocused_color()
+                })
+            })
+            .collect::<Vec<_>>();
 
         let tab_hl_style = if let Focus::TabList = self.focus {
             Style::default().reversed().fg(self.theme.cursor_color())
@@ -121,7 +127,6 @@ impl AppState {
             _ => Span::raw("Press / to search"),
         };
 
-
         let search_color_style = if let Focus::Search = self.focus {
             self.theme.focused_color()
         } else {
@@ -145,11 +150,21 @@ impl AppState {
                  node, has_children, ..
              }| {
                 if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(if let Focus::List = self.focus { self.theme.dir_color() } else { self.theme.unfocused_color() })
+                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name)).style(
+                        if let Focus::List = self.focus {
+                            self.theme.dir_color()
+                        } else {
+                            self.theme.unfocused_color()
+                        },
+                    )
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(if let Focus::List = self.focus { self.theme.cmd_color() } else { self.theme.unfocused_color() })
+                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name)).style(
+                        if let Focus::List = self.focus {
+                            self.theme.cmd_color()
+                        } else {
+                            self.theme.unfocused_color()
+                        },
+                    )
                 }
             },
         ));
@@ -209,11 +224,11 @@ impl AppState {
                     self.focus = Focus::List
                 }
                 KeyCode::Char('j') | KeyCode::Down
-                if self.current_tab.selected().unwrap() + 1 < TABS.len() =>
-                    {
-                        self.current_tab.select_next();
-                        self.refresh_tab();
-                    }
+                    if self.current_tab.selected().unwrap() + 1 < TABS.len() =>
+                {
+                    self.current_tab.select_next();
+                    self.refresh_tab();
+                }
                 KeyCode::Char('k') | KeyCode::Up => {
                     self.current_tab.select_previous();
                     self.refresh_tab();
