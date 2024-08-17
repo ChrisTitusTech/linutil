@@ -4,15 +4,6 @@
 
 setupLACT() {
     
-    echo "Checking for rustup..."
-    if ! command_exists rustup; then
-        echo "rustup not found. Installing rustup..."
-        sudo pacman -S --noconfirm rustup
-    fi
-    echo "Installing stable Rust toolchain..."
-    rustup install stable
-    rustup default stable
-
     echo "Installing LACT (Open Source AMD GPU OverClocking Tool)..."
     if ! command_exists lact; then
         case ${PACKAGER} in
