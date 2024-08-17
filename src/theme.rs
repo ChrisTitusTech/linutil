@@ -1,42 +1,102 @@
+use clap::ValueEnum;
 use ratatui::style::Color;
 
-#[derive(Clone)]
-pub struct Theme {
-    pub dir_color: Color,
-    pub cmd_color: Color,
-    pub tab_color: Color,
-    pub dir_icon: &'static str,
-    pub cmd_icon: &'static str,
-    pub tab_icon: &'static str,
-    pub success_color: Color,
-    pub fail_color: Color,
-    pub focused_color: Color,
-    pub unfocused_color: Color,
+// Add the Theme name here for a new theme
+// This is more secure than the previous list
+// We cannot index out of bounds, and we are giving
+// names to our various themes, making it very clear
+// This will make it easy to add new themes
+#[derive(Clone, Debug, PartialEq, Default, ValueEnum, Copy)]
+pub enum Theme {
+    #[default]
+    Default,
+    Compatible,
 }
 
-pub const THEMES: [Theme; 2] = [
-    Theme {
-        dir_color: Color::Blue,
-        cmd_color: Color::LightGreen,
-        tab_color: Color::Yellow,
-        dir_icon: "[DIR]",
-        cmd_icon: "[CMD]",
-        tab_icon: ">>  ",
-        success_color: Color::Green,
-        fail_color: Color::Red,
-        focused_color: Color::LightBlue,
-        unfocused_color: Color::Gray,
-    },
-    Theme {
-        dir_color: Color::Blue,
-        cmd_color: Color::Rgb(204, 224, 208),
-        tab_color: Color::Rgb(255, 255, 85),
-        dir_icon: "  ",
-        cmd_icon: "  ",
-        tab_icon: "   ",
-        fail_color: Color::Rgb(199, 55, 44),
-        success_color: Color::Rgb(5, 255, 55),
-        focused_color: Color::LightBlue,
-        unfocused_color: Color::Gray,
-    },
-];
+impl Theme {
+    pub fn dir_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Blue,
+            Theme::Compatible => Color::Blue,
+        }
+    }
+
+    pub fn cmd_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Rgb(204, 224, 208),
+            Theme::Compatible => Color::LightGreen,
+        }
+    }
+
+    pub fn tab_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Rgb(255, 255, 85),
+            Theme::Compatible => Color::Yellow,
+        }
+    }
+
+    pub fn dir_icon(&self) -> &'static str {
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => "[DIR]",
+        }
+    }
+
+    pub fn cmd_icon(&self) -> &'static str {
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => "[CMD]",
+        }
+    }
+
+    pub fn tab_icon(&self) -> &'static str {
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => ">> ",
+        }
+    }
+
+    pub fn success_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Rgb(199, 55, 44),
+            Theme::Compatible => Color::Green,
+        }
+    }
+
+    pub fn fail_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Rgb(5, 255, 55),
+            Theme::Compatible => Color::Red,
+        }
+    }
+
+    pub fn focused_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::LightBlue,
+            Theme::Compatible => Color::LightBlue,
+        }
+    }
+
+    pub fn unfocused_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::Gray,
+            Theme::Compatible => Color::Gray,
+        }
+    }
+}
+
+impl Theme {
+    #[allow(unused)]
+    pub fn next(self) -> Self {
+        let position = self as usize;
+        let types = Theme::value_variants();
+        types[(position + 1) % types.len()].into()
+    }
+
+    #[allow(unused)]
+    pub fn prev(self) -> Self {
+        let position = self as usize;
+        let types = Theme::value_variants();
+        types[(position + types.len() - 1) % types.len()].into()
+    }
+}

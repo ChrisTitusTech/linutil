@@ -10,6 +10,7 @@ use std::{
     time::Duration,
 };
 
+use crate::theme::Theme;
 use clap::Parser;
 use crossterm::{
     cursor::RestorePosition,
@@ -25,9 +26,8 @@ use ratatui::{
 };
 use state::AppState;
 use tempdir::TempDir;
-use theme::THEMES;
 
-/// This is a binary :), Chris, change this to update the documentation on -h
+// Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
     /// Enable compatibility mode (disable icons and RGB colors)
@@ -36,23 +36,22 @@ struct Args {
     #[arg(long, default_value_t = false)]
     #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
     override_validation: bool,
+    #[arg(short, long, value_enum)]
+    #[arg(default_value_t = Theme::Default)]
+    #[arg(help = "Set the theme to use in the application")]
+    theme: Theme,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
-    let theme = if args.compat {
-        THEMES[0].clone()
-    } else {
-        THEMES[1].clone()
-    };
     let commands_dir = include_dir!("src/commands");
     let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
     commands_dir
         .extract(temp_dir.path())
         .expect("Failed to extract the saved directory");
 
-    let mut state = AppState::new(theme, temp_dir.path(), args.override_validation);
+    let mut state = AppState::new(args.theme, temp_dir.path(), args.override_validation);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

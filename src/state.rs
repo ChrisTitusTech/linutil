@@ -71,7 +71,7 @@ impl AppState {
         let longest_tab_display_len = self
             .tabs
             .iter()
-            .map(|tab| tab.name.len() + self.theme.tab_icon.len())
+            .map(|tab| tab.name.len() + self.theme.tab_icon().len())
             .max()
             .unwrap_or(0);
 
@@ -94,15 +94,15 @@ impl AppState {
             .collect::<Vec<_>>();
 
         let tab_hl_style = if let Focus::TabList = self.focus {
-            Style::default().reversed().fg(self.theme.tab_color)
+            Style::default().reversed().fg(self.theme.tab_color())
         } else {
-            Style::new().fg(self.theme.tab_color)
+            Style::new().fg(self.theme.tab_color())
         };
 
         let list = List::new(tabs)
             .block(Block::default().borders(Borders::ALL))
             .highlight_style(tab_hl_style)
-            .highlight_symbol(self.theme.tab_icon);
+            .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
 
         let chunks = Layout::default()
@@ -128,7 +128,7 @@ impl AppState {
         let mut items: Vec<Line> = Vec::new();
         if !self.at_root() {
             items.push(
-                Line::from(format!("{}  ..", self.theme.dir_icon)).style(self.theme.dir_color),
+                Line::from(format!("{}  ..", self.theme.dir_icon())).style(self.theme.dir_color()),
             );
         }
 
@@ -137,11 +137,11 @@ impl AppState {
                  node, has_children, ..
              }| {
                 if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon, node.name))
-                        .style(self.theme.dir_color)
+                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
+                        .style(self.theme.dir_color())
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon, node.name))
-                        .style(self.theme.cmd_color)
+                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
+                        .style(self.theme.cmd_color())
                 }
             },
         ));
@@ -202,6 +202,8 @@ impl AppState {
                     self.refresh_tab();
                 }
                 KeyCode::Char('/') => self.enter_search(),
+                KeyCode::Char('t') => self.theme = self.theme.next(),
+                KeyCode::Char('T') => self.theme = self.theme.prev(),
                 _ => {}
             },
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
@@ -218,6 +220,8 @@ impl AppState {
                 }
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Tab => self.focus = Focus::TabList,
+                KeyCode::Char('t') => self.theme = self.theme.next(),
+                KeyCode::Char('T') => self.theme = self.theme.prev(),
                 _ => {}
             },
             _ => {}
