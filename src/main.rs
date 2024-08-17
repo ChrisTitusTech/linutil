@@ -30,16 +30,13 @@ use tempdir::TempDir;
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
-    /// Enable compatibility mode (disable icons and RGB colors)
-    #[arg(short, long, default_value_t = false)]
-    compat: bool,
-    #[arg(long, default_value_t = false)]
-    #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
-    override_validation: bool,
     #[arg(short, long, value_enum)]
     #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
     theme: Theme,
+    #[arg(long, default_value_t = false)]
+    #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
+    override_validation: bool,
 }
 
 fn main() -> std::io::Result<()> {
