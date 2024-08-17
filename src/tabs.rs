@@ -54,7 +54,7 @@ pub static TABS: LazyLock<Vec<Tab>> = LazyLock::new(|| {
                 },
                 ListNode {
                     name: "Remove Snaps",
-                    command: Command::LocalFile("system-setup/4-remove-snaps.sh"),
+                    command: Command::LocalFile("system-setup/5-remove-snaps.sh"),
                 }
             }),
         },
@@ -119,6 +119,10 @@ pub static TABS: LazyLock<Vec<Tab>> = LazyLock::new(|| {
                 ListNode {
                     name: "Bluetooth Manager",
                     command: Command::LocalFile("utils/bluetooth-control.sh"),
+                },
+                ListNode {
+                    name: "Toggle Numlock On Startup",
+                    command: Command::LocalFile("utils/numlock.sh"),
                 },
                 ListNode {
                     name: "MonitorControl(xorg)",
