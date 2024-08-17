@@ -96,13 +96,15 @@ impl AppState {
             Style::new().fg(self.theme.cursor_color())
         };
 
+        let tab_color_style = if let Focus::TabList = self.focus {
+            self.theme.focused_color()
+        } else {
+            self.theme.unfocused_color()
+        };
+
         let list = List::new(tabs)
             .block(Block::default().borders(Borders::ALL))
-            .style(Style::default().fg(if let Focus::TabList = self.focus {
-                self.theme.focused_color()
-            } else {
-                self.theme.unfocused_color()
-            }))
+            .style(Style::default().fg(tab_color_style))
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
@@ -118,13 +120,17 @@ impl AppState {
             _ if !self.search_query.is_empty() => Span::raw(&self.search_query),
             _ => Span::raw("Press / to search"),
         };
+
+
+        let search_color_style = if let Focus::Search = self.focus {
+            self.theme.focused_color()
+        } else {
+            self.theme.unfocused_color()
+        };
+
         let search_bar = Paragraph::new(search_text)
             .block(Block::default().borders(Borders::ALL))
-            .style(Style::default().fg(if let Focus::Search = self.focus {
-                self.theme.focused_color()
-            } else {
-                self.theme.unfocused_color()
-            }));
+            .style(Style::default().fg(search_color_style));
         frame.render_widget(search_bar, chunks[0]);
 
         let mut items: Vec<Line> = Vec::new();
@@ -148,22 +154,26 @@ impl AppState {
             },
         ));
 
+        let list_hl_style = if let Focus::List = self.focus {
+            Style::default().reversed().fg(self.theme.cursor_color())
+        } else {
+            Style::default().fg(self.theme.cursor_color())
+        };
+
+        let list_color_style = if let Focus::List = self.focus {
+            self.theme.focused_color()
+        } else {
+            self.theme.unfocused_color()
+        };
+
         // Create the list widget with items
         let list = List::new(items)
-            .highlight_style(if let Focus::List = self.focus {
-                Style::default().reversed().fg(self.theme.cursor_color())
-            } else {
-                Style::default().fg(self.theme.cursor_color())
-            })
+            .highlight_style(list_hl_style)
             .block(Block::default().borders(Borders::ALL).title(format!(
                 "Linux Toolbox - {}",
                 chrono::Local::now().format("%Y-%m-%d")
             )))
-            .style(Style::default().fg(if let Focus::List = self.focus {
-                self.theme.focused_color()
-            } else {
-                self.theme.unfocused_color()
-            }))
+            .style(list_color_style)
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
