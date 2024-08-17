@@ -90,7 +90,17 @@ install_additional_dependencies() {
             
             ;;
         *pacman)
+            echo "Installing Steam for Arch Linux..."
+            sudo pacman -S --noconfirm steam
+            echo "Steam installation complete."
             
+            echo "Installing Lutris for Arch Linux..."
+            sudo pacman -S --noconfirm lutris
+            echo "Lutris installation complete."
+            
+            echo "Installing GOverlay for Arch Linux..."
+            sudo pacman -S --noconfirm goverlay
+            echo "GOverlay installation complete."
             ;;
         *)
             
