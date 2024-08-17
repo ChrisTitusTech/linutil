@@ -9,7 +9,7 @@ use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
-    style::{Color, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
@@ -85,16 +85,24 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)])
             .split(horizontal[0]);
 
-        let tabs = TABS.iter().map(|tab| tab.name).collect::<Vec<_>>();
+        let tabs = TABS.iter().map(|tab| {
+            Line::from(tab.name)
+                .style(if let Focus::TabList = self.focus { self.theme.tab_color() } else { self.theme.unfocused_color() })
+        }).collect::<Vec<_>>();
 
         let tab_hl_style = if let Focus::TabList = self.focus {
-            Style::default().reversed().fg(self.theme.tab_color())
+            Style::default().reversed().fg(self.theme.cursor_color())
         } else {
-            Style::new().fg(self.theme.tab_color())
+            Style::new().fg(self.theme.cursor_color())
         };
 
         let list = List::new(tabs)
             .block(Block::default().borders(Borders::ALL))
+            .style(Style::default().fg(if let Focus::TabList = self.focus {
+                self.theme.focused_color()
+            } else {
+                self.theme.unfocused_color()
+            }))
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
@@ -113,9 +121,9 @@ impl AppState {
         let search_bar = Paragraph::new(search_text)
             .block(Block::default().borders(Borders::ALL))
             .style(Style::default().fg(if let Focus::Search = self.focus {
-                Color::Blue
+                self.theme.focused_color()
             } else {
-                Color::DarkGray
+                self.theme.unfocused_color()
             }));
         frame.render_widget(search_bar, chunks[0]);
 
@@ -132,10 +140,10 @@ impl AppState {
              }| {
                 if *has_children {
                     Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(self.theme.dir_color())
+                        .style(if let Focus::List = self.focus { self.theme.dir_color() } else { self.theme.unfocused_color() })
                 } else {
                     Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(self.theme.cmd_color())
+                        .style(if let Focus::List = self.focus { self.theme.cmd_color() } else { self.theme.unfocused_color() })
                 }
             },
         ));
@@ -143,14 +151,19 @@ impl AppState {
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(if let Focus::List = self.focus {
-                Style::default().reversed()
+                Style::default().reversed().fg(self.theme.cursor_color())
             } else {
-                Style::new()
+                Style::default().fg(self.theme.cursor_color())
             })
             .block(Block::default().borders(Borders::ALL).title(format!(
                 "Linux Toolbox - {}",
                 chrono::Local::now().format("%Y-%m-%d")
             )))
+            .style(Style::default().fg(if let Focus::List = self.focus {
+                self.theme.focused_color()
+            } else {
+                self.theme.unfocused_color()
+            }))
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -186,11 +199,11 @@ impl AppState {
                     self.focus = Focus::List
                 }
                 KeyCode::Char('j') | KeyCode::Down
-                    if self.current_tab.selected().unwrap() + 1 < TABS.len() =>
-                {
-                    self.current_tab.select_next();
-                    self.refresh_tab();
-                }
+                if self.current_tab.selected().unwrap() + 1 < TABS.len() =>
+                    {
+                        self.current_tab.select_next();
+                        self.refresh_tab();
+                    }
                 KeyCode::Char('k') | KeyCode::Up => {
                     self.current_tab.select_previous();
                     self.refresh_tab();
