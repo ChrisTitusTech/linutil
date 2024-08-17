@@ -196,8 +196,8 @@ impl AppState {
                     self.refresh_tab();
                 }
                 KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Char('t') => self.theme = self.theme.next(),
-                KeyCode::Char('T') => self.theme = self.theme.prev(),
+                KeyCode::Char('t') => self.theme.next(),
+                KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
@@ -214,8 +214,8 @@ impl AppState {
                 }
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Tab => self.focus = Focus::TabList,
-                KeyCode::Char('t') => self.theme = self.theme.next(),
-                KeyCode::Char('T') => self.theme = self.theme.prev(),
+                KeyCode::Char('t') => self.theme.next(),
+                KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
             _ => {}
