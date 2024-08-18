@@ -17,6 +17,7 @@ tempdir = "0.3.7"
 serde = { version = "1.0.205", features = ["derive"] }
 toml = "0.8.19"
 which = "6.0.2"
+unicode-width = "0.1.13"
 
 [[bin]]
 name = "linutil"
