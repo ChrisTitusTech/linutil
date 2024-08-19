@@ -91,7 +91,7 @@ install_additional_dependencies() {
             ;;
         *pacman)
             echo "Installing Steam for Arch Linux..."
-            sudo pacman -S --noconfirm steam
+            sudo pacman -S steam
             echo "Steam installation complete."
             
             echo "Installing Lutris for Arch Linux..."
