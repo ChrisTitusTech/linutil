@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./utils/monitor-control/utility_functions.sh
+source ./utility_functions.sh
 
 RESET='\033[0m'
 BOLD='\033[1m'

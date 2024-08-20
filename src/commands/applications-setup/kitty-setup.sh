@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../common-script.sh
 
 setupKitty() {
     echo "Install Kitty if not already installed..."

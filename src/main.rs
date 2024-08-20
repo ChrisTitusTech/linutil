@@ -34,12 +34,13 @@ struct Args {
     #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
     theme: Theme,
+    #[arg(long, default_value_t = false)]
+    #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
+    override_validation: bool,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-
-    let theme = args.theme;
 
     let commands_dir = include_dir!("src/commands");
     let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
@@ -47,7 +48,7 @@ fn main() -> std::io::Result<()> {
         .extract(temp_dir.path())
         .expect("Failed to extract the saved directory");
 
-    let mut state = AppState::new(theme, temp_dir.path().to_owned());
+    let mut state = AppState::new(args.theme, temp_dir.path(), args.override_validation);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

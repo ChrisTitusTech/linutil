@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./common-script.sh
+. ../common-script.sh
 
 # Function to install zsh
 install_zsh() {

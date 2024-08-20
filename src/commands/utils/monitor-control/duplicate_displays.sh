@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./utils/monitor-control/utility_functions.sh
+source ./utility_functions.sh
 
 # Function to duplicate displays
 duplicate_displays() {

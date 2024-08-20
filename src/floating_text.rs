@@ -7,7 +7,6 @@ use ratatui::{
     widgets::{Block, Borders, List},
     Frame,
 };
-use std::path::PathBuf;
 
 pub struct FloatingText {
     text: Vec<String>,
@@ -19,7 +18,7 @@ impl FloatingText {
         Self { text, scroll: 0 }
     }
 
-    pub fn from_command(command: &Command, mut full_path: PathBuf) -> Option<Self> {
+    pub fn from_command(command: &Command) -> Option<Self> {
         let lines = match command {
             Command::Raw(cmd) => {
                 // Reconstruct the line breaks and file formatting after the
@@ -27,9 +26,8 @@ impl FloatingText {
                 cmd.lines().map(|line| line.to_string()).collect()
             }
             Command::LocalFile(file_path) => {
-                full_path.push(file_path);
-                let file_contents = std::fs::read_to_string(&full_path)
-                    .map_err(|_| format!("File not found: {:?}", &full_path))
+                let file_contents = std::fs::read_to_string(file_path)
+                    .map_err(|_| format!("File not found: {:?}", file_path))
                     .unwrap();
                 file_contents.lines().map(|line| line.to_string()).collect()
             }

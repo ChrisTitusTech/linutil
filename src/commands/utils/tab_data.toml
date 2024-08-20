@@ -1,0 +1,66 @@
+name = "Utilities"
+
+[[data]]
+name = "WiFi Manager"
+script = "wifi-control.sh"
+
+[[data]]
+name = "Bluetooth Manager"
+script = "bluetooth-control.sh"
+
+[[data]]
+name = "Monitor Control"
+
+[[data.preconditions]]
+matches = true
+data = { environment = "XDG_SESSION_TYPE" }
+values = ["x11"]
+
+[[data.entries]]
+name = "Set Resolution"
+script = "monitor-control/set_resolutions.sh"
+
+[[data.entries]]
+name = "Set Resolution"
+script = "monitor-control/set_resolutions.sh"
+
+[[data.entries]]
+name = "Duplicate Displays"
+script = "monitor-control/duplicate_displays.sh"
+
+[[data.entries]]
+name = "Extend Displays"
+script = "monitor-control/extend_displays.sh"
+
+[[data.entries]]
+name = "Auto Detect Displays"
+script = "monitor-control/auto_detect_displays.sh"
+
+[[data.entries]]
+name = "Enable Monitor"
+script = "monitor-control/enable_monitor.sh"
+
+[[data.entries]]
+name = "Disable Monitor"
+script = "monitor-control/disable_monitor.sh"
+
+[[data.entries]]
+name = "Set Primary Monitor"
+script = "monitor-control/set_primary_monitor.sh"
+
+[[data.entries]]
+name = "Change Orientation"
+script = "monitor-control/change_orientation.sh"
+
+[[data.entries]]
+name = "Manage Arrangement"
+script = "monitor-control/manage_arrangement.sh"
+
+[[data.entries]]
+name = "Scale Monitors"
+script = "monitor-control/scale_monitor.sh"
+
+[[data.entries]]
+name = "Reset Scaling"
+script = "monitor-control/reset_scaling.sh"
+matches = true
