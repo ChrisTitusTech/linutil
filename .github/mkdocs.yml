@@ -1,5 +1,6 @@
 site_name: Chris Titus LinUtil Official Documentation
 repo_url: https://github.com/ChrisTitusTech/linutil
+docs_dir: '../docs'
 
 nav:
   - Introduction: 'index.md'
@@ -10,7 +11,7 @@ nav:
 
 theme:
   name: material
-  custom_dir: 'overrides'
+  custom_dir: '../overrides'
   features:
     - navigation.tabs
     - navigation.sections
