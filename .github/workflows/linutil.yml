@@ -40,24 +40,12 @@ jobs:
       - name: Install cross-rs for cross-compilation
         run: cargo install cross
 
-      - name: Update glibc
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install -y libc6
-
       - name: Build x86_64 binary
         run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl
-
-      - name: Build aarch64 binary
-        run: cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl
 
       - name: Move binaries to build directory
         run: |
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
-          mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
 
       - name: Pull latest changes
         run: |
