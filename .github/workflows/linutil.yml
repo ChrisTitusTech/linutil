@@ -17,39 +17,45 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache Cargo registry
         uses: actions/cache@v4
         with:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-registry-
+
       - name: Cache Cargo index
         uses: actions/cache@v4
         with:
           path: ~/.cargo/git
           key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-index-
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-unknown-linux-musl
+
       - name: Install cross-rs for cross-compilation
         run: cargo install cross
+
       - name: Build x86_64 binary
         run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl
-      - name: Build aarch64 binary
-        run: cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl
+
       - name: Move binaries to build directory
         run: |
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
-          mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
+
       - name: Pull latest changes
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
           git pull origin main
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
-          file_pattern: "build/linutil build/linutil-aarch64"
+          file_pattern: "build/linutil"
+          add_options: '--force'
         if: success()
