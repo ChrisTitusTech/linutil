@@ -1,56 +1,99 @@
-# Contributing Guidelines for Linutil
+# How to Contribute?
 
-Thank you for considering contributing to Linutil! We appreciate your effort in helping improve this project. To ensure that your contributions align with the goals and quality standards of Linutil, please follow these guidelines:
+## Testing
 
-## 1. Setting Up Your Development Environment
+* Test the latest changes to LinUtil by running the latest release and reporting issues you are encountering to help us continually improve LinUtil!
 
-1. **Clone the repo**: Start by cloning the Linutil repository to your local machine.
-   ```bash
-   git clone https://github.com/christitustech/linutil.git
-   cd linutil
-   ```
-2. **Install Rust**: Make sure you have Rust installed on your machine. If you don't, you can install it by following the instructions at [rust-lang.org](https://www.rust-lang.org/tools/install).
-3. **Edit the files you want to change**: Make your changes to the relevant files.
-4. **Test your changes**: Run `cargo run` to test your modifications in a local environment and ensure everything works as expected.
 
-## 2. Make Meaningful Changes
+## Issues
 
-- **Have a clear reason**: Don’t change the way things are done without a valid reason. If you propose an alteration, be prepared to explain why it’s necessary and how it improves the project.
-- **Respect existing conventions**: Changes should align with the existing code style, design patterns, and overall project philosophy. If you want to introduce a new way of doing things, justify it clearly.
+* If you encounter any challenges or problems with the script, I kindly request that you submit them via the "Issues" tab on the GitHub repository. By filling out the provided template, you can provide specific details about the issue, allowing me (and others in the community) to promptly address any bugs or consider feature requests.
 
-## 3. Learn from Past Pull Requests (PRs)
+## Contribute Code
 
-- **Check merged PRs**: Reviewing merged pull requests can give you an idea of what kind of contributions are accepted and how they are implemented.
-- **Study rejected PRs**: This is especially important as it helps you avoid making similar mistakes or proposing changes that have already been considered and declined.
+* Pull requests are now handled directly on the **MAIN branch**. This was done since we can now select specific releases to launch via releases in GitHub.
 
-## 4. Write Clean, Descriptive Commit Messages
+* If you're doing code changes, then you can submit a PR to `main` branch, but I am very selective about these.
 
-- **Be descriptive**: Your commit messages should clearly describe what the change does and why it was made.
-- **Use the imperative mood**: For example, "Add feature X" or "Fix bug in Y", rather than "Added feature X" or "Fixed bug in Y".
-- **Keep commits clean**: Avoid committing a change and then immediately following it with a fix for that change. Instead, amend your commit or squash it if needed.
+!!! warning "Important"
 
-## 5. Keep Your Pull Requests (PRs) Small and Focused
+     Do not use a code formatter, make massive amounts of line changes, or make multiple feature changes. EACH FEATURE CHANGE SHOULD BE IT'S OWN PULL REQUEST!
 
-- **Make small, targeted PRs**: Focus on one feature or fix per pull request. This makes it easier to review and increases the likelihood of acceptance.
-- **Avoid combining unrelated changes**: PRs that tackle multiple unrelated issues are harder to review and might be rejected because of a single problem.
+* When creating pull requests, it is essential to thoroughly document all changes made. Document your changes and briefly explain why you made your changes in your Pull Request Description. Failure to adhere to this format may result in the denial of the pull request. Additionally, any code lacking sufficient documentation may also be denied.
 
-## 6. Code Review and Feedback
+* By following these guidelines, we can maintain a high standard of quality and ensure that the codebase remains organized and well-documented.
 
-- **Expect feedback**: PRs will undergo code review. Be open to feedback and willing to make adjustments as needed.
-- **Participate in reviews**: If you feel comfortable, review other contributors' PRs as well. Peer review is a great way to learn and ensure high-quality contributions.
+## Walk through
 
-## 7. Contributing Is More Than Just Code
+* This is a guide for beginners. If you are still having issues, look at the following official GitHub documentation:
+    * [Commit through WEB](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/about-commits)
+    * [Commit through GitHub Desktop](https://docs.github.com/en/desktop/making-changes-in-a-branch/committing-and-reviewing-changes-to-your-project-in-github-desktop#about-commits)
+    * [Create a Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
 
-- **Test the tool**: Running tests and providing feedback on how the tool works in different environments is a valuable contribution.
-- **Write well-formed issues**: Clearly describe bugs or problems you encounter, providing as much detail as possible, including steps to reproduce the issue.
-- **Propose reasonable feature requests**: When suggesting new features, ensure they fit within the scope, style, and design of the project. Provide clear reasoning and use cases.
 
-## 8. Documentation
+### Overview
 
-- **Update the documentation**: If your change affects the functionality, please update the relevant documentation files to reflect this.
+``` mermaid
+%%{init: {"flowchart": {"curve": "cardinal"}} }%%
+graph TD
+  A[Fork Project] --> B[Clone Repository];
+  B --> C[Create New Branch];
+  C --> D[Make Changes];
+  D --> G[Test Changes];
+  G --> H{Tests Passed?};
+  H -->|Yes| E[Commit Changes];
+  H -->|No| J[Fix Issues];
+  J --> G;
+  E --> F[Push Branch];
+  F --> K[Create Pull Request];
+  K --> L[Fill out PR template];
+  classDef default stroke:#333,stroke-width:4px,font-size:12pt;
+```
+!!! info
 
-## 9. License
+     This is a diagram to guide you through the process. It may vary depending on the type of change you're making.
 
-- **Agree to the license**: By contributing to Linutil, you agree that your contributions will be licensed under the project's MIT license.
+### Fork the Repo
+* Fork the LinUtil Repository [here](https://github.com/ChrisTitusTech/linutil) to create a copy that will be available in your repository list.
 
-We appreciate your contributions and look forward to collaborating with you to make Linutil better!
+![Fork Image](/docs/assets/Fork-Button-Dark.png#only-dark)
+
+![Fork Image](/docs/assets/Fork-Button-Light.png#only-light)
+
+### Clone the Fork
+!!! tip
+
+     While you can make your changes directly through the Web, we recommend cloning the repo to your device using the application GitHub Desktop (available in LinUtil) to test your fork easily.
+
+* Install GitHub Desktop if it is not already installed.
+* Log in using the same GitHub account you used to fork LinUtil.
+* Choose the fork under "Your Repositories" and press "clone {repo name}"
+* Create a new branch and name it something relatable to your changes.
+
+* Now you can modify LinUtil to your liking using your preferred text editor.
+
+
+### Testing your changes
+
+* To test to see if your changes work as intended run following commands in a powershell teminal as admin:
+
+* Change the directory where you are running the commands to the forked project.
+* `cd {path to the folder with the linutil files}`
+* Run the following command to compile and run LinUtil:
+* `cargo run`
+
+* After seeing that your changes work properly, feel free to commit the changes to the repository and make a PR. For help on that, follow the documentation below.
+
+### Committing the changes
+* Now, commit your changes once you are happy with the result.
+
+![Commit Image](/docs/assets/Commit-GHD.png)
+
+* Push the changes to upload them to your fork on github.com.
+
+![Push Commit Image](/docs/assets/Push-Commit.png)
+
+### Making a PR
+* To make a PR on your repo under a new branch linking to the main branch, a button will show and say Preview and Create pull request. Click that button and fill in all the information that is provided on the template. Once everything is good, make the PR and wait for Chris (the maintainer) to accept or deny your PR. Once it is accepted by Chris, you will be able to see your changes in the "/windev" build.
+* If you do not see your feature in the main "/linux" build, that is fine. All new changes go into the pre release build to make sure everything is working OK before going fully public.
+* Congratulations! You just submitted your first PR. Thank you so much for contributing to LinUtil.
