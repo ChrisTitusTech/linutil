@@ -128,9 +128,9 @@ checksum = "df8670b8c7b9dae1793364eafadf7239c40d669904660c5960d74cfd80b46a53"
 
 [[package]]
 name = "castaway"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a17ed5635fc8536268e5d4de1e22e81ac34419e5f052d4d51f4e01dcc263fcc"
+checksum = "0abae9be0aaf9ea96a3b1b8b1b55c602ca751eba1b1500220cea4ecbafe7c0d5"
 dependencies = [
  "rustversion",
 ]
@@ -216,6 +216,20 @@ dependencies = [
  "castaway",
  "cfg-if",
  "itoa",
+ "ryu",
+ "static_assertions",
+]
+
+[[package]]
+name = "compact_str"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6050c3a16ddab2e412160b31f2c871015704239bca62f72f6e5f0be631d3f644"
+dependencies = [
+ "castaway",
+ "cfg-if",
+ "itoa",
+ "rustversion",
  "ryu",
  "static_assertions",
 ]
@@ -377,6 +391,16 @@ checksum = "93ead53efc7ea8ed3cfb0c79fc8023fbb782a5432b52830b6518941cebe6505c"
 dependencies = [
  "equivalent",
  "hashbrown",
+]
+
+[[package]]
+name = "instability"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b23a0c8dfe501baac4adf6ebbfa6eddf8f0c07f56b058cc1288017e32397846c"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -633,12 +657,32 @@ checksum = "d16546c5b5962abf8ce6e2881e722b4e0ae3b6f1a08a26ae3573c55853ca68d3"
 dependencies = [
  "bitflags 2.5.0",
  "cassowary",
- "compact_str",
+ "compact_str 0.7.1",
  "crossterm",
  "itertools",
  "lru",
  "paste",
  "stability",
+ "strum",
+ "strum_macros",
+ "unicode-segmentation",
+ "unicode-truncate",
+ "unicode-width",
+]
+
+[[package]]
+name = "ratatui"
+version = "0.28.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ba6a365afbe5615999275bea2446b970b10a41102500e27ce7678d50d978303"
+dependencies = [
+ "bitflags 2.5.0",
+ "cassowary",
+ "compact_str 0.8.0",
+ "instability",
+ "itertools",
+ "lru",
+ "paste",
  "strum",
  "strum_macros",
  "unicode-segmentation",
@@ -966,7 +1010,7 @@ dependencies = [
  "include_dir",
  "oneshot",
  "portable-pty",
- "ratatui",
+ "ratatui 0.27.0",
  "serde",
  "tempdir",
  "toml",
@@ -976,11 +1020,11 @@ dependencies = [
 
 [[package]]
 name = "tui-term"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fac7538a3b9d5e92739253323e169ed25f005669c0e7f9d98f50f697fcada4e8"
+checksum = "d07f0233f0d4795d2dc6663cfc3ce56b87bebcee66d6bcc088aa6aff5c072361"
 dependencies = [
- "ratatui",
+ "ratatui 0.28.0",
  "vt100",
 ]
 
