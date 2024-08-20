@@ -58,5 +58,4 @@ jobs:
           commit_message: Commit Linutil
           file_pattern: "build/linutil"
           add_options: '--force'
-          push_options: '--force'
         if: success()
