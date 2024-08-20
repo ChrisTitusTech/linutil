@@ -56,5 +56,5 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
-          file_pattern: "build/linutil build/linutil-aarch64"
+          file_pattern: "build/linutil"
         if: success()
