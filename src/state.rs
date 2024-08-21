@@ -2,7 +2,7 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     running_command::{Command, RunningCommand},
-    tabs::{ListNode, TABS},
+    tabs::{ListNode, Tab},
     theme::Theme,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
@@ -14,15 +14,15 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
-use std::path::PathBuf;
+use std::path::Path;
 
 pub struct AppState {
     /// Selected theme
-    pub theme: Theme,
-    /// Path to the root of the unpacked files in /tmp
-    temp_path: PathBuf,
+    theme: Theme,
     /// Currently focused area
     focus: Focus,
+    /// List of tabs
+    tabs: Vec<Tab>,
     /// Current tab
     current_tab: ListState,
     /// Current search query
@@ -51,12 +51,13 @@ struct ListEntry {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, temp_path: PathBuf) -> Self {
-        let root_id = TABS[0].tree.root().id();
+    pub fn new(theme: Theme, temp_path: &Path, override_validation: bool) -> Self {
+        let tabs = crate::tabs::get_tabs(temp_path, !override_validation);
+        let root_id = tabs[0].tree.root().id();
         let mut state = Self {
             theme,
-            temp_path,
             focus: Focus::List,
+            tabs,
             current_tab: ListState::default().with_selected(Some(0)),
             search_query: String::new(),
             items: vec![],
@@ -67,7 +68,8 @@ impl AppState {
         state
     }
     pub fn draw(&mut self, frame: &mut Frame) {
-        let longest_tab_display_len = TABS
+        let longest_tab_display_len = self
+            .tabs
             .iter()
             .map(|tab| tab.name.len() + self.theme.tab_icon().len())
             .max()
@@ -85,7 +87,11 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)])
             .split(horizontal[0]);
 
-        let tabs = TABS.iter().map(|tab| tab.name).collect::<Vec<_>>();
+        let tabs = self
+            .tabs
+            .iter()
+            .map(|tab| tab.name.as_str())
+            .collect::<Vec<_>>();
 
         let tab_hl_style = if let Focus::TabList = self.focus {
             Style::default().reversed().fg(self.theme.tab_color())
@@ -186,7 +192,7 @@ impl AppState {
                     self.focus = Focus::List
                 }
                 KeyCode::Char('j') | KeyCode::Down
-                    if self.current_tab.selected().unwrap() + 1 < TABS.len() =>
+                    if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
                 {
                     self.current_tab.select_next();
                     self.refresh_tab();
@@ -224,7 +230,7 @@ impl AppState {
     }
     pub fn update_items(&mut self) {
         if self.search_query.is_empty() {
-            let curr = TABS[self.current_tab.selected().unwrap()]
+            let curr = self.tabs[self.current_tab.selected().unwrap()]
                 .tree
                 .get(*self.visit_stack.last().unwrap())
                 .unwrap();
@@ -241,7 +247,7 @@ impl AppState {
             self.items.clear();
 
             let query_lower = self.search_query.to_lowercase();
-            for tab in TABS.iter() {
+            for tab in self.tabs.iter() {
                 let mut stack = vec![tab.tree.root().id()];
                 while let Some(node_id) = stack.pop() {
                     let node = tab.tree.get(node_id).unwrap();
@@ -259,7 +265,7 @@ impl AppState {
                     stack.extend(node.children().map(|child| child.id()));
                 }
             }
-            self.items.sort_by(|a, b| a.node.name.cmp(b.node.name));
+            self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
         }
     }
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
@@ -299,14 +305,14 @@ impl AppState {
     }
     fn enable_preview(&mut self) {
         if let Some(command) = self.get_selected_command(false) {
-            if let Some(preview) = FloatingText::from_command(&command, self.temp_path.clone()) {
+            if let Some(preview) = FloatingText::from_command(&command) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
     fn handle_enter(&mut self) {
         if let Some(cmd) = self.get_selected_command(true) {
-            let command = RunningCommand::new(cmd, &self.temp_path);
+            let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
         }
     }
@@ -323,7 +329,10 @@ impl AppState {
         self.update_items();
     }
     fn refresh_tab(&mut self) {
-        self.visit_stack = vec![TABS[self.current_tab.selected().unwrap()].tree.root().id()];
+        self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
+            .tree
+            .root()
+            .id()];
         self.selection.select(Some(0));
         self.update_items();
     }

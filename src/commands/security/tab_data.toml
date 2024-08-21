@@ -1,0 +1,5 @@
+name = "Security"
+
+[[data]]
+name = "Firewall Baselines (CTT)"
+script = "firewall-baselines.sh"

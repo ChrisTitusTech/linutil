@@ -13,7 +13,7 @@ use ratatui::{
 };
 use std::{
     io::Write,
-    path::Path,
+    path::PathBuf,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -22,10 +22,10 @@ use tui_term::{
     widget::PseudoTerminal,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Hash, Eq, PartialEq)]
 pub enum Command {
-    Raw(&'static str),
-    LocalFile(&'static str),
+    Raw(String),
+    LocalFile(PathBuf),
     None, // Directory
 }
 
@@ -126,7 +126,7 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(command: Command, temp_path: &Path) -> Self {
+    pub fn new(command: Command) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -137,12 +137,13 @@ impl RunningCommand {
                 cmd.arg(prompt);
             }
             Command::LocalFile(file) => {
-                cmd.arg(file);
+                cmd.arg(&file);
+                if let Some(parent) = file.parent() {
+                    cmd.cwd(parent);
+                }
             }
             Command::None => panic!("Command::None was treated as a command"),
         }
-
-        cmd.cwd(temp_path);
 
         // Open a pseudo-terminal with initial size
         let pair = pty_system
