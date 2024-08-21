@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../common-script.sh
 
 # Function to check if NetworkManager is installed
 setupNetworkManager() {

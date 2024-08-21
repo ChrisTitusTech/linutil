@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../../common-script.sh
 
 # Function to check bluetoothctl is installed
 setup_xrandr() {
@@ -33,26 +33,6 @@ colored_echo() {
     blue) echo -e "\033[34m$text\033[0m" ;;
     *) echo "$text" ;;
     esac
-}
-
-# Function to check the display server type
-check_display_server() {
-    if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-        colored_echo "red" "You are using Wayland."
-        colored_echo "red" "This script is designed for X11. It may not work correctly on Wayland."
-
-        if ! confirm_action "Do you want to continue anyway?"; then
-            echo "Exiting script."
-            exit 1
-        fi
-
-    elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
-        colored_echo "green" "You are using X11 (X-server)."
-        return 0
-    else
-        colored_echo "red" "Unable to determine the display server type."
-        exit 1
-    fi
 }
 
 # Function to execute xrandr commands and handle errors
@@ -92,4 +72,3 @@ confirm_action() {
 
 checkEnv
 setup_xrandr
-check_display_server

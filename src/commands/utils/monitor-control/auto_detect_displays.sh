@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./utils/monitor-control/utility_functions.sh
+. ./utility_functions.sh
 
 # Function to auto-detect displays and set common resolution
 auto_detect_displays() {

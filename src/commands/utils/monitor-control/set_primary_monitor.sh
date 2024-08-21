@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./utils/monitor-control/utility_functions.sh
+. ./utility_functions.sh
 
 # Function to set a monitor as primary
 set_primary_monitor() {
