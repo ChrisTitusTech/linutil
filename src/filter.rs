@@ -16,14 +16,14 @@ pub enum SearchAction {
     Update,
 }
 
-pub struct FilterInstance {
+pub struct Filter {
     search_input: Vec<char>,
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
 }
 
-impl FilterInstance {
+impl Filter {
     pub fn new() -> Self {
         Self {
             search_input: vec![],
@@ -78,7 +78,7 @@ impl FilterInstance {
             self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
         }
     }
-    pub fn draw(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
+    pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         //Set the search bar text (If empty use the placeholder)
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
             Span::raw("Press / to search")

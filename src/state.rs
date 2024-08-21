@@ -1,5 +1,5 @@
 use crate::{
-    filter::{FilterInstance, SearchAction},
+    filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
     running_command::{Command, RunningCommand},
@@ -32,7 +32,7 @@ pub struct AppState {
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
-    filter: FilterInstance,
+    filter: Filter,
 }
 
 pub enum Focus {
@@ -59,7 +59,7 @@ impl AppState {
             current_tab: ListState::default().with_selected(Some(0)),
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
-            filter: FilterInstance::new(),
+            filter: Filter::new(),
         };
         state.update_items();
         state
@@ -107,7 +107,7 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
             .split(horizontal[1]);
 
-        self.filter.draw(frame, chunks[0], &self.theme);
+        self.filter.draw_searchbar(frame, chunks[0], &self.theme);
 
         let mut items: Vec<Line> = Vec::new();
         if !self.at_root() {
