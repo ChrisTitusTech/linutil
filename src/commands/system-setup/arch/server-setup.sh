@@ -26,7 +26,7 @@ set_password() {
     read -rs -p "Please re-enter password: " PASSWORD2
     echo -ne "\n"
     if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        set_option "$1" "$PASSWORD1"
+        export PASSWORD=$PASSWORD1
     else
         echo -ne "ERROR! Passwords do not match. \n"
         set_password
@@ -208,11 +208,11 @@ options=("btrfs" "ext4" "luks" "exit")
 select_option $? 1 "${options[@]}"
 
 case $? in
-0) set_option FS btrfs;;
-1) set_option FS ext4;;
+0) export FS=btrfs;;
+1) export FS=ext4;;
 2) 
     set_password "LUKS_PASSWORD"
-    set_option FS luks
+    export FS=luks
     ;;
 3) exit ;;
 *) echo "Wrong option please select again"; filesystem;;
@@ -232,12 +232,12 @@ select_option $? 1 "${options[@]}"
 case ${options[$?]} in
     y|Y|yes|Yes|YES)
     echo "${time_zone} set as timezone"
-    set_option TIMEZONE $time_zone;;
+    export TIMEZONE=$time_zone;;
     n|N|no|NO|No)
     echo "Please enter your desired timezone e.g. Europe/London :" 
     read new_timezone
     echo "${new_timezone} set as timezone"
-    set_option TIMEZONE $new_timezone;;
+    export TIMEZONE=$new_timezone;;
     *) echo "Wrong option. Try again";timezone;;
 esac
 }
@@ -252,7 +252,7 @@ select_option $? 4 "${options[@]}"
 keymap=${options[$?]}
 
 echo -ne "Your key boards layout: ${keymap} \n"
-set_option KEYMAP $keymap
+export KEYMAP=$keymap
 }
 
 # @description Choose whether drive is SSD or not.
@@ -266,9 +266,9 @@ select_option $? 1 "${options[@]}"
 
 case ${options[$?]} in
     y|Y|yes|Yes|YES)
-    set_option MOUNT_OPTIONS "noatime,compress=zstd,ssd,commit=120";;
+    export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
     n|N|no|NO|No)
-    set_option MOUNT_OPTIONS "noatime,compress=zstd,commit=120";;
+    export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
     *) echo "Wrong option. Try again";drivessd;;
 esac
 }
@@ -294,7 +294,7 @@ select_option $? 1 "${options[@]}"
 disk=${options[$?]%|*}
 
 echo -e "\n${disk%|*} selected \n"
-    set_option DISK ${disk%|*}
+    export DISK=${disk%|*}
 
 drivessd
 }
@@ -302,10 +302,10 @@ drivessd
 # @description Gather username and password to be used for installation. 
 userinfo () {
 read -p "Please enter your username: " username
-set_option USERNAME ${username,,} # convert to lower case as in issue #109 
+export USERNAME=${username,,} # convert to lower case as in issue #109 
 set_password "PASSWORD"
 read -rep "Please enter your hostname: " nameofmachine
-set_option NAME_OF_MACHINE $nameofmachine
+export NAME_OF_MACHINE=$nameofmachine
 }
 
 # Starting functions
