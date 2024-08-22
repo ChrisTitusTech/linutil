@@ -6,6 +6,10 @@ permissions:
 
 on:
   workflow_dispatch: # Manual trigger added
+  workflow_run:
+    workflows: ["LinUtil Release"] 
+    types:
+      - completed
 
 jobs:
   build-runspace:
