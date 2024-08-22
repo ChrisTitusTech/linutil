@@ -2,12 +2,12 @@
 
 echo -ne "
 -------------------------------------------------------------------------
-   █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
-  ██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
-  ███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
-  ██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
-  ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
-  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
+ █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
+██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
+███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
+██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
+██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
 -------------------------------------------------------------------------
@@ -82,11 +82,11 @@ select_option() {
 
     # little helpers for terminal print control and key input
     ESC=$( printf "\033")
-    cursor_blink_on()  { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to()        { printf "$ESC[$1;${2:-1}H"; }
+    cursor_blink_on()  { printf "${ESC}[?25h"; }
+    cursor_blink_off() { printf "${ESC}[?25l"; }
+    cursor_to()        { printf "${ESC}[$1;${2:-1}H"; }
     print_option()     { printf "$2   $1 "; }
-    print_selected()   { printf "$2  $ESC[7m $1 $ESC[27m"; }
+    print_selected()   { printf "$2  ${ESC}[7m $1 ${ESC}[27m"; }
     get_cursor_row()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[}; }
     get_cursor_col()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${COL#*[}; }
     key_input()         {
@@ -139,17 +139,22 @@ select_option() {
     for opt; do printf "\n"; done
 
     # determine current screen position for overwriting the options
-    local return_value=$1
-    local lastrow=`get_cursor_row`
-    local lastcol=`get_cursor_col`
+    local lastrow=$(get_cursor_row)
     local startrow=$(($lastrow - $#))
-    local startcol=1
-    local lines=$( tput lines )
-    local cols=$( tput cols ) 
-    local colmax=$2
+    local cols=$(tput cols) 
+
+    # Calculate the maximum number of columns based on screen width and option length
+    local max_option_length=0
+    for opt in "$@"; do
+        if [ ${#opt} -gt $max_option_length ]; then
+            max_option_length=${#opt}
+        fi
+    done
+    local colmax=$(( $cols / (max_option_length + 4) ))
+    if [ $colmax -lt 1 ]; then colmax=1; fi
+
     local offset=$(( $cols / $colmax ))
 
-    local size=$4
     shift 4
 
     # ensure cursor and input echoing back on upon a ctrl+c during read -s
@@ -646,12 +651,12 @@ export PATH=$PATH:~/.local/bin
 
 echo -ne "
 -------------------------------------------------------------------------
-   █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
-  ██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
-  ███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
-  ██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
-  ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
-  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
+ █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
+██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
+███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
+██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
+██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
                         SCRIPTHOME: ArchTitus
