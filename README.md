@@ -1,10 +1,15 @@
-# Chris Titus Tech's Linux Utility
+<center>
+    <h4 align="center">Linux Toolbox - Simplifying Linux Tasks</h4>
+</center>
 
-[![Version](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest)
-![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge)
+<p align="center">
+  <a href="https://github.com/ChrisTitusTech/linutil/releases/latest"><img src="https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge"></a>
+  <a href="https://github.com/ChrisTitusTech/linutil/releases"><img src="https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge"></a>
+</p>
 
 ![Preview](docs/assets/preview.png)
 
+***
 **Linutil** is a distro-agnostic toolbox designed to simplify everyday Linux tasks. It helps you set up applications and optimize your system for specific use cases. The utility is actively developed in Rust 🦀, providing performance and reliability.
 
 *Note:* Since the project is still in active development, you may encounter some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues) if you do.
