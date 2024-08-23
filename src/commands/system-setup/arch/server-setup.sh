@@ -71,7 +71,9 @@ select_option() {
             echo -ne "\033[${num_options}A"
         fi
 
-        echo "Please select an option using the arrow keys and Enter:"
+        if [ $last_selected -eq -1 ]; then
+            echo "Please select an option using the arrow keys and Enter:"
+        fi
         for i in "${!options[@]}"; do
             if [ $i -eq $selected ]; then
                 echo "> ${options[$i]}"
@@ -309,7 +311,9 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-mkdir /mnt &>/dev/null # Hiding error message if any
+if [ ! -d "/mnt" ]; then
+    mkdir /mnt
+fi
 echo -ne "
 -------------------------------------------------------------------------
                     Installing Prerequisites
@@ -402,7 +406,11 @@ elif [[ "${FS}" == "luks" ]]; then
     subvolumesetup
 fi
 
-# mount target
+sync
+if ! mountpoint -q /mnt; then
+    echo "ERROR! Failed to mount ${partition3} to /mnt after multiple attempts."
+    exit 1
+fi
 mkdir -p /mnt/boot/efi
 mount -t vfat -L EFIBOOT /mnt/boot/
 
