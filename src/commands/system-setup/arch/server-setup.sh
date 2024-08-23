@@ -472,7 +472,7 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
 
-arch-chroot /mnt
+arch-chroot /mnt /bin/bash <<EOF
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -675,3 +675,4 @@ sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 # Replace in the same state
 cd "$(pwd)" || exit
+EOF
