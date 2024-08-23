@@ -2,17 +2,6 @@
 
 . ../common-script.sh
 
-# Check if the home directory and linuxtoolbox folder exist, create them if they don't
-LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
-
-if [ ! -d "$LINUXTOOLBOXDIR" ]; then
-    printf "${YELLOW}Creating linuxtoolbox directory: %s${RC}\n" "$LINUXTOOLBOXDIR"
-    mkdir -p "$LINUXTOOLBOXDIR"
-    printf "${GREEN}linuxtoolbox directory created: %s${RC}\n" "$LINUXTOOLBOXDIR"
-fi
-
-cd "$LINUXTOOLBOXDIR" || exit
-
 install_theme_tools() {
     printf "${YELLOW}Installing theme tools (qt6ct and kvantum)...${RC}\n"
     case $PACKAGER in
