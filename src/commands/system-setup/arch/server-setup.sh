@@ -72,19 +72,12 @@ background_checks() {
     docker_check
 }
 
-# Renders a text based list of options that can be selected by the
-# user using up, down and enter keys and returns the chosen option.
-#
-#   Arguments   : list of options, maximum of 256
-#                 "opt1" "opt2" ...
-#   Return value: selected index (0 for opt1, 1 for opt2 ...)
 select_option() {
     local options=("$@")
     local num_options=${#options[@]}
     local selected=0
 
     while true; do
-        clear
         echo "Please select an option using the arrow keys and Enter:"
         for i in "${!options[@]}"; do
             if [ $i -eq $selected ]; then
@@ -143,45 +136,45 @@ echo -ne "
 # @description This function will handle file systems. At this movement we are handling only
 # btrfs and ext4. Others will be added in future.
 filesystem () {
-echo -ne "
-Please Select your file system for both boot and root
-"
-options=("btrfs" "ext4" "luks" "exit")
-select_option "${options[@]}"
+    echo -ne "
+    Please Select your file system for both boot and root
+    "
+    options=("btrfs" "ext4" "luks" "exit")
+    select_option "${options[@]}"
 
-case $? in
-0) export FS=btrfs;;
-1) export FS=ext4;;
-2) 
-    set_password "LUKS_PASSWORD"
-    export FS=luks
-    ;;
-3) exit ;;
-*) echo "Wrong option please select again"; filesystem;;
-esac
+    case $? in
+    0) export FS=btrfs;;
+    1) export FS=ext4;;
+    2) 
+        set_password "LUKS_PASSWORD"
+        export FS=luks
+        ;;
+    3) exit ;;
+    *) echo "Wrong option please select again"; filesystem;;
+    esac
 }
 # @description Detects and sets timezone. 
 timezone () {
-# Added this from arch wiki https://wiki.archlinux.org/title/System_time
-time_zone="$(curl --fail https://ipapi.co/timezone)"
-echo -ne "
-System detected your timezone to be '$time_zone' \n"
-echo -ne "Is this correct?
-" 
-options=("Yes" "No")
-select_option "${options[@]}"
+    # Added this from arch wiki https://wiki.archlinux.org/title/System_time
+    time_zone="$(curl --fail https://ipapi.co/timezone)"
+    echo -ne "
+    System detected your timezone to be '$time_zone' \n"
+    echo -ne "Is this correct?
+    " 
+    options=("Yes" "No")
+    select_option "${options[@]}"
 
-case ${options[$?]} in
-    y|Y|yes|Yes|YES)
-    echo "${time_zone} set as timezone"
-    export TIMEZONE=$time_zone;;
-    n|N|no|NO|No)
-    echo "Please enter your desired timezone e.g. Europe/London :" 
-    read new_timezone
-    echo "${new_timezone} set as timezone"
-    export TIMEZONE=$new_timezone;;
-    *) echo "Wrong option. Try again";timezone;;
-esac
+    case ${options[$?]} in
+        y|Y|yes|Yes|YES)
+        echo "${time_zone} set as timezone"
+        export TIMEZONE=$time_zone;;
+        n|N|no|NO|No)
+        echo "Please enter your desired timezone e.g. Europe/London :" 
+        read new_timezone
+        echo "${new_timezone} set as timezone"
+        export TIMEZONE=$new_timezone;;
+        *) echo "Wrong option. Try again";timezone;;
+    esac
 }
 # @description Set user's keyboard mapping. 
 keymap () {
@@ -243,11 +236,34 @@ drivessd
 
 # @description Gather username and password to be used for installation. 
 userinfo () {
-read -p "Please enter your username: " username
-export USERNAME=${username,,} # convert to lower case as in issue #109 
-set_password "PASSWORD"
-read -rep "Please enter your hostname: " nameofmachine
-export NAME_OF_MACHINE=$nameofmachine
+    # Loop through user input until the user gives a valid username
+    while true
+    do 
+            read -p "Please enter username:" username
+            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
+            then 
+                    break
+            fi 
+            echo "Incorrect username."
+    done 
+    export USERNAME=$username
+     # Loop through user input until the user gives a valid hostname, but allow the user to force save 
+    while true
+    do 
+            read -p "Please name your machine:" name_of_machine
+            # hostname regex (!!couldn't find spec for computer name!!)
+            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
+            then 
+                    break 
+            fi 
+            # if validation fails allow the user to force saving of the hostname
+            read -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
+            if [[ "${force,,}" = "y" ]]
+            then 
+                    break 
+            fi 
+    done 
+    export NAME_OF_MACHINE=$name_of_machine
 }
 
 # Starting functions
@@ -273,7 +289,7 @@ iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
-setfont ter-v22b
+setfont ter-v18b
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -S --noconfirm --needed reflector rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -519,35 +535,6 @@ elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
 elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
     pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
-    # Loop through user input until the user gives a valid username
-    while true
-    do 
-            read -p "Please enter username:" USERNAME
-            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-            then 
-                    break
-            fi 
-            echo "Incorrect username."
-    done 
-
-    read -p "Please enter password:" PASSWORD
-
-    # Loop through user input until the user gives a valid hostname, but allow the user to force save 
-    while true
-    do 
-            read -p "Please name your machine:" name_of_machine
-            # hostname regex (!!couldn't find spec for computer name!!)
-            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-            then 
-                    break 
-            fi 
-            # if validation fails allow the user to force saving of the hostname
-            read -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
-            if [[ "${force,,}" = "y" ]]
-            then 
-                    break 
-            fi 
-    done 
 
 echo -ne "
 -------------------------------------------------------------------------
