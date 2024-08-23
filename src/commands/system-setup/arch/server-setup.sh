@@ -20,19 +20,6 @@ if [ ! -f /usr/bin/pacstrap ]; then
     exit 1
 fi
 
-set_password() {
-    read -rs -p "Please enter password: " PASSWORD1
-    echo -ne "\n"
-    read -rs -p "Please re-enter password: " PASSWORD2
-    echo -ne "\n"
-    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        export PASSWORD=$PASSWORD1
-    else
-        echo -ne "ERROR! Passwords do not match. \n"
-        set_password
-    fi
-}
-
 root_check() {
     if [[ "$(id -u)" != "0" ]]; then
         echo -ne "ERROR! This script must be run under the 'root' user!\n"
@@ -76,8 +63,14 @@ select_option() {
     local options=("$@")
     local num_options=${#options[@]}
     local selected=0
+    local last_selected=-1
 
     while true; do
+        # Move cursor up to the start of the menu
+        if [ $last_selected -ne -1 ]; then
+            echo -ne "\033[${num_options}A"
+        fi
+
         echo "Please select an option using the arrow keys and Enter:"
         for i in "${!options[@]}"; do
             if [ $i -eq $selected ]; then
@@ -86,6 +79,8 @@ select_option() {
                 echo "  ${options[$i]}"
             fi
         done
+
+        last_selected=$selected
 
         # Read user input
         read -rsn1 key
@@ -178,34 +173,34 @@ timezone () {
 }
 # @description Set user's keyboard mapping. 
 keymap () {
-echo -ne "
-Please select key board layout from this list"
-# These are default key maps as presented in official arch repo archinstall
-options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru sg ua uk)
+    echo -ne "
+    Please select key board layout from this list"
+    # These are default key maps as presented in official arch repo archinstall
+    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru sg ua uk)
 
-select_option "${options[@]}"
-keymap=${options[$?]}
+    select_option "${options[@]}"
+    keymap=${options[$?]}
 
-echo -ne "Your key boards layout: ${keymap} \n"
-export KEYMAP=$keymap
+    echo -ne "Your key boards layout: ${keymap} \n"
+    export KEYMAP=$keymap
 }
 
 # @description Choose whether drive is SSD or not.
 drivessd () {
-echo -ne "
-Is this an ssd? yes/no:
-"
+    echo -ne "
+    Is this an ssd? yes/no:
+    "
 
-options=("Yes" "No")
-select_option "${options[@]}"
+    options=("Yes" "No")
+    select_option "${options[@]}"
 
-case ${options[$?]} in
-    y|Y|yes|Yes|YES)
-    export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-    n|N|no|NO|No)
-    export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-    *) echo "Wrong option. Try again";drivessd;;
-esac
+    case ${options[$?]} in
+        y|Y|yes|Yes|YES)
+        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
+        n|N|no|NO|No)
+        export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
+        *) echo "Wrong option. Try again";drivessd;;
+    esac
 }
 
 # @description Disk selection for drive to be used with installation.
@@ -221,17 +216,17 @@ echo -ne "
 
 "
 
-PS3='
-Select the disk to install on: '
-options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
+    PS3='
+    Select the disk to install on: '
+    options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
 
-select_option "${options[@]}"
-disk=${options[$?]%|*}
+    select_option "${options[@]}"
+    disk=${options[$?]%|*}
 
-echo -e "\n${disk%|*} selected \n"
-    export DISK=${disk%|*}
+    echo -e "\n${disk%|*} selected \n"
+        export DISK=${disk%|*}
 
-drivessd
+    drivessd
 }
 
 # @description Gather username and password to be used for installation. 
@@ -247,6 +242,21 @@ userinfo () {
             echo "Incorrect username."
     done 
     export USERNAME=$username
+
+    while true
+    do
+        read -rs -p "Please enter password: " PASSWORD1
+        echo -ne "\n"
+        read -rs -p "Please re-enter password: " PASSWORD2
+        echo -ne "\n"
+        if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
+            break
+        else
+            echo -ne "ERROR! Passwords do not match. \n"
+        fi
+    done
+    export PASSWORD=$PASSWORD1
+
      # Loop through user input until the user gives a valid hostname, but allow the user to force save 
     while true
     do 
@@ -410,7 +420,6 @@ echo -ne "
 "
 pacstrap /mnt base base-devel linux-lts linux-lts-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
-cp -R ${SCRIPT_DIR} /mnt/root/ArchTitus
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >> /mnt/etc/fstab
@@ -448,6 +457,8 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
     echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
+
+arch-chroot /mnt
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -550,10 +561,6 @@ if [ $(whoami) = "root"  ]; then
     echo "$USERNAME:$PASSWORD" | chpasswd
     echo "$USERNAME password set"
 
-	cp -R $HOME/ArchTitus /home/$USERNAME/
-    chown -R $USERNAME: /home/$USERNAME/ArchTitus
-    echo "ArchTitus copied to home directory"
-
 # enter $NAME_OF_MACHINE to /etc/hostname
 	echo $NAME_OF_MACHINE > /etc/hostname
 else
@@ -567,8 +574,6 @@ if [[ ${FS} == "luks" ]]; then
     mkinitcpio -p linux-lts
 fi
 
-export PATH=$PATH:~/.local/bin
-
 echo -ne "
 -------------------------------------------------------------------------
  █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
@@ -579,7 +584,6 @@ echo -ne "
 ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
-                        SCRIPTHOME: ArchTitus
 -------------------------------------------------------------------------
 
 Final Setup and Configurations
@@ -603,19 +607,27 @@ fi
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash /' /etc/default/grub
 
 echo -e "Installing CyberRe Grub theme..."
-THEME_DIR="/boot/grub/themes"
-THEME_NAME=CyberRe
+THEME_DIR="/boot/grub/themes/CyberRe"
 echo -e "Creating the theme directory..."
-mkdir -p "${THEME_DIR}/${THEME_NAME}"
-echo -e "Copying the theme..."
-cd "${HOME}/ArchTitus" || exit
-cp -a configs${THEME_DIR}/${THEME_NAME}/* ${THEME_DIR}/${THEME_NAME}
+mkdir -p "${THEME_DIR}"
+
+# Clone the theme
+cd "${THEME_DIR}" || exit
+git init
+git remote add -f origin https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes.git
+git config core.sparseCheckout true
+echo "themes/CyberRe/*" >> .git/info/sparse-checkout
+git pull origin main
+mv themes/CyberRe/* .
+rm -rf themes
+rm -rf .git
+
+echo "CyberRe theme has been cloned to ${THEME_DIR}"
 echo -e "Backing up Grub config..."
 cp -an /etc/default/grub /etc/default/grub.bak
 echo -e "Setting the theme as the default..."
-# shellcheck disable=SC2069
 grep "GRUB_THEME=" /etc/default/grub 2>&1 >/dev/null && sed -i '/GRUB_THEME=/d' /etc/default/grub
-echo "GRUB_THEME=\"${THEME_DIR}/${THEME_NAME}/theme.txt\"" >> /etc/default/grub
+echo "GRUB_THEME=\"${THEME_DIR}/theme.txt\"" >> /etc/default/grub
 echo -e "Updating grub..."
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "All set!"
@@ -647,25 +659,6 @@ echo "  NetworkManager enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
-               Enabling (and Theming) Plymouth Boot Splash
--------------------------------------------------------------------------
-"
-PLYMOUTH_THEMES_DIR="$HOME/ArchTitus/configs/usr/share/plymouth/themes"
-PLYMOUTH_THEME="arch-glow" # can grab from config later if we allow selection
-mkdir -p /usr/share/plymouth/themes
-echo 'Installing Plymouth theme...'
-cp -rf "${PLYMOUTH_THEMES_DIR}"/${PLYMOUTH_THEME} /usr/share/plymouth/themes
-if [[ $FS == "luks" ]]; then
-  sed -i 's/HOOKS=(base udev*/& plymouth/' /etc/mkinitcpio.conf # add plymouth after base udev
-  sed -i 's/HOOKS=(base udev \(.*block\) /&plymouth-/' /etc/mkinitcpio.conf # create plymouth-encrypt after block hook
-else
-  sed -i 's/HOOKS=(base udev*/& plymouth/' /etc/mkinitcpio.conf # add plymouth after base udev
-fi
-plymouth-set-default-theme -R arch-glow # sets the theme and runs mkinitcpio
-echo 'Plymouth theme installed'
-
-echo -ne "
--------------------------------------------------------------------------
                     Cleaning
 -------------------------------------------------------------------------
 "
@@ -676,10 +669,5 @@ sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: A
 sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-rm -r $HOME/ArchTitus
-rm -r /home/$USERNAME/ArchTitus
-
 # Replace in the same state
 cd "$(pwd)" || exit
-
-
