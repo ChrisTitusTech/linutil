@@ -10,10 +10,14 @@
 *Note:* Since the project is still in active development, you may encounter some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues) if you do.
 
 ## 💡 Usage
-
-To get started, open your terminal and run the following command:
+To get started, pick which branch you would like to use, then run the command in your terminal:
+### Stable Branch (Recommended)
 ```bash
 curl -fsSL https://christitus.com/linux | sh
+```
+### Dev branch
+```bash
+curl -fsSL https://christitus.com/linuxdev | sh
 ```
 ## 💖 Support
 
