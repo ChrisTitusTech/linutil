@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Redirect stdout and stderr to archsetup.txt and still output to console
+exec > >(tee -i archsetup.txt)
+exec 2>&1
+
 echo -ne "
 -------------------------------------------------------------------------
  █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
