@@ -535,10 +535,10 @@ echo -ne "
 "
 # determine processor type and install microcode
 proc_type=$(lscpu)
-if grep -E "GenuineIntel" <<< ${proc_type}; then
+if echo "${proc_type}" | grep -E "GenuineIntel"; then
     echo "Installing Intel microcode"
     pacman -S --noconfirm --needed intel-ucode
-elif grep -E "AuthenticAMD" <<< ${proc_type}; then
+elif echo "${proc_type}" | grep -E "AuthenticAMD"; then
     echo "Installing AMD microcode"
     pacman -S --noconfirm --needed amd-ucode
 fi
@@ -550,15 +550,18 @@ echo -ne "
 "
 # Graphics Drivers find and install
 gpu_type=$(lspci)
-if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+if echo ${gpu_type} | grep -E "NVIDIA|GeForce"; then
+    echo "Installing NVIDIA drivers: nvidia-lts"
     pacman -S --noconfirm --needed nvidia-lts
-	nvidia-xconfig
-elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
+elif echo ${gpu_type} | grep 'VGA' | grep -E "Radeon|AMD"; then
+    echo "Installing AMD drivers: xf86-video-amdgpu"
     pacman -S --noconfirm --needed xf86-video-amdgpu
-elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
+elif echo ${gpu_type} | grep -E "Integrated Graphics Controller"; then
+    echo "Installing Intel drivers:"
     pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
-elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+elif echo ${gpu_type} | grep -E "Intel Corporation UHD"; then
+    echo "Installing Intel UHD drivers:"
+    pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
 
 echo -ne "
