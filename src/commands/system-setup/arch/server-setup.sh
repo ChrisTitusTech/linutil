@@ -552,16 +552,16 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # Graphics Drivers find and install
-if echo ${gpu_type} | grep -E "NVIDIA|GeForce"; then
+if echo "${gpu_type}" | grep -E "NVIDIA|GeForce"; then
     echo "Installing NVIDIA drivers: nvidia-lts"
     pacman -S --noconfirm --needed nvidia-lts
-elif echo ${gpu_type} | grep 'VGA' | grep -E "Radeon|AMD"; then
+elif echo "${gpu_type}" | grep 'VGA' | grep -E "Radeon|AMD"; then
     echo "Installing AMD drivers: xf86-video-amdgpu"
     pacman -S --noconfirm --needed xf86-video-amdgpu
-elif echo ${gpu_type} | grep -E "Integrated Graphics Controller"; then
+elif echo "${gpu_type}" | grep -E "Integrated Graphics Controller"; then
     echo "Installing Intel drivers:"
     pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
-elif echo ${gpu_type} | grep -E "Intel Corporation UHD"; then
+elif echo "${gpu_type}" | grep -E "Intel Corporation UHD"; then
     echo "Installing Intel UHD drivers:"
     pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
