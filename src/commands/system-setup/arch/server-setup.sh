@@ -472,6 +472,8 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
 
+gpu_type=$(lspci | grep -E "VGA|3D|Display")
+
 arch-chroot /mnt /bin/bash <<EOF
 
 echo -ne "
@@ -534,13 +536,14 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # determine processor type and install microcode
-proc_type=$(lscpu)
-if echo "${proc_type}" | grep -E "GenuineIntel"; then
+if grep -q "GenuineIntel" /proc/cpuinfo; then
     echo "Installing Intel microcode"
     pacman -S --noconfirm --needed intel-ucode
-elif echo "${proc_type}" | grep -E "AuthenticAMD"; then
+elif grep -q "AuthenticAMD" /proc/cpuinfo; then
     echo "Installing AMD microcode"
     pacman -S --noconfirm --needed amd-ucode
+else
+    echo "Unable to determine CPU vendor. Skipping microcode installation."
 fi
 
 echo -ne "
@@ -549,7 +552,6 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # Graphics Drivers find and install
-gpu_type=$(lspci)
 if echo ${gpu_type} | grep -E "NVIDIA|GeForce"; then
     echo "Installing NVIDIA drivers: nvidia-lts"
     pacman -S --noconfirm --needed nvidia-lts
@@ -569,20 +571,13 @@ echo -ne "
                     Adding User
 -------------------------------------------------------------------------
 "
-if [ $(whoami) = "root"  ]; then
-    groupadd libvirt
-    useradd -m -G wheel,libvirt -s /bin/bash $USERNAME 
-    echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
+groupadd libvirt
+useradd -m -G wheel,libvirt -s /bin/bash $USERNAME 
+echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
+echo "$USERNAME:$PASSWORD" | chpasswd
+echo "$USERNAME password set"
+echo $NAME_OF_MACHINE > /etc/hostname
 
-# use chpasswd to enter $USERNAME:$password
-    echo "$USERNAME:$PASSWORD" | chpasswd
-    echo "$USERNAME password set"
-
-# enter $NAME_OF_MACHINE to /etc/hostname
-	echo $NAME_OF_MACHINE > /etc/hostname
-else
-	echo "You are already a user proceed with aur installs"
-fi
 if [[ ${FS} == "luks" ]]; then
 # Making sure to edit mkinitcpio conf if luks is selected
 # add encrypt in mkinitcpio.conf before filesystems in hooks
