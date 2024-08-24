@@ -24,28 +24,12 @@ script = "arch/yay-setup.sh"
 name = "GRUB Themes"
 
 [[data.entries]]
-name = "CyberRe"
-script = "grub-themes/cyberre-setup.sh"
+name = "Theme setup"
+script = "grub-themes/theme-setup.sh"
 
 [[data.entries]]
-name = "Cyberpunk"
-script = "grub-themes/cyberpunk-setup.sh"
-
-[[data.entries]]
-name = "Shodan"
-script = "grub-themes/shodan-setup.sh"
-
-[[data.entries]]
-name = "Vimix"
-script = "grub-themes/vimix-setup.sh"
-
-[[data.entries]]
-name = "Fallout"
-script = "grub-themes/fallout-setup.sh"
-
-[[data.entries]]
-name = "Remove GRUB themes"
-script = "grub-themes/remove-grub-themes.sh"
+name = "Remove theme"
+script = "grub-themes/remove-theme.sh"
 
 [[data]]
 name = "Full System Update"
