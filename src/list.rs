@@ -444,10 +444,15 @@ impl CustomList {
 // Function to get the latest release date from GitHub
 fn get_latest_release_date() -> String {
     let url = "https://api.github.com/repos/ChrisTitusTech/linutil/releases/latest"; // Replace with your repo
-    let response: serde_json::Value = get(url)
-        .unwrap()
-        .json()
-        .unwrap();
-    
-    response["published_at"].as_str().unwrap_or("Unknown").to_string()
+    let response = get(url);
+    match response {
+        Ok(resp) => {
+            let json: serde_json::Value = resp.json().unwrap(); // Change this line
+            json["published_at"].as_str().unwrap_or("Unknown").to_string()
+        },
+        Err(e) => {
+            eprintln!("Error fetching data: {}", e); // Handle the error
+            "Unknown".to_string() // or handle it as needed
+        }
+    }
 }
