@@ -8,19 +8,13 @@
 # - Configures parallel downloads for improved speed
 # - Enables colorized output for better readability
 
-# Check for sudo privileges
-if [ "$EUID" -ne 0 ]; then
-    echo "This script requires sudo privileges. Please enter your password."
-    exec sudo "$0" "$@"
-    exit $?
-fi
 
 # Function to check and install dependencies
 # Usage: dependency package_name
 dependency() {
     if ! command -v $1 &> /dev/null; then
         echo "$1 is not installed. Installing..."
-        pacman -S --noconfirm $1
+        sudo pacman -S --noconfirm $1
     fi
 }
 
@@ -47,18 +41,18 @@ sudo reflector --verbose --sort rate -l $MIRROR_COUNT --save /etc/pacman.d/mirro
 echo "Modifying pacman.conf..."
 
 # Uncomment ParallelDownloads option
-sed -i '/^# *ParallelDownloads/s/^# *//' /etc/pacman.conf
+sudo sed -i '/^# *ParallelDownloads/s/^# *//' /etc/pacman.conf
 
 # Set the number of parallel downloads
-sed -i "s/^ParallelDownloads *= *[0-9]*/ParallelDownloads = $PARALLEL_DOWNLOADS/" /etc/pacman.conf
+sudo sed -i "s/^ParallelDownloads *= *[0-9]*/ParallelDownloads = $PARALLEL_DOWNLOADS/" /etc/pacman.conf
 
 # Uncomment Color option for colorized output
-sed -i '/^# *Color/s/^# *//' /etc/pacman.conf
+sudo sed -i '/^# *Color/s/^# *//' /etc/pacman.conf
 
 # Add ILoveCandy option if not present
 if ! grep -q "ILoveCandy" /etc/pacman.conf; then
     echo "Adding ILoveCandy option..."
-    sed -i '/^Color/a ILoveCandy' /etc/pacman.conf
+    sudo sed -i '/^Color/a ILoveCandy' /etc/pacman.conf
 fi
 
 echo "Setup complete! Mirror list updated and pacman.conf modified with $PARALLEL_DOWNLOADS parallel downloads."
