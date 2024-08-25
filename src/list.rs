@@ -8,6 +8,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
     Frame,
 };
+use reqwest::blocking::get; // Add this import
 
 #[derive(Clone)]
 struct ListNode {
@@ -180,8 +181,8 @@ impl CustomList {
         let list = List::new(item_list)
             .highlight_style(Style::default().reversed())
             .block(Block::default().borders(Borders::ALL).title(format!(
-                "Linux Toolbox - {}",
-                chrono::Local::now().format("%Y-%m-%d")
+                "Linux Toolbox - {}", // Change this line
+                get_latest_release_date() // Call a function to get the latest release date
             )))
             .scroll_padding(1);
 
@@ -438,4 +439,15 @@ impl CustomList {
     fn at_root(&self) -> bool {
         self.visit_stack.len() == 1
     }
+}
+
+// Function to get the latest release date from GitHub
+fn get_latest_release_date() -> String {
+    let url = "https://api.github.com/repos/ChrisTitusTech/linutil/releases/latest"; // Replace with your repo
+    let response: serde_json::Value = get(url)
+        .unwrap()
+        .json()
+        .unwrap();
+    
+    response["published_at"].as_str().unwrap_or("Unknown").to_string()
 }
