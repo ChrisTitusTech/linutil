@@ -13,7 +13,7 @@ name = "Arch Server Setup"
 script = "arch/server-setup.sh"
 
 [[data.entries]]
-name = "pacman-go-brr"
+name = "Pacman-go-brr"
 script = "arch/pacman-go-brr.sh"
 
 [[data.entries]]
