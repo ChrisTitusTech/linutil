@@ -16,7 +16,7 @@ include_dir = "0.7.4"
 tempdir = "0.3.7"
 serde = { version = "1.0.205", features = ["derive"] }
 toml = "0.8.19"
-which = "6.0.2"
+which = "6.0.3"
 
 [[bin]]
 name = "linutil"
