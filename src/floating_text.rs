@@ -69,6 +69,9 @@ impl FloatContent for FloatingText {
             .iter()
             .skip(self.scroll)
             .flat_map(|line| {
+                if line.is_empty() {
+                    return vec![String::new()];
+                }
                 line.chars()
                     .collect::<Vec<char>>()
                     .chunks(inner_area.width as usize)
