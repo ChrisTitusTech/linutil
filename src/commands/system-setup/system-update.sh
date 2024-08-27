@@ -7,12 +7,13 @@ fastUpdate() {
         pacman)
             if ! command_exists yay && ! command_exists paru; then
                 echo "Installing yay as AUR helper..."
-                sudo ${PACKAGER} -S --needed --noconfirm base-devel || { echo -e "${RED}Failed to install base-devel${RC}"; exit 1; }
-                cd /opt && sudo git clone https://aur.archlinux.org/yay-git.git && sudo chown -R ${USER}:${USER} ./yay-git
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm base-devel || { echo -e "${RED}Failed to install base-devel${RC}"; exit 1; }
+                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R ${USER}:${USER} ./yay-git
                 cd yay-git && makepkg --noconfirm -si || { echo -e "${RED}Failed to install yay${RC}"; exit 1; }
             else
-                echo "Aur helper already installed"
+                echo "AUR helper already installed"
             fi
+
             if command_exists yay; then
                 AUR_HELPER="yay"
             elif command_exists paru; then
@@ -21,43 +22,52 @@ fastUpdate() {
                 echo "No AUR helper found. Please install yay or paru."
                 exit 1
             fi
+
             ${AUR_HELPER} -S --needed --noconfirm rate-mirrors-bin
+
             if [ -s /etc/pacman.d/mirrorlist ]; then
-                sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+                $ESCALATION_TOOL cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
             fi
-            
+
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
             dtype_local=${DTYPE}
             if [ "${DTYPE}" = "unknown" ]; then
                 dtype_local="arch"
             fi
-            sudo rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
+
+            $ESCALATION_TOOL rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
+            if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
+                echo -e "${RED}Rate-mirrors failed, restoring backup.${RC}"
+                $ESCALATION_TOOL cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+            fi
             ;;
         apt-get|nala)
-            sudo apt-get update
+            $ESCALATION_TOOL apt-get update
             if ! command_exists nala; then
-                sudo apt-get install -y nala || { echo -e "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
+                $ESCALATION_TOOL apt-get install -y nala || { echo -e "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
             fi
+
             if [ "${PACKAGER}" = "nala" ]; then
-                sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                sudo nala update
+                $ESCALATION_TOOL cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                $ESCALATION_TOOL nala update
                 PACKAGER="nala"
             fi
-            sudo ${PACKAGER} upgrade -y
+
+            $ESCALATION_TOOL ${PACKAGER} upgrade -y
             ;;
         dnf)
-            sudo ${PACKAGER} update -y
+            $ESCALATION_TOOL ${PACKAGER} update -y
             ;;
         zypper)
-            sudo ${PACKAGER} ref
-            sudo ${PACKAGER} --non-interactive dup
+            $ESCALATION_TOOL ${PACKAGER} ref
+            $ESCALATION_TOOL ${PACKAGER} --non-interactive dup
             ;;
         yum)
-            sudo ${PACKAGER} update -y
-            sudo ${PACKAGER} upgrade -y
+            $ESCALATION_TOOL ${PACKAGER} update -y
+            $ESCALATION_TOOL ${PACKAGER} upgrade -y
             ;;
         xbps-install)
-            sudo ${PACKAGER} -Syu
+            $ESCALATION_TOOL ${PACKAGER} -Syu
             ;;
         *)
             echo -e "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -70,23 +80,23 @@ updateSystem() {
     echo -e "${GREEN}Updating system${RC}"
     case ${PACKAGER} in
         nala|apt-get)
-            sudo "${PACKAGER}" update -y
-            sudo "${PACKAGER}" upgrade -y
+            $ESCALATION_TOOL "${PACKAGER}" update -y
+            $ESCALATION_TOOL "${PACKAGER}" upgrade -y
             ;;
         yum|dnf)
-            sudo "${PACKAGER}" update -y
-            sudo "${PACKAGER}" upgrade -y
+            $ESCALATION_TOOL "${PACKAGER}" update -y
+            $ESCALATION_TOOL "${PACKAGER}" upgrade -y
             ;;
         pacman)
-            sudo "${PACKAGER}" -Sy --noconfirm --needed archlinux-keyring
-            sudo "${PACKAGER}" -Su --noconfirm
+            $ESCALATION_TOOL "${PACKAGER}" -Sy --noconfirm --needed archlinux-keyring
+            $ESCALATION_TOOL "${PACKAGER}" -Su --noconfirm
             ;;
         zypper)
-            sudo ${PACKAGER} ref
-            sudo ${PACKAGER} --non-interactive dup
+            $ESCALATION_TOOL ${PACKAGER} ref
+            $ESCALATION_TOOL ${PACKAGER} --non-interactive dup
             ;;
         xbps-install)
-            sudo ${PACKAGER} -Syu
+            $ESCALATION_TOOL ${PACKAGER} -Syu
             ;;
         *)
             echo -e "${RED}Unsupported package manager: ${PACKAGER}${RC}"
@@ -101,6 +111,7 @@ updateFlatpaks() {
     fi
 }
 
+checkEscalationTool
 checkEnv
 fastUpdate
 updateSystem
