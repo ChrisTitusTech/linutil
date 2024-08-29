@@ -38,7 +38,7 @@ set_resolutions() {
         fi
 
         monitor_name="${monitor_array[monitor_choice - 1]}"
-        resolutions=$(get_unique_resolutions "$monitor_name")
+        resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
         # Create a temporary file with resolutions and indices
         temp_res_file=$(mktemp)
