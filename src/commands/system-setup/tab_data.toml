@@ -9,12 +9,16 @@ data = "command_exists"
 values = ["pacman"]
 
 [[data.entries]]
-name = "Yay AUR Helper"
-script = "arch/yay-setup.sh"
+name = "Arch Server Setup"
+script = "arch/server-setup.sh"
 
 [[data.entries]]
 name = "Paru AUR Helper"
 script = "arch/paru-setup.sh"
+
+[[data.entries]]
+name = "Yay AUR Helper"
+script = "arch/yay-setup.sh"
 
 [[data]]
 name = "Full System Update"
