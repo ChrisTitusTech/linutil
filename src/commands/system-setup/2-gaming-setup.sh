@@ -90,7 +90,17 @@ install_additional_dependencies() {
 
             ;;
         *pacman)
-
+            echo "Installing Steam for Arch Linux..."
+            $ESCALATION_TOOL pacman -S --needed --noconfirm steam
+            echo "Steam installation complete."
+            
+            echo "Installing Lutris for Arch Linux..."
+            $ESCALATION_TOOL pacman -S --needed --noconfirm lutris
+            echo "Lutris installation complete."
+            
+            echo "Installing GOverlay for Arch Linux..."
+            $ESCALATION_TOOL pacman -S --needed --noconfirm goverlay
+            echo "GOverlay installation complete."
             ;;
         *)
 
