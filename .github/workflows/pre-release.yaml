@@ -33,7 +33,6 @@ jobs:
         with:
           config-name: release-drafter.yml
           version: ${{ env.version }}
-          disable-releaser: true
 
       - name: Prepare Release Body
         id: prepare_body
