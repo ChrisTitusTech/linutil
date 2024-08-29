@@ -7,10 +7,10 @@ setupAlacritty() {
     if ! command_exists alacritty; then
         case ${PACKAGER} in
             pacman)
-                sudo ${PACKAGER} -S --needed --noconfirm alacritty
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm alacritty
                 ;;
             *)
-                sudo ${PACKAGER} install -y alacritty
+                $ESCALATION_TOOL ${PACKAGER} install -y alacritty
                 ;;
         esac
     else
@@ -26,4 +26,5 @@ setupAlacritty() {
 }
 
 checkEnv
+checkEscalationTool
 setupAlacritty

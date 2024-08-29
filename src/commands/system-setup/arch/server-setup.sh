@@ -1,13 +1,17 @@
 #!/bin/bash
 
+# Redirect stdout and stderr to archsetup.txt and still output to console
+exec > >(tee -i archsetup.txt)
+exec 2>&1
+
 echo -ne "
 -------------------------------------------------------------------------
-   █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
-  ██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
-  ███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
-  ██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
-  ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
-  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
+ █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
+██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
+███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
+██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
+██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
 -------------------------------------------------------------------------
@@ -19,19 +23,6 @@ if [ ! -f /usr/bin/pacstrap ]; then
     echo "This script must be run from an Arch Linux ISO environment."
     exit 1
 fi
-
-set_password() {
-    read -rs -p "Please enter password: " PASSWORD1
-    echo -ne "\n"
-    read -rs -p "Please re-enter password: " PASSWORD2
-    echo -ne "\n"
-    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        export PASSWORD=$PASSWORD1
-    else
-        echo -ne "ERROR! Passwords do not match. \n"
-        set_password
-    fi
-}
 
 root_check() {
     if [[ "$(id -u)" != "0" ]]; then
@@ -72,115 +63,60 @@ background_checks() {
     docker_check
 }
 
-# Renders a text based list of options that can be selected by the
-# user using up, down and enter keys and returns the chosen option.
-#
-#   Arguments   : list of options, maximum of 256
-#                 "opt1" "opt2" ...
-#   Return value: selected index (0 for opt1, 1 for opt2 ...)
 select_option() {
+    local options=("$@")
+    local num_options=${#options[@]}
+    local selected=0
+    local last_selected=-1
 
-    # little helpers for terminal print control and key input
-    ESC=$( printf "\033")
-    cursor_blink_on()  { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to()        { printf "$ESC[$1;${2:-1}H"; }
-    print_option()     { printf "$2   $1 "; }
-    print_selected()   { printf "$2  $ESC[7m $1 $ESC[27m"; }
-    get_cursor_row()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[}; }
-    get_cursor_col()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${COL#*[}; }
-    key_input()         {
-                        local key
-                        IFS= read -rsn1 key 2>/dev/null >&2
-                        if [[ $key = ""      ]]; then echo enter; fi;
-                        if [[ $key = $'\x20' ]]; then echo space; fi;
-                        if [[ $key = "k" ]]; then echo up; fi;
-                        if [[ $key = "j" ]]; then echo down; fi;
-                        if [[ $key = "h" ]]; then echo left; fi;
-                        if [[ $key = "l" ]]; then echo right; fi;
-                        if [[ $key = "a" ]]; then echo all; fi;
-                        if [[ $key = "n" ]]; then echo none; fi;
-                        if [[ $key = $'\x1b' ]]; then
-                            read -rsn2 key
-                            if [[ $key = [A || $key = k ]]; then echo up;    fi;
-                            if [[ $key = [B || $key = j ]]; then echo down;  fi;
-                            if [[ $key = [C || $key = l ]]; then echo right;  fi;
-                            if [[ $key = [D || $key = h ]]; then echo left;  fi;
-                        fi 
-    }
-    print_options_multicol() {
-        # print options by overwriting the last lines
-        local curr_col=$1
-        local curr_row=$2
-        local curr_idx=0
-
-        local idx=0
-        local row=0
-        local col=0
-        
-        curr_idx=$(( $curr_col + $curr_row * $colmax ))
-        
-        for option in "${options[@]}"; do
-
-            row=$(( $idx/$colmax ))
-            col=$(( $idx - $row * $colmax ))
-
-            cursor_to $(( $startrow + $row + 1)) $(( $offset * $col + 1))
-            if [ $idx -eq $curr_idx ]; then
-                print_selected "$option"
-            else
-                print_option "$option"
-            fi
-            ((idx++))
-        done
-    }
-
-    # initially print empty new lines (scroll down if at bottom of screen)
-    for opt; do printf "\n"; done
-
-    # determine current screen position for overwriting the options
-    local return_value=$1
-    local lastrow=`get_cursor_row`
-    local lastcol=`get_cursor_col`
-    local startrow=$(($lastrow - $#))
-    local startcol=1
-    local lines=$( tput lines )
-    local cols=$( tput cols ) 
-    local colmax=$2
-    local offset=$(( $cols / $colmax ))
-
-    local size=$4
-    shift 4
-
-    # ensure cursor and input echoing back on upon a ctrl+c during read -s
-    trap "cursor_blink_on; stty echo; printf '\n'; exit" 2
-    cursor_blink_off
-
-    local active_row=0
-    local active_col=0
     while true; do
-        print_options_multicol $active_col $active_row 
-        # user key control
-        case `key_input` in
-            enter)  break;;
-            up)     ((active_row--));
-                    if [ $active_row -lt 0 ]; then active_row=0; fi;;
-            down)   ((active_row++));
-                    if [ $active_row -ge $(( ${#options[@]} / $colmax ))  ]; then active_row=$(( ${#options[@]} / $colmax )); fi;;
-            left)     ((active_col=$active_col - 1));
-                    if [ $active_col -lt 0 ]; then active_col=0; fi;;
-            right)     ((active_col=$active_col + 1));
-                    if [ $active_col -ge $colmax ]; then active_col=$(( $colmax - 1 )) ; fi;;
+        # Move cursor up to the start of the menu
+        if [ $last_selected -ne -1 ]; then
+            echo -ne "\033[${num_options}A"
+        fi
+
+        if [ $last_selected -eq -1 ]; then
+            echo "Please select an option using the arrow keys and Enter:"
+        fi
+        for i in "${!options[@]}"; do
+            if [ $i -eq $selected ]; then
+                echo "> ${options[$i]}"
+            else
+                echo "  ${options[$i]}"
+            fi
+        done
+
+        last_selected=$selected
+
+        # Read user input
+        read -rsn1 key
+        case $key in
+            $'\x1b') # ESC sequence
+                read -rsn2 -t 0.1 key
+                case $key in
+                    '[A') # Up arrow
+                        ((selected--))
+                        if [ $selected -lt 0 ]; then
+                            selected=$((num_options - 1))
+                        fi
+                        ;;
+                    '[B') # Down arrow
+                        ((selected++))
+                        if [ $selected -ge $num_options ]; then
+                            selected=0
+                        fi
+                        ;;
+                esac
+                ;;
+            '') # Enter key
+                break
+                ;;
         esac
     done
 
-    # cursor position back to normal
-    cursor_to $lastrow
-    printf "\n"
-    cursor_blink_on
-
-    return $(( $active_col + $active_row * $colmax ))
+    return $selected
 }
+
 # @description Displays ArchTitus logo
 # @noargs
 logo () {
@@ -201,76 +137,76 @@ echo -ne "
 # @description This function will handle file systems. At this movement we are handling only
 # btrfs and ext4. Others will be added in future.
 filesystem () {
-echo -ne "
-Please Select your file system for both boot and root
-"
-options=("btrfs" "ext4" "luks" "exit")
-select_option $? 1 "${options[@]}"
+    echo -ne "
+    Please Select your file system for both boot and root
+    "
+    options=("btrfs" "ext4" "luks" "exit")
+    select_option "${options[@]}"
 
-case $? in
-0) export FS=btrfs;;
-1) export FS=ext4;;
-2) 
-    set_password "LUKS_PASSWORD"
-    export FS=luks
-    ;;
-3) exit ;;
-*) echo "Wrong option please select again"; filesystem;;
-esac
+    case $? in
+    0) export FS=btrfs;;
+    1) export FS=ext4;;
+    2) 
+        set_password "LUKS_PASSWORD"
+        export FS=luks
+        ;;
+    3) exit ;;
+    *) echo "Wrong option please select again"; filesystem;;
+    esac
 }
 # @description Detects and sets timezone. 
 timezone () {
-# Added this from arch wiki https://wiki.archlinux.org/title/System_time
-time_zone="$(curl --fail https://ipapi.co/timezone)"
-echo -ne "
-System detected your timezone to be '$time_zone' \n"
-echo -ne "Is this correct?
-" 
-options=("Yes" "No")
-select_option $? 1 "${options[@]}"
+    # Added this from arch wiki https://wiki.archlinux.org/title/System_time
+    time_zone="$(curl --fail https://ipapi.co/timezone)"
+    echo -ne "
+    System detected your timezone to be '$time_zone' \n"
+    echo -ne "Is this correct?
+    " 
+    options=("Yes" "No")
+    select_option "${options[@]}"
 
-case ${options[$?]} in
-    y|Y|yes|Yes|YES)
-    echo "${time_zone} set as timezone"
-    export TIMEZONE=$time_zone;;
-    n|N|no|NO|No)
-    echo "Please enter your desired timezone e.g. Europe/London :" 
-    read new_timezone
-    echo "${new_timezone} set as timezone"
-    export TIMEZONE=$new_timezone;;
-    *) echo "Wrong option. Try again";timezone;;
-esac
+    case ${options[$?]} in
+        y|Y|yes|Yes|YES)
+        echo "${time_zone} set as timezone"
+        export TIMEZONE=$time_zone;;
+        n|N|no|NO|No)
+        echo "Please enter your desired timezone e.g. Europe/London :" 
+        read new_timezone
+        echo "${new_timezone} set as timezone"
+        export TIMEZONE=$new_timezone;;
+        *) echo "Wrong option. Try again";timezone;;
+    esac
 }
 # @description Set user's keyboard mapping. 
 keymap () {
-echo -ne "
-Please select key board layout from this list"
-# These are default key maps as presented in official arch repo archinstall
-options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru sg ua uk)
+    echo -ne "
+    Please select key board layout from this list"
+    # These are default key maps as presented in official arch repo archinstall
+    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg ua uk)
 
-select_option $? 4 "${options[@]}"
-keymap=${options[$?]}
+    select_option "${options[@]}"
+    keymap=${options[$?]}
 
-echo -ne "Your key boards layout: ${keymap} \n"
-export KEYMAP=$keymap
+    echo -ne "Your key boards layout: ${keymap} \n"
+    export KEYMAP=$keymap
 }
 
 # @description Choose whether drive is SSD or not.
 drivessd () {
-echo -ne "
-Is this an ssd? yes/no:
-"
+    echo -ne "
+    Is this an ssd? yes/no:
+    "
 
-options=("Yes" "No")
-select_option $? 1 "${options[@]}"
+    options=("Yes" "No")
+    select_option "${options[@]}"
 
-case ${options[$?]} in
-    y|Y|yes|Yes|YES)
-    export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-    n|N|no|NO|No)
-    export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-    *) echo "Wrong option. Try again";drivessd;;
-esac
+    case ${options[$?]} in
+        y|Y|yes|Yes|YES)
+        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
+        n|N|no|NO|No)
+        export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
+        *) echo "Wrong option. Try again";drivessd;;
+    esac
 }
 
 # @description Disk selection for drive to be used with installation.
@@ -286,26 +222,64 @@ echo -ne "
 
 "
 
-PS3='
-Select the disk to install on: '
-options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
+    PS3='
+    Select the disk to install on: '
+    options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
 
-select_option $? 1 "${options[@]}"
-disk=${options[$?]%|*}
+    select_option "${options[@]}"
+    disk=${options[$?]%|*}
 
-echo -e "\n${disk%|*} selected \n"
-    export DISK=${disk%|*}
+    echo -e "\n${disk%|*} selected \n"
+        export DISK=${disk%|*}
 
-drivessd
+    drivessd
 }
 
 # @description Gather username and password to be used for installation. 
 userinfo () {
-read -p "Please enter your username: " username
-export USERNAME=${username,,} # convert to lower case as in issue #109 
-set_password "PASSWORD"
-read -rep "Please enter your hostname: " nameofmachine
-export NAME_OF_MACHINE=$nameofmachine
+    # Loop through user input until the user gives a valid username
+    while true
+    do 
+            read -p "Please enter username:" username
+            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
+            then 
+                    break
+            fi 
+            echo "Incorrect username."
+    done 
+    export USERNAME=$username
+
+    while true
+    do
+        read -rs -p "Please enter password: " PASSWORD1
+        echo -ne "\n"
+        read -rs -p "Please re-enter password: " PASSWORD2
+        echo -ne "\n"
+        if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
+            break
+        else
+            echo -ne "ERROR! Passwords do not match. \n"
+        fi
+    done
+    export PASSWORD=$PASSWORD1
+
+     # Loop through user input until the user gives a valid hostname, but allow the user to force save 
+    while true
+    do 
+            read -p "Please name your machine:" name_of_machine
+            # hostname regex (!!couldn't find spec for computer name!!)
+            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
+            then 
+                    break 
+            fi 
+            # if validation fails allow the user to force saving of the hostname
+            read -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
+            if [[ "${force,,}" = "y" ]]
+            then 
+                    break 
+            fi 
+    done 
+    export NAME_OF_MACHINE=$name_of_machine
 }
 
 # Starting functions
@@ -331,7 +305,7 @@ iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
-setfont ter-v22b
+setfont ter-v18b
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -S --noconfirm --needed reflector rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -341,7 +315,9 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-mkdir /mnt &>/dev/null # Hiding error message if any
+if [ ! -d "/mnt" ]; then
+    mkdir /mnt
+fi
 echo -ne "
 -------------------------------------------------------------------------
                     Installing Prerequisites
@@ -434,7 +410,11 @@ elif [[ "${FS}" == "luks" ]]; then
     subvolumesetup
 fi
 
-# mount target
+sync
+if ! mountpoint -q /mnt; then
+    echo "ERROR! Failed to mount ${partition3} to /mnt after multiple attempts."
+    exit 1
+fi
 mkdir -p /mnt/boot/efi
 mount -t vfat -L EFIBOOT /mnt/boot/
 
@@ -450,9 +430,12 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
-pacstrap /mnt base base-devel linux-lts linux-lts-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
+if [[ ! -d "/sys/firmware/efi" ]]; then
+    pacstrap /mnt base base-devel linux-lts linux-firmware --noconfirm --needed
+else
+    pacstrap /mnt base base-devel linux-lts linux-firmware efibootmgr --noconfirm --needed
+fi
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
-cp -R ${SCRIPT_DIR} /mnt/root/ArchTitus
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
 genfstab -L /mnt >> /mnt/etc/fstab
@@ -467,8 +450,6 @@ echo -ne "
 "
 if [[ ! -d "/sys/firmware/efi" ]]; then
     grub-install --boot-directory=/mnt/boot ${DISK}
-else
-    pacstrap /mnt efibootmgr --noconfirm --needed
 fi
 echo -ne "
 -------------------------------------------------------------------------
@@ -491,6 +472,10 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
 
+gpu_type=$(lspci | grep -E "VGA|3D|Display")
+
+arch-chroot /mnt /bin/bash <<EOF
+
 echo -ne "
 -------------------------------------------------------------------------
                     Network Setup 
@@ -504,14 +489,14 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed pacman-contrib curl
-pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git
+pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
 nc=$(grep -c ^processor /proc/cpuinfo)
 echo -ne "
 -------------------------------------------------------------------------
                     You have " $nc" cores. And
-			changing the makeflags for "$nc" cores. Aswell as
+			changing the makeflags for " $nc" cores. Aswell as
 				changing the compression settings.
 -------------------------------------------------------------------------
 "
@@ -551,15 +536,14 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # determine processor type and install microcode
-proc_type=$(lscpu)
-if grep -E "GenuineIntel" <<< ${proc_type}; then
+if grep -q "GenuineIntel" /proc/cpuinfo; then
     echo "Installing Intel microcode"
     pacman -S --noconfirm --needed intel-ucode
-    proc_ucode=intel-ucode.img
-elif grep -E "AuthenticAMD" <<< ${proc_type}; then
+elif grep -q "AuthenticAMD" /proc/cpuinfo; then
     echo "Installing AMD microcode"
     pacman -S --noconfirm --needed amd-ucode
-    proc_ucode=amd-ucode.img
+else
+    echo "Unable to determine CPU vendor. Skipping microcode installation."
 fi
 
 echo -ne "
@@ -568,72 +552,32 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # Graphics Drivers find and install
-gpu_type=$(lspci)
-if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+if echo "${gpu_type}" | grep -E "NVIDIA|GeForce"; then
+    echo "Installing NVIDIA drivers: nvidia-lts"
     pacman -S --noconfirm --needed nvidia-lts
-	nvidia-xconfig
-elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
+elif echo "${gpu_type}" | grep 'VGA' | grep -E "Radeon|AMD"; then
+    echo "Installing AMD drivers: xf86-video-amdgpu"
     pacman -S --noconfirm --needed xf86-video-amdgpu
-elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
+elif echo "${gpu_type}" | grep -E "Integrated Graphics Controller"; then
+    echo "Installing Intel drivers:"
     pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
-elif grep -E "Intel Corporation UHD" <<< ${gpu_type}; then
-    pacman -S --needed --noconfirm libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+elif echo "${gpu_type}" | grep -E "Intel Corporation UHD"; then
+    echo "Installing Intel UHD drivers:"
+    pacman -S --noconfirm --needed libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
 fi
-    # Loop through user input until the user gives a valid username
-    while true
-    do 
-            read -p "Please enter username:" username
-            # username regex per response here https://unix.stackexchange.com/questions/157426/what-is-the-regex-to-validate-linux-users
-            # lowercase the username to test regex
-            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-            then 
-                    break
-            fi 
-            echo "Incorrect username."
-    done 
-    #Set Password
-    read -p "Please enter password:" password
-
-    # Loop through user input until the user gives a valid hostname, but allow the user to force save 
-    while true
-    do 
-            read -p "Please name your machine:" name_of_machine
-            # hostname regex (!!couldn't find spec for computer name!!)
-            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-            then 
-                    break 
-            fi 
-            # if validation fails allow the user to force saving of the hostname
-            read -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
-            if [[ "${force,,}" = "y" ]]
-            then 
-                    break 
-            fi 
-    done 
 
 echo -ne "
 -------------------------------------------------------------------------
                     Adding User
 -------------------------------------------------------------------------
 "
-if [ $(whoami) = "root"  ]; then
-    groupadd libvirt
-    useradd -m -G wheel,libvirt -s /bin/bash $USERNAME 
-    echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
+groupadd libvirt
+useradd -m -G wheel,libvirt -s /bin/bash $USERNAME 
+echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
+echo "$USERNAME:$PASSWORD" | chpasswd
+echo "$USERNAME password set"
+echo $NAME_OF_MACHINE > /etc/hostname
 
-# use chpasswd to enter $USERNAME:$password
-    echo "$USERNAME:$PASSWORD" | chpasswd
-    echo "$USERNAME password set"
-
-	cp -R $HOME/ArchTitus /home/$USERNAME/
-    chown -R $USERNAME: /home/$USERNAME/ArchTitus
-    echo "ArchTitus copied to home directory"
-
-# enter $NAME_OF_MACHINE to /etc/hostname
-	echo $NAME_OF_MACHINE > /etc/hostname
-else
-	echo "You are already a user proceed with aur installs"
-fi
 if [[ ${FS} == "luks" ]]; then
 # Making sure to edit mkinitcpio conf if luks is selected
 # add encrypt in mkinitcpio.conf before filesystems in hooks
@@ -642,19 +586,16 @@ if [[ ${FS} == "luks" ]]; then
     mkinitcpio -p linux-lts
 fi
 
-export PATH=$PATH:~/.local/bin
-
 echo -ne "
 -------------------------------------------------------------------------
-   █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
-  ██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
-  ███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
-  ██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
-  ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
-  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
+ █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
+██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
+███████║██████╔╝██║     ███████║   ██║   ██║   ██║   ██║   ██║███████╗
+██╔══██║██╔══██╗██║     ██╔══██║   ██║   ██║   ██║   ██║   ██║╚════██║
+██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 -------------------------------------------------------------------------
                     Automated Arch Linux Installer
-                        SCRIPTHOME: ArchTitus
 -------------------------------------------------------------------------
 
 Final Setup and Configurations
@@ -678,32 +619,30 @@ fi
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash /' /etc/default/grub
 
 echo -e "Installing CyberRe Grub theme..."
-THEME_DIR="/boot/grub/themes"
-THEME_NAME=CyberRe
+THEME_DIR="/boot/grub/themes/CyberRe"
 echo -e "Creating the theme directory..."
-mkdir -p "${THEME_DIR}/${THEME_NAME}"
-echo -e "Copying the theme..."
-cd "${HOME}/ArchTitus" || exit
-cp -a configs${THEME_DIR}/${THEME_NAME}/* ${THEME_DIR}/${THEME_NAME}
+mkdir -p "${THEME_DIR}"
+
+# Clone the theme
+cd "${THEME_DIR}" || exit
+git init
+git remote add -f origin https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes.git
+git config core.sparseCheckout true
+echo "themes/CyberRe/*" >> .git/info/sparse-checkout
+git pull origin main
+mv themes/CyberRe/* .
+rm -rf themes
+rm -rf .git
+
+echo "CyberRe theme has been cloned to ${THEME_DIR}"
 echo -e "Backing up Grub config..."
 cp -an /etc/default/grub /etc/default/grub.bak
 echo -e "Setting the theme as the default..."
-# shellcheck disable=SC2069
 grep "GRUB_THEME=" /etc/default/grub 2>&1 >/dev/null && sed -i '/GRUB_THEME=/d' /etc/default/grub
-echo "GRUB_THEME=\"${THEME_DIR}/${THEME_NAME}/theme.txt\"" >> /etc/default/grub
+echo "GRUB_THEME=\"${THEME_DIR}/theme.txt\"" >> /etc/default/grub
 echo -e "Updating grub..."
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "All set!"
-
-echo -ne "
--------------------------------------------------------------------------
-               Enabling (and Theming) Login Display Manager
--------------------------------------------------------------------------
-"
-
-systemctl enable sddm.service
-echo "[Theme]" >>  /etc/sddm.conf
-echo "Current=Nordic" >> /etc/sddm.conf
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -722,25 +661,6 @@ echo "  NetworkManager enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
-               Enabling (and Theming) Plymouth Boot Splash
--------------------------------------------------------------------------
-"
-PLYMOUTH_THEMES_DIR="$HOME/ArchTitus/configs/usr/share/plymouth/themes"
-PLYMOUTH_THEME="arch-glow" # can grab from config later if we allow selection
-mkdir -p /usr/share/plymouth/themes
-echo 'Installing Plymouth theme...'
-cp -rf "${PLYMOUTH_THEMES_DIR}"/${PLYMOUTH_THEME} /usr/share/plymouth/themes
-if [[ $FS == "luks" ]]; then
-  sed -i 's/HOOKS=(base udev*/& plymouth/' /etc/mkinitcpio.conf # add plymouth after base udev
-  sed -i 's/HOOKS=(base udev \(.*block\) /&plymouth-/' /etc/mkinitcpio.conf # create plymouth-encrypt after block hook
-else
-  sed -i 's/HOOKS=(base udev*/& plymouth/' /etc/mkinitcpio.conf # add plymouth after base udev
-fi
-plymouth-set-default-theme -R arch-glow # sets the theme and runs mkinitcpio
-echo 'Plymouth theme installed'
-
-echo -ne "
--------------------------------------------------------------------------
                     Cleaning
 -------------------------------------------------------------------------
 "
@@ -751,10 +671,6 @@ sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: A
 sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-rm -r $HOME/ArchTitus
-rm -r /home/$USERNAME/ArchTitus
-
 # Replace in the same state
 cd "$(pwd)" || exit
-
-
+EOF

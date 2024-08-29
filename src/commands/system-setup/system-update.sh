@@ -40,6 +40,7 @@ fastUpdate() {
                 echo -e "${RED}Rate-mirrors failed, restoring backup.${RC}"
                 $ESCALATION_TOOL cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
             fi
+
             ;;
         apt-get|nala)
             $ESCALATION_TOOL apt-get update
@@ -111,8 +112,8 @@ updateFlatpaks() {
     fi
 }
 
-checkEscalationTool
 checkEnv
+checkEscalationTool
 fastUpdate
 updateSystem
 updateFlatpaks
