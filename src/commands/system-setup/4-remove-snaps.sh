@@ -5,24 +5,26 @@
 removeSnaps() {
     case $PACKAGER in
         pacman)
-            sudo ${PACKAGER} -Rns snapd
+            $ESCALATION_TOOL ${PACKAGER} -Rns snapd
             ;;
         apt-get|nala)
-            sudo ${PACKAGER} autoremove --purge snapd
+            $ESCALATION_TOOL ${PACKAGER} autoremove --purge snapd
             if [ "$ID" = ubuntu ]; then
-                sudo apt-mark hold snapd
+                $ESCALATION_TOOL apt-mark hold snapd
             fi
             ;;
         dnf)
-            sudo ${PACKAGER} remove snapd
+            $ESCALATION_TOOL ${PACKAGER} remove snapd
             ;;
         zypper)
-            sudo ${PACKAGER} remove snapd
+            $ESCALATION_TOOL ${PACKAGER} remove snapd
             ;;
         *)
-            echo "removing snapd not implemented for this package manager"
+            echo "Removing snapd not implemented for this package manager"
+            ;;
     esac
 }
 
 checkEnv
+checkEscalationTool
 removeSnaps
