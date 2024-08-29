@@ -1,0 +1,41 @@
+name = "System Setup"
+
+[[data]]
+name = "Arch Linux"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman"]
+
+[[data.entries]]
+name = "Arch Server Setup"
+script = "arch/server-setup.sh"
+
+[[data.entries]]
+name = "Paru AUR Helper"
+script = "arch/paru-setup.sh"
+
+[[data.entries]]
+name = "Yay AUR Helper"
+script = "arch/yay-setup.sh"
+
+[[data]]
+name = "Full System Update"
+script = "system-update.sh"
+
+[[data]]
+name = "Build Prerequisites"
+script = "1-compile-setup.sh"
+
+[[data]]
+name = "Gaming Dependencies"
+script = "2-gaming-setup.sh"
+
+[[data]]
+name = "Global Theme"
+script = "3-global-theme.sh"
+
+[[data]]
+name = "Remove Snaps"
+script = "4-remove-snaps.sh"

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Linutil
+Exec=sh -c "$HOME/.local/bin/linutil"
+Icon=utilities-terminal
+Type=Application
+Terminal=true
+Categories=Utility;
