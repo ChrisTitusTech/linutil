@@ -2,28 +2,6 @@
 
 . ../common-script.sh
 
-# Check if the home directory and linuxtoolbox folder exist, create them if they don't
-LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
-
-if [ ! -d "$LINUXTOOLBOXDIR" ]; then
-    echo -e "${YELLOW}Creating linuxtoolbox directory: $LINUXTOOLBOXDIR${RC}"
-    mkdir -p "$LINUXTOOLBOXDIR"
-    echo -e "${GREEN}linuxtoolbox directory created: $LINUXTOOLBOXDIR${RC}"
-fi
-
-if [ ! -d "$LINUXTOOLBOXDIR/linutil" ]; then
-    echo -e "${YELLOW}Cloning linutil repository into: $LINUXTOOLBOXDIR/linutil${RC}"
-    git clone https://github.com/ChrisTitusTech/linutil "$LINUXTOOLBOXDIR/linutil"
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Successfully cloned linutil repository${RC}"
-    else
-        echo -e "${RED}Failed to clone linutil repository${RC}"
-        exit 1
-    fi
-fi
-
-cd "$LINUXTOOLBOXDIR/linutil" || exit
-
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
