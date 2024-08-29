@@ -40,11 +40,11 @@ set_resolutions() {
         monitor_name="${monitor_array[monitor_choice - 1]}"
         resolutions=$(get_unique_resolutions "$monitor_name")
 
-        # Create a temporary file with sorted resolutions and indices
+        # Create a temporary file with resolutions and indices
         temp_res_file=$(mktemp)
-        echo "$resolutions" | sort -nr | awk '{print NR " " $0}' > "$temp_res_file"
+        echo "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
 
-        # Read the sorted resolutions into an associative array
+        # Read the resolutions into an associative array
         declare -A resolution_map
         while read -r index resolution; do
             resolution_map[$index]="$resolution"
