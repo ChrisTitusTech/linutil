@@ -2,11 +2,28 @@
 
 . "$(dirname "$0")/../../common-script.sh"
 
+checkGrubIsInstalled() {
+    if ! command_exists update-grub && \
+       ! command_exists grub2-mkconfig && \
+       ! command_exists grub-mkconfig; then
+        echo "GRUB is not installed."
+        exit 1
+    fi
+}
+
 
 removingGrubTheme(){
 
 echo -e "${GREEN}Removing GRUB themes${RC}"
-GRUB_DIR="/boot/grub"
+
+    if [[ -d "/boot/grub" ]]; then
+        GRUB_DIR='/boot/grub'
+    elif [[ -d "/boot/grub2" ]]; then
+        GRUB_DIR='/boot/grub2'
+    else
+        echo "GRUB directory not found. Exiting."
+        exit 1
+    fi
 
 cd "${GRUB_DIR}" || exit
 
@@ -23,7 +40,7 @@ done
 # Check if there are any existing themes
 if [ ${#existing_themes[@]} -eq 0 ]; then
     echo "No themes found."
-    exit 0
+    exit 1
 fi
 
 # Display the menu for theme selection
@@ -31,7 +48,7 @@ echo "Select a theme to remove:"
 select theme in "${existing_themes[@]}" "Quit"; do
     case $theme in
         "Quit")
-            echo "No theme selected. Exiting."
+            echo "No theme selected. press <ENTER>."
             exit 0
             ;;
         *)
@@ -41,6 +58,7 @@ select theme in "${existing_themes[@]}" "Quit"; do
                 echo "Removed theme: $theme"
             else
                 echo "Invalid selection."
+                exit 1
             fi
             break
             ;;
@@ -61,7 +79,7 @@ updateGrub() {
         yum|dnf|zypper)
             $ESCALATION_TOOL grub2-mkconfig -o /boot/grub2/grub.cfg
             ;;
-        pacman|xbps-install)
+        pacman)
             $ESCALATION_TOOL grub-mkconfig -o /boot/grub/grub.cfg
             ;;
         *)
@@ -78,7 +96,9 @@ updateGrub() {
     fi
 }
 
-checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+
+checkGrubIsInstalled
+checkPackageManager 'apt-get nala dnf pacman zypper yum'
 checkEscalationTool
 removingGrubTheme
 updateGrub

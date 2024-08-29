@@ -2,9 +2,16 @@
 
 . "$(dirname "$0")/../../common-script.sh"
 
-installGit() {
+checkGrubIsInstalled() {
+    if ! command_exists update-grub && \
+       ! command_exists grub2-mkconfig && \
+       ! command_exists grub-mkconfig; then
+        echo "GRUB is not installed."
+        exit 1
+    fi
+}
 
-    echo -e "Checking git..."
+installGit() {
             if ! command_exists git; then
             echo -e "${GREEN}Installing git${RC}"
     case $PACKAGER in
@@ -25,33 +32,38 @@ installGit() {
             exit 1
             ;;
     esac
-
-    else
-            echo "git already installed"
             fi
 }
 
-GrubThemes() {
+chooseTheme() {
+echo -e "${GREEN}GRUB themes${RC}"
 
-echo -e "${GREEN}Adding GRUB theme${RC}"
 THEME_REPO="https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes.git"
 
 themes=("CyberRe" "Cyberpunk" "Shodan" "Vimix" "fallout")
 
-
-# Display the menu for theme selection
 echo "Select a theme to use:"
+
+    if [[ -d "/boot/grub" ]]; then
+        GRUB_DIR='/boot/grub'
+    elif [[ -d "/boot/grub2" ]]; then
+        GRUB_DIR='/boot/grub2'
+    else
+        echo "GRUB directory not found. Exiting."
+        exit 1
+    fi
+
 select theme in "${themes[@]}" "Quit"; do
     case $theme in
         "Quit")
-            echo "No theme selected. Exiting."
+            echo "No theme selected. press <ENTER>."
             exit 0
             ;;
         *)
             if [[ -n $theme ]]; then
     
             
-            THEME_DIR="/boot/grub/themes/$theme"
+            THEME_DIR="$GRUB_DIR/themes/$theme"
 
             if [ ! -d "${THEME_DIR}" ]; then
                 
@@ -73,7 +85,7 @@ select theme in "${themes[@]}" "Quit"; do
                 echo "GRUB_THEME=\"$THEME_DIR/theme.txt\"" | $ESCALATION_TOOL tee -a /etc/default/grub
             else
                 echo "Invalid selection."
-                 exit 0
+                 exit 1
             fi
             break
             ;;
@@ -91,7 +103,7 @@ updateGrub() {
         yum|dnf|zypper)
             $ESCALATION_TOOL grub2-mkconfig -o /boot/grub2/grub.cfg
             ;;
-        pacman|xbps-install)
+        pacman)
             $ESCALATION_TOOL grub-mkconfig -o /boot/grub/grub.cfg
             ;;
         *)
@@ -108,8 +120,9 @@ updateGrub() {
     fi
 }
 
-checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+checkGrubIsInstalled
+checkPackageManager 'apt-get nala dnf pacman zypper yum'
 checkEscalationTool
 installGit
-GrubThemes
+chooseTheme
 updateGrub
