@@ -33,6 +33,7 @@ jobs:
         with:
           config-name: release-drafter.yml
           version: ${{ env.version }}
+          version-template: '$YEAR.$MONTH.$DAY'
 
       - name: Prepare Release Body
         id: prepare_body
