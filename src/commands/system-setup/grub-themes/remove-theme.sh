@@ -3,8 +3,10 @@
 . "$(dirname "$0")/../../common-script.sh"
 
 
-    echo -e "${GREEN}Removing GRUB themes${RC}"
-    GRUB_DIR="/boot/grub"
+removingGrubTheme(){
+
+echo -e "${GREEN}Removing GRUB themes${RC}"
+GRUB_DIR="/boot/grub"
 
 cd "${GRUB_DIR}" || exit
 
@@ -35,7 +37,7 @@ select theme in "${existing_themes[@]}" "Quit"; do
         *)
             if [[ -n $theme ]]; then
                 theme_dir="${GRUB_DIR}/themes/${theme}"
-                sudo rm -rf "$theme_dir"
+                $ESCALATION_TOOL rm -rf "$theme_dir"
                 echo "Removed theme: $theme"
             else
                 echo "Invalid selection."
@@ -45,20 +47,22 @@ select theme in "${existing_themes[@]}" "Quit"; do
     esac
 done
 
-sudo sed -i "/^GRUB_THEME=/d" /etc/default/grub
+$ESCALATION_TOOL sed -i "/^GRUB_THEME=/d" /etc/default/grub
+}
 
 updateGrub() {
+
     echo -e "${GREEN}Updating GRUB...${RC}"
 
     case $PACKAGER in
         nala|apt-get)
-            sudo update-grub
+            $ESCALATION_TOOL update-grub
             ;;
         yum|dnf|zypper)
-            sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+            $ESCALATION_TOOL grub2-mkconfig -o /boot/grub2/grub.cfg
             ;;
         pacman|xbps-install)
-            sudo grub-mkconfig -o /boot/grub/grub.cfg
+            $ESCALATION_TOOL grub-mkconfig -o /boot/grub/grub.cfg
             ;;
         *)
             echo -e "${RED}update GRUB manuli${RC}"
@@ -74,5 +78,7 @@ updateGrub() {
     fi
 }
 
-checkEnv
+checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+checkEscalationTool
+removingGrubTheme
 updateGrub

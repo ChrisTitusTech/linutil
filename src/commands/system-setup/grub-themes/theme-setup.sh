@@ -3,27 +3,25 @@
 . "$(dirname "$0")/../../common-script.sh"
 
 installGit() {
-    echo -e "${GREEN}Checking git...${RC}"
+
+    echo -e "Checking git..."
             if ! command_exists git; then
-                echo -e "${GREEN}Installing git${RC}"
-    ## Check for dependencies.
-    DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
-    echo -e "${YELLOW}Installing dependencies...${RC}"
+            echo -e "${GREEN}Installing git${RC}"
     case $PACKAGER in
         pacman)
-            sudo "$PACKAGER" -S --needed --noconfirm git
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm git
             ;;
         apt-get|nala)
-            sudo "$PACKAGER" install -y git
+            $ESCALATION_TOOL "$PACKAGER" install -y git
             ;;
         dnf)
-            sudo "$PACKAGER" install -y git
+            $ESCALATION_TOOL "$PACKAGER" install -y git
             ;;
         zypper)
-            sudo "$PACKAGER" --non-interactive install git
+            $ESCALATION_TOOL "$PACKAGER" --non-interactive install git
             ;;
         *)
-            echo "No known package manager detected. Cannot install Git."
+            echo -e "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
@@ -34,7 +32,7 @@ installGit() {
 }
 
 GrubThemes() {
-clear
+
 echo -e "${GREEN}Adding GRUB theme${RC}"
 THEME_REPO="https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes.git"
 
@@ -42,7 +40,7 @@ themes=("CyberRe" "Cyberpunk" "Shodan" "Vimix" "fallout")
 
 
 # Display the menu for theme selection
-echo "Select a theme to add:"
+echo "Select a theme to use:"
 select theme in "${themes[@]}" "Quit"; do
     case $theme in
         "Quit")
@@ -51,33 +49,31 @@ select theme in "${themes[@]}" "Quit"; do
             ;;
         *)
             if [[ -n $theme ]]; then
-              
+    
+            
             THEME_DIR="/boot/grub/themes/$theme"
 
-            if [ -d "${THEME_DIR}" ]; then
-               sudo cp -r "${THEME_DIR}" "${THEME_DIR}"-bak
-            fi
-                sudo mkdir -p "${THEME_DIR}"
-
+            if [ ! -d "${THEME_DIR}" ]; then
+                
+                $ESCALATION_TOOL mkdir -p "${THEME_DIR}"
                 cd "${THEME_DIR}" || exit
                 
                 # Clone the specific theme using sparse checkout
-                sudo git init
-                sudo git remote add -f origin https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes.git
-                sudo git config core.sparseCheckout true
-                echo "themes/$theme/*" | sudo tee -a .git/info/sparse-checkout
-                sudo git pull origin main
-                sudo mv themes/$theme/* .
-                sudo rm -rf themes
-                sudo rm -rf .git
-
-                echo "Added theme: $theme"
-
+                $ESCALATION_TOOL git init
+                $ESCALATION_TOOL git remote add -f origin $THEME_REPO
+                $ESCALATION_TOOL git config core.sparseCheckout true
+                echo "themes/$theme/*" | $ESCALATION_TOOL tee -a .git/info/sparse-checkout
+                $ESCALATION_TOOL git pull origin main
+                $ESCALATION_TOOL mv themes/$theme/* $THEME_DIR
+                $ESCALATION_TOOL rm -rf themes
+                $ESCALATION_TOOL rm -rf .git
+            fi
                 # Add the theme to the GRUB configuration
-                sudo sed -i "/^GRUB_THEME=/d" /etc/default/grub
-                echo "GRUB_THEME=\"$THEME_DIR/theme.txt\"" | sudo tee -a /etc/default/grub
+                $ESCALATION_TOOL sed -i "/^GRUB_THEME=/d" /etc/default/grub
+                echo "GRUB_THEME=\"$THEME_DIR/theme.txt\"" | $ESCALATION_TOOL tee -a /etc/default/grub
             else
                 echo "Invalid selection."
+                 exit 0
             fi
             break
             ;;
@@ -90,13 +86,13 @@ updateGrub() {
 
     case $PACKAGER in
         nala|apt-get)
-            sudo update-grub
+            $ESCALATION_TOOL update-grub
             ;;
         yum|dnf|zypper)
-            sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+            $ESCALATION_TOOL grub2-mkconfig -o /boot/grub2/grub.cfg
             ;;
         pacman|xbps-install)
-            sudo grub-mkconfig -o /boot/grub/grub.cfg
+            $ESCALATION_TOOL grub-mkconfig -o /boot/grub/grub.cfg
             ;;
         *)
             echo -e "${RED}Manually update GRUB${RC}"
@@ -112,7 +108,8 @@ updateGrub() {
     fi
 }
 
-checkEnv
+checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+checkEscalationTool
 installGit
 GrubThemes
 updateGrub
