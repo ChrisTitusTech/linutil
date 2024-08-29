@@ -11,7 +11,7 @@ installRPMFusion() {
                 echo "Installing RPM Fusion..."
                 $ESCALATION_TOOL "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
                 $ESCALATION_TOOL "$PACKAGER" config-manager --enable fedora-cisco-openh264
-                $ESCALATION_TOOL "RPM Fusion installed"
+                echo "RPM Fusion installed"
             else
                 echo "RPM Fusion already installed"
             fi
