@@ -25,17 +25,6 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
         shell: bash
 
-      - name: Get Latest Release
-        id: get_latest_release
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/{owner}/{repo}/releases/latest
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
       - name: Generate Release Notes
         id: generate_notes
         uses: release-drafter/release-drafter@v5
@@ -48,20 +37,10 @@ jobs:
       - name: Prepare Release Body
         id: prepare_body
         run: |
-          latest_release_body="${{ fromJson(steps.get_latest_release.outputs.data).body }}"
           new_changes="${{ steps.generate_notes.outputs.body }}"
-          if [[ -z "$latest_release_body" ]]; then
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "$new_changes" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          else
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "$new_changes" >> $GITHUB_OUTPUT
-            echo "" >> $GITHUB_OUTPUT
-            echo "Previous Release Notes:" >> $GITHUB_OUTPUT
-            echo "$latest_release_body" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-          fi
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$new_changes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create and Upload Release
         id: create_release
