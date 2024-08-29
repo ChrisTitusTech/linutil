@@ -20,8 +20,8 @@ detect_connected_monitors() {
 get_unique_resolutions() {
     local monitor="$1"
     xrandr_output=$(xrandr)
-    # Get available resolutions from xrandr
-    available_resolutions=$(echo "$xrandr_output" | grep -A 10 "$monitor connected" | grep -oP '\d+x\d+' | sort -u)
+    # Get available resolutions from xrandr without line limit
+    available_resolutions=$(echo "$xrandr_output" | sed -n "/$monitor connected/,/^[^ ]/p" | grep -oP '\d+x\d+' | sort -u)
     
     # Define standard resolutions
     standard_resolutions="1920x1080 1280x720 1600x900 2560x1440 3840x2160"
