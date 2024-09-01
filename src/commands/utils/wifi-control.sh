@@ -8,13 +8,13 @@ setupNetworkManager() {
     if ! command_exists nmcli; then
         case ${PACKAGER} in
             pacman)
-                sudo "${PACKAGER}" -S --noconfirm networkmanager
+                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm networkmanager
                 ;;
             dnf)
-                sudo "${PACKAGER}" install -y NetworkManager-1
+                $ESCALATION_TOOL "${PACKAGER}" install -y NetworkManager-1
                 ;;
             *)
-                sudo "${PACKAGER}" install -y network-manager
+                $ESCALATION_TOOL "${PACKAGER}" install -y network-manager
                 ;;
         esac
     else
@@ -24,7 +24,7 @@ setupNetworkManager() {
     # Check if NetworkManager service is running
     if ! systemctl is-active --quiet NetworkManager; then
         echo "NetworkManager service is not running. Starting it now..."
-        sudo systemctl start NetworkManager
+        $ESCALATION_TOOL systemctl start NetworkManager
         
         if systemctl is-active --quiet NetworkManager; then
             echo "NetworkManager service started successfully."

@@ -8,10 +8,10 @@ setupBluetooth() {
     if ! command_exists bluetoothctl; then
         case ${PACKAGER} in
             pacman)
-                sudo "${PACKAGER}" -S --noconfirm bluez-utils
+                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm bluez-utils
                 ;;
             *)
-                sudo "${PACKAGER}" install -y bluez
+                $ESCALATION_TOOL "${PACKAGER}" install -y bluez
                 ;;
         esac
     else
@@ -21,7 +21,7 @@ setupBluetooth() {
     # Check if bluetooth service is running
     if ! systemctl is-active --quiet bluetooth; then
         echo "Bluetooth service is not running. Starting it now..."
-        sudo systemctl start bluetooth
+        $ESCALATION_TOOL systemctl start bluetooth
         
         if systemctl is-active --quiet bluetooth; then
             echo "bluetooth service started successfully."

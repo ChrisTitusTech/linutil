@@ -8,13 +8,13 @@ setup_xrandr() {
     if ! command_exists xrandr; then
         case ${PACKAGER} in
         pacman)
-            sudo "${PACKAGER}" -S --noconfirm xorg-xrandr
+            $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm xorg-xrandr
             ;;
         apt-get)
-            sudo "${PACKAGER}" install -y x11-xserver-utils
+            $ESCALATION_TOOL "${PACKAGER}" install -y x11-xserver-utils
             ;;
         *)
-            sudo "${PACKAGER}" install -y xorg-x11-server-utils
+            $ESCALATION_TOOL "${PACKAGER}" install -y xorg-x11-server-utils
             ;;
         esac
     else
