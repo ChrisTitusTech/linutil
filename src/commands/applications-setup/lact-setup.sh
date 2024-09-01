@@ -16,6 +16,7 @@ setuplact() {
         if command_exists "${helper}"; then
             echo "Using AUR helper: ${helper}"
             ${helper} -S --noconfirm lact
+            sudo systemctl enable --now lactd
             return
         fi
     done
