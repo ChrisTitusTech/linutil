@@ -9,16 +9,21 @@ name = "Bluetooth Manager"
 script = "bluetooth-control.sh"
 
 [[data]]
+name = "Numlock on Startup"
+script = "numlock.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
-values = ["x11"]
+values = ["x11", "X11", "xorg", "Xorg", "tty"]
 
-[[data.entries]]
-name = "Set Resolution"
-script = "monitor-control/set_resolutions.sh"
+[[data.preconditions]]
+matches = true
+data = { environment = "DISPLAY" }
+values = [":0", ":1", ":2", ":3", ":4", ":5", ":6", ":7", ":8", ":9"]
 
 [[data.entries]]
 name = "Duplicate Displays"

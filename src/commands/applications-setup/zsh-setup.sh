@@ -8,10 +8,10 @@ install_zsh() {
     if ! command_exists zsh; then
         case "$PACKAGER" in
             pacman)
-                sudo "$PACKAGER" -S --needed --noconfirm zsh
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm zsh
                 ;;
             *)
-                sudo "$PACKAGER" install -y zsh
+                $ESCALATION_TOOL "$PACKAGER" install -y zsh
                 ;;
         esac
     else
@@ -43,9 +43,10 @@ RPROMPT='%F{15}(%F{166}%D{%H:%M}%F{15})%f'
 EOL
 
   # Ensure /etc/zsh/zshenv sets ZDOTDIR to the user's config directory
-  echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zsh/zshenv
+  echo 'export ZDOTDIR="$HOME/.config/zsh"' | $ESCALATION_TOOL tee -a /etc/zsh/zshenv
 }
 
 checkEnv
-setup_zsh_config
+checkEscalationTool
 install_zsh
+setup_zsh_config

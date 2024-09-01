@@ -7,10 +7,10 @@ setupRofi() {
     if ! command_exists rofi; then
         case "$PACKAGER" in
             pacman)
-                sudo "$PACKAGER" -S --needed --noconfirm rofi
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm rofi
                 ;;
             *)
-                sudo "$PACKAGER" install -y rofi
+                $ESCALATION_TOOL "$PACKAGER" install -y rofi
                 ;;
         esac
     else
@@ -31,4 +31,5 @@ setupRofi() {
 }
 
 checkEnv
+checkEscalationTool
 setupRofi
