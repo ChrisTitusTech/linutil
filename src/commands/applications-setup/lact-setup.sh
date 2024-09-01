@@ -25,4 +25,5 @@ setuplact() {
     exit 1
 }
 
+checkEnv
 setuplact
