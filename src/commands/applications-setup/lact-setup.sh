@@ -10,19 +10,16 @@ setuplact() {
         return
     fi
 
-    checkAURHelper
+    checkAURHelper  # Ensure we have an AUR helper available
 
-    for helper in yay paru trizen; do
-        if command_exists "${helper}"; then
-            echo "Using AUR helper: ${helper}"
-            ${helper} -S --noconfirm lact
-            sudo systemctl enable --now lactd
-            return
-        fi
-    done
+    if [ -z "$AUR_HELPER" ]; then
+        echo -e "${RED}No suitable AUR helper found to install Lact!${RC}"
+        exit 1
+    fi
 
-    echo -e "${RED}No suitable AUR helper found to install Lact!${RC}"
-    exit 1
+    echo "Using AUR helper: ${AUR_HELPER}"
+    $AUR_HELPER -S --noconfirm lact
+    sudo systemctl enable --now lactd
 }
 
 checkEnv

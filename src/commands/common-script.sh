@@ -57,20 +57,6 @@ checkPackageManager() {
     fi
 }
 
-checkAURHelper() {
-    ## Check AUR Helpers
-    AUR_HELPERS='yay paru trizen'
-    for aur_helper in ${AUR_HELPERS}; do
-        if command_exists "${aur_helper}"; then
-            echo "Using AUR helper: ${aur_helper}"
-            return 0
-        fi
-    done
-
-    echo -e "${RED}No suitable AUR helper found!${RC}"
-    exit 1
-}
-
 checkSuperUser() {
     ## Check SuperUser Group
     SUPERUSERGROUP='wheel sudo root'
@@ -110,7 +96,6 @@ checkDistro() {
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
     checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
-    checkAURHelper
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
