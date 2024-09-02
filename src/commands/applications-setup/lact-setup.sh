@@ -19,8 +19,13 @@ setuplact() {
 
     echo "Using AUR helper: ${AUR_HELPER}"
     $AUR_HELPER -S --noconfirm lact
-    sudo systemctl enable --now lactd
+
+    if command_exists systemctl; then
+       $ESCALATION_TOOL systemctl enable --now lactd
+    fi
+
 }
 
 checkEnv
+checkEscalationTool
 setuplact
