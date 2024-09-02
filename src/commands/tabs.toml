@@ -1,1 +1,7 @@
-directories = ["system-setup", "applications-setup", "security", "utils", "gaming"]
+directories = [
+    "applications-setup",
+    "gaming",
+    "security",
+    "system-setup",
+    "utils"
+]
