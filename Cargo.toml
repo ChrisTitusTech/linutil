@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
-compile-time = "0.2.0"
 crossterm = "0.27.0"
 ego-tree = "0.6.2"
 oneshot = "0.1.8"
