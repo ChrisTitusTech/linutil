@@ -1,7 +1,7 @@
 name = "Gaming"
 
 [[data]]
-name = Diablo II Ressurected
+name = "Diablo II Ressurected"
 
 [[data.entries]]
 name = "Loot Filter Install"
