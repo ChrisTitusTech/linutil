@@ -1,3 +1,4 @@
+mod filter;
 mod float;
 mod floating_text;
 mod running_command;
