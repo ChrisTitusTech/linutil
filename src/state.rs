@@ -137,10 +137,11 @@ impl AppState {
             } else {
                 Style::new()
             })
-            .block(Block::default().borders(Borders::ALL).title(format!(
-                "Linux Toolbox - {}",
-                chrono::Local::now().format("%Y-%m-%d")
-            )))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
+            )
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
