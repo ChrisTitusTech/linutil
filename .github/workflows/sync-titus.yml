@@ -1,0 +1,34 @@
+name: Sync Titus Branch
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "aarjaycreation"
+          git config user.email "aarjaycreation@github.com"
+
+      - name: Add Upstream Remote
+        run: |
+          git remote add upstream https://github.com/ChrisTitusTech/linutil.git
+          git fetch upstream
+
+      - name: Merge Upstream Changes into Titus Branch
+        run: |
+          git checkout titus
+          git merge upstream/main
+          git push origin titus

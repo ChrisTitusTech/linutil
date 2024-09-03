@@ -11,7 +11,7 @@ Make sure you have Rust installed on your machine. You can install it by followi
 1. Make a fork of the repo in GitHub
 2. Clone the fork
 ```bash
-git clone https://github.com/YOUR_USERNAME_HERE/linutil.git
+git clone https://github.com/aarjaycreation/linutil.git
 cd linutil
    ```
 
