@@ -86,17 +86,15 @@ impl Theme {
 }
 
 impl Theme {
-    #[allow(unused)]
-    pub fn next(self) -> Self {
-        let position = self as usize;
+    pub fn next(&mut self) {
+        let position = *self as usize;
         let types = Theme::value_variants();
-        types[(position + 1) % types.len()].into()
+        *self = types[(position + 1) % types.len()];
     }
 
-    #[allow(unused)]
-    pub fn prev(self) -> Self {
-        let position = self as usize;
+    pub fn prev(&mut self) {
+        let position = *self as usize;
         let types = Theme::value_variants();
-        types[(position + types.len() - 1) % types.len()].into()
+        *self = types[(position + types.len() - 1) % types.len()];
     }
 }

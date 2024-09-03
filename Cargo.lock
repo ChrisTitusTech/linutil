@@ -882,6 +882,7 @@ dependencies = [
  "tempdir",
  "toml",
  "tui-term",
+ "unicode-width",
  "which",
 ]
 
