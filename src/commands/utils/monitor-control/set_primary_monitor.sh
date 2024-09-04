@@ -1,10 +1,11 @@
-#!/bin/bash
-source ./utility_functions.sh
+#!/bin/sh -e
+
+. ./utility_functions.sh
 
 # Function to set a monitor as primary
 set_primary_monitor() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     clear
     echo -e "${BLUE}=========================================${RESET}"

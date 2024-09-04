@@ -1,4 +1,5 @@
 use crate::{
+    filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
     running_command::{Command, RunningCommand},
@@ -9,9 +10,9 @@ use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
-    style::{Color, Style, Stylize},
-    text::{Line, Span},
-    widgets::{Block, Borders, List, ListState, Paragraph},
+    style::{Style, Stylize},
+    text::Line,
+    widgets::{Block, Borders, List, ListState},
     Frame,
 };
 use std::path::Path;
@@ -25,16 +26,13 @@ pub struct AppState {
     tabs: Vec<Tab>,
     /// Current tab
     current_tab: ListState,
-    /// Current search query
-    search_query: String,
-    /// Current items
-    items: Vec<ListEntry>,
     /// This stack keeps track of our "current dirrectory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<NodeId>,
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
+    filter: Filter,
 }
 
 pub enum Focus {
@@ -44,10 +42,10 @@ pub enum Focus {
     FloatingWindow(Float),
 }
 
-struct ListEntry {
-    node: ListNode,
-    id: NodeId,
-    has_children: bool,
+pub struct ListEntry {
+    pub node: ListNode,
+    pub id: NodeId,
+    pub has_children: bool,
 }
 
 impl AppState {
@@ -59,10 +57,9 @@ impl AppState {
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
-            search_query: String::new(),
-            items: vec![],
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
+            filter: Filter::new(),
         };
         state.update_items();
         state
@@ -110,20 +107,7 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
             .split(horizontal[1]);
 
-        // Render search bar
-        let search_text = match self.focus {
-            Focus::Search => Span::raw(&self.search_query),
-            _ if !self.search_query.is_empty() => Span::raw(&self.search_query),
-            _ => Span::raw("Press / to search"),
-        };
-        let search_bar = Paragraph::new(search_text)
-            .block(Block::default().borders(Borders::ALL))
-            .style(Style::default().fg(if let Focus::Search = self.focus {
-                Color::Blue
-            } else {
-                Color::DarkGray
-            }));
-        frame.render_widget(search_bar, chunks[0]);
+        self.filter.draw_searchbar(frame, chunks[0], &self.theme);
 
         let mut items: Vec<Line> = Vec::new();
         if !self.at_root() {
@@ -132,7 +116,7 @@ impl AppState {
             );
         }
 
-        items.extend(self.items.iter().map(
+        items.extend(self.filter.item_list().iter().map(
             |ListEntry {
                  node, has_children, ..
              }| {
@@ -153,10 +137,11 @@ impl AppState {
             } else {
                 Style::new()
             })
-            .block(Block::default().borders(Borders::ALL).title(format!(
-                "Linux Toolbox - {}",
-                chrono::Local::now().format("%Y-%m-%d")
-            )))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
+            )
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -171,21 +156,11 @@ impl AppState {
                     self.focus = Focus::List;
                 }
             }
-            Focus::Search => {
-                match key.code {
-                    KeyCode::Char(c) => self.search_query.push(c),
-                    KeyCode::Backspace => {
-                        self.search_query.pop();
-                    }
-                    KeyCode::Esc => {
-                        self.search_query = String::new();
-                        self.exit_search();
-                    }
-                    KeyCode::Enter => self.exit_search(),
-                    _ => return true,
-                }
-                self.update_items();
-            }
+            Focus::Search => match self.filter.handle_key(key) {
+                SearchAction::Exit => self.exit_search(),
+                SearchAction::Update => self.update_items(),
+                _ => {}
+            },
             _ if key.code == KeyCode::Char('q') => return false,
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
@@ -202,8 +177,8 @@ impl AppState {
                     self.refresh_tab();
                 }
                 KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Char('t') => self.theme = self.theme.next(),
-                KeyCode::Char('T') => self.theme = self.theme.prev(),
+                KeyCode::Char('t') => self.theme.next(),
+                KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
@@ -220,53 +195,20 @@ impl AppState {
                 }
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Tab => self.focus = Focus::TabList,
-                KeyCode::Char('t') => self.theme = self.theme.next(),
-                KeyCode::Char('T') => self.theme = self.theme.prev(),
+                KeyCode::Char('t') => self.theme.next(),
+                KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
             _ => {}
         };
         true
     }
-    pub fn update_items(&mut self) {
-        if self.search_query.is_empty() {
-            let curr = self.tabs[self.current_tab.selected().unwrap()]
-                .tree
-                .get(*self.visit_stack.last().unwrap())
-                .unwrap();
-
-            self.items = curr
-                .children()
-                .map(|node| ListEntry {
-                    node: node.value().clone(),
-                    id: node.id(),
-                    has_children: node.has_children(),
-                })
-                .collect();
-        } else {
-            self.items.clear();
-
-            let query_lower = self.search_query.to_lowercase();
-            for tab in self.tabs.iter() {
-                let mut stack = vec![tab.tree.root().id()];
-                while let Some(node_id) = stack.pop() {
-                    let node = tab.tree.get(node_id).unwrap();
-
-                    if node.value().name.to_lowercase().contains(&query_lower)
-                        && !node.has_children()
-                    {
-                        self.items.push(ListEntry {
-                            node: node.value().clone(),
-                            id: node.id(),
-                            has_children: false,
-                        });
-                    }
-
-                    stack.extend(node.children().map(|child| child.id()));
-                }
-            }
-            self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
-        }
+    fn update_items(&mut self) {
+        self.filter.update_items(
+            &self.tabs,
+            self.current_tab.selected().unwrap(),
+            *self.visit_stack.last().unwrap(),
+        );
     }
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
@@ -292,7 +234,7 @@ impl AppState {
             selected_index = selected_index.saturating_sub(1);
         }
 
-        if let Some(item) = self.items.get(selected_index) {
+        if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
                 return Some(item.node.command.clone());
             } else if change_directory {
@@ -321,11 +263,13 @@ impl AppState {
     }
     fn enter_search(&mut self) {
         self.focus = Focus::Search;
+        self.filter.activate_search();
         self.selection.select(None);
     }
     fn exit_search(&mut self) {
         self.selection.select(Some(0));
         self.focus = Focus::List;
+        self.filter.deactivate_search();
         self.update_items();
     }
     fn refresh_tab(&mut self) {

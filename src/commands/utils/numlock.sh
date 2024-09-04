@@ -1,12 +1,15 @@
 #!/bin/sh -e
 
+. ../common-script.sh
+
 # setleds can be used in all distros
 # This method works by calling a script using systemd service
 
 # Create a script to toggle numlock
+
 create_file() {
   echo "Creating script..."
-  sudo tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
+  $ESCALATION_TOOL tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
 #!/bin/bash
 
 for tty in /dev/tty{1..6}
@@ -15,13 +18,13 @@ do
 done
 EOF
 
-  sudo chmod +x /usr/local/bin/numlock
+  $ESCALATION_TOOL chmod +x /usr/local/bin/numlock
 }
 
 # Create a systemd service to run the script on boot
 create_service() {
   echo "Creating service..."
-  sudo tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
+  $ESCALATION_TOOL tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
 [Unit]
 Description=numlock
         
@@ -35,7 +38,7 @@ WantedBy=multi-user.target
 EOF
 }
 
-main() {
+numlockSetup() {
   # Check if the script and service files exists
   if [ ! -f "/usr/local/bin/numlock" ]; then
     create_file
@@ -48,13 +51,14 @@ main() {
   printf "Do you want to enable Numlock on boot? (y/n): "
   read -r confirm
   if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-    sudo systemctl enable numlock.service --quiet
+    $ESCALATION_TOOL systemctl enable numlock.service --quiet
     echo "Numlock will be enabled on boot"
   else
-    sudo systemctl disable numlock.service --quiet
+    $ESCALATION_TOOL systemctl disable numlock.service --quiet
     echo "Numlock will not be enabled on boot"
 
   fi
 }
 
-main
+checkEscalationTool
+numlockSetup

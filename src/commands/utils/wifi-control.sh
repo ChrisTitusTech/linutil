@@ -1,5 +1,36 @@
-@@ -0,0 +1,168 @@
-#!/bin/bash
+#!/bin/sh -e
+
+. ../common-script.sh
+
+# Function to check if NetworkManager is installed
+setupNetworkManager() {
+    echo "Install NetworkManger if not already installed..."
+    if ! command_exists nmcli; then
+        case ${PACKAGER} in
+            pacman)
+                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm networkmanager
+                ;;
+            dnf)
+                $ESCALATION_TOOL "${PACKAGER}" install -y NetworkManager-1
+                ;;
+            *)
+                $ESCALATION_TOOL "${PACKAGER}" install -y network-manager
+                ;;
+        esac
+    else
+        echo "NetworkManager is already installed."
+    fi
+    
+    # Check if NetworkManager service is running
+    if ! systemctl is-active --quiet NetworkManager; then
+        echo "NetworkManager service is not running. Starting it now..."
+        $ESCALATION_TOOL systemctl start NetworkManager
+        
+        if systemctl is-active --quiet NetworkManager; then
+            echo "NetworkManager service started successfully."
+        fi
+    fi
+}
 
 # Function to display colored text
 colored_echo() {
@@ -166,4 +197,6 @@ remove_network() {
 }
 
 # Initialize
+checkEnv
+setupNetworkManager
 main_menu

@@ -1,5 +1,6 @@
-#!/bin/bash
-source ./utility_functions.sh
+#!/bin/sh -e
+
+. ./utility_functions.sh
 
 # Function to extend displays
 extend_displays() {

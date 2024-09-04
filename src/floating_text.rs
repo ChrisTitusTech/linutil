@@ -68,8 +68,18 @@ impl FloatContent for FloatingText {
             .text
             .iter()
             .skip(self.scroll)
+            .flat_map(|line| {
+                if line.is_empty() {
+                    return vec![String::new()];
+                }
+                line.chars()
+                    .collect::<Vec<char>>()
+                    .chunks(inner_area.width as usize)
+                    .map(|chunk| chunk.iter().collect())
+                    .collect::<Vec<String>>()
+            })
             .take(inner_area.height as usize)
-            .map(|line| Line::from(line.as_str()))
+            .map(Line::from)
             .collect();
 
         // Create list widget
