@@ -1,16 +1,16 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../common-script.sh
 
 setupRofi() {
     echo "Install Rofi if not already installed..."
     if ! command_exists rofi; then
         case "$PACKAGER" in
             pacman)
-                sudo "$PACKAGER" -S --needed --noconfirm rofi
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm rofi
                 ;;
             *)
-                sudo "$PACKAGER" install -y rofi
+                $ESCALATION_TOOL "$PACKAGER" install -y rofi
                 ;;
         esac
     else
@@ -31,4 +31,5 @@ setupRofi() {
 }
 
 checkEnv
+checkEscalationTool
 setupRofi

@@ -1,5 +1,6 @@
-#!/bin/bash
-source ./utils/monitor-control/utility_functions.sh
+#!/bin/sh -e
+
+. ./utility_functions.sh
 
 RESET='\033[0m'
 BOLD='\033[1m'
@@ -12,7 +13,7 @@ CYAN='\033[36m'
 # Function to set resolutions
 set_resolutions() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
     
     while true; do
         clear
@@ -38,13 +39,13 @@ set_resolutions() {
         fi
 
         monitor_name="${monitor_array[monitor_choice - 1]}"
-        resolutions=$(get_unique_resolutions "$monitor_name")
+        resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
-        # Create a temporary file with sorted resolutions and indices
+        # Create a temporary file with resolutions and indices
         temp_res_file=$(mktemp)
-        echo "$resolutions" | sort -nr | awk '{print NR " " $0}' > "$temp_res_file"
+        echo "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
 
-        # Read the sorted resolutions into an associative array
+        # Read the resolutions into an associative array
         declare -A resolution_map
         while read -r index resolution; do
             resolution_map[$index]="$resolution"
