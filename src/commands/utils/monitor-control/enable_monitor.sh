@@ -1,5 +1,6 @@
-#!/bin/bash
-source ./utility_functions.sh
+#!/bin/sh -e
+
+. ./utility_functions.sh
 
 RESET='\033[0m'
 BOLD='\033[1m'
@@ -12,7 +13,7 @@ CYAN='\033[36m'
 # Function to enable a monitor
 enable_monitor() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -d '' -a monitor_array <<<"$monitor_list"
+    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
 
     clear
     echo -e "${BLUE}=========================================${RESET}"

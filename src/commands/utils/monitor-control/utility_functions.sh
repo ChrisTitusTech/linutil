@@ -1,4 +1,39 @@
-#!/bin/bash
+#!/bin/sh -e
+
+. ../../common-script.sh
+
+# Function to check bluetoothctl is installed
+setup_xrandr() {
+    echo "Install xrandr if not already installed..."
+    if ! command_exists xrandr; then
+        case ${PACKAGER} in
+        pacman)
+            $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm xorg-xrandr
+            ;;
+        apt-get)
+            $ESCALATION_TOOL "${PACKAGER}" install -y x11-xserver-utils
+            ;;
+        *)
+            $ESCALATION_TOOL "${PACKAGER}" install -y xorg-x11-server-utils
+            ;;
+        esac
+    else
+        echo "xrandr is already installed."
+    fi
+}
+
+# Function to display colored text
+colored_echo() {
+    local color=$1
+    local text=$2
+    case $color in
+    red) echo -e "\033[31m$text\033[0m" ;;
+    green) echo -e "\033[32m$text\033[0m" ;;
+    yellow) echo -e "\033[33m$text\033[0m" ;;
+    blue) echo -e "\033[34m$text\033[0m" ;;
+    *) echo "$text" ;;
+    esac
+}
 
 # Function to execute xrandr commands and handle errors
 execute_command() {
@@ -47,3 +82,6 @@ confirm_action() {
         return 1
     fi
 }
+
+checkEnv
+setup_xrandr

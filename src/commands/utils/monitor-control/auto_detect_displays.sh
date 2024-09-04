@@ -1,5 +1,6 @@
-#!/bin/bash
-source ./utility_functions.sh
+#!/bin/sh -e
+
+. ./utility_functions.sh
 
 # Function to auto-detect displays and set common resolution
 auto_detect_displays() {
