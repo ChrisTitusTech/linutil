@@ -6,3 +6,10 @@ name = "Diablo II Ressurected"
 [[data.entries]]
 name = "Loot Filter Install"
 script = "diablo-ii/d2r-loot-filters.sh"
+
+[[data]]
+name = "Wine"
+
+[[data.entries]]
+name = "Stable"
+script = "Wine/Stable.sh"
