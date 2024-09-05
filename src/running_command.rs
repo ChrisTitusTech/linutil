@@ -270,7 +270,7 @@ impl RunningCommand {
                 send
             }
             KeyCode::Enter => vec![b'\n'],
-            KeyCode::Backspace => vec![8],
+            KeyCode::Backspace => vec![0x7f],
             KeyCode::Left => vec![27, 91, 68],
             KeyCode::Right => vec![27, 91, 67],
             KeyCode::Up => vec![27, 91, 65],
