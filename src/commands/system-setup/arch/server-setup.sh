@@ -187,6 +187,11 @@ keymap () {
     select_option "${options[@]}"
     keymap=${options[$?]}
 
+    # Check if the selected keymap is "se" and set it to "se-lat6" for correct layout.
+    if [[ "$keymap" == "se" ]]; then
+        keymap="se-lat6"
+    fi
+
     echo -ne "Your key boards layout: ${keymap} \n"
     export KEYMAP=$keymap
 }
@@ -658,6 +663,22 @@ systemctl stop dhcpcd.service
 echo "  DHCP stopped"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
+
+# @description Edit vconsole.conf and locale.conf for persistence
+echo -ne "
+-------------------------------------------------------------------------
+                    Updating vconsole.conf and locale.conf
+-------------------------------------------------------------------------
+"
+# Update /etc/vconsole.conf
+echo "KEYMAP=${KEYMAP}" > /mnt/etc/vconsole.conf
+
+# Update /etc/locale.conf
+echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+
+# Ensure the locale is generated
+echo "Generating locales..."
+arch-chroot /mnt locale-gen
 
 echo -ne "
 -------------------------------------------------------------------------
