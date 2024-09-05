@@ -1,7 +1,42 @@
-use crate::running_command::Command;
+use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
+use include_dir::{include_dir, Dir};
 use serde::Deserialize;
 use std::path::{Path, PathBuf};
+use tempdir::TempDir;
+
+const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/../tabs");
+
+pub fn get_tabs(validate: bool) -> Vec<Tab> {
+    let tab_files = TabList::get_tabs();
+    let tabs = tab_files.into_iter().map(|path| {
+        let directory = path.parent().unwrap().to_owned();
+        let data = std::fs::read_to_string(path).expect("Failed to read tab data");
+        let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
+
+        if validate {
+            filter_entries(&mut tab_data.data);
+        }
+        (tab_data, directory)
+    });
+
+    let tabs: Vec<Tab> = tabs
+        .map(|(TabEntry { name, data }, directory)| {
+            let mut tree = Tree::new(ListNode {
+                name: "root".to_string(),
+                command: Command::None,
+            });
+            let mut root = tree.root_mut();
+            create_directory(data, &mut root, &directory);
+            Tab { name, tree }
+        })
+        .collect();
+
+    if tabs.is_empty() {
+        panic!("No tabs found");
+    }
+    tabs
+}
 
 #[derive(Deserialize)]
 struct TabList {
@@ -79,49 +114,6 @@ enum SystemDataType {
     CommandExists,
 }
 
-#[derive(Hash, Eq, PartialEq)]
-pub struct Tab {
-    pub name: String,
-    pub tree: Tree<ListNode>,
-}
-
-#[derive(Clone, Hash, Eq, PartialEq)]
-pub struct ListNode {
-    pub name: String,
-    pub command: Command,
-}
-
-pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
-    let tab_files = TabList::get_tabs(command_dir);
-    let tabs = tab_files.into_iter().map(|path| {
-        let directory = path.parent().unwrap().to_owned();
-        let data = std::fs::read_to_string(path).expect("Failed to read tab data");
-        let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
-
-        if validate {
-            filter_entries(&mut tab_data.data);
-        }
-        (tab_data, directory)
-    });
-
-    let tabs: Vec<Tab> = tabs
-        .map(|(TabEntry { name, data }, directory)| {
-            let mut tree = Tree::new(ListNode {
-                name: "root".to_string(),
-                command: Command::None,
-            });
-            let mut root = tree.root_mut();
-            create_directory(data, &mut root, &directory);
-            Tab { name, tree }
-        })
-        .collect();
-
-    if tabs.is_empty() {
-        panic!("No tabs found");
-    }
-    tabs
-}
-
 fn filter_entries(entries: &mut Vec<Entry>) {
     entries.retain_mut(|entry| {
         if !entry.is_supported() {
@@ -176,15 +168,21 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
         }
     }
 }
+
 impl TabList {
-    fn get_tabs(command_dir: &Path) -> Vec<PathBuf> {
-        let tab_files = std::fs::read_to_string(command_dir.join("tabs.toml"))
-            .expect("Failed to read tabs.toml");
+    fn get_tabs() -> Vec<PathBuf> {
+        let temp_dir = TempDir::new("linutil_scripts").unwrap().into_path();
+        TAB_DATA
+            .extract(&temp_dir)
+            .expect("Failed to extract the saved directory");
+
+        let tab_files =
+            std::fs::read_to_string(temp_dir.join("tabs.toml")).expect("Failed to read tabs.toml");
         let data: Self = toml::from_str(&tab_files).expect("Failed to parse tabs.toml");
 
         data.directories
-            .into_iter()
-            .map(|path| command_dir.join(path).join("tab_data.toml"))
+            .iter()
+            .map(|path| temp_dir.join(path).join("tab_data.toml"))
             .collect()
     }
 }

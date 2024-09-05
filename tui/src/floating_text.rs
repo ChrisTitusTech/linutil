@@ -1,5 +1,6 @@
-use crate::{float::FloatContent, running_command::Command};
+use crate::float::FloatContent;
 use crossterm::event::{KeyCode, KeyEvent};
+use linutil_core::Command;
 use ratatui::{
     layout::Rect,
     style::{Style, Stylize},

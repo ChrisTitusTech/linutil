@@ -2,12 +2,12 @@ use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
-    running_command::{Command, RunningCommand},
-    tabs::{ListNode, Tab},
+    running_command::RunningCommand,
     theme::Theme,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
+use linutil_core::{Command, ListNode, Tab};
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     style::{Style, Stylize},
@@ -15,7 +15,6 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
     Frame,
 };
-use std::path::Path;
 
 pub struct AppState {
     /// Selected theme
@@ -49,8 +48,8 @@ pub struct ListEntry {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, temp_path: &Path, override_validation: bool) -> Self {
-        let tabs = crate::tabs::get_tabs(temp_path, !override_validation);
+    pub fn new(theme: Theme, override_validation: bool) -> Self {
+        let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
         let mut state = Self {
             theme,

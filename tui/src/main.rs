@@ -3,7 +3,6 @@ mod float;
 mod floating_text;
 mod running_command;
 pub mod state;
-mod tabs;
 mod theme;
 
 use std::{
@@ -20,13 +19,11 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use include_dir::include_dir;
 use ratatui::{
     backend::{Backend, CrosstermBackend},
     Terminal,
 };
 use state::AppState;
-use tempdir::TempDir;
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
@@ -43,13 +40,7 @@ struct Args {
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
-    let commands_dir = include_dir!("src/commands");
-    let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
-    commands_dir
-        .extract(temp_dir.path())
-        .expect("Failed to extract the saved directory");
-
-    let mut state = AppState::new(args.theme, temp_dir.path(), args.override_validation);
+    let mut state = AppState::new(args.theme, args.override_validation);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
