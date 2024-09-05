@@ -5,6 +5,7 @@ mod running_command;
 pub mod state;
 mod tabs;
 mod theme;
+mod tips;
 
 use std::{
     io::{self, stdout},
