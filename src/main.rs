@@ -1,11 +1,11 @@
 mod filter;
 mod float;
 mod floating_text;
+mod gui;
 mod running_command;
 pub mod state;
 mod tabs;
 mod theme;
-
 use std::{
     io::{self, stdout},
     time::Duration,
@@ -26,8 +26,8 @@ use ratatui::{
     Terminal,
 };
 use state::AppState;
+use std::env::var;
 use tempdir::TempDir;
-
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
@@ -42,6 +42,17 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
+
+    // Make sure we check for the $DISPLAY env. variable before we launch this thing.
+    // Otherwise launch in terminal.
+    match var("DISPLAY") {
+        Ok(_exists) => {
+            println!("We are running some sort of GUI, launching the egui frontend.");
+        }
+        Err(_doesnt_exist) => {
+            println!("$DISPLAY variable is not set, launching terminal version.");
+        }
+    };
 
     let commands_dir = include_dir!("src/commands");
     let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
