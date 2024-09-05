@@ -28,7 +28,7 @@ path = "src/main.rs"
 
 
 [profile.release]
-opt-level = 3
+opt-level = "z"
 debug = false
 lto = true
 codegen-units = 1
