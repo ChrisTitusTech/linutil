@@ -7,7 +7,7 @@ mod tabs;
 mod theme;
 
 use std::{
-    io::{self, stdout},
+    io::{self, stdout, Stdout},
     time::Duration,
 };
 
@@ -68,7 +68,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, state: &mut AppState) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> io::Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
 
