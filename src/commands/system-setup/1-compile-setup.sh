@@ -15,7 +15,6 @@ installDepend() {
             else
                 echo "Multilib is already enabled."
             fi
-            checkAURHelper
             $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES"
             ;;
         apt-get|nala)
@@ -65,6 +64,7 @@ install_additional_dependencies() {
 }
 
 checkEnv
+checkAURHelper
 checkEscalationTool
 installDepend
 install_additional_dependencies

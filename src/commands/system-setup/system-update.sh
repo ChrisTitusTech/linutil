@@ -6,7 +6,6 @@ fastUpdate() {
     case ${PACKAGER} in
         pacman)
 
-          checkAURHelper
           $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
 
             if [ -s /etc/pacman.d/mirrorlist ]; then
@@ -97,6 +96,7 @@ updateFlatpaks() {
 }
 
 checkEnv
+checkAURHelper
 checkEscalationTool
 fastUpdate
 updateSystem

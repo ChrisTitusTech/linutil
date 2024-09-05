@@ -14,25 +14,29 @@ command_exists() {
 checkAURHelper() {
     ## Check & Install AUR helper
     if [ "$PACKAGER" = "pacman" ]; then
-        AUR_HELPERS="yay paru"
-        for helper in ${AUR_HELPERS}; do
-            if command_exists "${helper}"; then
-                AUR_HELPER=${helper}
-                echo "Using ${helper} as AUR helper"
-                return 0
+        if [ -z "$AUR_HELPER_CHECKED" ]; then
+            AUR_HELPERS="yay paru"
+            for helper in ${AUR_HELPERS}; do
+                if command_exists "${helper}"; then
+                    AUR_HELPER=${helper}
+                    echo "Using ${helper} as AUR helper"
+                    AUR_HELPER_CHECKED=true
+                    return 0
+                fi
+            done
+
+            echo "Installing yay as AUR helper..."
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
+            cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER":"$USER" ./yay-git
+            cd yay-git && makepkg --noconfirm -si
+
+            if command_exists yay; then
+                AUR_HELPER="yay"
+                AUR_HELPER_CHECKED=true
+            else
+                echo -e "${RED}Failed to install AUR helper.${RC}"
+                exit 1
             fi
-        done
-
-        echo "Installing yay as AUR helper..."
-        $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-        cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER":"$USER" ./yay-git
-        cd yay-git && makepkg --noconfirm -si
-
-        if command_exists yay; then
-            AUR_HELPER="yay"
-        else
-            echo -e "${RED}Failed to install AUR helper.${RC}"
-            exit 1
         fi
     fi
 }
@@ -126,4 +130,5 @@ checkEnv() {
     checkSuperUser
     checkDistro
     checkEscalationTool
+    checkAURHelper
 }
