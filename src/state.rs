@@ -78,7 +78,7 @@ impl AppState {
                 Constraint::Min(longest_tab_display_len as u16 + 5),
                 Constraint::Percentage(100),
             ])
-            .split(frame.size());
+            .split(frame.area());
         let left_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(1)])
