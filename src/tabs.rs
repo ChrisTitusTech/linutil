@@ -22,12 +22,18 @@ struct Entry {
     description: String,
     #[serde(default)]
     preconditions: Option<Vec<Precondition>>,
-    #[serde(default)]
-    entries: Option<Vec<Entry>>,
-    #[serde(default)]
-    command: Option<String>,
-    #[serde(default)]
-    script: Option<PathBuf>,
+    #[serde(flatten)]
+    entry_type: EntryType,
+}
+
+#[derive(Deserialize)]
+enum EntryType {
+    #[serde(rename = "entries")]
+    Entries(Vec<Entry>),
+    #[serde(rename = "command")]
+    Command(String),
+    #[serde(rename = "script")]
+    Script(PathBuf),
 }
 
 impl Entry {
@@ -127,7 +133,7 @@ fn filter_entries(entries: &mut Vec<Entry>) {
         if !entry.is_supported() {
             return false;
         }
-        if let Some(entries) = &mut entry.entries {
+        if let EntryType::Entries(entries) = &mut entry.entry_type {
             filter_entries(entries);
             !entries.is_empty()
         } else {
@@ -138,41 +144,30 @@ fn filter_entries(entries: &mut Vec<Entry>) {
 
 fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
     for entry in data {
-        if [
-            entry.entries.is_some(),
-            entry.command.is_some(),
-            entry.script.is_some(),
-        ]
-        .iter()
-        .filter(|&&x| x)
-        .count()
-            > 1
-        {
-            panic!("Entry must have only one data type");
-        }
-
-        if let Some(entries) = entry.entries {
-            let mut node = node.append(ListNode {
-                name: entry.name,
-                command: Command::None,
-            });
-            create_directory(entries, &mut node, command_dir);
-        } else if let Some(command) = entry.command {
-            node.append(ListNode {
-                name: entry.name,
-                command: Command::Raw(command),
-            });
-        } else if let Some(script) = entry.script {
-            let dir = command_dir.join(script);
-            if !dir.exists() {
-                panic!("Script {} does not exist", dir.display());
+        match entry.entry_type {
+            EntryType::Entries(entries) => {
+                let mut node = node.append(ListNode {
+                    name: entry.name,
+                    command: Command::None,
+                });
+                create_directory(entries, &mut node, command_dir);
             }
-            node.append(ListNode {
-                name: entry.name,
-                command: Command::LocalFile(dir),
-            });
-        } else {
-            panic!("Entry must have data");
+            EntryType::Command(command) => {
+                node.append(ListNode {
+                    name: entry.name,
+                    command: Command::Raw(command),
+                });
+            }
+            EntryType::Script(script) => {
+                let dir = command_dir.join(script);
+                if !dir.exists() {
+                    panic!("Script {} does not exist", dir.display());
+                }
+                node.append(ListNode {
+                    name: entry.name,
+                    command: Command::LocalFile(dir),
+                });
+            }
         }
     }
 }
