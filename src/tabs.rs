@@ -4,30 +4,30 @@ use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
 #[derive(Deserialize)]
-struct TabList {
-    directories: Vec<PathBuf>,
+pub(crate) struct TabList {
+    pub(crate) directories: Vec<PathBuf>,
 }
 
 #[derive(Deserialize)]
-struct TabEntry {
-    name: String,
-    data: Vec<Entry>,
+pub(crate) struct TabEntry {
+    pub(crate) name: String,
+    pub(crate) data: Vec<Entry>,
 }
 
 #[derive(Deserialize)]
-struct Entry {
-    name: String,
+pub(crate) struct Entry {
+    pub(crate) name: String,
     #[allow(dead_code)]
     #[serde(default)]
-    description: String,
+    pub(crate) description: String,
     #[serde(default)]
     preconditions: Option<Vec<Precondition>>,
     #[serde(default)]
-    entries: Option<Vec<Entry>>,
+    pub(crate) entries: Option<Vec<Entry>>,
     #[serde(default)]
-    command: Option<String>,
+    pub(crate) command: Option<String>,
     #[serde(default)]
-    script: Option<PathBuf>,
+    pub(crate) script: Option<PathBuf>,
 }
 
 impl Entry {

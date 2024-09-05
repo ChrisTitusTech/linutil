@@ -27,6 +27,7 @@ use ratatui::{
 };
 use state::AppState;
 use std::env::var;
+use std::process::exit;
 use tempdir::TempDir;
 // Linux utility toolbox
 #[derive(Debug, Parser)]
@@ -42,12 +43,13 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-
     // Make sure we check for the $DISPLAY env. variable before we launch this thing.
     // Otherwise launch in terminal.
     match var("DISPLAY") {
         Ok(_exists) => {
             println!("We are running some sort of GUI, launching the egui frontend.");
+            gui::start_gui().unwrap();
+            exit(0);
         }
         Err(_doesnt_exist) => {
             println!("$DISPLAY variable is not set, launching terminal version.");
