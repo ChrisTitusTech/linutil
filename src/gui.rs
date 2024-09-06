@@ -12,7 +12,7 @@ impl GuiFrontend {
         Self::default()
     }
 }
-fn err_dialog(ctx: &egui::Context, err_msg: &str) {
+fn info(ctx: &egui::Context, err_msg: &str) {
     egui::CentralPanel::default().show(ctx, |dialog| {
         dialog.centered_and_justified(|d| {
             d.heading(format!("Failed to finish the action: {err_msg}"));
@@ -53,14 +53,9 @@ impl App for GuiFrontend {
                                                 .changed()
                                             {
                                                 if let Some(script) = entry.script {
-                                                    match std::process::Command::new(&script)
-                                                        .output()
-                                                    {
-                                                        Ok(ok) => println!(
-                                                            "{script:#?} finished successfully"
-                                                        ),
-                                                        Err(e) => err_dialog(ctx, &e.to_string()),
-                                                    };
+                                                    crate::running_command::Command::Raw(
+                                                        script.display().to_string(),
+                                                    );
                                                 }
                                             }
                                         });
