@@ -189,7 +189,7 @@ keymap () {
 
     # Check if the selected keymap is "se" and set it to "se-lat6" for correct layout.
     if [[ "$keymap" == "se" ]]; then
-        keymap="se-lat6"
+        keymap="sv-latin1"
     fi
 
     echo -ne "Your key boards layout: ${keymap} \n"
