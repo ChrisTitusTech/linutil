@@ -6,6 +6,7 @@ setuplact() {
     echo "Installing Lact"
     if command_exists lact; then
         echo "Lact already Installed"
+        exit 1
     fi    
         case $PACKAGER in
         pacman)   
