@@ -2,6 +2,7 @@ use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
+    hint::{draw_shortcuts, SHORTCUT_LINES},
     running_command::{Command, RunningCommand},
     tabs::{ListNode, Tab},
     theme::Theme,
@@ -21,7 +22,7 @@ pub struct AppState {
     /// Selected theme
     theme: Theme,
     /// Currently focused area
-    focus: Focus,
+    pub focus: Focus,
     /// List of tabs
     tabs: Vec<Tab>,
     /// Current tab
@@ -72,13 +73,23 @@ impl AppState {
             .max()
             .unwrap_or(0);
 
+        let vertical = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(100),
+                Constraint::Min(2 + SHORTCUT_LINES as u16),
+            ])
+            .margin(0)
+            .split(frame.size());
+
         let horizontal = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
                 Constraint::Min(longest_tab_display_len as u16 + 5),
                 Constraint::Percentage(100),
             ])
-            .split(frame.size());
+            .split(vertical[0]);
+
         let left_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(1)])
@@ -148,6 +159,8 @@ impl AppState {
         if let Focus::FloatingWindow(float) = &mut self.focus {
             float.draw(frame, chunks[1]);
         }
+
+        draw_shortcuts(self, frame, vertical[1]);
     }
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         match &mut self.focus {
@@ -213,7 +226,7 @@ impl AppState {
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
-    fn at_root(&self) -> bool {
+    pub fn at_root(&self) -> bool {
         self.visit_stack.len() == 1
     }
     fn enter_parent_directory(&mut self) {
@@ -221,13 +234,10 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    fn get_selected_command(&mut self, change_directory: bool) -> Option<Command> {
+    pub fn get_selected_command(&self) -> Option<Command> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
-            if change_directory {
-                self.enter_parent_directory();
-            }
             return None;
         }
         if !self.at_root() {
@@ -237,25 +247,83 @@ impl AppState {
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
                 return Some(item.node.command.clone());
-            } else if change_directory {
+            }
+        }
+        None
+    }
+    pub fn go_to_selected_dir(&mut self) {
+        let mut selected_index = self.selection.selected().unwrap_or(0);
+
+        if !self.at_root() && selected_index == 0 {
+            self.enter_parent_directory();
+            return;
+        }
+
+        if !self.at_root() {
+            selected_index = selected_index.saturating_sub(1);
+        }
+
+        if let Some(item) = self.filter.item_list().get(selected_index) {
+            if item.has_children {
                 self.visit_stack.push(item.id);
                 self.selection.select(Some(0));
                 self.update_items();
             }
         }
-        None
+    }
+    pub fn selected_item_is_dir(&self) -> bool {
+        let mut selected_index = self.selection.selected().unwrap_or(0);
+
+        if !self.at_root() && selected_index == 0 {
+            return false;
+        }
+
+        if !self.at_root() {
+            selected_index = selected_index.saturating_sub(1);
+        }
+
+        if let Some(item) = self.filter.item_list().get(selected_index) {
+            item.has_children
+        } else {
+            false
+        }
+    }
+
+    pub fn selected_item_is_cmd(&self) -> bool {
+        let mut selected_index = self.selection.selected().unwrap_or(0);
+
+        if !self.at_root() && selected_index == 0 {
+            return false;
+        }
+
+        if !self.at_root() {
+            selected_index = selected_index.saturating_sub(1);
+        }
+
+        if let Some(item) = self.filter.item_list().get(selected_index) {
+            !item.has_children
+        } else {
+            false
+        }
+    }
+    pub fn selected_item_is_up_dir(&self) -> bool {
+        let selected_index = self.selection.selected().unwrap_or(0);
+
+        !self.at_root() && selected_index == 0
     }
     fn enable_preview(&mut self) {
-        if let Some(command) = self.get_selected_command(false) {
+        if let Some(command) = self.get_selected_command() {
             if let Some(preview) = FloatingText::from_command(&command) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command(true) {
+        if let Some(cmd) = self.get_selected_command() {
             let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
+        } else {
+            self.go_to_selected_dir();
         }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
