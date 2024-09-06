@@ -2,6 +2,7 @@ use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
+    keys::{KeyHint, KeyHintSet},
     running_command::{Command, RunningCommand},
     tabs::{ListNode, Tab},
     theme::Theme,
@@ -11,8 +12,8 @@ use ego_tree::NodeId;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Borders, List, ListState},
+    text::{Line, Span},
+    widgets::{Block, Borders, List, ListState, Padding, Paragraph},
     Frame,
 };
 use std::path::Path;
@@ -33,6 +34,8 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
+    /// Key hints for the current focus
+    key_hints: Vec<KeyHint>,
 }
 
 pub enum Focus {
@@ -40,6 +43,18 @@ pub enum Focus {
     TabList,
     List,
     FloatingWindow(Float),
+}
+
+impl Focus {
+    // Get all key hints for this specific focus
+    fn get_key_hints(&self) -> Vec<KeyHint> {
+        match self {
+            Focus::Search => KeyHintSet::Search.get_key_hints(),
+            Focus::TabList => KeyHintSet::TabList.get_key_hints(),
+            Focus::List => KeyHintSet::List.get_key_hints(),
+            Focus::FloatingWindow(_) => KeyHintSet::FloatingWindow.get_key_hints(),
+        }
+    }
 }
 
 pub struct ListEntry {
@@ -60,6 +75,7 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            key_hints: Focus::List.get_key_hints(),
         };
         state.update_items();
         state
@@ -72,13 +88,22 @@ impl AppState {
             .max()
             .unwrap_or(0);
 
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Min(1),    // Main content
+                Constraint::Length(3), // Bottom bar
+            ])
+            .split(frame.size());
+
         let horizontal = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
                 Constraint::Min(longest_tab_display_len as u16 + 5),
                 Constraint::Percentage(100),
             ])
-            .split(frame.size());
+            .split(layout[0]);
+
         let left_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(1)])
@@ -148,12 +173,35 @@ impl AppState {
         if let Focus::FloatingWindow(float) = &mut self.focus {
             float.draw(frame, chunks[1]);
         }
+
+        let mut key_hints: Vec<Span> = Vec::new();
+
+        for (i, key_hint) in self.key_hints.iter().enumerate() {
+            let content = format!("{} {}", key_hint.get_key(), key_hint.get_description());
+            let span = Span::styled(content, Style::new().fg(self.theme.unfocused_color()));
+
+            key_hints.push(span);
+
+            if i < self.key_hints.len() - 1 {
+                key_hints.push(Span::raw("   "));
+            }
+        }
+
+        // Display key hints at bottom
+        let key_hint_bar = Paragraph::new(Line::from(key_hints)).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .padding(Padding::horizontal(1)),
+        );
+
+        // Render the bottom bar in the last chunk of the layout
+        frame.render_widget(key_hint_bar, layout[1]);
     }
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
-                    self.focus = Focus::List;
+                    self.update_focus(Focus::List)
                 }
             }
             Focus::Search => match self.filter.handle_key(key) {
@@ -164,7 +212,7 @@ impl AppState {
             _ if key.code == KeyCode::Char('q') => return false,
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
-                    self.focus = Focus::List
+                    self.update_focus(Focus::List)
                 }
                 KeyCode::Char('j') | KeyCode::Down
                     if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
@@ -188,13 +236,13 @@ impl AppState {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
-                        self.focus = Focus::TabList;
+                        self.update_focus(Focus::TabList)
                     } else {
                         self.enter_parent_directory();
                     }
                 }
                 KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Tab => self.focus = Focus::TabList,
+                KeyCode::Tab => self.update_focus(Focus::TabList),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
@@ -259,18 +307,26 @@ impl AppState {
         }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
-        self.focus = Focus::FloatingWindow(Float::new(Box::new(float), width, height));
+        self.update_focus(Focus::FloatingWindow(Float::new(
+            Box::new(float),
+            width,
+            height,
+        )));
     }
     fn enter_search(&mut self) {
-        self.focus = Focus::Search;
+        self.update_focus(Focus::Search);
         self.filter.activate_search();
         self.selection.select(None);
     }
     fn exit_search(&mut self) {
         self.selection.select(Some(0));
-        self.focus = Focus::List;
+        self.update_focus(Focus::List);
         self.filter.deactivate_search();
         self.update_items();
+    }
+    fn update_focus(&mut self, focus: Focus) {
+        self.focus = focus;
+        self.key_hints = self.focus.get_key_hints();
     }
     fn refresh_tab(&mut self) {
         self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]

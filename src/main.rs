@@ -1,6 +1,7 @@
 mod filter;
 mod float;
 mod floating_text;
+mod keys;
 mod running_command;
 pub mod state;
 mod tabs;
