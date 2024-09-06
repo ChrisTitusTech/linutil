@@ -14,31 +14,24 @@ impl GuiFrontend {
 
 impl App for GuiFrontend {
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
-        // egui::SidePanel::new(egui::panel::Side::Left, "categories").show_animated(
-        //     ctx,
-        //     true,
-        //     |side| {
-        //         side.heading("Categories");
-        //         side.separator();
-        //         let file = std::fs::read_to_string("src/commands/tabs.toml").unwrap();
-        //         let toml: crate::tabs::TabList = toml::from_str(&file).unwrap();
-        //         for dir in toml.directories {
-        //             if side.button(dir.to_str().unwrap()).clicked() {}
-        //         }
-        //     },
-        // );
         egui::CentralPanel::default().show(ctx, |central| {
-            central.horizontal_centered(|stuff| {
+            central.horizontal_centered(|content| {
                 let file = std::fs::read_to_string("src/commands/tabs.toml").unwrap();
                 let toml: crate::tabs::TabList = toml::from_str(&file).unwrap();
                 for dir in toml.directories {
                     let dirname = std::fs::read_to_string(
-                        Path::new("src/commands").join(dir).join("tab_data.toml"),
+                        Path::new("src/commands")
+                            .join(dir.clone())
+                            .join("tab_data.toml"),
                     )
                     .unwrap();
+                    content.heading(dir.display().to_string());
                     let cfg: crate::tabs::TabEntry = toml::from_str(&dirname).unwrap();
                     for entry in cfg.data {
-                        stuff.button(entry.name.to_string());
+                        if content
+                            .checkbox(&mut false, entry.name.to_string())
+                            .clicked()
+                        {}
                     }
                 }
             });
