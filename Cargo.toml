@@ -18,6 +18,7 @@ toml = "0.8.19"
 which = "6.0.3"
 unicode-width = "0.1.13"
 eframe = "0.28.1"
+egui_extras = "0.28.1"
 
 [build-dependencies]
 chrono = "0.4.33"

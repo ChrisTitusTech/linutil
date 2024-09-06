@@ -1,6 +1,6 @@
 use eframe::egui;
 use eframe::App;
-use std::fs::read_dir;
+use egui_extras::{Column, TableBuilder};
 use std::path::Path;
 use std::process::exit;
 #[derive(Default)]
@@ -25,14 +25,38 @@ impl App for GuiFrontend {
                             .join("tab_data.toml"),
                     )
                     .unwrap();
-                    content.heading(dir.display().to_string());
-                    let cfg: crate::tabs::TabEntry = toml::from_str(&dirname).unwrap();
-                    for entry in cfg.data {
-                        if content
-                            .checkbox(&mut false, entry.name.to_string())
-                            .clicked()
-                        {}
-                    }
+                    content.push_id(&dir.display().to_string(), |table| {
+                        TableBuilder::new(table)
+                            .column(Column::auto().resizable(true))
+                            .column(Column::remainder().clip(true))
+                            .header(21.0, |mut header| {
+                                header.col(|col| {
+                                    col.push_id(&dir.display().to_string(), |data| {
+                                        data.heading(&dir.display().to_string());
+                                    });
+                                });
+                            })
+                            .body(|mut body| {
+                                let cfg: crate::tabs::TabEntry = toml::from_str(&dirname).unwrap();
+                                for entry in cfg.data {
+                                    body.row(20f32, |mut col| {
+                                        col.col(|content| {
+                                            if content
+                                                .checkbox(&mut false, entry.name.to_string())
+                                                .changed()
+                                            {
+                                                if let Some(script) = entry.script {
+                                                    std::process::Command::new(script)
+                                                        .output()
+                                                        .unwrap()
+                                                        .stdout;
+                                                }
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                    });
                 }
             });
         });
