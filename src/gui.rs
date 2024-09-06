@@ -1,5 +1,6 @@
 use eframe::egui;
 use eframe::App;
+use egui::InnerResponse;
 use egui_extras::{Column, TableBuilder};
 use std::path::Path;
 use std::process::exit;
@@ -11,7 +12,13 @@ impl GuiFrontend {
         Self::default()
     }
 }
-
+fn err_dialog(ctx: &egui::Context, err_msg: &str) {
+    egui::CentralPanel::default().show(ctx, |dialog| {
+        dialog.centered_and_justified(|d| {
+            d.heading(format!("Failed to finish the action: {err_msg}"));
+        });
+    });
+}
 impl App for GuiFrontend {
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |central| {
@@ -46,10 +53,14 @@ impl App for GuiFrontend {
                                                 .changed()
                                             {
                                                 if let Some(script) = entry.script {
-                                                    std::process::Command::new(script)
+                                                    match std::process::Command::new(&script)
                                                         .output()
-                                                        .unwrap()
-                                                        .stdout;
+                                                    {
+                                                        Ok(ok) => println!(
+                                                            "{script:#?} finished successfully"
+                                                        ),
+                                                        Err(e) => err_dialog(ctx, &e.to_string()),
+                                                    };
                                                 }
                                             }
                                         });
