@@ -25,6 +25,8 @@ impl App for GuiFrontend {
             central.horizontal_centered(|content| {
                 let file = std::fs::read_to_string("src/commands/tabs.toml").unwrap();
                 let toml: crate::tabs::TabList = toml::from_str(&file).unwrap();
+                // We need this loop to access directories and execute scripts.
+                // NOTE: This will not work if you are not in the root of the directory.
                 for dir in toml.directories {
                     let dirname = std::fs::read_to_string(
                         Path::new("src/commands")
@@ -45,6 +47,8 @@ impl App for GuiFrontend {
                             })
                             .body(|mut body| {
                                 let cfg: crate::tabs::TabEntry = toml::from_str(&dirname).unwrap();
+                                // This mess of spaghetti code is a result of having to have both
+                                // row and col in the same loop.
                                 for entry in cfg.data {
                                     body.row(20f32, |mut col| {
                                         col.col(|content| {
