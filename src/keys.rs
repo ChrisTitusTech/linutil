@@ -53,7 +53,6 @@ impl KeyHintSet {
                 KeyHint::new("down/j", "Down"),
                 KeyHint::new("up/k", "Up"),
                 KeyHint::new("left/h", "Back"),
-                KeyHint::new("up/k", "Up"),
                 KeyHint::new("/", "Search"),
                 KeyHint::new("q", "Quit"),
                 KeyHint::new("t", "Next theme"),
