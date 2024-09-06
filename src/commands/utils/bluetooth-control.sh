@@ -104,7 +104,7 @@ prompt_for_mac() {
         fi
 
         # Display devices with numbers
-        IFS=$'\n' read -r -a device_list <<<"$devices"
+        echo "$devices" | IFS=$'\n' read -r -a device_list
         for i in "${!device_list[@]}"; do
             echo "$((i+1)). ${device_list[$i]}"
         done
