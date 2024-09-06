@@ -29,6 +29,10 @@ data = "command_exists"
 values =  ["dnf"]
 
 [[data.entries]]
+name = "DNF Tweaks"
+script = "fedora/dnf-tweaks.sh"
+
+[[data.entries]]
 name = "RPM Fusion Setup"
 script = "fedora/rpm-fusion-setup.sh"
 
