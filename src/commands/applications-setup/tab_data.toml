@@ -29,5 +29,5 @@ name = "ZSH Prompt"
 script = "zsh-setup.sh"
 
 [[data]]
-name = "Lact Setup For Archlinux"
+name = "Lact"
 script = "lact-setup.sh"
