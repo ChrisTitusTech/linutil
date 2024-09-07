@@ -27,6 +27,8 @@ setupRofi() {
                 $ESCALATION_TOOL ${PACKAGER} install -y wget
                 ;;
         esac
+    else
+        echo "wget is already installed."
     fi
 
     echo "Copy Rofi config files"

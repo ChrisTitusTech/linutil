@@ -27,8 +27,10 @@ setupKitty() {
                 $ESCALATION_TOOL ${PACKAGER} install -y wget
                 ;;
         esac
+    else
+        echo "wget is already installed."
     fi
-    
+        
     echo "Copy Kitty config files"
     if [ -d "${HOME}/.config/kitty" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
