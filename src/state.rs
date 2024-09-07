@@ -10,10 +10,10 @@ use crate::{
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
 use ratatui::{
-    layout::{Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Layout},
     style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Borders, List, ListState},
+    text::{Line, Span},
+    widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
 use std::path::Path;
@@ -66,12 +66,35 @@ impl AppState {
         state
     }
     pub fn draw(&mut self, frame: &mut Frame) {
+        let label_block =
+            Block::default()
+                .borders(Borders::all())
+                .border_set(ratatui::symbols::border::Set {
+                    top_left: " ",
+                    top_right: " ",
+                    bottom_left: " ",
+                    bottom_right: " ",
+                    vertical_left: " ",
+                    vertical_right: " ",
+                    horizontal_top: "*",
+                    horizontal_bottom: "*",
+                });
+        let str1 = "Linutil ";
+        let str2 = "by Chris Titus";
+        let label = Paragraph::new(Line::from(vec![
+            Span::styled(str1, Style::default().bold()),
+            Span::styled(str2, Style::default().italic()),
+        ]))
+        .block(label_block)
+        .alignment(Alignment::Center);
+
         let longest_tab_display_len = self
             .tabs
             .iter()
             .map(|tab| tab.name.len() + self.theme.tab_icon().len())
             .max()
-            .unwrap_or(0);
+            .unwrap_or(0)
+            .max(str1.len() + str2.len());
 
         let vertical = Layout::default()
             .direction(Direction::Vertical)
@@ -94,6 +117,7 @@ impl AppState {
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(1)])
             .split(horizontal[0]);
+        frame.render_widget(label, left_chunks[0]);
 
         let tabs = self
             .tabs
