@@ -106,15 +106,18 @@ installDocker() {
     apt-get)
         if [ -f /etc/os-release ]; then
             . /etc/os-release
-            # check if the $ID is ubuntu
             if [ "$ID" = "ubuntu" ]; then
+                echo "Installing Docker on Ubuntu..."
                 installDockerUbuntu
             elif [ "$ID" = "debian" ]; then
+                echo "Installing Docker on Debian..."
                 installDockerDebian
-            # check if the $ID_LIKE contains ubuntu
-            elif [[ "$ID_LIKE" =~ "ubuntu" ]]; then
+            # check if the $ID_LIKE contains ubuntu or debian
+            elif echo "$ID_LIKE" | grep -q "ubuntu"; then
+                echo "Installing Docker on Ubuntu derived distribution..."
                 installDockerUbuntu
-            elif [[ "$ID_LIKE" =~ "debian" ]]; then
+            elif echo "$ID_LIKE" | grep -q "debian"; then
+                echo "Installing Docker on Debian derived distribution..."
                 installDockerDebian
             else
                 echo "Unsupported distribution"
