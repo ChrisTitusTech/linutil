@@ -142,6 +142,16 @@ installDocker() {
 setupDocker() {
     echo "Setting up Docker..."
     installDocker
+    # Start and enable the Docker service
+    $ESCALATION_TOOL systemctl enable docker.service
+    $ESCALATION_TOOL systemctl start docker.service
+    $ESCALATION_TOOL systemctl enable docker.socket
+    $ESCALATION_TOOL systemctl start docker.socket
+
+    $ESCALATION_TOOL systemctl enable docker
+    $ESCALATION_TOOL systemctl start docker
+
+
     # Add user to the docker group
     $ESCALATION_TOOL groupadd docker
     $ESCALATION_TOOL usermod -aG docker $USER
