@@ -16,6 +16,19 @@ setupRofi() {
     else
         echo "Rofi is already installed."
     fi
+
+    echo "Install wget if not already installed..."
+    if ! command_exists wget; then
+        case ${PACKAGER} in
+            pacman)
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm wget
+                ;;
+            *)
+                $ESCALATION_TOOL ${PACKAGER} install -y wget
+                ;;
+        esac
+    fi
+
     echo "Copy Rofi config files"
     if [ -d "$HOME/.config/rofi" ]; then
         cp -r "$HOME/.config/rofi" "$HOME/.config/rofi.bak"

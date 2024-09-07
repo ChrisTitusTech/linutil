@@ -16,6 +16,19 @@ setupKitty() {
     else
         echo "Kitty is already installed."
     fi
+
+    echo "Install wget if not already installed..."
+    if ! command_exists wget; then
+        case ${PACKAGER} in
+            pacman)
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm wget
+                ;;
+            *)
+                $ESCALATION_TOOL ${PACKAGER} install -y wget
+                ;;
+        esac
+    fi
+    
     echo "Copy Kitty config files"
     if [ -d "${HOME}/.config/kitty" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
