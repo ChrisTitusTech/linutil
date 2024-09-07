@@ -18,6 +18,10 @@ checkKVMSupport() {
             exit 1
             ;;
         esac
+    else
+        echo "KVM is supported on this machine."
+        # Add user to the kvm group
+        $ESCALATION_TOOL usermod -aG kvm $USER
     fi
     echo "KVM is supported on this machine."
 }
@@ -162,13 +166,11 @@ setupDocker() {
     echo "Docker setup successfully"
 }
 
+
 checkEnv
 checkEscalationTool
 
 checkKVMSupport
 check64Bit
-
-# Add user to the kvm group
-$ESCALATION_TOOL usermod -aG kvm $USER
 
 setupDocker
