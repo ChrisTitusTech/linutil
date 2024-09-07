@@ -142,29 +142,32 @@ clone_config_folders() {
 }
 
 configure_backgrounds() {
+    # Set the variable PIC_DIR which stores the path for images
+    PIC_DIR="$HOME/Pictures"
+
     # Set the variable BG_DIR to the path where backgrounds will be stored
-    BG_DIR="$HOME/Pictures/backgrounds"
+    BG_DIR="$PIC_DIR/backgrounds"
 
     # Check if the ~/Pictures directory exists
-    if [ ! -d "~/Pictures" ]; then
+    if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         echo "Pictures directory does not exist"
-        mkdir ~/Pictures
+        mkdir "$PIC_DIR"
         echo "Directory was created in Home folder"
     fi
-    
+
     # Check if the backgrounds directory (BG_DIR) exists
     if [ ! -d "$BG_DIR" ]; then
         # If the backgrounds directory doesn't exist, attempt to clone a repository containing backgrounds
-        if ! git clone https://github.com/ChrisTitusTech/nord-background.git ~/Pictures; then
+        if ! git clone https://github.com/ChrisTitusTech/nord-background.git "$PIC_DIR/nord-background"; then
             # If the git clone command fails, print an error message and return with a status of 1
             echo "Failed to clone the repository"
             return 1
         fi
         # Rename the cloned directory to 'backgrounds'
-        mv ~/Pictures/nord-background ~/Pictures/backgrounds
+        mv "$PIC_DIR/nord-background" "$PIC_DIR/backgrounds"
         # Print a success message indicating that the backgrounds have been downloaded
-        echo "Downloaded desktop backgrounds to $BG_DIR"    
+        echo "Downloaded desktop backgrounds to $BG_DIR"
     else
         # If the backgrounds directory already exists, print a message indicating that the download is being skipped
         echo "Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds"
@@ -290,9 +293,6 @@ setupDisplayManager() {
             echo "Auto-login configuration skipped"
         fi
     fi
-    
-
-    
 }
 
 checkEnv
