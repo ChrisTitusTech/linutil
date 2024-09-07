@@ -16,6 +16,19 @@ setupAlacritty() {
     else
         echo "alacritty is already installed."
     fi
+
+    echo "Install wget if not already installed..."
+    if ! command_exists wget; then
+        case ${PACKAGER} in
+            pacman)
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm wget
+                ;;
+            *)
+                $ESCALATION_TOOL ${PACKAGER} install -y wget
+                ;;
+        esac
+    fi
+    
     echo "Copy alacritty config files"
     if [ -d "${HOME}/.config/alacritty" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
