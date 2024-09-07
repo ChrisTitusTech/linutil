@@ -215,7 +215,7 @@ echo -ne "
 ------------------------------------------------------------------------
     THIS WILL FORMAT AND DELETE ALL DATA ON THE DISK
     Please make sure you know what you are doing because
-    after formating your disk there is no way to get data back
+    after formatting your disk there is no way to get data back
     *****BACKUP YOUR DATA BEFORE CONTINUING*****
     ***I AM NOT RESPONSIBLE FOR ANY DATA LOSS***
 ------------------------------------------------------------------------
@@ -326,7 +326,7 @@ echo -ne "
 pacman -S --noconfirm --needed gptfdisk btrfs-progs glibc
 echo -ne "
 -------------------------------------------------------------------------
-                    Formating Disk
+                    Formatting Disk
 -------------------------------------------------------------------------
 "
 umount -A --recursive /mnt # make sure everything is unmounted before we start
