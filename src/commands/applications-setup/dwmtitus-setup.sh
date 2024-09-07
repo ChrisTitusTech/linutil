@@ -19,7 +19,7 @@ setupDWM() {
             ;;
         dnf)
             $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
-            $ESCALATION_TOOL "$PACKAGER" install -y libx11-devel libxinerama-devel libxft-devel imlib2-devel libxcb-devel
+            $ESCALATION_TOOL "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
             ;;
         *)
             echo "Unsupported package manager: $PACKAGER"
