@@ -154,23 +154,17 @@ setupDocker() {
     $ESCALATION_TOOL systemctl start docker.service
     $ESCALATION_TOOL systemctl enable docker.socket
     $ESCALATION_TOOL systemctl start docker.socket
-
     $ESCALATION_TOOL systemctl enable docker
     $ESCALATION_TOOL systemctl start docker
-
-
-    # Add user to the docker group
+   # Add user to the docker group
     $ESCALATION_TOOL groupadd docker
     $ESCALATION_TOOL usermod -aG docker $USER
     docker run hello-world
     echo "Docker setup successfully"
 }
 
-
 checkEnv
 checkEscalationTool
-
 checkKVMSupport
 check64Bit
-
 setupDocker
