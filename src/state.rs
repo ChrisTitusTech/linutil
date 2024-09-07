@@ -33,6 +33,8 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
+    multi_select: bool,              // This keeps track of Multi select toggle
+    selected_commands: Vec<Command>, // This field is to store selected commands
 }
 
 pub enum Focus {
@@ -60,6 +62,8 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            multi_select: false,
+            selected_commands: Vec::new(), // Initialize with an empty vector
         };
         state.update_items();
         state
@@ -120,12 +124,24 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
+                let is_selected = self.selected_commands.contains(&node.command); // Add * if command is selected
+                let indicator = if is_selected { "*" } else { "" };
                 if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(self.theme.dir_color())
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.dir_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.dir_color())
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(self.theme.cmd_color())
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.cmd_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.cmd_color())
                 }
             },
         ));
@@ -137,11 +153,15 @@ impl AppState {
             } else {
                 Style::new()
             })
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
-            )
+            .block(Block::default().borders(Borders::ALL).title(format!(
+                "Linux Toolbox - {} {}",
+                env!("BUILD_DATE"),
+                if self.multi_select {
+                    "[Multi-Select]"
+                } else {
+                    ""
+                }
+            )))
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -197,12 +217,34 @@ impl AppState {
                 KeyCode::Tab => self.focus = Focus::TabList,
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('v') => self.toggle_multi_select(),
+                KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(), // Add space key to toggle selection
+
                 _ => {}
             },
             _ => {}
         };
         true
     }
+
+    fn toggle_multi_select(&mut self) {
+        self.multi_select = !self.multi_select;
+        if !self.multi_select {
+            self.selected_commands.clear();
+        }
+    }
+
+    fn toggle_selection(&mut self) {
+        if let Some(command) = self.get_selected_command(false) {
+            if self.selected_commands.contains(&command) {
+                self.selected_commands.retain(|c| c != &command);
+            } else {
+                self.selected_commands.push(command);
+            }
+        }
+    }
+
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
@@ -253,10 +295,16 @@ impl AppState {
         }
     }
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command(true) {
-            let command = RunningCommand::new(cmd);
-            self.spawn_float(command, 80, 80);
+        if self.selected_commands.is_empty() {
+            // If no commands are selected, run the currently highlighted command
+            if let Some(cmd) = self.get_selected_command(true) {
+                self.selected_commands.push(cmd);
+            }
         }
+
+        let command = RunningCommand::new(self.selected_commands.clone());
+        self.spawn_float(command, 80, 80);
+        self.selected_commands.clear();
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
         self.focus = Focus::FloatingWindow(Float::new(Box::new(float), width, height));
