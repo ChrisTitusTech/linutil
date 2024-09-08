@@ -1,108 +1,117 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # Import common utilities
 . ./common-script.sh
 
+# List of available fonts
+fonts="
+0xProto_Nerd_Font
+3270_Nerd_Font
+Agave_Nerd_Font
+AnonymicePro_Nerd_Font
+Arimo_Nerd_Font
+AurulentSansMono_Nerd_Font
+BigBlueTerminal_Nerd_Font
+BitstromWera_Nerd_Font
+BlexMono_Nerd_Font
+CaskaydiaCove_Nerd_Font
+CaskaydiaMono_Nerd_Font
+CodeNewRoman_Nerd_Font
+ComicShannsMono_Nerd_Font
+CommitMono_Nerd_Font
+Cousine_Nerd_Font
+D2Coding_Nerd_Font
+DaddyTimeMono_Nerd_Font
+DejaVuSansMono_Nerd_Font
+DroidSansMono_Nerd_Font
+EnvyCodeR_Nerd_Font
+FantasqueSansMono_Nerd_Font
+FiraCode_Nerd_Font
+FiraMono_Nerd_Font
+GeistMono_Nerd_Font
+GoMono_Nerd_Font
+Gohu_Nerd_Font
+Hack_Nerd_Font
+Hasklug_Nerd_Font
+HeavyDataMono_Nerd_Font
+Hurmit_Nerd_Font
+iM-Writing_Nerd_Font
+Inconsolata_Nerd_Font
+InconsolataGo_Nerd_Font
+Inconsolata_LGC_Nerd_Font
+IntoneMono_Nerd_Font
+Iosevka_Nerd_Font
+IosevkaTerm_Nerd_Font
+IosevkaTermSlab_Nerd_Font
+JetBrainsMono_Nerd_Font
+Lekton_Nerd_Font
+Literation_Nerd_Font
+Lilex_Nerd_Font
+MartianMono_Nerd_Font
+Meslo_Nerd_Font
+Monaspice_Nerd_Font
+Monofur_Nerd_Font
+Monoid_Nerd_Font
+Mononoki_Nerd_Font
+M+_Nerd_Font
+Noto_Nerd_Font
+OpenDyslexic_Nerd_Font
+Overpass_Nerd_Font
+ProFont_Nerd_Font
+ProggyClean_Nerd_Font
+RecMono_Nerd_Font
+RobotoMono_Nerd_Font
+SauceCodePro_Nerd_Font
+ShureTechMono_Nerd_Font
+SpaceMono_Nerd_Font
+Terminess_Nerd_Font
+Tinos_Nerd_Font
+Ubuntu_Nerd_Font
+UbuntuMono_Nerd_Font
+VictorMono_Nerd_Font
+ZedMono_Nerd_Font
+"
+
 # Function to prompt user for font selection
 prompt_font_selection() {
-    fonts=(
-        "0xProto Nerd Font"
-        "3270 Nerd Font"
-        "Agave Nerd Font"
-        "AnonymicePro Nerd Font"
-        "Arimo Nerd Font"
-        "AurulentSansMono Nerd Font"
-        "BigBlueTerminal Nerd Font"
-        "BitstromWera Nerd Font"
-        "BlexMono Nerd Font"
-        "CaskaydiaCove Nerd Font"
-        "CaskaydiaMono Nerd Font"
-        "CodeNewRoman Nerd Font"
-        "ComicShannsMono Nerd Font"
-        "CommitMono Nerd Font"
-        "Cousine Nerd Font"
-        "D2Coding Nerd Font"
-        "DaddyTimeMono Nerd Font"
-        "DejaVuSansMono Nerd Font"
-        "DroidSansMono Nerd Font"
-        "EnvyCodeR Nerd Font"
-        "FantasqueSansMono Nerd Font"
-        "FiraCode Nerd Font"
-        "FiraMono Nerd Font"
-        "GeistMono Nerd Font"
-        "GoMono Nerd Font"
-        "Gohu Nerd Font"
-        "Hack Nerd Font"
-        "Hasklug Nerd Font"
-        "HeavyDataMono Nerd Font"
-        "Hurmit Nerd Font"
-        "iM-Writing Nerd Font"
-        "Inconsolata Nerd Font"
-        "InconsolataGo Nerd Font"
-        "Inconsolata LGC Nerd Font"
-        "IntoneMono Nerd Font"
-        "Iosevka Nerd Font"
-        "IosevkaTerm Nerd Font"
-        "IosevkaTermSlab Nerd Font"
-        "JetBrainsMono Nerd Font"
-        "Lekton Nerd Font"
-        "Literation Nerd Font"
-        "Lilex Nerd Font"
-        "MartianMono Nerd Font"
-        "Meslo Nerd Font"
-        "Monaspice Nerd Font"
-        "Monofur Nerd Font"
-        "Monoid Nerd Font"
-        "Mononoki Nerd Font"
-        "M+ Nerd Font"
-        "Noto Nerd Font"
-        "OpenDyslexic Nerd Font"
-        "Overpass Nerd Font"
-        "ProFont Nerd Font"
-        "ProggyClean Nerd Font"
-        "RecMono Nerd Font"
-        "RobotoMono Nerd Font"
-        "SauceCodePro Nerd Font"
-        "ShureTechMono Nerd Font"
-        "SpaceMono Nerd Font"
-        "Terminess Nerd Font"
-        "Tinos Nerd Font"
-        "Ubuntu Nerd Font"
-        "UbuntuMono Nerd Font"
-        "VictorMono Nerd Font"
-        "ZedMono Nerd Font"
-    )
-
     echo "Select fonts to install (separate with spaces):"
     echo "---------------------------------------------"
-    for i in "${!fonts[@]}"; do
-        echo " $i  -  ${fonts[i]}"
+    i=0
+    for font in $fonts; do
+        echo " $i  -  $font"
+        i=$((i + 1))
     done
     echo "---------------------------------------------"
 
-    read -rp "Enter the numbers of the fonts to install (e.g., '0 1 2'): " font_selection
+    printf "Enter the numbers of the fonts to install (e.g., '0 1 2'): "
+    read font_selection
 
     echo "Fonts selected: $font_selection"
 }
 
 # Function to download and install the selected fonts
 download_and_install_fonts() {
-    for selection in $font_selection; do
-        font=${fonts[$selection]}
-        font_name=$(echo "$font" | awk '{print $1}')
-        echo "Downloading and installing $font..."
-        
-        # Check if wget and tar are installed, using common-script.sh helper
-        checkCommandRequirements "wget"
-        checkCommandRequirements "tar"
+    i=0
+    for font in $fonts; do
+        for selection in $font_selection; do
+            if [ "$i" = "$selection" ]; then
+                font_name=$(echo "$font" | sed 's/_/ /g')  # Replace underscores with spaces
+                echo "Downloading and installing $font_name..."
+                
+                # Check if wget and tar are installed, using common-script.sh helper
+                checkCommandRequirements "wget"
+                checkCommandRequirements "tar"
 
-        # Download the font
-        wget -q --show-progress "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.tar.xz" -P "$HOME/tmp"
-        
-        # Extract and install the font
-        mkdir -p ~/.local/share/fonts
-        tar -xf "$HOME/tmp/$font_name.tar.xz" -C "$HOME/.local/share/fonts"
-        rm "$HOME/tmp/$font_name.tar.xz"
+                # Download the font
+                wget -q --show-progress "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.tar.xz" -P "$HOME/tmp"
+                
+                # Extract and install the font
+                mkdir -p ~/.local/share/fonts
+                tar -xf "$HOME/tmp/$font_name.tar.xz" -C "$HOME/.local/share/fonts"
+                rm "$HOME/tmp/$font_name.tar.xz"
+            fi
+        done
+        i=$((i + 1))
     done
 
     # Update the font cache
