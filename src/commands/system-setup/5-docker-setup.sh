@@ -79,6 +79,7 @@ setupDocker() {
     $ESCALATION_TOOL usermod -aG docker $USER
     docker run hello-world
     echo "Docker setup successfully"
+    echo "Please logout and login again to use Docker without sudo"
 }
 
 checkEnv
