@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 # Import common utilities
 . ./common-script.sh
