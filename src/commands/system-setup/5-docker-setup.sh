@@ -36,68 +36,11 @@ check64Bit() {
     echo "This is a 64-bit system."
 }
 
-installDockerUbuntu() {
-    echo "Install Docker if not already installed..."
-    if ! command_exists docker; then
-        # Add Docker's official GPG key:
-        $ESCALATION_TOOL apt-get update
-        $ESCALATION_TOOL apt-get install ca-certificates curl -y
-        $ESCALATION_TOOL install -m 0755 -d /etc/apt/keyrings
-        $ESCALATION_TOOL curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-        $ESCALATION_TOOL chmod a+r /etc/apt/keyrings/docker.asc
-
-        # Add the repository to Apt sources:
-        echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$(. /etc/os-release && echo "$VERSION_CODENAME")") stable" |
-            $ESCALATION_TOOL tee /etc/apt/sources.list.d/docker.list >/dev/null
-        $ESCALATION_TOOL apt-get update
-        # Install Docker and its dependencies:
-        $ESCALATION_TOOL apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    else
-        echo "Docker is already installed."
-    fi
-}
-
-installDockerDebian() {
-    echo "Install Docker if not already installed..."
-    if ! command_exists docker; then
-        # Add Docker's official GPG key:
-        $ESCALATION_TOOL apt-get update
-        $ESCALATION_TOOL apt-get install ca-certificates curl
-        $ESCALATION_TOOL install -m 0755 -d /etc/apt/keyrings
-        $ESCALATION_TOOL curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-        $ESCALATION_TOOL chmod a+r /etc/apt/keyrings/docker.asc
-
-        # Add the repository to Apt sources:
-        echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$(. /etc/os-release && echo "$VERSION_CODENAME")") stable" |
-            $ESCALATION_TOOL tee /etc/apt/sources.list.d/docker.list >/dev/null
-        $ESCALATION_TOOL apt-get update
-        # Install Docker and its dependencies:
-        $ESCALATION_TOOL apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-    else
-        echo "Docker is already installed."
-    fi
-}
-
-installDockerFedora() {
-    echo "Install Docker if not already installed..."
-    if ! command_exists docker; then
-        $ESCALATION_TOOL dnf -y install dnf-plugins-core
-        $ESCALATION_TOOL dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-        $ESCALATION_TOOL dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-        $ESCALATION_TOOL systemctl start docker
-    else
-        echo "Docker is already installed."
-    fi
-}
 
 installDockerArch() {
     echo "Install Docker if not already installed..."
     if ! command_exists docker; then
-        $ESCALATION_TOOL pacman -S docker
+        $ESCALATION_TOOL pacman -S docker docker-compose docker-buildx --noconfirm
         $ESCALATION_TOOL systemctl enable docker.service
         $ESCALATION_TOOL systemctl start docker.service
     else
@@ -108,34 +51,8 @@ installDockerArch() {
 installDocker() {
     # Install Docker based on the package manager
     case "$PACKAGER" in
-    apt-get)
-        if [ -f /etc/os-release ]; then
-            . /etc/os-release
-            if [ "$ID" = "ubuntu" ]; then
-                echo "Installing Docker on Ubuntu..."
-                installDockerUbuntu
-            elif [ "$ID" = "debian" ]; then
-                echo "Installing Docker on Debian..."
-                installDockerDebian
-            # check if the $ID_LIKE contains ubuntu or debian
-            elif echo "$ID_LIKE" | grep -q "ubuntu"; then
-                echo "Installing Docker on Ubuntu derived distribution..."
-                installDockerUbuntu
-            elif echo "$ID_LIKE" | grep -q "debian"; then
-                echo "Installing Docker on Debian derived distribution..."
-                installDockerDebian
-            else
-                echo "Unsupported distribution"
-                exit 1
-            fi
-
-        else
-            echo "Unsupported distribution"
-            exit 1
-        fi
-        ;;
-    dnf)
-        installDockerFedora
+    apt-get | apt | dnf)
+        curl -fsSL https://get.docker.com/ | sh
         ;;
     pacman)
         installDockerArch
