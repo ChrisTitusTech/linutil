@@ -58,9 +58,11 @@ impl App for GuiFrontend {
                                                 .changed()
                                             {
                                                 if let Some(script) = entry.script {
-                                                    crate::running_command::Command::Raw(
-                                                        script.display().to_string(),
+                                                    crate::running_command::Command::LocalFile(
+                                                        script,
                                                     );
+                                                } else if let Some(cmd) = entry.command {
+                                                    crate::running_command::Command::Raw(cmd);
                                                 }
                                             }
                                         });
