@@ -24,7 +24,6 @@ checkKVMSupport() {
         # Add user to the kvm group
         $ESCALATION_TOOL usermod -aG kvm $USER
     fi
-    echo "KVM is supported on this machine."
 }
 
 installDocker() {
