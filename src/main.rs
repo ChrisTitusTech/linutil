@@ -43,7 +43,7 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    // Make sure we check for the $DISPLAY env. variable before we launch this thing.
+    // Make sure we check for the $DISPLAY env. variable before we launch this tool.
     // Otherwise launch in terminal.
     match var("DISPLAY") {
         Ok(_exists) => {

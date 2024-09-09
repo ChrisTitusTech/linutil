@@ -4,6 +4,7 @@ use egui::InnerResponse;
 use egui_extras::{Column, TableBuilder};
 use std::path::Path;
 use std::process::exit;
+use std::process::Command;
 #[derive(Default)]
 struct GuiFrontend;
 
@@ -75,13 +76,10 @@ impl App for GuiFrontend {
 
 pub(crate) fn start_gui() -> eframe::Result<(), eframe::Error> {
     let native_options = eframe::NativeOptions::default();
-    match eframe::run_native(
+    eframe::run_native(
         "CTT Linux toolkit",
         native_options,
         Box::new(|cc| Ok(Box::new(GuiFrontend::new(cc)))),
-    ) {
-        Ok(ok) => ok,
-        Err(_) => exit(1),
-    };
+    )?;
     Ok(())
 }
