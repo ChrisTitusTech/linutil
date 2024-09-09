@@ -80,9 +80,7 @@ copy_and_confirm_ssh_key() {
     ssh -T git@github.com
 }
 
-# Check environment and necessary tools
-checkEnv
-
 # Main execution
+checkEnv
 setup_git_config
 copy_and_confirm_ssh_key

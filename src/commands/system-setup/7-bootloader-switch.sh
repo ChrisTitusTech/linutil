@@ -163,8 +163,7 @@ menu() {
     esac
 }
 
-# Check environment and prerequisites
+# Main script execution
 checkEnv
-
-# Run the menu function for user interaction
+checkEscalationTool
 menu
