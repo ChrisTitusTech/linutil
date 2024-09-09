@@ -99,11 +99,11 @@ download_and_install_fonts() {
                 echo "Downloading and installing $font_name..."
                 
                 # Check if wget and tar are installed, using common-script.sh helper
-                checkCommandRequirements "wget"
+                checkCommandRequirements "curl"
                 checkCommandRequirements "tar"
 
                 # Download the font
-                wget -q --show-progress "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.tar.xz" -P "$HOME/tmp"
+                curl -sSLo "$HOME/tmp/$font_name.tar.xz" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.tar.xz"
                 
                 # Extract and install the font
                 mkdir -p ~/.local/share/fonts
