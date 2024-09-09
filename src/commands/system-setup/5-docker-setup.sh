@@ -27,17 +27,6 @@ checkKVMSupport() {
     echo "KVM is supported on this machine."
 }
 
-check64Bit() {
-    # check  if the os is 64 bit
-    if [ "$(uname -m)" != "x86_64" ]; then
-        echo "This script is only for 64-bit systems."
-        exit 1
-    fi
-    echo "This is a 64-bit system."
-}
-
-
-
 
 installDocker() {  
     echo "Install Docker if not already installed..."  
@@ -77,5 +66,4 @@ setupDocker() {
 checkEnv
 checkEscalationTool
 checkKVMSupport
-check64Bit
 setupDocker
