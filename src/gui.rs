@@ -62,6 +62,7 @@ impl App for GuiFrontend {
                                                     );
                                                 } else if let Some(cmd) = entry.command {
                                                     crate::running_command::Command::Raw(cmd);
+                                                } else {
                                                 }
                                             }
                                         });
