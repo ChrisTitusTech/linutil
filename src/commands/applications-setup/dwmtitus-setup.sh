@@ -15,7 +15,7 @@ setupDWM() {
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb
             ;;
         apt)
-            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb1
+            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libxcb1-dev libx11-xcb1
             ;;
         dnf)
             $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
