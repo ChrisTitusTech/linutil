@@ -39,10 +39,18 @@ struct Args {
     #[arg(long, default_value_t = false)]
     #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
     override_validation: bool,
+    #[arg(short, long, default_value_t = false)]
+    #[clap(help = "Force run GUI, even if the $DISPLAY env. variable isn't set")]
+    run_gui: bool,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
+    if args.run_gui {
+        println!("We are running some sort of GUI, launching the egui frontend.");
+        gui::start_gui().unwrap();
+        exit(0);
+    }
     // Make sure we check for the $DISPLAY env. variable before we launch this tool.
     // Otherwise launch in terminal.
     match var("DISPLAY") {

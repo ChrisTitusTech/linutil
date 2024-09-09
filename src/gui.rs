@@ -1,24 +1,15 @@
 use eframe::egui;
 use eframe::App;
-use egui::InnerResponse;
 use egui_extras::{Column, TableBuilder};
 use std::path::Path;
-use std::process::exit;
-use std::process::Command;
 #[derive(Default)]
 struct GuiFrontend;
 
 impl GuiFrontend {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        cc.egui_ctx.enable_accesskit();
         Self::default()
     }
-}
-fn info(ctx: &egui::Context, err_msg: &str) {
-    egui::CentralPanel::default().show(ctx, |dialog| {
-        dialog.centered_and_justified(|d| {
-            d.heading(format!("Failed to finish the action: {err_msg}"));
-        });
-    });
 }
 impl App for GuiFrontend {
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
@@ -39,7 +30,7 @@ impl App for GuiFrontend {
                         TableBuilder::new(table)
                             .column(Column::auto().resizable(true))
                             .column(Column::remainder().clip(true))
-                            .header(21.0, |mut header| {
+                            .header(0f32, |mut header| {
                                 header.col(|col| {
                                     col.push_id(&dir.display().to_string(), |data| {
                                         data.heading(&dir.display().to_string());
@@ -53,16 +44,21 @@ impl App for GuiFrontend {
                                 for entry in cfg.data {
                                     body.row(20f32, |mut col| {
                                         col.col(|content| {
-                                            if content
-                                                .checkbox(&mut false, entry.name.to_string())
-                                                .changed()
-                                            {
-                                                if let Some(script) = entry.script {
+                                            if content.button(entry.name.to_string()).clicked() {
+                                                println!(
+                                                    "Clicked on button {}, running script {}",
+                                                    entry.name,
+                                                    entry
+                                                        .script
+                                                        .clone()
+                                                        .unwrap()
+                                                        .display()
+                                                        .to_string()
+                                                );
+                                                for anc in &entry.script.unwrap() {
                                                     crate::running_command::Command::LocalFile(
-                                                        script,
+                                                        Path::new(&anc).to_path_buf(),
                                                     );
-                                                } else if let Some(cmd) = entry.command {
-                                                    crate::running_command::Command::Raw(cmd);
                                                 }
                                             }
                                         });
