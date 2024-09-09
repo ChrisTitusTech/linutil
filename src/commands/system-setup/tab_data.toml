@@ -59,3 +59,7 @@ script = "5-git-config-auto.sh"
 [[data]]
 name = "Nerd fonts installer"
 script = "6-nerd-fonts-setup.sh" 
+
+[[data]]
+name = "Bootloader switcher"
+script = "7-bootloader-switch.sh"
