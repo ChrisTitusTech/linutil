@@ -27,26 +27,25 @@ checkKVMSupport() {
     echo "KVM is supported on this machine."
 }
 
-
-installDocker() {  
-    echo "Install Docker if not already installed..."  
-    if ! command_exists docker; then  
-        case ${PACKAGER} in  
-            pacman)  
-                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm docker docker-compose docker-buildx  
-                ;;  
-            apt-get | apt | dnf)  
-                curl -fsSL https://get.docker.com/ | sh  
-                ;;  
-            *)  
-                echo "Unsupported package manager: $PACKAGER"  
-                exit 1  
-                ;;  
-        esac  
-    else  
-        echo "Docker is already installed."  
-    fi  
-}  
+installDocker() {
+    echo "Install Docker if not already installed..."
+    if ! command_exists docker; then
+        case ${PACKAGER} in
+        pacman)
+            $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm docker docker-compose docker-buildx
+            ;;
+        apt-get | apt | dnf)
+            curl -fsSL https://get.docker.com/ | sh
+            ;;
+        *)
+            echo "Unsupported package manager: $PACKAGER"
+            exit 1
+            ;;
+        esac
+    else
+        echo "Docker is already installed."
+    fi
+}
 
 setupDocker() {
     echo "Setting up Docker..."
@@ -56,7 +55,7 @@ setupDocker() {
     $ESCALATION_TOOL systemctl start docker.service
     $ESCALATION_TOOL systemctl enable docker.socket
     $ESCALATION_TOOL systemctl start docker.socket
-   # Add user to the docker group
+    # Add user to the docker group
     $ESCALATION_TOOL groupadd docker
     $ESCALATION_TOOL usermod -aG docker $USER
     echo "Docker setup successfully"
