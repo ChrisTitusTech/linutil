@@ -119,13 +119,7 @@ download_and_install_fonts() {
     echo "Fonts installed and cache updated."
 }
 
-# Function to check environment and dependencies
-check_environment() {
-    echo "Checking environment..."
-    checkEnv  # Assuming this is a function from common-script.sh
-}
-
 # Main script execution
-check_environment
+checkEnv
 prompt_font_selection
 download_and_install_fonts
