@@ -37,32 +37,27 @@ check64Bit() {
 }
 
 
-installDockerArch() {
-    echo "Install Docker if not already installed..."
-    if ! command_exists docker; then
-        $ESCALATION_TOOL pacman -S docker docker-compose docker-buildx --noconfirm
-        $ESCALATION_TOOL systemctl enable docker.service
-        $ESCALATION_TOOL systemctl start docker.service
-    else
-        echo "Docker is already installed."
-    fi
-}
 
-installDocker() {
-    # Install Docker based on the package manager
-    case "$PACKAGER" in
-    apt-get | apt | dnf)
-        curl -fsSL https://get.docker.com/ | sh
-        ;;
-    pacman)
-        installDockerArch
-        ;;
-    *)
-        echo "Unsupported package manager: $PACKAGER"
-        exit 1
-        ;;
-    esac
-}
+
+installDocker() {  
+    echo "Install Docker if not already installed..."  
+    if ! command_exists docker; then  
+        case ${PACKAGER} in  
+            pacman)  
+                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm docker docker-compose docker-buildx  
+                ;;  
+            apt-get | apt | dnf)  
+                curl -fsSL https://get.docker.com/ | sh  
+                ;;  
+            *)  
+                echo "Unsupported package manager: $PACKAGER"  
+                exit 1  
+                ;;  
+        esac  
+    else  
+        echo "Docker is already installed."  
+    fi  
+}  
 
 setupDocker() {
     echo "Setting up Docker..."
