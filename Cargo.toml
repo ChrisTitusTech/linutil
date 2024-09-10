@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
 crossterm = "0.27.0"
-ego-tree = "0.6.2"
+ego-tree = "0.9.0"
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
 ratatui = "0.28.1"
