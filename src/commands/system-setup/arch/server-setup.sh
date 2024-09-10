@@ -430,11 +430,28 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
+# Kernel selection
+echo "Choose a kernel to install:"
+echo "1) linux (latest stable)"
+echo "2) linux-lts (long-term support)"
+echo "3) linux-zen (performance-tuned)"
+
+read -p "Enter your choice (1/2/3): " choice
+
+case $choice in
+    1) kernel="linux" ;;
+    2) kernel="linux-lts" ;;
+    3) kernel="linux-zen" ;;
+    *) echo "Invalid choice. Defaulting to linux-lts."; kernel="linux-lts" ;;
+esac
+
+# Installation process
 if [[ ! -d "/sys/firmware/efi" ]]; then
-    pacstrap /mnt base base-devel linux-lts linux-firmware --noconfirm --needed
+    pacstrap /mnt base base-devel $kernel linux-firmware --noconfirm --needed
 else
-    pacstrap /mnt base base-devel linux-lts linux-firmware efibootmgr --noconfirm --needed
+    pacstrap /mnt base base-devel $kernel linux-firmware efibootmgr --noconfirm --needed
 fi
+
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
@@ -444,6 +461,7 @@ echo "
 "
 cat /mnt/etc/fstab
 echo -ne "
+
 -------------------------------------------------------------------------
                     GRUB BIOS Bootloader Install & Check
 -------------------------------------------------------------------------
@@ -583,7 +601,7 @@ if [[ ${FS} == "luks" ]]; then
 # add encrypt in mkinitcpio.conf before filesystems in hooks
     sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
 # making mkinitcpio with linux kernel
-    mkinitcpio -p linux-lts
+    for kernel in $(pacman -Qq | grep -E '^linux$|^linux-lts$|^linux-zen$'); do sudo mkinitcpio -p "$kernel"; done
 fi
 
 echo -ne "
