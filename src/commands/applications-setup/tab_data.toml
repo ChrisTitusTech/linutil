@@ -6,7 +6,7 @@ script = "alacritty-setup.sh"
 
 [[data]]
 name = "Bash Prompt"
-command = "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh)\""
+command = "curl -sSL https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/setup.sh | sh"
 
 [[data]]
 name = "DWM-Titus"
@@ -18,7 +18,7 @@ script = "kitty-setup.sh"
 
 [[data]]
 name = "Neovim"
-command = "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh)\""
+command = "curl -sSL https://raw.githubusercontent.com/ChrisTitusTech/neovim/main/setup.sh | sh"
 
 [[data]]
 name = "Rofi"
