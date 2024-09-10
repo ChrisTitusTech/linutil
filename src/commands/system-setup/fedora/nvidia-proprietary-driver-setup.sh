@@ -50,7 +50,7 @@ driverSetupMenu() {
     fi
 
     # NOTE: Updating to latest package before installing nvidia driver.
-    $ESCALATION_TOOL dnf update
+    $ESCALATION_TOOL dnf upgrade -y
 
     # NOTE:: Installing graphics driver.
     $ESCALATION_TOOL dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
