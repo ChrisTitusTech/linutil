@@ -43,6 +43,7 @@ lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader l
     else
         $ESCALATION_TOOL ${PACKAGER} install -y ${DEPENDENCIES}
     fi
+
 }
 
 install_additional_dependencies() {
@@ -78,16 +79,65 @@ install_additional_dependencies() {
                 $ESCALATION_TOOL apt-add-repository non-free -y
                 #Install steam
                 $ESCALATION_TOOL apt-get install steam-installer -y
+
+                # Install flatpak for Debian/Ubuntu
+                $ESCALATION_TOOL apt-get install -y flatpak
+                echo "Flatpak installation complete."
+
+                # Add flathub repository
+                flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+                echo "Flathub repository added."
+
+                # Install gnome-software-plugin-flatpak for Gnome
+                if (dpkg -l | grep -qi gnome); then
+                    $ESCALATION_TOOL apt-get install -y gnome-software-plugin-flatpak
+                fi
+
+                # Install plasma-discover-backend-flatpak for KDE
+                if (dpkg -l | grep -qi kde); then
+                    $ESCALATION_TOOL apt-get install -y plasma-discover-backend-flatpak
+                fi
             else
             #Install steam on Ubuntu
                 $ESCALATION_TOOL apt-get install -y steam
+
+                # Check if Ubuntu version is older than 18
+                ubuntu_version=$(lsb_release -r | cut -f2)
+                if [ $(echo "$ubuntu_version < 18" | bc) -eq 1 ]; then
+                    echo "Ubuntu version is older than 18. Adding flatpak PPA..."
+                    $ESCALATION_TOOL add-apt-repository ppa:flatpak/stable -y
+                    $ESCALATION_TOOL apt update
+                    $ESCALATION_TOOL apt install flatpak -y
+                    echo "Flatpak installation complete."
+                else
+                    $ESCALATION_TOOL apt-get install -y flatpak
+                    echo "Flatpak installation complete."
+                fi
+
+                # Add flathub repository
+                flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+                echo "Flathub repository added."
+
+                # Install gnome-software-plugin-flatpak for Gnome
+                if (dpkg -l | grep -qi gnome); then
+                    $ESCALATION_TOOL apt-get install -y gnome-software-plugin-flatpak
+                fi
+
+                # Install plasma-discover-backend-flatpak for KDE
+                if (dpkg -l | grep -qi kde); then
+                    $ESCALATION_TOOL apt-get install -y plasma-discover-backend-flatpak
+                fi
             fi
             ;;
         *zypper)
-
+            # Install flatpak for openSUSE
+            $ESCALATION_TOOL zypper install -y flatpak
+            echo "Flatpak installation complete."
             ;;
         *dnf)
-
+            # Install flatpak for Fedora/CentOS/RHEL
+            $ESCALATION_TOOL dnf install -y flatpak
+            echo "Flatpak installation complete."
             ;;
         *pacman)
             echo "Installing Steam for Arch Linux..."
@@ -101,6 +151,10 @@ install_additional_dependencies() {
             echo "Installing GOverlay for Arch Linux..."
             $ESCALATION_TOOL pacman -S --needed --noconfirm goverlay
             echo "GOverlay installation complete."
+
+            # Install flatpak for Arch Linux
+            $ESCALATION_TOOL pacman -S --needed --noconfirm flatpak
+            echo "Flatpak installation complete."
             ;;
         *)
 
