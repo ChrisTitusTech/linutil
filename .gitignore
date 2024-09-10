@@ -2,4 +2,3 @@
 /build
 rust/target
 rust/build
-Cargo.lock
