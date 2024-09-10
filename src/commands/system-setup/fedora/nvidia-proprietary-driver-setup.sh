@@ -119,8 +119,6 @@ userConfirmation() {
   read -p "Do you want to continue? (Y/N): " choice
   case "$choice" in
   y | Y)
-    checkEnv
-    checkEscalationTool
     checkRepo
     driverSetupMenu
     return
@@ -130,7 +128,7 @@ userConfirmation() {
     return
     ;;
   *)
-    printf "%b\n" "${RED} Invalid Option ${RC}"
+    printf "%b\n" "${RED} Invalid Option! ${RC}"
     userConfirmation
     ;;
   esac
@@ -138,4 +136,6 @@ userConfirmation() {
 
 printf "%b\n" "${YELLOW}Warning! This script will enable Nvidia non-free repository and only install drivers for GPUs from 2014 or later. It works on fedora 34 and above.${RC}"
 
+checkEnv
+checkEscalationTool
 userConfirmation
