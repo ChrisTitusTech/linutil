@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh -e
 
-. "$(dirname "$0")/../../common-script.sh"
+. ./../../common-script.sh
 # This script allows user to download proprietary drivers for nvidia in fedora
 
 # It also disables noveau nvidia drivers
@@ -9,48 +9,108 @@
 
 # NOTE: Currently script only provides drivers for gpu 2014 and above (510+ and above)
 
-#NOTE: The main function which executes the commands based on option selected by user
-# all the commands are used from the installation guide link provided above
-function menu() {
-  echo -e "Welcome to Nvidia Driver Setup Script"
-  PS3="Your Option: "
-  options=("Install Nvidia Drivers" "Remove Nvidia Drivers")
+checkRepo() {
+  REPO_ID="rpmfusion-nonfree-nvidia-driver"
 
-  select SELECTED_OPTION in "${options[@]}"; do
-    case "${SELECTED_OPTION}" in
-    "Install Nvidia Drivers")
-      checkPackageManager 'dnf'
-      sudo dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
-      echo -e "${YELLOW} Stopping script for 4min, for building the drivers. Please don't kill the script!\n If the driver number is showing then your driver is installed properly.\n Else run the script again, select second option and reboot the system, then try the first option again.${RC}"
-      sleep 4m
-      modinfo -F version nvidia
-      echo -e "Now you can reboot the system."
-      break
-      ;;
+  if [ $(dnf repolist enabled 2>/dev/null | grep "$REPO_ID" | wc -l) -gt 0 ]; then
+    printf "%b\n" "${GREEN}Nvidia non-free repository is already enabled.${RC}"
+  else
+    printf "%b\n" "${YELLOW}Nvidia non-free repository is not enabled. Enabling now...${RC}"
 
-    "Remove Nvidia Drivers")
-      echo -e "${GREEN}Removing Nvidia Drivers${RC}"
-      sudo dnf remove akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda -y
+    # Enable the repository
+    $ESCALATION_TOOL dnf config-manager --set-enabled "$REPO_ID"
 
-      echo -e "${GREEN}Resetting Nvidia Settings${RC}"
-      sudo rm -f /usr/lib{,64}/libGL.so.* /usr/lib{,64}/libEGL.so.*
-      sudo rm -f /usr/lib{,64}/xorg/modules/extensions/libglx.so
-      sudo dnf reinstall xorg-x11-server-Xorg mesa-libGL mesa-libEGL libglvnd\* -y
-      # Check if /etc/X11/xorg.conf exists
-      if [ -f /etc/X11/xorg.conf ]; then
-        sudo mv /etc/X11/xorg.conf /etc/X11/xorg.conf.saved
-      else
-        echo "/etc/X11/xorg.conf does not exist."
+    # Refreshing repository list
+    $ESCALATION_TOOL dnf makecache
+
+    # Verify if the repository is enabled
+    if [ $(dnf repolist enabled 2>/dev/null | grep "$REPO_ID" | wc -l) -gt 0 ]; then
+      printf "%b\n" "${GREEN}Nvidia non-free repository is now enabled...${RC}"
+    else
+      printf "%b\n" "${RED}Failed to enable nvidia non-free repository...${RC}"
+      exit 1
+    fi
+  fi
+}
+
+checkDriverInstallation() {
+  if modinfo -F version nvidia >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+driverSetupMenu() {
+
+  installDriver() {
+    if checkDriverInstallation; then
+      printf "%b\n" "${GREEN}NVIDIA driver is already installed.${RC}"
+      exit 0
+    fi
+
+    # NOTE: Updating to latest package before installing nvidia driver
+    $ESCALATION_TOOL dnf update
+
+    # NOTE:
+    $ESCALATION_TOOL dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
+    printf "%b\n" "${YELLOW}Building the drivers may take upto 5 minutes. Please don't kill the script!\n If the build failed try running the script again, select \"Remove Nvidia Drivers\" and reboot the system, then try installing drivers again.${RC}"
+
+    for i in {1..5}; do
+      if checkDriverInstallation; then
+        printf "%b\n" "${GREEN}Driver installed successfully.${RC}"
+        printf "%b\n" "${GREEN}Installed driver version $(modinfo -F version nvidia)${RC}"
+        break
       fi
-      break
-      ;;
+      printf "%b\n" "${YELLOW}Waiting for driver to be built..."
+      sleep 1m
+    done
 
-    "*")
-      echo "Invalid Option"
-      break
-      ;;
-    esac
-  done
+    printf "%b\n" "${GREEN}Now you can reboot the system.${RC}"
+  }
+
+  removeDriver() {
+
+    if ! checkDriverInstallation; then
+      printf "%b\n" "${RED}NVIDIA driver is not installed.${RC}"
+      exit 0
+    fi
+
+    printf "%b\n" "${YELLOW}Removing Nvidia Drivers ${RC}"
+    $ESCALATION_TOOL dnf remove akmod-nvidia xorg-x11-drv-nvidia xorg-x11-drv-nvidia-cuda -y
+
+    printf "%b\n" "${YELLOW}Resetting Nvidia Settings${RC}"
+    $ESCALATION_TOOL rm -f /usr/lib{,64}/libGL.so.* /usr/lib{,64}/libEGL.so.*
+    $ESCALATION_TOOL rm -f /usr/lib{,64}/xorg/modules/extensions/libglx.so
+    $ESCALATION_TOOL dnf reinstall xorg-x11-server-Xorg mesa-libGL mesa-libEGL libglvnd\* -y
+
+    # NOTE: Check if /etc/X11/xorg.conf exists
+    if [ -f /etc/X11/xorg.conf ]; then
+      $ESCALATION_TOOL mv /etc/X11/xorg.conf /etc/X11/xorg.conf.saved
+    else
+      echo "/etc/X11/xorg.conf does not exist."
+    fi
+    printf "%b\n" "${GREEN}Nvidia driver was successfully removed${RC}"
+    printf "%b\n" "${YELLOW}If you want to remove the nvidia non-free repository run sudo dnf config-manager --set-disabled rpmfusion-nonfree-nvidia-driver${RC}"
+  }
+
+  echo "1. Install Nvidia Drivers"
+  echo "2. Remove Nvidia Drivers"
+
+  read -p "Enter your choice: " choice
+
+  case "${choice}" in
+  1)
+    installDriver
+    ;;
+  2)
+    removeDriver
+    ;;
+  *)
+    printf "%b\n" "${RED}Invalid Options${RC}"
+    exit 1
+    ;;
+  esac
 
 }
 
@@ -59,20 +119,23 @@ userConfirmation() {
   read -p "Do you want to continue? (Y/N): " choice
   case "$choice" in
   y | Y)
-    menu
+    checkEnv
+    checkEscalationTool
+    checkRepo
+    driverSetupMenu
     return
     ;;
   n | N)
-    echo "Exiting the script"
+    printf "%b\n" "${RED} Exiting the Script ${RC}"
     return
     ;;
   *)
-    echo "Invalid Option"
+    printf "%b\n" "${RED} Invalid Option ${RC}"
     userConfirmation
     ;;
   esac
 }
 
-echo -e "${YELLOW} Warning! This script only install drivers for GPU found in 2014 or later and this works on fedora 40 and above system ${RC}"
+printf "%b\n" "${YELLOW}Warning! This script will enable Nvidia non-free repository and only install drivers for GPUs from 2014 or later. It works on fedora 34 and above.${RC}"
 
 userConfirmation
