@@ -103,7 +103,7 @@ impl AppState {
                 Constraint::Min(2 + SHORTCUT_LINES as u16),
             ])
             .margin(0)
-            .split(frame.size());
+            .split(frame.area());
 
         let horizontal = Layout::default()
             .direction(Direction::Horizontal)
