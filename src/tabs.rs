@@ -12,6 +12,12 @@ struct TabList {
 struct TabEntry {
     name: String,
     data: Vec<Entry>,
+    #[serde(default = "default_multi_selectable")]
+    multi_selectable: bool,
+}
+
+fn default_multi_selectable() -> bool {
+    true
 }
 
 #[derive(Deserialize)]
@@ -83,6 +89,7 @@ enum SystemDataType {
 pub struct Tab {
     pub name: String,
     pub tree: Tree<ListNode>,
+    pub multi_selectable: bool,
 }
 
 #[derive(Clone, Hash, Eq, PartialEq)]
@@ -105,15 +112,28 @@ pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
     });
 
     let tabs: Vec<Tab> = tabs
-        .map(|(TabEntry { name, data }, directory)| {
-            let mut tree = Tree::new(ListNode {
-                name: "root".to_string(),
-                command: Command::None,
-            });
-            let mut root = tree.root_mut();
-            create_directory(data, &mut root, &directory);
-            Tab { name, tree }
-        })
+        .map(
+            |(
+                TabEntry {
+                    name,
+                    data,
+                    multi_selectable,
+                },
+                directory,
+            )| {
+                let mut tree = Tree::new(ListNode {
+                    name: "root".to_string(),
+                    command: Command::None,
+                });
+                let mut root = tree.root_mut();
+                create_directory(data, &mut root, &directory);
+                Tab {
+                    name,
+                    tree,
+                    multi_selectable,
+                }
+            },
+        )
         .collect();
 
     if tabs.is_empty() {
