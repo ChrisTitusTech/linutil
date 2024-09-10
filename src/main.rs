@@ -1,6 +1,7 @@
 mod filter;
 mod float;
 mod floating_text;
+mod hint;
 mod running_command;
 pub mod state;
 mod tabs;
@@ -71,7 +72,6 @@ fn main() -> std::io::Result<()> {
 fn run<B: Backend>(terminal: &mut Terminal<B>, state: &mut AppState) -> io::Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
-
         // Wait for an event
         if !event::poll(Duration::from_millis(10))? {
             continue;

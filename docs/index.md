@@ -3,13 +3,20 @@
 [![Version](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest)
 ![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/start.sh?label=Total%20Downloads&style=for-the-badge)
 
-## Running latest release of LinUtil
+## Running the latest release of LinUtil
 
-* You will first need to start a Terminal on your linux machine.
-* Now you will need to run following command:
-   ```
-   curl -fsSL https://christitus.com/linux | sh
-   ```
+To get started, run the following command in your terminal:
+
+### Stable branch
+
+```
+curl -fsSL https://christitus.com/linux | sh
+```
+---
+
+After you've ran the command, you should see a GUI on your screen; It will look something like this:
+
+![preview](assets/preview.png)
 
 !!! info
 
