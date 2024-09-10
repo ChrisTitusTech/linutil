@@ -9,7 +9,7 @@ crossterm = "0.27.0"
 ego-tree = "0.6.2"
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
-ratatui = "0.28.1"
+ratatui = "0.27.0"
 tui-term = "0.1.12"
 include_dir = "0.7.4"
 tempdir = "0.3.7"
@@ -24,8 +24,6 @@ chrono = "0.4.33"
 [[bin]]
 name = "linutil"
 path = "src/main.rs"
-
-
 
 [profile.release]
 opt-level = 3
