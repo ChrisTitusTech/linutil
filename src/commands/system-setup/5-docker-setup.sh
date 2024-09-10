@@ -49,11 +49,12 @@ installDocker() {
 setupDocker() {
     echo "Setting up Docker..."
     installDocker
-    # Start and enable the Docker service
-    $ESCALATION_TOOL systemctl enable docker
-    $ESCALATION_TOOL systemctl start docker    # Add user to the docker group
+    # Add user to the docker group
     $ESCALATION_TOOL groupadd docker
     $ESCALATION_TOOL usermod -aG docker $USER
+    # Start and enable the Docker service
+    $ESCALATION_TOOL systemctl enable docker
+    $ESCALATION_TOOL systemctl start docker    
     echo "Docker setup successfully"
     echo "Please logout and login again to use Docker without sudo"
 }
