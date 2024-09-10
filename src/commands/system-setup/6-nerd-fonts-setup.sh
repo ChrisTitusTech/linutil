@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # Import common utilities
-. ./common-script.sh
+. ../common-script.sh
 
 # List of available fonts
 fonts="
@@ -76,13 +76,29 @@ ZedMono_Nerd_Font
 prompt_font_selection() {
     echo "Select fonts to install (separate with spaces):"
     echo "---------------------------------------------"
-    i=0
-    for font in $fonts; do
-        echo " $i  -  $font"
-        i=$((i + 1))
-    done
-    echo "---------------------------------------------"
 
+    # Set number of columns
+    cols=3
+    i=0
+
+    # Calculate the format string dynamically
+    for font in $fonts; do
+        # Print font in columns
+        printf "%-35s" "$i - $font"
+        i=$((i + 1))
+
+        # Print newline after every $cols fonts
+        if [ $((i % cols)) -eq 0 ]; then
+            echo ""
+        fi
+    done
+
+    # Print remaining fonts if the total count isn't a multiple of $cols
+    if [ $((i % cols)) -ne 0 ]; then
+        echo ""
+    fi
+
+    echo "---------------------------------------------"
     printf "Enter the numbers of the fonts to install (e.g., '0 1 2'): "
     read font_selection
 
@@ -97,14 +113,14 @@ download_and_install_fonts() {
             if [ "$i" = "$selection" ]; then
                 font_name=$(echo "$font" | sed 's/_/ /g')  # Replace underscores with spaces
                 echo "Downloading and installing $font_name..."
-                
+
                 # Check if wget and tar are installed, using common-script.sh helper
                 checkCommandRequirements "curl"
                 checkCommandRequirements "tar"
 
                 # Download the font
                 curl -sSLo "$HOME/tmp/$font_name.tar.xz" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.tar.xz"
-                
+
                 # Extract and install the font
                 mkdir -p ~/.local/share/fonts
                 tar -xf "$HOME/tmp/$font_name.tar.xz" -C "$HOME/.local/share/fonts"
