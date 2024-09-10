@@ -1,4 +1,5 @@
 name = "Utilities"
+multi_selectable = false
 
 [[data]]
 name = "WiFi Manager"

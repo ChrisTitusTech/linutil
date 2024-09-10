@@ -217,9 +217,8 @@ impl AppState {
                 KeyCode::Tab => self.focus = Focus::TabList,
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
-                KeyCode::Char('v') => self.toggle_multi_select(),
-                KeyCode::Char('V') => self.toggle_multi_select(),
-                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(), // Add space key to toggle selection
+                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
 
                 _ => {}
             },
@@ -229,9 +228,11 @@ impl AppState {
     }
 
     fn toggle_multi_select(&mut self) {
-        self.multi_select = !self.multi_select;
-        if !self.multi_select {
-            self.selected_commands.clear();
+        if self.is_current_tab_multi_selectable() {
+            self.multi_select = !self.multi_select;
+            if !self.multi_select {
+                self.selected_commands.clear();
+            }
         }
     }
 
@@ -245,12 +246,24 @@ impl AppState {
         }
     }
 
+    fn is_current_tab_multi_selectable(&self) -> bool {
+        let index = self.current_tab.selected().unwrap_or(0);
+        self.tabs
+            .get(index)
+            .map_or(false, |tab| tab.multi_selectable)
+    }
+
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
             *self.visit_stack.last().unwrap(),
         );
+
+        if !self.is_current_tab_multi_selectable() {
+            self.multi_select = false;
+            self.selected_commands.clear();
+        }
     }
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
@@ -296,15 +309,19 @@ impl AppState {
     }
     fn handle_enter(&mut self) {
         if self.selected_commands.is_empty() {
-            // If no commands are selected, run the currently highlighted command
+            // If no commands are selected, run the currently highlighted command by pushing them into vector
             if let Some(cmd) = self.get_selected_command(true) {
                 self.selected_commands.push(cmd);
             }
         }
 
-        let command = RunningCommand::new(self.selected_commands.clone());
-        self.spawn_float(command, 80, 80);
-        self.selected_commands.clear();
+        // Only spawn the floating window if there are selected commands
+        // This prevents the floating window when changing directories
+        if !self.selected_commands.is_empty() {
+            let command = RunningCommand::new(self.selected_commands.clone());
+            self.spawn_float(command, 80, 80);
+            self.selected_commands.clear();
+        }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
         self.focus = Focus::FloatingWindow(Float::new(Box::new(float), width, height));
