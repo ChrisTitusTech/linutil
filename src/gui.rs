@@ -55,10 +55,17 @@ impl App for GuiFrontend {
                                                         .display()
                                                         .to_string()
                                                 );
-                                                for anc in &entry.script.unwrap() {
-                                                    crate::running_command::Command::LocalFile(
-                                                        Path::new(&anc).to_path_buf(),
+                                                let defpath = Path::new("src/commands")
+                                                    .join(entry.name)
+                                                    .join(entry.script.unwrap());
+                                                if defpath.exists() {
+                                                    println!(
+                                                        "{} exists, running the command",
+                                                        defpath.display()
                                                     );
+                                                    std::process::Command::new(defpath)
+                                                        .output()
+                                                        .unwrap();
                                                 }
                                             }
                                         });
