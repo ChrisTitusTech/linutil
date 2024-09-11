@@ -7,15 +7,7 @@ install_virt_dependencies(){
 
     case $(command -v apt-get || command -v zypper || command -v dnf || command -v pacman) in
     *apt-get)
-
-        # Install Virt packages on Debian
-        if (lsb_release -i  | grep -qi Debian); then
-            ${ESCALATION_TOOL} apt-get install -y qemu-kvm libvirt-clients libvirt-daemon-system virtinst virt-manager bridge-utils dnsmasq
-
-        # Install Virt packages on Ubuntu
-        else
-            ${ESCALATION_TOOL} apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager dnsmasq
-        fi
+        ${ESCALATION_TOOL} apt-get install -y qemu-kvm libvirt-clients libvirt-daemon-system virtinst virt-manager bridge-utils dnsmasq
         ;;
 
     *zypper)
