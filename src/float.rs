@@ -4,10 +4,13 @@ use ratatui::{
     Frame,
 };
 
+use crate::hint::ShortcutList;
+
 pub trait FloatContent {
     fn draw(&mut self, frame: &mut Frame, area: Rect);
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
     fn is_finished(&self) -> bool;
+    fn get_shortcut_list(&self) -> ShortcutList;
 }
 
 pub struct Float {
@@ -68,5 +71,9 @@ impl Float {
             }
             _ => self.content.handle_key_event(key),
         }
+    }
+
+    pub fn get_shortcut_list(&self) -> ShortcutList {
+        self.content.get_shortcut_list()
     }
 }
