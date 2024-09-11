@@ -45,6 +45,10 @@ name = "Gaming Dependencies"
 script = "2-gaming-setup.sh"
 
 [[data]]
+name = "VM Dependencies"
+script = "5-vm-setup.sh"
+
+[[data]]
 name = "Global Theme"
 script = "3-global-theme.sh"
 
