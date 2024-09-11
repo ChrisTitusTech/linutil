@@ -22,7 +22,6 @@ setupAlacritty() {
     fi
     mkdir -p "${HOME}/.config/alacritty/"
     wget -O "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.toml"
-    wget -O "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
 }
 
 checkEnv
