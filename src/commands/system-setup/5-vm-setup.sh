@@ -37,15 +37,40 @@ install_virt_dependencies(){
 }
 
 enable_services(){
-    printf "${YELLOW}Enabling Virt Services${RC}\n"
-    ${ESCALATION_TOOL} systemctl enable --now libvirtd
-    ${ESCALATION_TOOL} systemctl enable --now virtlogd
+    read -p "Do you want to enable Virt Services? (y/n): " answer
+    case $answer in
+        y|Y)
+            printf "${YELLOW}Enabling Virt Services${RC}\n"
+            ${ESCALATION_TOOL} systemctl enable --now libvirtd
+            ${ESCALATION_TOOL} systemctl enable --now virtlogd
+            ;;
+        n|N)
+            printf "${YELLOW}Skipping Virt Services enablement${RC}\n"
+            ;;
+        *)
+            printf "${RED}Invalid input. Please enter y or n.${RC}\n"
+            enable_services
+            ;;
+    esac
 }
 
 add_user_to_libvirt_group(){
-    printf "${YELLOW}Adding $USER to libvirt group${RC}\n"
-    ${ESCALATION_TOOL} usermod -aG libvirt $USER
+    read -p "Do you want to add $USER to the libvirt group? (y/n): " answer
+    case $answer in
+        y|Y)
+            printf "${YELLOW}Adding $USER to libvirt group${RC}\n"
+            ${ESCALATION_TOOL} usermod -aG libvirt $USER
+            ;;
+        n|N)
+            printf "${YELLOW}Skipping adding $USER to libvirt group${RC}\n"
+            ;;
+        *)
+            printf "${RED}Invalid input. Please enter y or n.${RC}\n"
+            add_user_to_libvirt_group
+            ;;
+    esac
     printf "${YELLOW}Done!${RC}\n"
+
 }
 
 checkEscalationTool
