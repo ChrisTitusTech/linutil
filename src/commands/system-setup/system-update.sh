@@ -5,25 +5,8 @@
 fastUpdate() {
     case ${PACKAGER} in
         pacman)
-            if ! command_exists yay && ! command_exists paru; then
-                echo "Installing yay as AUR helper..."
-                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm base-devel || { echo -e "${RED}Failed to install base-devel${RC}"; exit 1; }
-                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R ${USER}:${USER} ./yay-git
-                cd yay-git && makepkg --noconfirm -si || { echo -e "${RED}Failed to install yay${RC}"; exit 1; }
-            else
-                echo "AUR helper already installed"
-            fi
 
-            if command_exists yay; then
-                AUR_HELPER="yay"
-            elif command_exists paru; then
-                AUR_HELPER="paru"
-            else
-                echo "No AUR helper found. Please install yay or paru."
-                exit 1
-            fi
-
-            ${AUR_HELPER} -S --needed --noconfirm rate-mirrors-bin
+          $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
 
             if [ -s /etc/pacman.d/mirrorlist ]; then
                 $ESCALATION_TOOL cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
@@ -113,6 +96,7 @@ updateFlatpaks() {
 }
 
 checkEnv
+checkAURHelper
 checkEscalationTool
 fastUpdate
 updateSystem

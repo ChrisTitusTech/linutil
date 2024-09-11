@@ -15,22 +15,6 @@ installDepend() {
             else
                 echo "Multilib is already enabled."
             fi
-            if ! command_exists yay && ! command_exists paru; then
-                echo "Installing yay as AUR helper..."
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER":"$USER" ./yay-git
-                cd yay-git && makepkg --noconfirm -si
-            else
-                echo "Aur helper already installed"
-            fi
-            if command_exists yay; then
-                AUR_HELPER="yay"
-            elif command_exists paru; then
-                AUR_HELPER="paru"
-            else
-                echo "No AUR helper found. Please install yay or paru."
-                exit 1
-            fi
             $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES"
             ;;
         apt-get|nala)
@@ -80,6 +64,7 @@ install_additional_dependencies() {
 }
 
 checkEnv
+checkAURHelper
 checkEscalationTool
 installDepend
 install_additional_dependencies
