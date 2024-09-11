@@ -37,16 +37,47 @@ install_virt_dependencies(){
 }
 
 enable_services(){
-    read -p "Do you want to enable Virt Services? (y/n): " answer
-    case $answer in
+    printf "${YELLOW}Enable services...${RC}\n"
+    read -p "Do you want to enable libvirtd? (y/n): " answer_libvirtd
+    case $answer_libvirtd in
         y|Y)
-            printf "${YELLOW}Enabling Virt Services${RC}\n"
+            printf "${YELLOW}Enabling libvirtd${RC}\n"
             ${ESCALATION_TOOL} systemctl enable --now libvirtd
+            ;;
+        n|N)
+            printf "${YELLOW}Skipping libvirtd enablement${RC}\n"
+            ;;
+        *)
+            printf "${RED}Invalid input. Please enter y or n.${RC}\n"
+            enable_services
+            return
+            ;;
+    esac
+
+    read -p "Do you want to enable libvirtd.socket? (y/n): " answer_libvirtd_socket
+    case $answer_libvirtd_socket in
+        y|Y)
+            printf "${YELLOW}Enabling libvirtd.socket${RC}\n"
             ${ESCALATION_TOOL} systemctl enable --now libvirtd.socket
+            ;;
+        n|N)
+            printf "${YELLOW}Skipping libvirtd.socket enablement${RC}\n"
+            ;;
+        *)
+            printf "${RED}Invalid input. Please enter y or n.${RC}\n"
+            enable_services
+            return
+            ;;
+    esac
+
+    read -p "Do you want to enable virtlogd? (y/n): " answer_virtlogd
+    case $answer_virtlogd in
+        y|Y)
+            printf "${YELLOW}Enabling virtlogd${RC}\n"
             ${ESCALATION_TOOL} systemctl enable --now virtlogd
             ;;
         n|N)
-            printf "${YELLOW}Skipping Virt Services enablement${RC}\n"
+            printf "${YELLOW}Skipping virtlogd enablement${RC}\n"
             ;;
         *)
             printf "${RED}Invalid input. Please enter y or n.${RC}\n"
