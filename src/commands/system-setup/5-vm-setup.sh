@@ -42,6 +42,7 @@ enable_services(){
         y|Y)
             printf "${YELLOW}Enabling Virt Services${RC}\n"
             ${ESCALATION_TOOL} systemctl enable --now libvirtd
+            ${ESCALATION_TOOL} systemctl enable --now libvirtd.socket
             ${ESCALATION_TOOL} systemctl enable --now virtlogd
             ;;
         n|N)
