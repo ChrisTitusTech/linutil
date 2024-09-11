@@ -1,4 +1,8 @@
-use crate::{float::FloatContent, running_command::Command};
+use crate::{
+    float::FloatContent,
+    hint::{Shortcut, ShortcutList},
+    running_command::Command,
+};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     layout::Rect,
@@ -102,5 +106,16 @@ impl FloatContent for FloatingText {
 
     fn is_finished(&self) -> bool {
         true
+    }
+
+    fn get_shortcut_list(&self) -> ShortcutList {
+        ShortcutList {
+            scope_name: "Floating text",
+            hints: vec![
+                Shortcut::new(vec!["j", "Down"], "Scroll down"),
+                Shortcut::new(vec!["k", "Up"], "Scroll up"),
+                Shortcut::new(vec!["Enter", "q"], "Close window"),
+            ],
+        }
     }
 }
