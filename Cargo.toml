@@ -2,7 +2,6 @@
 license = "MIT"
 version = "0.1.0"
 
-# Use workspace dependencies for anything public in linutil_core to avoid versioning conflicts
 [workspace.dependencies]
 ego-tree = "0.6.2"
 

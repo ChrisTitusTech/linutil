@@ -3,7 +3,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ego_tree::NodeId;
 use linutil_core::Tab;
 use ratatui::{
-    layout::Rect,
+    layout::{Position, Rect},
     style::Style,
     text::Span,
     widgets::{Block, Borders, Paragraph},
@@ -109,7 +109,7 @@ impl Filter {
                 .sum();
             let x = area.x + cursor_position as u16 + 1;
             let y = area.y + 1;
-            frame.set_cursor(x, y);
+            frame.set_cursor_position(Position::new(x, y));
         }
     }
     // Handles key events. Returns true if search must be exited

@@ -6,11 +6,11 @@ license.workspace = true
 
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
-crossterm = "0.27.0"
+crossterm = "0.28.1"
 ego-tree = { workspace = true }
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
-ratatui = "0.27.0"
+ratatui = "0.28.1"
 tui-term = "0.1.12"
 unicode-width = "0.1.13"
 linutil_core = { path = "../core" }
