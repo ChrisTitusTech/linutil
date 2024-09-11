@@ -159,8 +159,12 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                let is_selected = self.selected_commands.contains(&node.command); // Add * if command is selected
-                let indicator = if is_selected { "*" } else { "" };
+                let is_selected = self.selected_commands.contains(&node.command);
+                let (indicator, style) = if is_selected {
+                    (self.theme.multi_select_icon(), Style::default().bold())
+                } else {
+                    ("", Style::new())
+                };
                 if *has_children {
                     Line::from(format!(
                         "{}  {} {}",
@@ -177,6 +181,7 @@ impl AppState {
                         indicator
                     ))
                     .style(self.theme.cmd_color())
+                    .patch_style(style)
                 }
             },
         ));

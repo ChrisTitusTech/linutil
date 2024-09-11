@@ -56,6 +56,13 @@ impl Theme {
         }
     }
 
+    pub fn multi_select_icon(&self) -> &'static str {
+        match self {
+            Theme::Default => "",
+            Theme::Compatible => "*",
+        }
+    }
+
     pub fn success_color(&self) -> Color {
         match self {
             Theme::Default => Color::Rgb(199, 55, 44),
