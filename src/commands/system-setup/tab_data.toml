@@ -20,10 +20,6 @@ script = "arch/paru-setup.sh"
 name = "Yay AUR Helper"
 script = "arch/yay-setup.sh"
 
-[[data.entries]]
-name = "Cosmic Wayland Install"
-script = "arch/cosmic-setup.sh"
-
 [[data]]
 name = "Fedora"
 
