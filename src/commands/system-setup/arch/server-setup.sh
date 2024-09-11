@@ -660,6 +660,53 @@ systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
 
 echo -ne "
+
+# @description Edit vconsole.conf and locale.conf for persistence
+# Sometimes the locale and vconsole.conf files are not updated, so we need to force update them manually.
+
+echo -ne "
+-------------------------------------------------------------------------
+                    Updating vconsole.conf and locale.conf
+-------------------------------------------------------------------------
+"
+
+# Ensure /mnt is mounted and necessary directories exist
+if ! mountpoint -q /mnt; then
+    echo "Mounting the root filesystem..."
+    
+    # Mount the correct filesystem based on user selection
+    if [[ "${FS}" == "btrfs" ]]; then
+        mount -o subvol=@ ${partition3} /mnt # Specify the subvolume for Btrfs
+    elif [[ "${FS}" == "ext4" ]]; then
+        mount -t ext4 ${partition3} /mnt
+    elif [[ "${FS}" == "luks" ]]; then
+        mount -t btrfs /dev/mapper/ROOT /mnt # Adjust if using a different filesystem for LUKS
+    fi
+
+    # Create necessary directories
+    mount -t proc /mnt/proc
+    mount -t sysfs /mnt/sys
+    mount --bind /dev /mnt/dev
+fi
+
+# Update /etc/vconsole.conf
+echo "KEYMAP=${KEYMAP}" > /mnt/etc/vconsole.conf
+
+# Update /etc/locale.conf
+echo "LANG=en_US.UTF-8" > /mnt/etc/locale.conf
+
+# Ensure the locale is generated
+echo "Generating locales..."
+arch-chroot /mnt locale-gen
+
+# Unmount the filesystems
+umount /mnt/dev
+umount /mnt/proc
+umount /mnt/sys
+umount /mnt
+
+echo -ne "
+
 -------------------------------------------------------------------------
                     Cleaning
 -------------------------------------------------------------------------
@@ -670,4 +717,13 @@ sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: A
 # Add sudo rights
 sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
+echo -ne "
+
+-------------------------------------------------------------------------
+                    Automated Arch Linux Installer
+-------------------------------------------------------------------------
+                               Finished! 
+-------------------------------------------------------------------------
+"
 EOF
