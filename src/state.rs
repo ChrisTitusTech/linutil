@@ -246,7 +246,7 @@ impl AppState {
         }
     }
 
-    fn is_current_tab_multi_selectable(&self) -> bool {
+    pub fn is_current_tab_multi_selectable(&self) -> bool {
         let index = self.current_tab.selected().unwrap_or(0);
         self.tabs
             .get(index)
@@ -313,14 +313,11 @@ impl AppState {
             if let Some(cmd) = self.get_selected_command(true) {
                 self.selected_commands.push(cmd);
             }
-        }
-
-        // Only spawn the floating window if there are selected commands
-        // This prevents the floating window when changing directories
-        if !self.selected_commands.is_empty() {
             let command = RunningCommand::new(self.selected_commands.clone());
             self.spawn_float(command, 80, 80);
             self.selected_commands.clear();
+        } else {
+            self.go_to_selected_dir();
         }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
