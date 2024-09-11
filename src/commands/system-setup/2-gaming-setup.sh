@@ -134,11 +134,7 @@ install_additional_dependencies() {
             $ESCALATION_TOOL zypper install -y flatpak
             echo "Flatpak installation complete."
             ;;
-        *dnf)
-            # Install flatpak for Fedora/CentOS/RHEL
-            $ESCALATION_TOOL dnf install -y flatpak
-            echo "Flatpak installation complete."
-            ;;
+            # Removed DNF, Fedora is packaged with Flathub/Flatpak.
         *pacman)
             echo "Installing Steam for Arch Linux..."
             $ESCALATION_TOOL pacman -S --needed --noconfirm steam
