@@ -187,6 +187,32 @@ impl AppState {
         draw_shortcuts(self, frame, vertical[1]);
     }
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
+        // Handle key only when Tablist or List is focused
+        // Prevents exiting the application even when a command is running
+        // Add keys here which should work on both TabList and List
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            match key.code {
+                KeyCode::Char('q') => return false,
+                KeyCode::Tab => {
+                    if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
+                        self.current_tab.select_first(); // Select first tab when it is at last
+                    } else {
+                        self.current_tab.select_next();
+                    }
+                    self.refresh_tab();
+                }
+                KeyCode::BackTab => {
+                    if self.current_tab.selected().unwrap() == 0 {
+                        self.current_tab.select(Some(self.tabs.len() - 1)); // Select last tab when it is at first
+                    } else {
+                        self.current_tab.select_previous();
+                    }
+                    self.refresh_tab();
+                }
+                _ => {}
+            }
+        }
+
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
@@ -198,11 +224,8 @@ impl AppState {
                 SearchAction::Update => self.update_items(),
                 _ => {}
             },
-            _ if key.code == KeyCode::Char('q') => return false,
             Focus::TabList => match key.code {
-                KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
-                    self.focus = Focus::List
-                }
+                KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
                 KeyCode::Char('j') | KeyCode::Down
                     if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
                 {
@@ -231,7 +254,6 @@ impl AppState {
                     }
                 }
                 KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Tab => self.focus = Focus::TabList,
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
