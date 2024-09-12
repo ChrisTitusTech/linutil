@@ -26,7 +26,7 @@
 - **Kitty Setup**: Installs and configures Kitty for you.
 - **Rofi Setup**: Installs the Rofi application/script launcher.
 - **Zsh Setup**: Installs and configures Zsh for you.
-
+- **Revert ZSH Changes**: Reverts the above command
 ## Security Features
 
 - **Firewall Baselines**: Sets up firewall rules.
