@@ -8,6 +8,8 @@
 - [ ] Remove Binary linutil from being tracked in git and make it a github action.
 - [ ] Document every function and feature of linutil. (Preview panel description addition)
 - [ ] Create a discord server for linutil and invite the community.
+- [ ] Power Optimizations for Laptops
+
 
 ## Milestones
 ### Q3 2024
