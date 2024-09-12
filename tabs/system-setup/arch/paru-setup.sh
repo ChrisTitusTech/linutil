@@ -3,8 +3,8 @@
 . "$(dirname "$0")/../../common-script.sh"
 
 installDepend() {
-    case $PACKAGER in
-        pacman)
+    case $DTYPE in
+        arch)
             if ! command_exists paru; then
                 echo "Installing paru as AUR helper..."
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
@@ -16,7 +16,7 @@ installDepend() {
             fi
             ;;
         *)
-            echo "Unsupported package manager: $PACKAGER"
+            echo "Unsupported distribution: $DTYPE"
             ;;
     esac
 }
