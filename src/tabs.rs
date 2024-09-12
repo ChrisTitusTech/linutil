@@ -104,7 +104,7 @@ pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
         (tab_data, directory)
     });
 
-    let tabs: Vec<Tab> = tabs
+    let mut tabs: Vec<Tab> = tabs
         .map(|(TabEntry { name, data }, directory)| {
             let mut tree = Tree::new(ListNode {
                 name: "root".to_string(),
@@ -115,6 +115,8 @@ pub fn get_tabs(command_dir: &Path, validate: bool) -> Vec<Tab> {
             Tab { name, tree }
         })
         .collect();
+
+    tabs.sort_by(|a, b| a.name.cmp(&b.name));
 
     if tabs.is_empty() {
         panic!("No tabs found");
@@ -136,7 +138,22 @@ fn filter_entries(entries: &mut Vec<Entry>) {
     });
 }
 
-fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+fn create_directory(mut data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+    // Sort by comparing two consecutive entries
+    data.sort_by(|a, b| {
+        // Determine if the entries are folders
+        let a_is_folder = a.entries.is_some();
+        let b_is_folder = b.entries.is_some();
+
+        let folder_comparison = b_is_folder.cmp(&a_is_folder);
+
+        if folder_comparison == std::cmp::Ordering::Equal {
+            a.name.cmp(&b.name) // If both entries are either folders or files, sort them alphabetically by name
+        } else {
+            folder_comparison // Otherwise, prioritize folders over files
+        }
+    });
+
     for entry in data {
         if [
             entry.entries.is_some(),
