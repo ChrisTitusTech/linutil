@@ -146,7 +146,7 @@ configure_backgrounds() {
     BG_DIR="$HOME/Pictures/backgrounds"
 
     # Check if the ~/Pictures directory exists
-    if [ ! -d "~/Pictures" ]; then
+    if [ ! -d "$HOME/Pictures" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         echo "Pictures directory does not exist"
         mkdir ~/Pictures
