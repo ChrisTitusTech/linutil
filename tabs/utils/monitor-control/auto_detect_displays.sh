@@ -2,6 +2,8 @@
 
 . ./utility_functions.sh
 
+. ../../common-script.sh
+
 # Function to auto-detect displays and set common resolution
 auto_detect_displays() {
     if confirm_action "Auto-detect displays and set common resolution?"; then
@@ -13,11 +15,19 @@ auto_detect_displays() {
 
         for monitor in $monitors; do
             resolutions=$(get_unique_resolutions "$monitor")
-            common_resolutions=$(comm -12 <(echo "$common_resolutions") <(echo "$resolutions"))
+            temp_common_resolutions=$(mktemp)
+            temp_resolutions=$(mktemp)
+
+            echo "$common_resolutions" > "$temp_common_resolutions"
+            echo "$resolutions" > "$temp_resolutions"
+
+            common_resolutions=$(comm -12 "$temp_common_resolutions" "$temp_resolutions")
+
+            rm -f "$temp_common_resolutions" "$temp_resolutions"
         done
         
         if [ -z "$common_resolutions" ]; then
-            dialog --msgbox "No common resolution found among connected monitors." 10 60
+            echo "No common resolution found among connected monitors."
             return
         fi
 
