@@ -38,8 +38,7 @@ install_additional_dependencies() {
                 cut -d '/' --fields=3)
 
             version_no_v=$(echo "$version" | tr -d v)
-            wget "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
-
+            curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
             # Install the downloaded .deb package using apt-get
             echo "Installing lutris_${version_no_v}_all.deb"
             $ESCALATION_TOOL apt-get update
