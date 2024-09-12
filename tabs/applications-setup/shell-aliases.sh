@@ -2,11 +2,6 @@
 
 . ../common-script.sh
 
-if command_exists linutil; then
-    echo "linutil already exists in your system."
-    exit 1
-fi
-
 shells=(bash zsh fish tcsh ksh nu)                                                    # Supported shells
 configs=(.bashrc .zshrc config.fish .tcshrc .kshrc config.nu)                         # Shell config filenames
 aliases=("alias linutil=\"curl -fsSL https://christitus.com/linux | sh\""             # Alias structures for different shell configs

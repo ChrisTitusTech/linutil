@@ -31,3 +31,8 @@ script = "zsh-setup.sh"
 [[data]]
 name = "Shell aliases for linutil"
 script = "shell-aliases.sh"
+
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = [ "linutil" ]
