@@ -1,34 +1,16 @@
-[package]
-name = "tui"
+[workspace.package]
+license = "MIT"
 version = "0.1.0"
-edition = "2021"
 
-[dependencies]
-clap = { version = "4.5.16", features = ["derive"] }
-crossterm = "0.28.1"
+[workspace.dependencies]
 ego-tree = "0.6.2"
-oneshot = "0.1.8"
-portable-pty = "0.8.1"
-ratatui = "0.28.1"
-tui-term = "0.1.12"
-include_dir = "0.7.4"
-tempdir = "0.3.7"
-serde = { version = "1.0.205", features = ["derive"] }
-toml = "0.8.19"
-which = "6.0.3"
-unicode-width = "0.1.13"
 
-[build-dependencies]
-chrono = "0.4.33"
-
-[[bin]]
-name = "linutil"
-path = "src/main.rs"
-
-
+[workspace]
+members = ["tui", "core"]
+resolver = "2"
 
 [profile.release]
-opt-level = 3
+opt-level = "z"
 debug = false
 lto = true
 codegen-units = 1
