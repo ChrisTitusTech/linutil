@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest)
 ![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge)
+[![](https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp)](https://discord.gg/bujFYKAHSp)
 
 ![Preview](docs/assets/preview.png)
 
