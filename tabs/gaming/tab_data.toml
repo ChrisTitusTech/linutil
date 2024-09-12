@@ -6,3 +6,11 @@ name = "Diablo II Ressurected"
 [[data.entries]]
 name = "Loot Filter Install"
 script = "diablo-ii/d2r-loot-filters.sh"
+
+[[data]]
+name = "Terraria"
+
+[[data.entries]]
+name = "Collector's Edition Bunny Pet"
+script = "terraria/collectors-bunny-pet.sh"
+
