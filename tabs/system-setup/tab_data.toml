@@ -55,3 +55,7 @@ script = "4-remove-snaps.sh"
 [[data]]
 name = "Automount Drive"
 script = "7-automount.sh"
+
+[[data]]
+name = "Automount Drive"
+script = "8-grub-theme.sh"
