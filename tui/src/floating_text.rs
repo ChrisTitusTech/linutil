@@ -1,9 +1,9 @@
 use crate::{
     float::FloatContent,
     hint::{Shortcut, ShortcutList},
-    running_command::Command,
 };
 use crossterm::event::{KeyCode, KeyEvent};
+use linutil_core::Command;
 use ratatui::{
     layout::Rect,
     style::{Style, Stylize},

@@ -3,6 +3,7 @@ use crate::{
     hint::{Shortcut, ShortcutList},
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
@@ -16,7 +17,6 @@ use ratatui::{
 };
 use std::{
     io::Write,
-    path::PathBuf,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -24,13 +24,6 @@ use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
-
-#[derive(Clone, Hash, Eq, PartialEq)]
-pub enum Command {
-    Raw(String),
-    LocalFile(PathBuf),
-    None, // Directory
-}
 
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)

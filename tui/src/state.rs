@@ -3,20 +3,19 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{draw_shortcuts, SHORTCUT_LINES},
-    running_command::{Command, RunningCommand},
-    tabs::{ListNode, Tab},
+    running_command::RunningCommand,
     theme::Theme,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
+use linutil_core::{Command, ListNode, Tab};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
-    style::{Style, Stylize},
+    style::{Color, Modifier, Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
-use std::path::Path;
 
 pub struct AppState {
     /// Selected theme
@@ -50,8 +49,8 @@ pub struct ListEntry {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, temp_path: &Path, override_validation: bool) -> Self {
-        let tabs = crate::tabs::get_tabs(temp_path, !override_validation);
+    pub fn new(theme: Theme, override_validation: bool) -> Self {
+        let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
         let mut state = Self {
             theme,
@@ -66,25 +65,44 @@ impl AppState {
         state
     }
     pub fn draw(&mut self, frame: &mut Frame) {
-        let label_block =
-            Block::default()
-                .borders(Borders::all())
-                .border_set(ratatui::symbols::border::Set {
-                    top_left: " ",
-                    top_right: " ",
-                    bottom_left: " ",
-                    bottom_right: " ",
-                    vertical_left: " ",
-                    vertical_right: " ",
-                    horizontal_top: "*",
-                    horizontal_bottom: "*",
-                });
-        let str1 = "Linutil ";
-        let str2 = "by Chris Titus";
-        let label = Paragraph::new(Line::from(vec![
-            Span::styled(str1, Style::default().bold()),
-            Span::styled(str2, Style::default().italic()),
-        ]))
+        let label_block = Block::default()
+            .borders(Borders::all())
+            .border_set(ratatui::symbols::border::Set {
+                top_left: " ",
+                top_right: " ",
+                bottom_left: " ",
+                bottom_right: " ",
+                vertical_left: " ",
+                vertical_right: " ",
+                horizontal_top: "*",
+                horizontal_bottom: "*",
+            });
+        
+        let ctt_style = Style::default()
+            .fg(Color::Rgb(0, 0, 100))
+            .add_modifier(Modifier::BOLD | Modifier::ITALIC);
+        
+        let string1 = Line::from(vec![
+            Span::raw(""),
+            Span::styled("CTT", ctt_style),
+        ]);
+        let blue_colors = [
+            Color::Rgb(0, 0, 100),  // Darkest blue
+            Color::Rgb(0, 0, 150),
+            Color::Rgb(0, 0, 200),
+            Color::LightBlue,       // Lightest blue
+        ];
+        let string2 = Line::from(Span::styled(" __    _         _   _ _ ", Style::default().fg(blue_colors[0])));
+        let string3 = Line::from(Span::styled("|  |  |_|___ _ _| |_|_| |", Style::default().fg(blue_colors[1])));
+        let string4 = Line::from(Span::styled("|  |__| |   | | |  _| | |", Style::default().fg(blue_colors[2])));
+        let string5 = Line::from(Span::styled("|_____|_|_|_|___|_| |_|_|", Style::default().fg(blue_colors[3])));
+        let label = Paragraph::new(vec![
+            string1,
+            string2,
+            string3,
+            string4,
+            string5,
+        ])
         .block(label_block)
         .alignment(Alignment::Center);
 
@@ -94,7 +112,7 @@ impl AppState {
             .map(|tab| tab.name.len() + self.theme.tab_icon().len())
             .max()
             .unwrap_or(0)
-            .max(str1.len() + str2.len());
+            .max(25);
 
         let vertical = Layout::default()
             .direction(Direction::Vertical)
@@ -115,7 +133,7 @@ impl AppState {
 
         let left_chunks = Layout::default()
             .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)])
+            .constraints([Constraint::Length(7), Constraint::Min(1)])
             .split(horizontal[0]);
         frame.render_widget(label, left_chunks[0]);
 
