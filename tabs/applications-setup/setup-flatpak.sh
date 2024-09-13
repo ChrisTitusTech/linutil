@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../common-script.sh
 
 # Used to detect the desktop environment, Only used for the If statement in the setup_flatpak function.
 # Perhaps this should be moved to common-script.sh later on?

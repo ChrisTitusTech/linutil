@@ -1,15 +1,8 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Flathub"
-
-[[data.entries]]
 name = "Setup Flatpak / Flathub"
-script = "flathub/setup-flatpak.sh"
-
-[[data.entries]]
-name = "Uninstall Flatpak / Flathub"
-script = "flathub/uninstall-flatpak.sh"
+script = "setup-flatpak.sh"
 
 [[data]]
 name = "Alacritty"
