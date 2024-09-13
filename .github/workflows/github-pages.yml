@@ -30,4 +30,6 @@ jobs:
         run: pip install -r .github/requirements.txt
 
       - name: Build & Deploy using mkdocs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mkdocs gh-deploy --force -f .github/mkdocs.yml
