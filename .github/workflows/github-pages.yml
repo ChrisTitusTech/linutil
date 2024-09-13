@@ -3,10 +3,11 @@ name: GitHub Pages Deploy
 on:
   push:
     paths:
-      - 'mkdocs.yml'
+      - '.github/mkdocs.yml'
+      - '.github/requirements.txt'
       - 'docs/**'
       - 'overrides/**'
-      - 'CONTRIBUTING.md'
+      - '.github/CONTRIBUTING.md'
   workflow_dispatch:
 
 jobs:
