@@ -1,16 +1,18 @@
 site_name: Chris Titus LinUtil Official Documentation
 repo_url: https://github.com/ChrisTitusTech/linutil
+docs_dir: '../docs'
 
 nav:
   - Introduction: 'index.md'
   - User Guide: 'userguide.md'
-  - Contribute: 'contribute.md'
-  - Known Issues: 'KnownIssues.md'
+  - Contributing Guide: 'contribute.md'
+  - Documentation:
+      - Known Issues: 'KnownIssues.md'
   - FAQ: 'faq.md'
 
 theme:
   name: material
-  custom_dir: 'overrides'
+  custom_dir: '../overrides'
   features:
     - navigation.tabs
     - navigation.sections
@@ -25,20 +27,28 @@ theme:
   logo: assets/favicon.png
   favicon: assets/favicon.png
   palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      accent: blue
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/brightness-7
         name: Switch to dark mode
-      primary: black
-      accent: purple
+
+    # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: black
+      accent: blue
       toggle:
-        icon: material/toggle-switch
+        icon: material/weather-night
         name: Switch to light mode
-      primary: teal
-      accent: lime
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -63,3 +73,15 @@ markdown_extensions:
   - def_list
   - pymdownx.tasklist:
       custom_checkbox: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - awesome-pages
+  - git-revision-date-localized
+  - minify:
+      minify_html: true
+      htmlmin_opts:
+          remove_comments: true
+      cache_safe: true

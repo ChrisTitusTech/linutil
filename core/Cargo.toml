@@ -1,0 +1,13 @@
+[package]
+name = "linutil_core"
+edition = "2021"
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+include_dir = "0.7.4"
+tempdir = "0.3.7"
+serde = { version = "1.0.205", features = ["derive"] }
+toml = "0.8.19"
+which = "6.0.3"
+ego-tree = { workspace = true }
