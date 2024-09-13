@@ -59,3 +59,7 @@ script = "7-automount.sh"
 [[data]]
 name = "Automount Drive"
 script = "8-grub-theme.sh"
+
+[[data]]
+name = "Install Bottles"
+script = "9-bottles-setup"
