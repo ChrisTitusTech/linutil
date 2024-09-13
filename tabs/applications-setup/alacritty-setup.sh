@@ -21,8 +21,8 @@ setupAlacritty() {
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
     mkdir -p "${HOME}/.config/alacritty/"
-    wget -O "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.toml"
-    wget -O "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
+    wget -O "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.yml"
+    wget -O "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.yml"
 
     alacritty_version=$(alacritty --version | awk '{print $2}')
     if [ "$(printf '%s\n' "$alacritty_version" "0.13.0" | sort -V | head -n1)" = "0.13.0" ]; then
