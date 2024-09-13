@@ -27,7 +27,8 @@ uninstall_flatpak() {
     fi
 
     if command_exists flatpak; then
-        printf "%b\n" "${RED}Uninstalling Flatpak...${RC}"
+        printf "%b\n" "${RED}Uninstalling Flatpak / Flathub...${RC}"
+        $ESCALATION_TOOL flatpak remote-delete flathub
         case "$PACKAGER" in
             pacman)
                 $ESCALATION_TOOL "$PACKAGER" -Rns --noconfirm flatpak
@@ -52,8 +53,6 @@ uninstall_flatpak() {
                 exit 1
                 ;;
         esac
-        printf "%b\n" "Removing Flathub remote..."
-        $ESCALATION_TOOL flatpak remote-delete flathub
     else
         printf "%b\n" "${GREEN}Flatpak is not installed. Nothing to do.${RC}"
     fi
