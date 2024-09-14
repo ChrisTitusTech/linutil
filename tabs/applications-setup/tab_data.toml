@@ -25,5 +25,9 @@ name = "Rofi"
 script = "rofi-setup.sh"
 
 [[data]]
+name = "SDDM Theme"
+script = "sddm-theme.sh"
+
+[[data]]
 name = "ZSH Prompt"
 script = "zsh-setup.sh"
