@@ -131,7 +131,7 @@ userConfirmation() {
   esac
 }
 
-printf "%b\n" "${YELLOW}Warning! This script will enable Nvidia non-free repository and only install drivers for GPUs from 2014 or later. It works on fedora 34 and above.${RC}"
+printf "%b\n" "${YELLOW}Warning! This script will enable Nvidia non-free repository and only install drivers for GPUs from 2014 or later. It works on fedora 34 and above.\n It is recommended remove this driver while updating your kernel packages to newer version.${RC}"
 
 checkEnv
 checkEscalationTool
