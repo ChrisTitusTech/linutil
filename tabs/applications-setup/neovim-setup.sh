@@ -5,6 +5,10 @@
 gitpath="$HOME/.local/share/neovim"
 
 cloneNeovim() {
+    # Check if the dir exists before attempting to clone into it.
+    if [ -d "$gitpath" ]; then
+        rm -rf "$gitpath"
+    fi
     mkdir -p "$HOME/.local/share" # Only create the dir if it doesn't exist.
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/neovim.git "$HOME/.local/share/neovim"
 }
