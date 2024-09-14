@@ -115,7 +115,7 @@ picom_animations() {
     fi
 
     # Install the built binary
-    if ! sudo ninja -C build install; then
+    if ! $ESCALATION_TOOL ninja -C build install; then
         echo "Failed to install the built binary"
         return 1
     fi
@@ -229,28 +229,28 @@ setupDisplayManager() {
                 echo "Configuring SDDM for autologin"
                 SDDM_CONF="/etc/sddm.conf"
                 if [ ! -f "$SDDM_CONF" ]; then
-                    echo "[Autologin]" | sudo tee -a "$SDDM_CONF"
-                    echo "User=$USER" | sudo tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | sudo tee -a "$SDDM_CONF"
+                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                 else
-                    sudo sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
-                    sudo sed -i '/^User=/d' "$SDDM_CONF"
-                    sudo sed -i '/^Session=/d' "$SDDM_CONF"
-                    echo "[Autologin]" | sudo tee -a "$SDDM_CONF"
-                    echo "User=$USER" | sudo tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | sudo tee -a "$SDDM_CONF"
+                    $ESCALATION_TOOL sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
+                    $ESCALATION_TOOL sed -i '/^User=/d' "$SDDM_CONF"
+                    $ESCALATION_TOOL sed -i '/^Session=/d' "$SDDM_CONF"
+                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                 fi
                 echo "Checking if autologin group exists"
                 if ! getent group autologin > /dev/null; then
                     echo "Creating autologin group"
-                    sudo groupadd autologin
+                    $ESCALATION_TOOL groupadd autologin
                 else
                     echo "Autologin group already exists"
                 fi
                 echo "Adding user with UID 1000 to autologin group"
                 USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
                 if [ -n "$USER_UID_1000" ]; then
-                    sudo usermod -aG autologin "$USER_UID_1000"
+                    $ESCALATION_TOOL usermod -aG autologin "$USER_UID_1000"
                     echo "User $USER_UID_1000 added to autologin group"
                 else
                     echo "No user with UID 1000 found - Auto login not possible"
