@@ -49,9 +49,6 @@ driverSetupMenu() {
       exit 0
     fi
 
-    # NOTE: Updating to latest package before installing nvidia driver.
-    $ESCALATION_TOOL dnf upgrade -y
-
     # NOTE:: Installing graphics driver.
     $ESCALATION_TOOL dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
     printf "%b\n" "${YELLOW}Building the drivers may take upto 5 minutes. Please don't kill the script!\n If the build failed try running the script again, select \"Remove Nvidia Drivers\" and reboot the system, then try installing drivers again.${RC}"
