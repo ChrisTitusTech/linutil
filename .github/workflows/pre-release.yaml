@@ -27,21 +27,12 @@ jobs:
 
       - name: Generate Release Notes
         id: generate_notes
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-name: release-drafter.yml
           version: ${{ env.version }}
-          version-template: '$YEAR.$MONTH.$DAY'
-
-      - name: Prepare Release Body
-        id: prepare_body
-        run: |
-          new_changes="${{ steps.generate_notes.outputs.body }}"
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$new_changes" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create and Upload Release
         id: create_release
@@ -50,7 +41,7 @@ jobs:
           tag_name: ${{ env.version }}
           name: Pre-Release ${{ env.version }}
           body: |
-            ${{ steps.prepare_body.outputs.body }}
+            ${{ steps.generate_notes.outputs.body }}
             
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)
           append_body: false

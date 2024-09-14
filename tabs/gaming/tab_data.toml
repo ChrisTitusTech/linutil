@@ -1,0 +1,8 @@
+name = "Gaming"
+
+[[data]]
+name = "Diablo II Ressurected"
+
+[[data.entries]]
+name = "Loot Filter Install"
+script = "diablo-ii/d2r-loot-filters.sh"
