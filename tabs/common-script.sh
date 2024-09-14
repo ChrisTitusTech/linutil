@@ -25,13 +25,29 @@ checkAURHelper() {
                 fi
             done
 
-            echo "Installing yay as AUR helper..."
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-            cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER":"$USER" ./yay-git
-            cd yay-git && makepkg --noconfirm -si
+            echo "Pick which AUR Helper you would like to install."
+            printf "(1) Yay (2) Paru (1/2): " # Printf here to handle new lines
+            read -r choice
+            case "$choice" in
+                1)
+                    AUR_HELPER="yay"
+                    echo "Installing yay as AUR helper..."
+                    ;;
+                2)
+                    AUR_HELPER="paru"
+                    echo "Installing paru as AUR helper..."
+                    ;;
+                *)
+                    echo -e "${RED}Invalid choice.${RC}"
+                    exit 1
+                    ;;
+            esac
 
-            if command_exists yay; then
-                AUR_HELPER="yay"
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
+            cd /opt && $ESCALATION_TOOL git clone "https://aur.archlinux.org/${AUR_HELPER}-bin.git" && $ESCALATION_TOOL chown -R "$USER":"$USER" "./${AUR_HELPER}-bin"
+            cd "${AUR_HELPER}-bin" && makepkg --noconfirm -si
+
+            if command_exists "$AUR_HELPER"; then
                 AUR_HELPER_CHECKED=true
             else
                 echo -e "${RED}Failed to install AUR helper.${RC}"
