@@ -1,12 +1,12 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 . ../common-script.sh
 
-USERNAME=$(whoami)
+USERNAME=`whoami`
 
 install_sddm() {
     printf "${YELLOW}Installing SDDM login manager...${RC}\n"
-    case $PACKAGER in
+    case "$PACKAGER" in
         apt-get)
             $ESCALATION_TOOL apt-get update
             $ESCALATION_TOOL apt-get install -y sddm qt6-svg
@@ -59,26 +59,31 @@ EOF
 # Autologin
 configure_autologin() {
     echo "Available sessions:"
-    declare -a session_names
-    declare -A sessions
-
     i=1
-    for session_type in xsessions wayland-sessions; do
+    while [ $i -le 2 ]; do
+        session_type=""
+        if [ $i -eq 1 ]; then
+            session_type="xsessions"
+        else
+            session_type="wayland-sessions"
+        fi
+
         for session_file in /usr/share/$session_type/*.desktop; do
             [ -e "$session_file" ] || continue
-            name=$(grep -i "^Name=" "$session_file" | cut -d= -f2)
-            type=${session_type%s}  # Remove trailing 's'
-            sessions["$i"]="$session_file"
-            session_names[i]="$name ($type)"
-            echo "$i) $name ($type)"
-            ((i++))
+            name=`grep -i "^Name=" "$session_file" | cut -d= -f2`
+            type=`echo $session_type | sed 's/s$//'`  # Remove trailing 's'
+            printf "%d) %s (%s)\n" "$i" "$name" "$type"
+            sessions[$i]="$session_file"
+            session_names[$i]="$name ($type)"
+            i=`expr $i + 1`
         done
     done
 
     # Prompt user to choose a session
     while true; do
-        read -p "Enter the number of the session you'd like to autologin: " choice
-        if [[ -n "${sessions[$choice]}" ]]; then
+        printf "Enter the number of the session you'd like to autologin: "
+        read choice
+        if [ -n "${sessions[$choice]}" ]; then
             session_file="${sessions[$choice]}"
             break
         else
@@ -87,7 +92,7 @@ configure_autologin() {
     done
 
     # Find the corresponding .desktop file and Update SDDM configuration
-    actual_session=$(basename "$session_file" .desktop)
+    actual_session=`basename "$session_file" .desktop`
 
     $ESCALATION_TOOL sed -i '1i[Autologin]\nUser = '$USERNAME'\nSession = '$actual_session'\n' /etc/sddm.conf
     echo "Autologin configuration complete."
@@ -97,7 +102,7 @@ checkEnv
 checkEscalationTool
 
 # Check if SDDM is already installed
-if ! command -v sddm &> /dev/null; then
+if ! command -v sddm > /dev/null; then
     install_sddm
 else
     echo "SDDM is already installed. Skipping installation."
@@ -105,8 +110,9 @@ fi
 
 install_theme
 
-read -p "Do you want to enable autologin? (y/n): " enable_autologin
-if [[ $enable_autologin =~ ^[Yy]$ ]]; then
+printf "Do you want to enable autologin? (y/n): "
+read enable_autologin
+if [ "$enable_autologin" = "y" ] || [ "$enable_autologin" = "Y" ]; then
     configure_autologin
 else
     echo "Autologin not configured."
