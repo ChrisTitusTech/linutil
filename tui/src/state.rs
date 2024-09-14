@@ -26,7 +26,7 @@ pub struct AppState {
     tabs: Vec<Tab>,
     /// Current tab
     current_tab: ListState,
-    /// This stack keeps track of our "current dirrectory". You can think of it as `pwd`. but not
+    /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<NodeId>,
     /// This is the state asociated with the list widget, used to display the selection in the
@@ -246,7 +246,7 @@ impl AppState {
             *self.visit_stack.last().unwrap(),
         );
     }
-    /// Checks ehther the current tree node is the root node (can we go up the tree or no)
+    /// Checks either the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
     pub fn at_root(&self) -> bool {
