@@ -13,12 +13,8 @@ name = "Arch Server Setup"
 script = "arch/server-setup.sh"
 
 [[data.entries]]
-name = "Paru AUR Helper"
-script = "arch/paru-setup.sh"
-
-[[data.entries]]
-name = "Yay AUR Helper"
-script = "arch/yay-setup.sh"
+name = "AUR Helper setup"
+script = "arch/aurhelper-setup.sh"
 
 [[data]]
 name = "Fedora"
