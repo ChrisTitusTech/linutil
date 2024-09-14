@@ -2,7 +2,7 @@
 
 . ../common-script.sh
 
-USERNAME=`whoami`
+USERNAME=$(whoami)
 
 install_sddm() {
     printf "${YELLOW}Installing SDDM login manager...${RC}\n"
@@ -30,14 +30,14 @@ install_sddm() {
 }
 
 install_theme() {
-    echo "Installing and configuring SDDM theme..."
+    printf "Installing and configuring SDDM theme...\n"
 
     # Check if astronaut-theme already exists
     if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme" ]; then
-        echo "SDDM astronaut theme is already installed. Skipping theme installation."
+        printf "SDDM astronaut theme is already installed. Skipping theme installation.\n"
     else
         if ! $ESCALATION_TOOL git clone https://github.com/keyitdev/sddm-astronaut-theme.git /usr/share/sddm/themes/sddm-astronaut-theme; then
-            echo "Failed to clone theme repository. Exiting."
+            printf "Failed to clone theme repository. Exiting.\n"
             exit 1
         fi
     fi
@@ -53,15 +53,14 @@ Current=sddm-astronaut-theme
 EOF
 
     $ESCALATION_TOOL systemctl enable sddm
-    echo "SDDM theme configuration complete."
+    printf "SDDM theme configuration complete.\n"
 }
 
 # Autologin
 configure_autologin() {
-    echo "Available sessions:"
+    printf "Available sessions:\n"
     i=1
     while [ $i -le 2 ]; do
-        session_type=""
         if [ $i -eq 1 ]; then
             session_type="xsessions"
         else
@@ -70,32 +69,29 @@ configure_autologin() {
 
         for session_file in /usr/share/$session_type/*.desktop; do
             [ -e "$session_file" ] || continue
-            name=`grep -i "^Name=" "$session_file" | cut -d= -f2`
-            type=`echo $session_type | sed 's/s$//'`  # Remove trailing 's'
+            name=$(grep -i "^Name=" "$session_file" | cut -d= -f2-)
+            type=$(echo "$session_type" | sed 's/s$//')  # Remove trailing 's'
             printf "%d) %s (%s)\n" "$i" "$name" "$type"
-            sessions[$i]="$session_file"
-            session_names[$i]="$name ($type)"
-            i=`expr $i + 1`
+            i=$((i + 1))
         done
     done
 
     # Prompt user to choose a session
     while true; do
         printf "Enter the number of the session you'd like to autologin: "
-        read choice
-        if [ -n "${sessions[$choice]}" ]; then
-            session_file="${sessions[$choice]}"
+        read -r choice
+        if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
+            session_file="/usr/share/$session_type/$(sed -n "${choice}p" <<< "$(printf "%s\n" /usr/share/$session_type/*.desktop)")"
+            actual_session=$(basename "$session_file" .desktop)
             break
         else
-            echo "Invalid choice. Please enter a valid number."
+            printf "Invalid choice. Please enter a valid number.\n"
         fi
     done
 
-    # Find the corresponding .desktop file and Update SDDM configuration
-    actual_session=`basename "$session_file" .desktop`
-
-    $ESCALATION_TOOL sed -i '1i[Autologin]\nUser = '$USERNAME'\nSession = '$actual_session'\n' /etc/sddm.conf
-    echo "Autologin configuration complete."
+    # Update SDDM configuration
+    $ESCALATION_TOOL sed -i "1i[Autologin]\nUser = $USERNAME\nSession = $actual_session\n" /etc/sddm.conf
+    printf "Autologin configuration complete.\n"
 }
 
 checkEnv
@@ -105,17 +101,17 @@ checkEscalationTool
 if ! command -v sddm > /dev/null; then
     install_sddm
 else
-    echo "SDDM is already installed. Skipping installation."
+    printf "SDDM is already installed. Skipping installation.\n"
 fi
 
 install_theme
 
 printf "Do you want to enable autologin? (y/n): "
-read enable_autologin
+read -r enable_autologin
 if [ "$enable_autologin" = "y" ] || [ "$enable_autologin" = "Y" ]; then
     configure_autologin
 else
-    echo "Autologin not configured."
+    printf "Autologin not configured.\n"
 fi
 
 $ESCALATION_TOOL systemctl restart sddm
