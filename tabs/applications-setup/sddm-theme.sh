@@ -5,7 +5,7 @@
 USERNAME=$(whoami)
 
 install_sddm() {
-    printf "${YELLOW}Installing SDDM login manager...${RC}\n"
+    printf "%sInstalling SDDM login manager...%s\n" "$YELLOW" "$RC"
     case "$PACKAGER" in
         apt-get)
             $ESCALATION_TOOL apt-get update
@@ -23,7 +23,7 @@ install_sddm() {
             $ESCALATION_TOOL pacman -S --needed --noconfirm sddm qt6-svg
             ;;
         *)
-            printf "${RED}Unsupported package manager. Please install SDDM manually.${RC}\n"
+            printf "%sUnsupported package manager. Please install SDDM manually.%s\n" "$RED" "$RC"
             exit 1
             ;;
     esac
@@ -59,19 +59,17 @@ EOF
 # Autologin
 configure_autologin() {
     printf "Available sessions:\n"
+    sessions=""
+    session_names=""
     i=1
-    while [ $i -le 2 ]; do
-        if [ $i -eq 1 ]; then
-            session_type="xsessions"
-        else
-            session_type="wayland-sessions"
-        fi
-
-        for session_file in /usr/share/$session_type/*.desktop; do
+    for session_type in xsessions wayland-sessions; do
+        for session_file in /usr/share/"$session_type"/*.desktop; do
             [ -e "$session_file" ] || continue
-            name=$(grep -i "^Name=" "$session_file" | cut -d= -f2-)
-            type=$(echo "$session_type" | sed 's/s$//')  # Remove trailing 's'
+            name=$(grep -i "^Name=" "$session_file" | cut -d= -f2)
+            type=$(printf "%s" "$session_type" | sed 's/s$//')  # Remove trailing 's'
             printf "%d) %s (%s)\n" "$i" "$name" "$type"
+            sessions="$sessions $i:$session_file"
+            session_names="$session_names $i:$name ($type)"
             i=$((i + 1))
         done
     done
@@ -80,17 +78,22 @@ configure_autologin() {
     while true; do
         printf "Enter the number of the session you'd like to autologin: "
         read -r choice
-        if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
-            session_file="/usr/share/$session_type/$(sed -n "${choice}p" <<< "$(printf "%s\n" /usr/share/$session_type/*.desktop)")"
-            actual_session=$(basename "$session_file" .desktop)
+        session_file=$(echo "$sessions" | tr ' ' '\n' | grep "^$choice:" | cut -d: -f2)
+        if [ -n "$session_file" ]; then
             break
         else
             printf "Invalid choice. Please enter a valid number.\n"
         fi
     done
 
-    # Update SDDM configuration
-    $ESCALATION_TOOL sed -i "1i[Autologin]\nUser = $USERNAME\nSession = $actual_session\n" /etc/sddm.conf
+    # Find the corresponding .desktop file and Update SDDM configuration
+    actual_session=$(basename "$session_file" .desktop)
+
+    $ESCALATION_TOOL tee -a /etc/sddm.conf > /dev/null << EOF
+[Autologin]
+User=$USERNAME
+Session=$actual_session
+EOF
     printf "Autologin configuration complete.\n"
 }
 
