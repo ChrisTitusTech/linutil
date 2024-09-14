@@ -72,7 +72,7 @@ configure_autologin() {
             [ -e "$session_file" ] || continue
             name=`grep -i "^Name=" "$session_file" | cut -d= -f2`
             type=`echo $session_type | sed 's/s$//'`  # Remove trailing 's'
-            printf "%d) %s (%s)\n" "$i" "$name" "$type"
+            echo "%d) %s (%s)\n" "$i" "$name" "$type"
             sessions[$i]="$session_file"
             session_names[$i]="$name ($type)"
             i=`expr $i + 1`
@@ -81,7 +81,7 @@ configure_autologin() {
 
     # Prompt user to choose a session
     while true; do
-        printf "Enter the number of the session you'd like to autologin: "
+        echo "Enter the number of the session you'd like to autologin: "
         read choice
         if [ -n "${sessions[$choice]}" ]; then
             session_file="${sessions[$choice]}"
@@ -110,7 +110,7 @@ fi
 
 install_theme
 
-printf "Do you want to enable autologin? (y/n): "
+echo "Do you want to enable autologin? (y/n): "
 read enable_autologin
 if [ "$enable_autologin" = "y" ] || [ "$enable_autologin" = "Y" ]; then
     configure_autologin
