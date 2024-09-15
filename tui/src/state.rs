@@ -362,7 +362,7 @@ impl AppState {
                 return Some(RevertableCommand {
                     command: item.node.command.clone(),
                     revertable: item.node.revertable,
-                    selected_reversion: item.node.default_revertable,
+                    selected_reversion: item.node.default_revertable != self.reversed_items,
                 });
             }
         }
