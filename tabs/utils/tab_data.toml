@@ -65,3 +65,7 @@ script = "monitor-control/scale_monitor.sh"
 name = "Reset Scaling"
 script = "monitor-control/reset_scaling.sh"
 matches = true
+
+[[data]]
+name = "User Manager"
+script = "user-manager.sh"
