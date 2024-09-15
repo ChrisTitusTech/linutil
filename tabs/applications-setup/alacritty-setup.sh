@@ -48,7 +48,7 @@ revertAlacritty() {
             fi
         fi
     else
-        echo "No backup found. Nothing to revert."
+        echo "No Alacritty configuration found. Nothing to revert."
     fi
 }
 

@@ -30,6 +30,42 @@ setupRofi() {
     wget -O "$HOME/.config/rofi/themes/powermenu.rasi" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/powermenu.rasi
 }
 
-checkEnv
-checkEscalationTool
-setupRofi
+revertRofi() {
+    echo "Reverting Rofi setup..."
+    CONFIG_DIR="$HOME/.config/rofi"
+
+    if [ -d "${CONFIG_DIR}" ]; then
+        rm -rf "$CONFIG_DIR"
+        echo "Rofi configuration reverted."
+
+        if command_exists rofi; then
+            printf "Do you want to uninstall Rofi as well? (y/N): "
+            read uninstall_choice
+            if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+                case ${PACKAGER} in
+                    pacman)
+                        $ESCALATION_TOOL ${PACKAGER} -R --noconfirm rofi
+                        ;;
+                    *)
+                        $ESCALATION_TOOL ${PACKAGER} remove -y rofi
+                        ;;
+                esac
+                echo "Rofi uninstalled."
+            fi
+        fi
+    else
+        echo "No Rofi configuration found. Nothing to revert."
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    setupRofi
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertRofi
+}
