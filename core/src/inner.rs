@@ -24,6 +24,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
         .map(|(TabEntry { name, data }, directory)| {
             let mut tree = Tree::new(ListNode {
                 name: "root".to_string(),
+                raw_command: Command::None,
                 command: Command::None,
                 revert_command: Command::None,
             });
@@ -147,6 +148,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
         if let Some(entries) = entry.entries {
             let mut node = node.append(ListNode {
                 name: entry.name,
+                raw_command: Command::None,
                 command: Command::None,
                 revert_command: Command::None,
             });
@@ -154,6 +156,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
         } else if let Some(command) = entry.command {
             node.append(ListNode {
                 name: entry.name,
+                raw_command: Command::Raw(command.clone()),
                 command: Command::Raw(command.clone()),
                 revert_command: Command::Raw(command),
             });
@@ -179,6 +182,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
 
             node.append(ListNode {
                 name: entry.name,
+                raw_command: Command::LocalFile(dir),
                 command: cmd,
                 revert_command: rev_cmd,
             });

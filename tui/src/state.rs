@@ -258,11 +258,11 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    pub fn get_selected_commands(&self) -> (Option<Command>, Option<Command>) {
+    pub fn get_selected_commands(&self) -> (Option<Command>, Option<Command>, Option<Command>) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
-            return (None, None);
+            return (None, None, None);
         }
         if !self.at_root() {
             selected_index = selected_index.saturating_sub(1);
@@ -271,12 +271,13 @@ impl AppState {
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
                 return (
+                    Some(item.node.raw_command.clone()),
                     Some(item.node.command.clone()),
                     Some(item.node.revert_command.clone()),
                 );
             }
         }
-        (None, None)
+        (None, None, None)
     }
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
@@ -346,7 +347,7 @@ impl AppState {
         }
     }
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_commands().0 {
+        if let Some(cmd) = self.get_selected_commands().1 {
             let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
         } else {
@@ -354,7 +355,7 @@ impl AppState {
         }
     }
     fn handle_revert(&mut self) {
-        if let Some(cmd) = self.get_selected_commands().1 {
+        if let Some(cmd) = self.get_selected_commands().2 {
             let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
         }

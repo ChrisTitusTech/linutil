@@ -21,6 +21,7 @@ pub struct Tab {
 #[derive(Clone, Hash, Eq, PartialEq)]
 pub struct ListNode {
     pub name: String,
+    pub raw_command: Command,
     pub command: Command,
     pub revert_command: Command,
 }
