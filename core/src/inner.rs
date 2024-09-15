@@ -1,9 +1,22 @@
 use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
 use include_dir::{include_dir, Dir};
-use serde::Deserialize;
-use std::path::{Path, PathBuf};
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+    sync::LazyLock,
+};
 use tempdir::TempDir;
+
+static STORE_FILE: LazyLock<PathBuf> = LazyLock::new(|| {
+    let state_dir = dirs::state_dir().expect("Failed to get state directory");
+    let store_file_path = state_dir.join("linutil_scripts.toml");
+    if !store_file_path.exists() {
+        std::fs::File::create(&store_file_path).expect("Failed to create store file");
+    }
+    store_file_path
+});
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/../tabs");
 
@@ -20,6 +33,10 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
         (tab_data, directory)
     });
 
+    let contents =
+        std::fs::read_to_string(STORE_FILE.as_path()).expect("Failed to read store file");
+    let completed_scripts: CompletedScripts = toml::from_str(&contents).unwrap_or_default();
+
     let tabs: Vec<Tab> = tabs
         .map(
             |(
@@ -33,9 +50,11 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                 let mut tree = Tree::new(ListNode {
                     name: "root".to_string(),
                     command: Command::None,
+                    revertable: false,
+                    default_revertable: false,
                 });
                 let mut root = tree.root_mut();
-                create_directory(data, &mut root, &directory);
+                create_directory(data, &mut root, &directory, &completed_scripts.scripts);
                 Tab {
                     name,
                     tree,
@@ -78,6 +97,7 @@ struct Entry {
     preconditions: Option<Vec<Precondition>>,
     #[serde(flatten)]
     entry_type: EntryType,
+    revertable: Option<bool>,
 }
 
 #[derive(Deserialize)]
@@ -153,30 +173,47 @@ fn filter_entries(entries: &mut Vec<Entry>) {
     });
 }
 
-fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+fn create_directory(
+    data: Vec<Entry>,
+    node: &mut NodeMut<ListNode>,
+    command_dir: &Path,
+    run_scripts: &HashSet<String>,
+) {
     for entry in data {
         match entry.entry_type {
             EntryType::Entries(entries) => {
                 let mut node = node.append(ListNode {
                     name: entry.name,
                     command: Command::None,
+                    revertable: false,
+                    default_revertable: false,
                 });
-                create_directory(entries, &mut node, command_dir);
+                create_directory(entries, &mut node, command_dir, run_scripts);
             }
             EntryType::Command(command) => {
                 node.append(ListNode {
                     name: entry.name,
                     command: Command::Raw(command),
+                    revertable: false,
+                    default_revertable: false,
                 });
             }
             EntryType::Script(script) => {
-                let dir = command_dir.join(script);
+                let dir = command_dir.join(&script);
                 if !dir.exists() {
                     panic!("Script {} does not exist", dir.display());
                 }
+                let script_name = script
+                    .components()
+                    .last()
+                    .unwrap()
+                    .as_os_str()
+                    .to_string_lossy();
                 node.append(ListNode {
                     name: entry.name,
                     command: Command::LocalFile(dir),
+                    revertable: entry.revertable.unwrap_or(true),
+                    default_revertable: run_scripts.contains(script_name.as_ref()),
                 });
             }
         }
@@ -199,4 +236,32 @@ impl TabList {
             .map(|path| temp_dir.join(path).join("tab_data.toml"))
             .collect()
     }
+}
+
+#[derive(Default, Deserialize, Serialize)]
+struct CompletedScripts {
+    scripts: HashSet<String>,
+}
+
+pub fn write_script_inner(script_path: &Path, revert: bool) {
+    let contents =
+        std::fs::read_to_string(STORE_FILE.as_path()).expect("Failed to read store file");
+    let mut completed_scripts: CompletedScripts = toml::from_str(&contents).unwrap_or_default();
+
+    // Take only the filename of the script
+    let script_path = script_path.components().last().unwrap().as_os_str();
+    if revert {
+        completed_scripts
+            .scripts
+            .remove(script_path.to_string_lossy().as_ref());
+    } else {
+        completed_scripts
+            .scripts
+            .insert(script_path.to_string_lossy().to_string());
+    }
+    std::fs::write(
+        STORE_FILE.as_path(),
+        toml::to_string_pretty(&completed_scripts).expect("Failed to serialize completed scripts"),
+    )
+    .expect("Failed to write store file");
 }

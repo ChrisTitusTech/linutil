@@ -3,12 +3,12 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{draw_shortcuts, SHORTCUT_LINES},
-    running_command::RunningCommand,
+    running_command::{RevertableCommand, RunningCommand},
     theme::Theme,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ego_tree::NodeId;
-use linutil_core::{Command, ListNode, Tab};
+use linutil_core::{ListNode, Tab};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Style, Stylize},
@@ -33,8 +33,9 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
-    multi_select: bool,              // This keeps track of Multi select toggle
-    selected_commands: Vec<Command>, // This field is to store selected commands
+    multi_select: bool, // This keeps track of Multi select toggle
+    selected_commands: Vec<RevertableCommand>, // This field is to store selected commands
+    reversed_items: bool,
 }
 
 pub enum Focus {
@@ -64,6 +65,7 @@ impl AppState {
             filter: Filter::new(),
             multi_select: false,
             selected_commands: Vec::new(), // Initialize with an empty vector
+            reversed_items: false,
         };
         state.update_items();
         state
@@ -158,24 +160,37 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                let is_selected = self.selected_commands.contains(&node.command);
-                let (indicator, style) = if is_selected {
+                let selected = self
+                    .selected_commands
+                    .iter()
+                    .find(|RevertableCommand { command, .. }| command == &node.command);
+                let (indicator, style) = if selected.is_some() {
                     (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
                     ("", Style::new())
                 };
+
+                let revert = if let Some(selected) = selected {
+                    selected.selected_reversion
+                } else {
+                    node.default_revertable != self.reversed_items
+                };
+                let revert_text = if revert { "Revert " } else { "" };
+
                 if *has_children {
                     Line::from(format!(
-                        "{}  {} {}",
+                        "{}  {}{} {}",
                         self.theme.dir_icon(),
+                        revert_text,
                         node.name,
                         indicator
                     ))
                     .style(self.theme.dir_color())
                 } else {
                     Line::from(format!(
-                        "{}  {} {}",
+                        "{}  {}{} {}",
                         self.theme.cmd_icon(),
+                        revert_text,
                         node.name,
                         indicator
                     ))
@@ -260,7 +275,7 @@ impl AppState {
                 KeyCode::Char('T') => self.theme.prev(),
                 KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
-
+                KeyCode::Char('r') => self.reversed_items = !self.reversed_items,
                 _ => {}
             },
             _ => {}
@@ -278,10 +293,25 @@ impl AppState {
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_command() {
-            if self.selected_commands.contains(&command) {
-                self.selected_commands.retain(|c| c != &command);
+        if let Some(RevertableCommand {
+            command,
+            revertable,
+            selected_reversion,
+        }) = self.get_selected_command()
+        {
+            if self
+                .selected_commands
+                .iter()
+                .any(|RevertableCommand { command: c, .. }| c == &command)
+            {
+                self.selected_commands
+                    .retain(|RevertableCommand { command: c, .. }| c != &command);
             } else {
+                let command = RevertableCommand {
+                    command,
+                    revertable,
+                    selected_reversion: selected_reversion != self.reversed_items,
+                };
                 self.selected_commands.push(command);
             }
         }
@@ -317,7 +347,7 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
+    pub fn get_selected_command(&self) -> Option<RevertableCommand> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
@@ -329,7 +359,11 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
-                return Some(item.node.command.clone());
+                return Some(RevertableCommand {
+                    command: item.node.command.clone(),
+                    revertable: item.node.revertable,
+                    selected_reversion: item.node.default_revertable,
+                });
             }
         }
         None
@@ -395,7 +429,7 @@ impl AppState {
         !self.at_root() && selected_index == 0
     }
     fn enable_preview(&mut self) {
-        if let Some(command) = self.get_selected_command() {
+        if let Some(RevertableCommand { command, .. }) = self.get_selected_command() {
             if let Some(preview) = FloatingText::from_command(&command) {
                 self.spawn_float(preview, 80, 80);
             }

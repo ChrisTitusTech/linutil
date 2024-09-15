@@ -1,9 +1,9 @@
 mod inner;
 
 use ego_tree::Tree;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-pub use inner::get_tabs;
+pub use inner::{get_tabs, write_script_inner};
 
 #[derive(Clone, Hash, Eq, PartialEq)]
 pub enum Command {
@@ -23,4 +23,14 @@ pub struct Tab {
 pub struct ListNode {
     pub name: String,
     pub command: Command,
+    pub revertable: bool,
+    pub default_revertable: bool,
+}
+
+pub fn write_completed_script(script_path: &Path) {
+    write_script_inner(script_path, false);
+}
+
+pub fn write_reverted_script(script_path: &Path) {
+    write_script_inner(script_path, true);
 }

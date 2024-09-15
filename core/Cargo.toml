@@ -11,3 +11,4 @@ serde = { version = "1.0.205", features = ["derive"] }
 toml = "0.8.19"
 which = "6.0.3"
 ego-tree = { workspace = true }
+dirs = "5.0.1"

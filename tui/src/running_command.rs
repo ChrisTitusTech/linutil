@@ -40,6 +40,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    commands: Vec<RevertableCommand>,
 }
 
 impl FloatContent for RunningCommand {
@@ -112,8 +113,8 @@ impl FloatContent for RunningCommand {
     }
 
     fn is_finished(&self) -> bool {
-        // Check if the command thread has finished
         if let Some(command_thread) = &self.command_thread {
+            // Check if the command thread has finished
             command_thread.is_finished()
         } else {
             true
@@ -135,8 +136,15 @@ impl FloatContent for RunningCommand {
     }
 }
 
+#[derive(Clone)]
+pub struct RevertableCommand {
+    pub command: Command,
+    pub revertable: bool,
+    pub selected_reversion: bool,
+}
+
 impl RunningCommand {
-    pub fn new(commands: Vec<Command>) -> Self {
+    pub fn new(commands: Vec<RevertableCommand>) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Create a command to execute all the selected commands
@@ -146,15 +154,24 @@ impl RunningCommand {
         // Initialize an empty string to hold the merged commands
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
         let mut script = String::new();
-        for command in commands {
-            match command {
+        for command in commands.iter() {
+            match &command.command {
                 Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)), // Merge raw commands
                 Command::LocalFile(file) => {
                     if let Some(parent) = file.parent() {
                         script.push_str(&format!("cd {}\n", parent.display()));
                         // Merge local file path
                     }
-                    script.push_str(&format!("sh {}\n", file.display()));
+                    script.push_str(&if command.revertable {
+                        let function = if command.selected_reversion {
+                            "revert"
+                        } else {
+                            "run"
+                        };
+                        format!(". {} && {}\n", file.display(), function)
+                    } else {
+                        format!("sh {}\n", file.display())
+                    });
                 }
                 Command::None => panic!("Command::None was treated as a command"),
             }
@@ -215,6 +232,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            commands,
         }
     }
 
@@ -244,6 +262,18 @@ impl RunningCommand {
         if self.command_thread.is_some() {
             let handle = self.command_thread.take().unwrap();
             let exit_status = handle.join().unwrap();
+            // If the commands successfully executed, write reversion data
+            if exit_status.success() {
+                self.commands.drain(..).for_each(|command| {
+                    if command.revertable {
+                        let script = match command.command {
+                            Command::LocalFile(ref path) => path,
+                            _ => panic!("Non script command was treated as revertable"),
+                        };
+                        linutil_core::write_script_inner(script, command.selected_reversion);
+                    }
+                });
+            }
             self.status = Some(exit_status.clone());
             exit_status
         } else {
