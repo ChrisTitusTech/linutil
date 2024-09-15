@@ -37,6 +37,10 @@ name = "Full System Update"
 script = "system-update.sh"
 
 [[data]]
+name = "Full System Cleanup"
+script = "system-cleanup.sh"
+
+[[data]]
 name = "Build Prerequisites"
 script = "1-compile-setup.sh"
 
