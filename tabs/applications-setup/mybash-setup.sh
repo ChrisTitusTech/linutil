@@ -88,7 +88,7 @@ installZoxide() {
 
 linkConfig() {
     OLD_BASHRC="$HOME/.bashrc"
-    if [ -e "$OLD_BASHRC" ]; then
+    if [ -e "$OLD_BASHRC" ] && [ ! -e "$HOME/.bashrc.bak" ]; then
         printf "%b\n" "${YELLOW}Moving old bash config file to $HOME/.bashrc.bak${RC}"
         if ! mv "$OLD_BASHRC" "$HOME/.bashrc.bak"; then
             printf "%b\n" "${RED}Can't move the old bash config file!${RC}"
@@ -105,7 +105,7 @@ linkConfig() {
         printf "%b\n" "${RED}Failed to create symbolic link for starship.toml${RC}"
         exit 1
     }
-    printf "%b\n" "${GREEN}Done!\nrestart your shell to see the changes.${RC}"
+    printf "%b\n" "${GREEN}Done! restart your shell to see the changes.${RC}"
 }
 
 checkEnv

@@ -36,7 +36,9 @@ setupNeovim() {
 }
 
 backupNeovimConfig() {
-    [ -d "$HOME/.config/nvim" ] && cp -r "$HOME/.config/nvim" "$HOME/.config/nvim-backup"
+    if [ -d "$HOME/.config/nvim" ] && [ ! -d "$HOME/.config/nvim-backup" ]; then
+        cp -r "$HOME/.config/nvim" "$HOME/.config/nvim-backup"
+    fi
     rm -rf "$HOME/.config/nvim"
 }
 
