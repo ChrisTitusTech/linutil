@@ -16,8 +16,6 @@ configureVirtualization() {
     esac
 }
 
-checkEnv () {
-    checkEscalationTool
- }
-
+checkEnv
+checkEscalationTool
 configureVirtualization
