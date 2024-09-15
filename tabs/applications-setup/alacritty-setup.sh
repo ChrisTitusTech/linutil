@@ -17,7 +17,7 @@ setupAlacritty() {
         echo "alacritty is already installed."
     fi
     echo "Copy alacritty config files"
-    if [ -d "${HOME}/.config/alacritty" ]; then
+    if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
     mkdir -p "${HOME}/.config/alacritty/"
