@@ -17,8 +17,8 @@ setupRofi() {
         echo "Rofi is already installed."
     fi
     echo "Copy Rofi config files"
-    if [ -d "$HOME/.config/rofi" ]; then
-        cp -r "$HOME/.config/rofi" "$HOME/.config/rofi.bak"
+    if [ -d "$HOME/.config/rofi" ] && [ ! -d "$HOME/.config/rofi-bak" ]; then
+        cp -r "$HOME/.config/rofi" "$HOME/.config/rofi-bak"
     fi
     mkdir -p "$HOME/.config/rofi"
     wget -O "$HOME/.config/rofi/powermenu.sh" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/powermenu.sh
