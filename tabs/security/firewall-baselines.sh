@@ -43,7 +43,41 @@ configureUFW() {
     echo -e "${GREEN}Enabled Firewall with Baselines!${RC}"
 }
 
-checkEnv
-checkEscalationTool
-installPkg
-configureUFW
+revertFirewall() {
+    echo "Reverting firewall baselines..."
+
+    $ESCALATION_TOOL ufw disable
+    echo "UFW disabled."
+
+    $ESCALATION_TOOL ufw reset
+    echo "UFW rules reset to default."
+
+    if command_exists ufw; then
+        printf "Do you want to uninstall UFW as well? (y/N): "
+        read uninstall_choice
+        if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+            case ${PACKAGER} in
+                pacman)
+                    $ESCALATION_TOOL ${PACKAGER} -Rns --noconfirm ufw
+                    ;;
+                *)
+                    $ESCALATION_TOOL ${PACKAGER} remove -y ufw
+                    ;;
+            esac
+            echo "UFW uninstalled."
+        fi
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    installPkg
+    configureUFW
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertFirewall
+}

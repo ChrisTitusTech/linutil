@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh -e
 
 # Search for possible Diablo II Resurrected folder locations
 echo "Searching for Diablo II Resurrected folders..."
@@ -70,9 +70,6 @@ select_path() {
     clear  # Clear the screen after selection
 }
 
-# Use the select_path function
-select_path
-
 # Validate the path
 if [ ! -d "$d2r_path" ]; then
     echo "Error: The specified path does not exist."
@@ -107,3 +104,18 @@ echo "5. In the 'Additional command line arguments' field, enter: -mod lootfilte
 echo "6. Click 'Done' to save the changes"
 echo
 echo "After completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter."
+
+# I don't play diablo II, If someone could implement this for me that would be great.
+revertD2rLootFilterSetup() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    select_path
+}
+
+revert() {
+    checkEnv
+    revertD2rLootFilterSetup
+}

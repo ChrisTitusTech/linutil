@@ -295,11 +295,22 @@ setupDisplayManager() {
     
 }
 
-checkEnv
-checkEscalationTool
-setupDisplayManager
-setupDWM
-makeDWM
-install_nerd_font
-clone_config_folders
-configure_backgrounds
+revertDwmTitusSetup() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    setupDisplayManager
+    setupDWM
+    makeDWM
+    install_nerd_font
+    clone_config_folders
+    configure_backgrounds
+}
+
+revert() {
+    checkEnv
+    revertDwmTitusSetup
+}

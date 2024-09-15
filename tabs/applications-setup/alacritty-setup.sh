@@ -25,6 +25,41 @@ setupAlacritty() {
     wget -O "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
 }
 
-checkEnv
-checkEscalationTool
-setupAlacritty
+revertAlacritty() {
+    echo "Reverting Alacritty configuration..."
+    if [ -d "${HOME}/.config/alacritty-bak" ]; then
+        rm -rf "${HOME}/.config/alacritty"
+        mv "${HOME}/.config/alacritty-bak" "${HOME}/.config/alacritty"
+        echo "Alacritty configuration reverted"
+
+        if command_exists alacritty; then
+            printf "Do you want to uninstall Alacritty as well? (y/N): "
+            read uninstall_choice
+            if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+                case ${PACKAGER} in
+                    pacman)
+                        $ESCALATION_TOOL ${PACKAGER} -Rns --noconfirm alacritty
+                        ;;
+                    *)
+                        $ESCALATION_TOOL ${PACKAGER} remove -y alacritty
+                        ;;
+                esac
+                echo "Alacritty uninstalled."
+            fi
+        fi
+    else
+        echo "No Alacritty configuration found. Nothing to revert."
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    setupAlacritty
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertAlacritty
+}

@@ -25,6 +25,43 @@ setupKitty() {
     wget -O "${HOME}/.config/kitty/nord.conf" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/nord.conf
 }
 
-checkEnv
-checkEscalationTool
-setupKitty
+revertKitty() {
+    echo "Reverting Kitty configuration..."
+    CONFIG_DIR="${HOME}/.config/kitty"
+
+    if [ -d "${CONFIG_DIR}" ]; then
+        rm -rf "${CONFIG_DIR}"
+        mv "${HOME}/.config/kitty-bak" "${HOME}/.config/kitty"
+        echo "Kitty configuration reverted."
+
+        if command_exists kitty; then
+            printf "Do you want to uninstall Kitty as well? (y/N): "
+            read uninstall_choice
+            if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+                case ${PACKAGER} in
+                    pacman)
+                        $ESCALATION_TOOL "${PACKAGER}" -Rns --noconfirm kitty
+                        ;;
+                    *)
+                        $ESCALATION_TOOL "${PACKAGER}" remove -y kitty
+                        ;;
+                esac
+                echo "Kitty uninstalled."
+            fi
+        fi
+    else
+        echo "No Kitty configuration found. Nothing to revert."
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    setupKitty
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertKitty
+}
