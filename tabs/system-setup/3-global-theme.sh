@@ -29,6 +29,9 @@ install_theme_tools() {
 
 configure_qt6ct() {
     printf "${YELLOW}Configuring qt6ct...${RC}\n"
+    if [ -d "${HOME}/.config/qt6ct" ] && [ ! -d "${HOME}/.config/qt6ct-bak" ]; then
+        cp -r "${HOME}/.config/qt6ct" "${HOME}/.config/qt6ct-bak"
+    fi
     mkdir -p "$HOME/.config/qt6ct"
     cat <<EOF > "$HOME/.config/qt6ct/qt6ct.conf"
 [Appearance]
@@ -50,6 +53,9 @@ EOF
 
 configure_kvantum() {
     printf "${YELLOW}Configuring Kvantum...${RC}\n"
+    if [ -d "${HOME}/.config/Kvantum" ] && [ ! -d "${HOME}/.config/Kvantum-bak" ]; then
+        cp -r "${HOME}/.config/Kvantum" "${HOME}/.config/Kvantum-bak"
+    fi
     mkdir -p "$HOME/.config/Kvantum"
     cat <<EOF > "$HOME/.config/Kvantum/kvantum.kvconfig"
 [General]
@@ -58,8 +64,52 @@ EOF
     printf "${GREEN}Kvantum configured successfully.${RC}\n"
 }
 
-checkEnv
-checkEscalationTool
-install_theme_tools
-configure_qt6ct
-configure_kvantum
+revertGlobalTheme() {
+    echo "Reverting global theme setup..."
+    
+    if [ -d "$HOME/.config/qt6ct-bak" ]; then
+        rm -rf "$HOME/.config/qt6ct"
+        mv "$HOME/.config/qt6ct-bak" "$HOME/.config/qt6ct"
+        echo "qt6ct configuration reverted."
+    else
+        echo "No qt6ct configuration found. Nothing to revert."
+    fi
+
+    if [ -d "$HOME/.config/Kvantum-bak" ]; then
+        rm -rf "$HOME/.config/Kvantum"
+        mv "$HOME/.config/Kvantum-bak" "$HOME/.config/Kvantum"
+        echo "Kvantum configuration reverted."
+    else
+        echo "No Kvantum configuration found. Nothing to revert."
+    fi
+
+    if command_exists qt6ct || command_exists kvantum; then
+        printf "Do you want to uninstall the theme tools as well? (y/N): "
+        read uninstall_choice
+        if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+            case $PACKAGER in
+                pacman)
+                    $ESCALATION_TOOL ${PACKAGER} -Rns --noconfirm qt6ct kvantum
+                    ;;
+                *)
+                    $ESCALATION_TOOL ${PACKAGER} remove -y qt6ct kvantum
+                    ;;
+            esac
+            echo "Theme tools uninstalled."
+        fi
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    install_theme_tools
+    configure_qt6ct
+    configure_kvantum
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertGlobalTheme
+}
