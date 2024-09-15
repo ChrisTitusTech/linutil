@@ -38,7 +38,7 @@ checkAURHelper() {
                     echo "Installing paru as AUR helper..."
                     ;;
                 *)
-                    echo -e "${RED}Invalid choice.${RC}"
+                    printf "%b\n" "${RED}Invalid choice.${RC}"
                     exit 1
                     ;;
             esac
@@ -50,7 +50,7 @@ checkAURHelper() {
             if command_exists "$AUR_HELPER"; then
                 AUR_HELPER_CHECKED=true
             else
-                echo -e "${RED}Failed to install AUR helper.${RC}"
+                printf "%b\n" "${RED}Failed to install AUR helper.${RC}"
                 exit 1
             fi
         fi
