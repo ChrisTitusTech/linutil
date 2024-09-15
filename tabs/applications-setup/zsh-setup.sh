@@ -47,7 +47,7 @@ EOL
 }
 
 revertZSH() {
-    echo "Reverting ZSH setup..."
+    echo "Reverting ZSH configuration..."
     CONFIG_DIR="$HOME/.config/zsh"
 
     if [ -d "${CONFIG_DIR}" ]; then

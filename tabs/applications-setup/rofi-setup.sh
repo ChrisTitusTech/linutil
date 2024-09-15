@@ -31,7 +31,7 @@ setupRofi() {
 }
 
 revertRofi() {
-    echo "Reverting Rofi setup..."
+    echo "Reverting Rofi configuration..."
     CONFIG_DIR="$HOME/.config/rofi"
 
     if [ -d "${CONFIG_DIR}" ]; then
