@@ -124,10 +124,10 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 if state.selected_item_is_up_dir() {
                     hints.push(Shortcut::new(
                         vec!["l", "Right", "Enter", "h", "Left"],
-                        "Go to parent directory",
+                        "Go to parrent directory",
                     ));
                 } else {
-                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
+                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parrent directory"));
                     hints.push(get_list_item_shortcut(state));
                     if state.selected_item_is_cmd() {
                         hints.push(Shortcut::new(vec!["p"], "Enable preview"));
