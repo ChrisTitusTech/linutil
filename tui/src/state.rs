@@ -222,6 +222,7 @@ impl AppState {
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
                 KeyCode::Char('p') => self.enable_preview(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
+                KeyCode::Char('r') => self.handle_revert(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
                         self.focus = Focus::TabList;
@@ -257,11 +258,11 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
+    pub fn get_selected_commands(&self) -> (Option<Command>, Option<Command>) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
-            return None;
+            return (None, None);
         }
         if !self.at_root() {
             selected_index = selected_index.saturating_sub(1);
@@ -269,10 +270,13 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
-                return Some(item.node.command.clone());
+                return (
+                    Some(item.node.command.clone()),
+                    Some(item.node.revert_command.clone()),
+                );
             }
         }
-        None
+        (None, None)
     }
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
@@ -335,18 +339,24 @@ impl AppState {
         !self.at_root() && selected_index == 0
     }
     fn enable_preview(&mut self) {
-        if let Some(command) = self.get_selected_command() {
+        if let Some(command) = self.get_selected_commands().0 {
             if let Some(preview) = FloatingText::from_command(&command) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command() {
+        if let Some(cmd) = self.get_selected_commands().0 {
             let command = RunningCommand::new(cmd);
             self.spawn_float(command, 80, 80);
         } else {
             self.go_to_selected_dir();
+        }
+    }
+    fn handle_revert(&mut self) {
+        if let Some(cmd) = self.get_selected_commands().1 {
+            let command = RunningCommand::new(cmd);
+            self.spawn_float(command, 80, 80);
         }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {

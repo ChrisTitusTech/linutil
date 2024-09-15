@@ -100,12 +100,24 @@ impl Shortcut {
     }
 }
 
-fn get_list_item_shortcut(state: &AppState) -> Shortcut {
+fn push_item_shortcut(mut hints: Vec<Shortcut>, state: &AppState) -> Vec<Shortcut> {
     if state.selected_item_is_dir() {
-        Shortcut::new(vec!["l", "Right", "Enter"], "Go to selected dir")
+        hints.push(Shortcut::new(
+            vec!["l", "Right", "Enter"],
+            "Go to selected dir",
+        ))
     } else {
-        Shortcut::new(vec!["l", "Right", "Enter"], "Run selected command")
+        hints.push(Shortcut::new(
+            vec!["l", "Right", "Enter"],
+            "Run selected command",
+        ));
+        hints.push(Shortcut::new(
+            vec!["r"],
+            "Revert changes made by this command",
+        ))
     }
+
+    hints
 }
 
 pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
@@ -119,7 +131,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             hints.push(Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"));
             if state.at_root() {
                 hints.push(Shortcut::new(vec!["h", "Left", "Tab"], "Focus tab list"));
-                hints.push(get_list_item_shortcut(state));
+                hints = push_item_shortcut(hints, state);
             } else {
                 if state.selected_item_is_up_dir() {
                     hints.push(Shortcut::new(
@@ -128,7 +140,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                     ));
                 } else {
                     hints.push(Shortcut::new(vec!["h", "Left"], "Go to parrent directory"));
-                    hints.push(get_list_item_shortcut(state));
+                    hints = push_item_shortcut(hints, state);
                     if state.selected_item_is_cmd() {
                         hints.push(Shortcut::new(vec!["p"], "Enable preview"));
                     }

@@ -22,4 +22,5 @@ pub struct Tab {
 pub struct ListNode {
     pub name: String,
     pub command: Command,
+    pub revert_command: Command,
 }

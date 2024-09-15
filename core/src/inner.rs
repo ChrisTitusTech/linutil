@@ -25,6 +25,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
             let mut tree = Tree::new(ListNode {
                 name: "root".to_string(),
                 command: Command::None,
+                revert_command: Command::None,
             });
             let mut root = tree.root_mut();
             create_directory(data, &mut root, &directory);
@@ -147,12 +148,14 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
             let mut node = node.append(ListNode {
                 name: entry.name,
                 command: Command::None,
+                revert_command: Command::None,
             });
             create_directory(entries, &mut node, command_dir);
         } else if let Some(command) = entry.command {
             node.append(ListNode {
                 name: entry.name,
-                command: Command::Raw(command),
+                command: Command::Raw(format!(". {} run", command)),
+                revert_command: Command::Raw(format!(". {} revert", command)),
             });
         } else if let Some(script) = entry.script {
             let dir = command_dir.join(script);
@@ -162,6 +165,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
             node.append(ListNode {
                 name: entry.name,
                 command: Command::LocalFile(dir),
+                revert_command: Command::None,
             });
         } else {
             panic!("Entry must have data");
