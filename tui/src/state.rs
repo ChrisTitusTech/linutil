@@ -299,13 +299,12 @@ impl AppState {
             selected_reversion,
         }) = self.get_selected_command()
         {
-            if self
+            if let Some(position) = self
                 .selected_commands
                 .iter()
-                .any(|RevertableCommand { command: c, .. }| c == &command)
+                .position(|RevertableCommand { command: c, .. }| c == &command)
             {
-                self.selected_commands
-                    .retain(|RevertableCommand { command: c, .. }| c != &command);
+                self.selected_commands.remove(position);
             } else {
                 let command = RevertableCommand {
                     command,
