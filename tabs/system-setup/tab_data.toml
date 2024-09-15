@@ -51,3 +51,15 @@ script = "3-global-theme.sh"
 [[data]]
 name = "Remove Snaps"
 script = "4-remove-snaps.sh"
+
+[[data]]
+name = "Auto Git Config"
+script = "5-git-config-auto.sh"
+
+[[data]]
+name = "Nerdfonts Installer"
+script = "6-nerd-fonts-setup.sh"
+
+[[data]]
+name = "Bootloader Switcher"
+script = "7-bootloader-switch.sh"
