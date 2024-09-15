@@ -169,6 +169,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
             let cmd_path = dir.parent().unwrap();
             let script_name = dir.file_name().unwrap().to_str().unwrap();
 
+            // Commands for run and revert script functions
             let cmd = Command::Raw(format!(
                 "cd {} && . ./{} && run",
                 cmd_path.display(),
@@ -182,7 +183,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
 
             node.append(ListNode {
                 name: entry.name,
-                raw_command: Command::LocalFile(dir),
+                raw_command: Command::LocalFile(dir), // Raw path to the script -> Command
                 command: cmd,
                 revert_command: rev_cmd,
             });

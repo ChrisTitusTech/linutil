@@ -101,6 +101,7 @@ impl Shortcut {
 }
 
 fn push_item_shortcut(mut hints: Vec<Shortcut>, state: &AppState) -> Vec<Shortcut> {
+    // This adds state-specific shortucts to the vector
     if state.selected_item_is_dir() {
         hints.push(Shortcut::new(
             vec!["l", "Right", "Enter"],
