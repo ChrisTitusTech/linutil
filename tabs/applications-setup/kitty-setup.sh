@@ -40,7 +40,7 @@ revertKitty() {
             if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
                 case ${PACKAGER} in
                     pacman)
-                        $ESCALATION_TOOL "${PACKAGER}" -R --noconfirm kitty
+                        $ESCALATION_TOOL "${PACKAGER}" -Rns --noconfirm kitty
                         ;;
                     *)
                         $ESCALATION_TOOL "${PACKAGER}" remove -y kitty

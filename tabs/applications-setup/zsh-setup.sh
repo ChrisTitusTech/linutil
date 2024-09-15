@@ -60,7 +60,7 @@ revertZSH() {
             if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
                 case ${PACKAGER} in
                     pacman)
-                        $ESCALATION_TOOL ${PACKAGER} -R --noconfirm zsh
+                        $ESCALATION_TOOL ${PACKAGER} -Rns --noconfirm zsh
                         ;;
                     *)
                         $ESCALATION_TOOL ${PACKAGER} remove -y zsh
