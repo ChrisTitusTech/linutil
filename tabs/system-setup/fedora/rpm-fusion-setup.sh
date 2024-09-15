@@ -22,5 +22,17 @@ installRPMFusion() {
     esac
 }
 
-checkEnv
-installRPMFusion
+# Not sure how to implement reverting rpm-fusion, I will look back into this in the future.
+revertRpmFusionSetup() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    installRPMFusion
+}
+
+revert() {
+    checkEnv
+    revertRpmFusionSetup
+}
