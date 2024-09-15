@@ -4,7 +4,7 @@
 
 installDepend() {
     ## Check for dependencies.
-    echo -e "${YELLOW}Installing dependencies...${RC}"
+    printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     if [ "$PACKAGER" = "pacman" ]; then
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
             echo "[multilib]" | $ESCALATION_TOOL tee -a /etc/pacman.conf

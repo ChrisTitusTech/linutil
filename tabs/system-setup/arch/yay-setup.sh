@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. "$(dirname "$0")/../../common-script.sh"
+. ../../common-script.sh
 
 installDepend() {
     case $PACKAGER in
