@@ -45,7 +45,7 @@ revertRofi() {
             if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
                 case ${PACKAGER} in
                     pacman)
-                        $ESCALATION_TOOL ${PACKAGER} -R --noconfirm rofi
+                        $ESCALATION_TOOL ${PACKAGER} -Rns --noconfirm rofi
                         ;;
                     *)
                         $ESCALATION_TOOL ${PACKAGER} remove -y rofi
