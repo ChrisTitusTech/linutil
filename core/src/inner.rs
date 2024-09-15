@@ -154,18 +154,33 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
         } else if let Some(command) = entry.command {
             node.append(ListNode {
                 name: entry.name,
-                command: Command::Raw(format!(". {} run", command)),
-                revert_command: Command::Raw(format!(". {} revert", command)),
+                command: Command::Raw(command.clone()),
+                revert_command: Command::Raw(command),
             });
         } else if let Some(script) = entry.script {
-            let dir = command_dir.join(script);
+            let dir = command_dir.join(script.clone());
             if !dir.exists() {
                 panic!("Script {} does not exist", dir.display());
             }
+
+            let cmd_path = dir.parent().unwrap();
+            let script_name = dir.file_name().unwrap().to_str().unwrap();
+
+            let cmd = Command::Raw(format!(
+                "cd {} && . ./{} && run",
+                cmd_path.display(),
+                script_name
+            ));
+            let rev_cmd = Command::Raw(format!(
+                "cd {} && . ./{} && revert",
+                cmd_path.display(),
+                script_name
+            ));
+
             node.append(ListNode {
                 name: entry.name,
-                command: Command::LocalFile(dir),
-                revert_command: Command::None,
+                command: cmd,
+                revert_command: rev_cmd,
             });
         } else {
             panic!("Entry must have data");
