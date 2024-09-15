@@ -296,27 +296,30 @@ setupDisplayManager() {
 }
 
 install_slstatus() {
-    printf "Do you want to install slstatus? (y/n): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
-    read -r response # -r flag to prevent backslashes from being interpreted
-    case "$response" in
-        [Yy] | [Yy][Ee][Ss]) # Matches: Y, y, Yes, yes, YES, yEs, yeS, etc.
-            echo "Installing slstatus"
-            cd slstatus/ || { echo "Failed to change directory to slstatus"; return 1; }
-            if $ESCALATION_TOOL make clean install; then
-                echo "slstatus installed successfully"
-            else
-                echo "Failed to install slstatus"
-                return 1
-            fi
-            ;;
-        [Nn] | [Nn][Oo]) # same logic as above, but for No
-            echo "Skipping slstatus installation"
-            ;;
-        *)
-            echo "Invalid input. Please enter y/yes or n/no."
-            install_slstatus
-            ;;
-    esac
+    while true; do
+        printf "Do you want to install slstatus? (y/n): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
+        read -r response # -r flag to prevent backslashes from being interpreted
+        case "$response" in
+            [Yy] | [Yy][Ee][Ss]) # Matches: Y, y, Yes, yes, YES, yEs, yeS, etc.
+                echo "Installing slstatus"
+                cd slstatus/ || { echo "Failed to change directory to slstatus"; return 1; }
+                if $ESCALATION_TOOL make clean install; then
+                    echo "slstatus installed successfully"
+                else
+                    echo "Failed to install slstatus"
+                    return 1
+                fi
+                break
+                ;;
+            [Nn] | [Nn][Oo]) # same logic as above, but for No
+                echo "Skipping slstatus installation"
+                break
+                ;;
+            *)
+                echo "Invalid input. Please enter y/yes or n/no."
+                ;;
+        esac
+    done
     cd ..
 }
 
