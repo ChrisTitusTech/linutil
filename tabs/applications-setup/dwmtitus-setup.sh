@@ -300,7 +300,7 @@ install_slstatus() {
     read -r response # -r flag to prevent backslashes from being interpreted
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         echo "Installing slstatus"
-        cd slstatus/ || { echo "Failed to change directory to slstatus"; return 1; }
+        cd "$HOME/dwm-titus/slstatus" || { echo "Failed to change directory to slstatus"; return 1; }
         if $ESCALATION_TOOL make clean install; then
             echo "slstatus installed successfully"
         else
