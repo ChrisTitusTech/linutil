@@ -56,7 +56,7 @@ install_nerd_font() {
     # Check if the font zip file already exists
     if [ ! -f "$FONT_ZIP" ]; then
         # Download the font zip file
-        wget -P "$FONT_DIR" "$FONT_URL" || {
+        curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
             echo "Failed to download Meslo Nerd-fonts from $FONT_URL"
             return 1
         }
@@ -266,8 +266,22 @@ setupDisplayManager() {
     
 }
 
-revertDwmTitusSetup() {
-    echo "Reverting is not implemented for this script."
+install_slstatus() {
+    printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
+    read -r response # -r flag to prevent backslashes from being interpreted
+    if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
+        echo "Installing slstatus"
+        cd "$HOME/dwm-titus/slstatus" || { echo "Failed to change directory to slstatus"; return 1; }
+        if $ESCALATION_TOOL make clean install; then
+            echo "slstatus installed successfully"
+        else
+            echo "Failed to install slstatus"
+            return 1
+        fi
+    else
+        echo "Skipping slstatus installation"
+    fi
+    cd "$HOME"
 }
 
 run() {
@@ -276,6 +290,7 @@ run() {
     setupDisplayManager
     setupDWM
     makeDWM
+    install_slstatus
     install_nerd_font
     clone_config_folders
     configure_backgrounds

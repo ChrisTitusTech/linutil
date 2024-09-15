@@ -82,7 +82,7 @@ mkdir -p "$mods_path"
 
 # Download the latest release
 echo "Downloading the latest loot filter..."
-wget -q --show-progress https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip -O /tmp/lootfilter.zip
+curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip
 
 # Extract the contents to the mods folder
 echo "Extracting loot filter to $mods_path..."
