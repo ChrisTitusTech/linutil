@@ -310,7 +310,7 @@ install_slstatus() {
     else
         echo "Skipping slstatus installation"
     fi
-    cd ..
+    cd "$HOME"
 }
 
 checkEnv
