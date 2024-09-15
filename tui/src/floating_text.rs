@@ -8,7 +8,7 @@ use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, List},
+    widgets::{Block, Borders, Clear, List},
     Frame,
 };
 
@@ -90,6 +90,9 @@ impl FloatContent for FloatingText {
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
+
+        // Clear the text underneath the floats rendered area
+        frame.render_widget(Clear, inner_area);
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
