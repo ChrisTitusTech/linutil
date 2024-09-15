@@ -6,7 +6,7 @@
 configureVirtualization() {
     case $PACKAGER in
         dnf)
-             echo "Installing virtualization tools..."
+            echo "Installing virtualization tools..."
             $ESCALATION_TOOL "$PACKAGER" install -y @virtualization 
             echo "Installed virtualization tools..."
             ;;
@@ -16,5 +16,8 @@ configureVirtualization() {
     esac
 }
 
-checkEnv
+checkEnv () {
+    checkEscalationTool
+ }
+
 configureVirtualization
