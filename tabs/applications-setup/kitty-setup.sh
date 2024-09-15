@@ -31,6 +31,7 @@ revertKitty() {
 
     if [ -d "${CONFIG_DIR}" ]; then
         rm -rf "${CONFIG_DIR}"
+        mv "${HOME}/.config/kitty-bak" "${HOME}/.config/kitty"
         echo "Kitty configuration reverted."
 
         if command_exists kitty; then
