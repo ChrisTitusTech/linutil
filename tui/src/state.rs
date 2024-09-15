@@ -220,7 +220,7 @@ impl AppState {
             Focus::Search => match self.filter.handle_key(key) {
                 SearchAction::Exit => self.exit_search(),
                 SearchAction::Update => self.update_items(),
-                _ => {}
+                SearchAction::None => {}
             },
             _ if key.code == KeyCode::Char('q') => return false,
             Focus::TabList => match key.code {

@@ -57,9 +57,7 @@ impl FloatingText {
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         // Define the Block with a border and background color
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .style(Style::default());
+        let block = Block::default().borders(Borders::ALL);
 
         // Draw the Block first
         frame.render_widget(block.clone(), area);
