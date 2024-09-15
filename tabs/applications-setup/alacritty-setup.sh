@@ -30,17 +30,22 @@ revertAlacritty() {
     if [ -d "${HOME}/.config/alacritty-bak" ]; then
         rm -rf "${HOME}/.config/alacritty"
         mv "${HOME}/.config/alacritty-bak" "${HOME}/.config/alacritty"
-        
+        echo "Alacritty setup reverted"
+
         if command_exists alacritty; then
-            case ${PACKAGER} in
-                pacman)
-                    $ESCALATION_TOOL ${PACKAGER} -R --noconfirm alacritty
-                    ;;
-                *)
-                    $ESCALATION_TOOL ${PACKAGER} remove -y alacritty
-                    ;;
-            esac
-            echo "Alacritty uninstalled."
+            printf "Do you want to uninstall Alacritty as well? (y/N): "
+            read uninstall_choice
+            if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+                case ${PACKAGER} in
+                    pacman)
+                        $ESCALATION_TOOL ${PACKAGER} -R --noconfirm alacritty
+                        ;;
+                    *)
+                        $ESCALATION_TOOL ${PACKAGER} remove -y alacritty
+                        ;;
+                esac
+                echo "Alacritty uninstalled."
+            fi
         fi
     else
         echo "No backup found. Nothing to revert."
