@@ -26,7 +26,7 @@ name = "Fedora"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values =  ["dnf"]
+values = ["dnf"]
 
 [[data.entries]]
 name = "RPM Fusion Setup"
@@ -35,6 +35,7 @@ script = "fedora/rpm-fusion-setup.sh"
 [[data]]
 name = "Full System Update"
 script = "system-update.sh"
+revertable = false
 
 [[data]]
 name = "Build Prerequisites"
