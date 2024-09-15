@@ -26,11 +26,11 @@ setupAlacritty() {
 }
 
 revertAlacritty() {
-    echo "Reverting Alacritty setup..."
+    echo "Reverting Alacritty configuration..."
     if [ -d "${HOME}/.config/alacritty-bak" ]; then
         rm -rf "${HOME}/.config/alacritty"
         mv "${HOME}/.config/alacritty-bak" "${HOME}/.config/alacritty"
-        echo "Alacritty setup reverted"
+        echo "Alacritty configuration reverted"
 
         if command_exists alacritty; then
             printf "Do you want to uninstall Alacritty as well? (y/N): "
