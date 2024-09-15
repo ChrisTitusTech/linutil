@@ -46,7 +46,43 @@ EOL
   echo 'export ZDOTDIR="$HOME/.config/zsh"' | $ESCALATION_TOOL tee -a /etc/zsh/zshenv
 }
 
-checkEnv
-checkEscalationTool
-install_zsh
-setup_zsh_config
+revertZSH() {
+    echo "Reverting ZSH setup..."
+    CONFIG_DIR="$HOME/.config/zsh"
+
+    if [ -d "${CONFIG_DIR}" ]; then
+        rm -rf "$CONFIG_DIR"
+        echo "ZSH configuration reverted."
+
+        if command_exists zsh; then
+            printf "Do you want to uninstall ZSH as well? (y/N): "
+            read uninstall_choice
+            if [ "$uninstall_choice" = "y" ] || [ "$uninstall_choice" = "Y" ]; then
+                case ${PACKAGER} in
+                    pacman)
+                        $ESCALATION_TOOL ${PACKAGER} -R --noconfirm zsh
+                        ;;
+                    *)
+                        $ESCALATION_TOOL ${PACKAGER} remove -y zsh
+                        ;;
+                esac
+                echo "ZSH uninstalled."
+            fi
+        fi
+    else
+        echo "No ZSH configuration found. Nothing to revert."
+    fi
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    install_zsh
+    setup_zsh_config
+}
+
+revert() {
+    checkEnv
+    checkEscalationTool
+    revertZSH
+}
