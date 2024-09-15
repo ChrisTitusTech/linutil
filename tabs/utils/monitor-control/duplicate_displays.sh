@@ -13,4 +13,16 @@ duplicate_displays() {
   done
 }
 
-duplicate_displays
+revertDuplicateDisplays() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    duplicate_displays
+}
+
+revert() {
+    checkEnv
+    revertDuplicateDisplays
+}

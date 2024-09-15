@@ -83,5 +83,16 @@ confirm_action() {
     fi
 }
 
-checkEnv
-setup_xrandr
+revertUtilityFunctions() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    setup_xrandr
+}
+
+revert() {
+    checkEnv
+    revertUtilityFunctions
+}

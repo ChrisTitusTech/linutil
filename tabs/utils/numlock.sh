@@ -60,5 +60,17 @@ numlockSetup() {
   fi
 }
 
-checkEscalationTool
-numlockSetup
+revertNumlockSetup() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    checkEscalationTool
+    numlockSetup
+}
+
+revert() {
+    checkEnv
+    revertNumlockSetup
+}

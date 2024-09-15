@@ -156,7 +156,17 @@ remove_device() {
     prompt_for_mac "remove" "remove" "Enter the number of the device to remove: " "Removing device completed." "Failed to remove device."
 }
 
-# Initialize
-checkEnv
-setupBluetooth
-main_menu
+revertBluetoothControl() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    setupBluetooth
+    main_menu
+}
+
+revert() {
+    checkEnv
+    revertBluetoothControl
+}

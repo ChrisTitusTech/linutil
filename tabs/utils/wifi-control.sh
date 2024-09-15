@@ -196,7 +196,17 @@ remove_network() {
     prompt_for_network "remove" "Enter the number of the network to remove: " "Network removed successfully." "Failed to remove the network."
 }
 
-# Initialize
-checkEnv
-setupNetworkManager
-main_menu
+revertWifiControl() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    setupNetworkManager
+    main_menu
+}
+
+revert() {
+    checkEnv
+    revertWifiControl
+}

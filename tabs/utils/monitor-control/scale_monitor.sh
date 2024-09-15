@@ -40,5 +40,16 @@ scale_monitors() {
     echo -e "${GREEN}Scaling complete. All monitors are now scaled to ${max_width}x${max_height}.${RESET}"
 }
 
-# Call the scale_monitors function
-scale_monitors
+revertScaleMonitor() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    scale_monitors
+}
+
+revert() {
+    checkEnv
+    revertScaleMonitor
+}

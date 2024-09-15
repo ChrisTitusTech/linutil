@@ -30,4 +30,16 @@ auto_detect_displays() {
     fi
 }
 
-auto_detect_displays
+revertAutoDetectDisplays() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    auto_detect_displays
+}
+
+revert() {
+    checkEnv
+    revertAutoDetectDisplays
+}

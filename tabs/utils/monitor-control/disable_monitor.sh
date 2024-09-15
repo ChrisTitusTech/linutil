@@ -56,5 +56,16 @@ confirm_action() {
     fi
 }
 
-# Call the disable_monitor function
-disable_monitor
+revertDisableMonitor() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    disable_monitor
+}
+
+revert() {
+    checkEnv
+    revertDisableMonitor
+}

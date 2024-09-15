@@ -13,4 +13,16 @@ extend_displays() {
     done
 }
 
-extend_displays
+revertExtendDisplays() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    extend_displays
+}
+
+revert() {
+    checkEnv
+    revertExtendDisplays
+}

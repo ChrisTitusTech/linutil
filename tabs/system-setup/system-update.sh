@@ -95,9 +95,20 @@ updateFlatpaks() {
     fi
 }
 
-checkEnv
-checkAURHelper
-checkEscalationTool
-fastUpdate
-updateSystem
-updateFlatpaks
+revertSystemUpdate() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    checkAURHelper
+    checkEscalationTool
+    fastUpdate
+    updateSystem
+    updateFlatpaks
+}
+
+revert() {
+    checkEnv
+    revertSystemUpdate
+}

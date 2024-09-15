@@ -54,5 +54,16 @@ change_orientation() {
     fi
 }
 
-# Call the change_orientation function
-change_orientation
+revertChangeOrientation() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    change_orientation
+}
+
+revert() {
+    checkEnv
+    revertChangeOrientation
+}

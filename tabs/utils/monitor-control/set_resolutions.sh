@@ -90,4 +90,16 @@ set_resolutions() {
     done
 }
 
-set_resolutions
+revertSetResolutions() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    setup_xrandr
+}
+
+revert() {
+    checkEnv
+    revertSetResolutions
+}

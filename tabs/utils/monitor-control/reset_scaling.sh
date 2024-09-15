@@ -19,5 +19,16 @@ reset_scaling() {
     echo -e "${GREEN}All monitor scalings have been reset to 1x1.${RESET}"
 }
 
-# Call the reset_scaling function
-reset_scaling
+revertResetScaling() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    reset_scaling
+}
+
+revert() {
+    checkEnv
+    revertResetScaling
+}

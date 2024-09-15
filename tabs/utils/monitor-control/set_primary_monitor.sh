@@ -34,5 +34,16 @@ set_primary_monitor() {
     fi
 }
 
-# Call the set_primary_monitor function
-set_primary_monitor
+revertSetPrimaryMonitor() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    set_primary_monitor
+}
+
+revert() {
+    checkEnv
+    revertSetPrimaryMonitor
+}

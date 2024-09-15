@@ -67,5 +67,16 @@ manage_arrangement() {
     fi
 }
 
-# Call the manage_arrangement function
-manage_arrangement
+revertManageArrangement() {
+    echo "Reverting is not implemented for this script."
+}
+
+run() {
+    checkEnv
+    manage_arrangement
+}
+
+revert() {
+    checkEnv
+    revertManageArrangement
+}
