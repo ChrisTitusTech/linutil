@@ -158,7 +158,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
                 name: entry.name,
                 raw_command: Command::Raw(command.clone()),
                 command: Command::Raw(command.clone()),
-                revert_command: Command::Raw(command),
+                revert_command: Command::None,
             });
         } else if let Some(script) = entry.script {
             let dir = command_dir.join(script.clone());

@@ -152,7 +152,7 @@ impl RunningCommand {
                     cmd.cwd(parent);
                 }
             }
-            Command::None => panic!("Command::None was treated as a command"),
+            Command::None => (),
         }
 
         // Open a pseudo-terminal with initial size

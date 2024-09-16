@@ -356,8 +356,18 @@ impl AppState {
     }
     fn handle_revert(&mut self) {
         if let Some(cmd) = self.get_selected_commands().2 {
-            let command = RunningCommand::new(cmd);
-            self.spawn_float(command, 80, 80);
+            if cmd != Command::None {
+                let command = RunningCommand::new(cmd);
+                self.spawn_float(command, 80, 80);
+            } else {
+                self.spawn_float(
+                    FloatingText::new(vec![
+                        "Revert functionality not found for this command.".to_string()
+                    ]),
+                    38,
+                    10,
+                );
+            }
         }
     }
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
