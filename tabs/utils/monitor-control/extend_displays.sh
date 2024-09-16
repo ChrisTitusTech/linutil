@@ -2,14 +2,22 @@
 
 . ./utility_functions.sh
 
+. ../../common-script.sh
+
 # Function to extend displays
 extend_displays() {
-    monitors=($(detect_connected_monitors))
-    for ((i=1; i<${#monitors[@]}; i++)); do
-        if confirm_action "Extend ${monitors[$i]} to the right of ${monitors[$((i-1))]}?"; then
-            echo "Extending ${monitors[$i]} to the right of ${monitors[$((i-1))]}"
-            execute_command "xrandr --output ${monitors[$i]} --right-of ${monitors[$((i-1))]}"
+    monitors=$(detect_connected_monitors)
+    monitor_array=$(echo "$monitors" | tr '\n' ' ')
+    i=1
+    for monitor in $monitor_array; do
+        if [ "$i" -gt 1 ]; then
+            prev_monitor=$(echo "$monitor_array" | cut -d' ' -f$((i-1)))
+            if confirm_action "Extend $monitor to the right of $prev_monitor?"; then
+                printf "%b\n" "${GREEN}Extending $monitor to the right of $prev_monitor${RC}"
+                execute_command "xrandr --output $monitor --right-of $prev_monitor"
+            fi
         fi
+        i=$((i + 1))
     done
 }
 

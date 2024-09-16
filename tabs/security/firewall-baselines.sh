@@ -19,7 +19,7 @@ installPkg() {
 }
 
 configureUFW() {
-    echo -e "${GREEN}Using Chris Titus Recommended Firewall Rules${RC}"
+    printf "%b\n" "${GREEN}Using Chris Titus Recommended Firewall Rules${RC}"
 
     echo "Disabling UFW"
     $ESCALATION_TOOL ufw disable
@@ -40,7 +40,7 @@ configureUFW() {
     $ESCALATION_TOOL ufw default allow outgoing
 
     $ESCALATION_TOOL ufw enable
-    echo -e "${GREEN}Enabled Firewall with Baselines!${RC}"
+    printf "%b\n" "${GREEN}Enabled Firewall with Baselines!${RC}"
 }
 
 revertFirewall() {

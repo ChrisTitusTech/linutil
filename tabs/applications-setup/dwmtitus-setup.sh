@@ -1,4 +1,5 @@
 #!/bin/sh -e
+
 . ../common-script.sh
 
 makeDWM() {
@@ -55,7 +56,7 @@ install_nerd_font() {
     # Check if the font zip file already exists
     if [ ! -f "$FONT_ZIP" ]; then
         # Download the font zip file
-        wget -P "$FONT_DIR" "$FONT_URL" || {
+        curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
             echo "Failed to download Meslo Nerd-fonts from $FONT_URL"
             return 1
         }
@@ -114,7 +115,7 @@ picom_animations() {
     fi
 
     # Install the built binary
-    if ! sudo ninja -C build install; then
+    if ! $ESCALATION_TOOL ninja -C build install; then
         echo "Failed to install the built binary"
         return 1
     fi
@@ -192,8 +193,8 @@ setupDisplayManager() {
     echo "Setting up Display Manager"
     currentdm="none"
     for dm in gdm sddm lightdm; do
-        if systemctl is-active --quiet $dm.service; then
-            currentdm=$dm
+        if systemctl is-active --quiet "$dm.service"; then
+            currentdm="$dm"
             break
         fi
     done
@@ -203,13 +204,13 @@ setupDisplayManager() {
         echo "No display manager found, installing $DM"
         case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm $DM
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
             apt)
-                $ESCALATION_TOOL "$PACKAGER" install -y $DM
+                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
-                $ESCALATION_TOOL "$PACKAGER" install -y $DM
+                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
                 ;;
             *)
                 echo "Unsupported package manager: $PACKAGER"
@@ -217,82 +218,67 @@ setupDisplayManager() {
                 ;;
         esac
         echo "$DM installed successfully"
-        systemctl enable $DM
-
-        # Clear the screen
-        clear
+        systemctl enable "$DM"
 
         # Prompt user for auto-login
-        echo "Do you want to enable auto-login?"
-        echo "Use arrow keys or j/k to navigate, Enter to select"
-        options=("Yes" "No")
-        selected=0
-
-        # Function to print menu
-        print_menu() {
-            for i in "${!options[@]}"; do
-                if [ $i -eq $selected ]; then
-                    echo "> ${options[$i]}"
+        # Using printf instead of echo -n as It's more posix-compliant.
+        printf "Do you want to enable auto-login? (Y/n) "
+        read -r answer
+        case "$answer" in
+            [Yy]*)
+                echo "Configuring SDDM for autologin"
+                SDDM_CONF="/etc/sddm.conf"
+                if [ ! -f "$SDDM_CONF" ]; then
+                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                 else
-                    echo "  ${options[$i]}"
+                    $ESCALATION_TOOL sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
+                    $ESCALATION_TOOL sed -i '/^User=/d' "$SDDM_CONF"
+                    $ESCALATION_TOOL sed -i '/^Session=/d' "$SDDM_CONF"
+                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                 fi
-            done
-        }
-
-        # Handle user input
-        while true; do
-            print_menu
-            read -rsn1 key
-            case "$key" in
-                $'\x1B')  # ESC sequence for arrow keys
-                    read -rsn2 key
-                    case "$key" in
-                        '[A' | 'k') ((selected > 0)) && ((selected--));;  # Up arrow or k
-                        '[B' | 'j') ((selected < ${#options[@]}-1)) && ((selected++));;  # Down arrow or j
-                    esac
-                    ;;
-                '') break;;  # Enter key
-            esac
-            clear
-        done
-
-        if [ "${options[$selected]}" = "Yes" ]; then
-            echo "Configuring SDDM for autologin"
-            SDDM_CONF="/etc/sddm.conf"
-            if [ ! -f "$SDDM_CONF" ]; then
-                echo "[Autologin]" | sudo tee -a "$SDDM_CONF"
-                echo "User=$USER" | sudo tee -a "$SDDM_CONF"
-                echo "Session=dwm" | sudo tee -a "$SDDM_CONF"
-            else
-                sudo sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
-                sudo sed -i '/^User=/d' "$SDDM_CONF"
-                sudo sed -i '/^Session=/d' "$SDDM_CONF"
-                echo "[Autologin]" | sudo tee -a "$SDDM_CONF"
-                echo "User=$USER" | sudo tee -a "$SDDM_CONF"
-                echo "Session=dwm" | sudo tee -a "$SDDM_CONF"
-            fi
-            echo "Checking if autologin group exists"
-            if ! getent group autologin > /dev/null; then
-                echo "Creating autologin group"
-                sudo groupadd autologin
-            else
-                echo "Autologin group already exists"
-            fi
-            echo "Adding user with UID 1000 to autologin group"
-            USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
-            if [ -n "$USER_UID_1000" ]; then
-                sudo usermod -aG autologin "$USER_UID_1000"
-                echo "User $USER_UID_1000 added to autologin group"
-            else
-                echo "No user with UID 1000 found - Auto login not possible"
-            fi
-        else
-            echo "Auto-login configuration skipped"
-        fi
+                echo "Checking if autologin group exists"
+                if ! getent group autologin > /dev/null; then
+                    echo "Creating autologin group"
+                    $ESCALATION_TOOL groupadd autologin
+                else
+                    echo "Autologin group already exists"
+                fi
+                echo "Adding user with UID 1000 to autologin group"
+                USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
+                if [ -n "$USER_UID_1000" ]; then
+                    $ESCALATION_TOOL usermod -aG autologin "$USER_UID_1000"
+                    echo "User $USER_UID_1000 added to autologin group"
+                else
+                    echo "No user with UID 1000 found - Auto login not possible"
+                fi
+                ;;
+            *)
+                echo "Auto-login configuration skipped"
+                ;;
+        esac
     fi
-    
+}
 
-    
+install_slstatus() {
+    printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
+    read -r response # -r flag to prevent backslashes from being interpreted
+    if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
+        echo "Installing slstatus"
+        cd "$HOME/dwm-titus/slstatus" || { echo "Failed to change directory to slstatus"; return 1; }
+        if $ESCALATION_TOOL make clean install; then
+            echo "slstatus installed successfully"
+        else
+            echo "Failed to install slstatus"
+            return 1
+        fi
+    else
+        echo "Skipping slstatus installation"
+    fi
+    cd "$HOME"
 }
 
 revertDwmTitusSetup() {
@@ -305,6 +291,7 @@ run() {
     setupDisplayManager
     setupDWM
     makeDWM
+    install_slstatus
     install_nerd_font
     clone_config_folders
     configure_backgrounds

@@ -2,55 +2,40 @@
 
 . ./utility_functions.sh
 
-RESET='\033[0m'
-BOLD='\033[1m'
-RED='\033[31m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-BLUE='\033[34m'
-CYAN='\033[36m'
+. ../../common-script.sh
 
 # Function to enable a monitor
 enable_monitor() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
+    monitor_array=$(echo "$monitor_list" | tr '\n' ' ')
 
     clear
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${BLUE}  Enable Monitor${RESET}"
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${YELLOW}Choose a monitor to enable:${RESET}"
-    for i in "${!monitor_array[@]}"; do
-        echo -e "$((i + 1)). ${CYAN}${monitor_array[i]}${RESET}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}  Enable Monitor${RC}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}Choose a monitor to enable:${RC}"
+    
+    i=1
+    for monitor in $monitor_array; do
+        printf "%b\n" "$i. ${GREEN}$monitor${RC}"
+        i=$((i + 1))
     done
 
     read -p "Enter the number of the monitor: " monitor_choice
 
-    if ! [[ "$monitor_choice" =~ ^[0-9]+$ ]] || (( monitor_choice < 1 )) || (( monitor_choice > ${#monitor_array[@]} )); then
-        echo -e "${RED}Invalid selection.${RESET}"
+    if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
+        printf "%b\n" "${RED}Invalid selection.${RC}"
         return
     fi
 
-    monitor_name="${monitor_array[monitor_choice - 1]}"
+    monitor_name=$(echo "$monitor_array" | cut -d' ' -f"$monitor_choice")
 
-    if confirm_action "Enable ${CYAN}$monitor_name${RESET}?"; then
-        echo -e "${GREEN}Enabling $monitor_name${RESET}"
+    if confirm_action "Enable $monitor_name?"; then
+        printf "%b\n" "${GREEN}Enabling $monitor_name${RC}"
         execute_command "xrandr --output $monitor_name --auto"
-        echo -e "${GREEN}Monitor $monitor_name enabled successfully.${RESET}"
+        printf "%b\n" "${GREEN}Monitor $monitor_name enabled successfully.${RC}"
     else
-        echo -e "${RED}Action canceled.${RESET}"
-    fi
-}
-
-# Function to prompt for confirmation
-confirm_action() {
-    local action="$1"
-    echo -e "${BOLD}${YELLOW}$action${RESET}"
-    read -p "Are you sure? (y/n): " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        return 0
-    else
-        return 1
+        printf "%b\n" "${RED}Action canceled.${RC}"
     fi
 }
 

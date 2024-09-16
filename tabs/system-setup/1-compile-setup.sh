@@ -5,7 +5,7 @@
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
-    echo -e "${YELLOW}Installing dependencies...${RC}"
+    printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case $PACKAGER in
         pacman)
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then

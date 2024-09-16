@@ -20,7 +20,7 @@ fastUpdate() {
 
             $ESCALATION_TOOL rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
             if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
-                echo -e "${RED}Rate-mirrors failed, restoring backup.${RC}"
+                printf "%b\n" "${RED}Rate-mirrors failed, restoring backup.${RC}"
                 $ESCALATION_TOOL cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
             fi
             ;;
@@ -28,7 +28,7 @@ fastUpdate() {
         apt-get|nala)
             $ESCALATION_TOOL apt-get update
             if ! command_exists nala; then
-                $ESCALATION_TOOL apt-get install -y nala || { echo -e "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
+                $ESCALATION_TOOL apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
             fi
 
             if [ "${PACKAGER}" = "nala" ]; then
@@ -54,14 +54,14 @@ fastUpdate() {
             $ESCALATION_TOOL ${PACKAGER} -Syu
             ;;
         *)
-            echo -e "${RED}Unsupported package manager: $PACKAGER${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
 }
 
 updateSystem() {
-    echo -e "${GREEN}Updating system${RC}"
+    printf "%b\n" "${GREEN}Updating system${RC}"
     case ${PACKAGER} in
         nala|apt-get)
             $ESCALATION_TOOL "${PACKAGER}" update -y
@@ -83,7 +83,7 @@ updateSystem() {
             $ESCALATION_TOOL ${PACKAGER} -Syu
             ;;
         *)
-            echo -e "${RED}Unsupported package manager: ${PACKAGER}${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
             exit 1
             ;;
     esac
