@@ -173,7 +173,7 @@ impl AppState {
                 let revert = if let Some(selected) = selected {
                     selected.selected_reversion
                 } else {
-                    node.default_revertable != self.reversed_items
+                    node.revertable && node.default_revertable != self.reversed_items
                 };
                 let revert_text = if revert { "Revert " } else { "" };
 
