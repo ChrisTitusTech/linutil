@@ -11,6 +11,7 @@ command = "bash -c \"$(curl -s https://raw.githubusercontent.com/ChrisTitusTech/
 [[data]]
 name = "DWM-Titus"
 script = "dwmtitus-setup.sh"
+revertable = false
 
 [[data]]
 name = "Kitty"

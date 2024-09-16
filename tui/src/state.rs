@@ -293,24 +293,14 @@ impl AppState {
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(RevertableCommand {
-            command,
-            revertable,
-            selected_reversion,
-        }) = self.get_selected_command()
-        {
+        if let Some(command) = self.get_selected_command() {
             if let Some(position) = self
                 .selected_commands
                 .iter()
-                .position(|RevertableCommand { command: c, .. }| c == &command)
+                .position(|RevertableCommand { command: c, .. }| c == &command.command)
             {
                 self.selected_commands.remove(position);
             } else {
-                let command = RevertableCommand {
-                    command,
-                    revertable,
-                    selected_reversion: selected_reversion != self.reversed_items,
-                };
                 self.selected_commands.push(command);
             }
         }
