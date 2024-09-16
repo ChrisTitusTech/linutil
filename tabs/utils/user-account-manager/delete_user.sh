@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+. ../../common-script.sh
 . ./utility_functions.sh
 
 clear
@@ -21,3 +22,5 @@ confirmAction || exit 1
 
 $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
 printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
+
+checkEnv

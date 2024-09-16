@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+. ../../common-script.sh
 . ./utility_functions.sh
 
 clear
@@ -14,3 +15,5 @@ confirmAction || exit 1
 
 echo "$username:$password" | $ESCALATION_TOOL chpasswd
 printf "%b\n" "${GREEN}Password changed successfully${RC}"
+
+checkEnv

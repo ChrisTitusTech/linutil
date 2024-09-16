@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+. ../../common-script.sh
 . ./utility_functions.sh
 
 clear
@@ -21,3 +22,5 @@ echo "$username:$password" | $ESCALATION_TOOL chpasswd
 
 printf "%b\n" "${GREEN}User $username created successfully${RC}"
 printf "%b\n" "${GREEN}To add additional groups use Add User To Groups${RC}"
+
+checkEnv
