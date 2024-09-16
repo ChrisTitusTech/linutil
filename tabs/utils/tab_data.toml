@@ -17,6 +17,10 @@ name = "Ollama"
 script = "ollama.sh"
 
 [[data]]
+name = "Service Manager"
+script = "service-control.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]

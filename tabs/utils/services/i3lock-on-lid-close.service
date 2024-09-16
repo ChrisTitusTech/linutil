@@ -1,0 +1,14 @@
+/etc/systemd/system/
+
+[Unit]
+Description=i3lock on Lid Close
+Before=sleep.target
+
+[Service]
+User=
+Type=forking
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/i3lock
+
+[Install]
+WantedBy=sleep.target
