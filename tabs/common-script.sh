@@ -70,7 +70,7 @@ checkEscalationTool() {
             fi
         done
 
-        echo -e "${RED}Can't find a supported escalation tool${RC}"
+        printf "%b\n" "${RED}Can't find a supported escalation tool${RC}"
         exit 1
     fi
 }
@@ -98,7 +98,7 @@ checkPackageManager() {
     done
 
     if [ -z "${PACKAGER}" ]; then
-        echo -e "${RED}Can't find a supported package manager${RC}"
+        printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
 }
