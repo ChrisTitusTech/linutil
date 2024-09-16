@@ -27,3 +27,7 @@ script = "rofi-setup.sh"
 [[data]]
 name = "ZSH Prompt"
 script = "zsh-setup.sh"
+
+[[data]]
+name = "Fastfetch"
+script = "fastfetch-setup.sh"
