@@ -4,7 +4,7 @@
 
 installDepend() {
     ## Check for dependencies.
-    echo -e "${YELLOW}Installing dependencies...${RC}"
+    printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     if [ "$PACKAGER" = "pacman" ]; then
         if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
             echo "[multilib]" | $ESCALATION_TOOL tee -a /etc/pacman.conf
@@ -38,8 +38,7 @@ install_additional_dependencies() {
                 cut -d '/' --fields=3)
 
             version_no_v=$(echo "$version" | tr -d v)
-            wget "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
-
+            curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
             # Install the downloaded .deb package using apt-get
             echo "Installing lutris_${version_no_v}_all.deb"
             $ESCALATION_TOOL apt-get update
