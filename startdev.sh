@@ -75,5 +75,4 @@ check $? "Executing linutil"
 
 rm -f $TMPFILE
 check $? "Deleting the temporary file"
-
 } # End of wrapping
