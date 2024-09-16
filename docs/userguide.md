@@ -37,4 +37,4 @@
 - **Bluetooth Control**: Controls Bluetooth settings.
 - **Wifi Control**: Controls WiFi settings.
 - **Numlock Control**: Sets up Numlock on boot.
-- **User Management**: Manages users and groups.
+- **User Account Manager**: Manage users and groups.
