@@ -13,6 +13,10 @@ name = "Numlock on Startup"
 script = "numlock.sh"
 
 [[data]]
+name = "Service Control"
+script = "service-control.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
