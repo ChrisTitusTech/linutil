@@ -1,12 +1,16 @@
+#!/bin/sh -e
+
+. ./utility_functions.sh
+
+clear
 printf "%b\n" "${YELLOW}Change password${RC}"
 printf "%b\n" "${YELLOW}=================${RC}"
 
-password=$(promptPassword)
+username=$(promptUsername "" "root") || exit 1
+password=$(promptPassword) || exit 1
 
 read -p "Are you sure you want to change password for $username? [Y/N]: " confirm
-confirmAction
+confirmAction || exit 1
 
-echo "$1:$password" | $ESCALATION_TOOL chpasswd
+echo "$username:$password" | $ESCALATION_TOOL chpasswd
 printf "%b\n" "${GREEN}Password changed successfully${RC}"
-printf "%b\n" "${GREEN}Press [Enter] to continue...${RC}"
-read dummy
