@@ -16,6 +16,9 @@ setupKitty() {
     else
         echo "Kitty is already installed."
     fi
+}
+
+setupKittyConfig() {
     echo "Copy Kitty config files"
     if [ -d "${HOME}/.config/kitty" ] && [ ! -d "${HOME}/.config/kitty-bak" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
@@ -23,8 +26,10 @@ setupKitty() {
     mkdir -p "${HOME}/.config/kitty/"
     curl -sSLo "${HOME}/.config/kitty/kitty.conf" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/kitty.conf
     curl -sSLo "${HOME}/.config/kitty/nord.conf" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/nord.conf
+    
 }
 
 checkEnv
 checkEscalationTool
 setupKitty
+setupKittyConfig
