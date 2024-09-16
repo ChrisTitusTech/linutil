@@ -62,9 +62,9 @@ installAdditionalDepend() {
                 cut -d '/' --fields=3)
 
             version_no_v=$(echo "$version" | tr -d v)
-            wget "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
-
-            # Install the downloaded .deb
+            curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
+            
+	    # Install the downloaded .deb package
             echo "Installing lutris_${version_no_v}_all.deb"
             $ESCALATION_TOOL "$PACKAGER" update
             $ESCALATION_TOOL "$PACKAGER" install ./lutris_${version_no_v}_all.deb
