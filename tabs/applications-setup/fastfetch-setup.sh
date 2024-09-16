@@ -16,6 +16,9 @@ setupFastfetch() {
     else
         echo "Fastfetch is already installed."
     fi
+}
+
+setupFastfetchConfig() {
     echo "Copy Fastfetch config files"
     if [ -d "${HOME}/.config/fastfetch" ] && [ ! -d "${HOME}/.config/fastfetch-bak" ]; then
         cp -r "${HOME}/.config/fastfetch" "${HOME}/.config/fastfetch-bak"
@@ -27,3 +30,4 @@ setupFastfetch() {
 checkEnv
 checkEscalationTool
 setupFastfetch
+setupFastfetchConfig
