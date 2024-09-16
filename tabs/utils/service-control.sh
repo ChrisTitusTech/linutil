@@ -55,7 +55,12 @@ add_service() {
     while [ -z "$SERVICE_NAME" ]; do
         echo "Enter the name of the new service (e.g., my_service):"
         read -r SERVICE_NAME
-    done    
+
+        if $ESCALATION_TOOL systemctl list-units --type=service --all --no-legend | grep -q "$SERVICE_NAME.service"; then
+            echo "Service already exists!"
+            SERVICE_NAME=""
+        fi
+    done
 
     echo "Enter the description of the service:"
     read -r SERVICE_DESCRIPTION
