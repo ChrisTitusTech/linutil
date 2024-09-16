@@ -136,24 +136,30 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(command: Command) -> Self {
+    pub fn new(commands: Vec<Command>) -> Self {
         let pty_system = NativePtySystem::default();
 
-        // Build the command based on the provided Command enum variant
-        let mut cmd = CommandBuilder::new("sh");
-        match command {
-            Command::Raw(prompt) => {
-                cmd.arg("-c");
-                cmd.arg(prompt);
-            }
-            Command::LocalFile(file) => {
-                cmd.arg(&file);
-                if let Some(parent) = file.parent() {
-                    cmd.cwd(parent);
+        // Create a command to execute all the selected commands
+        let mut cmd: CommandBuilder = CommandBuilder::new("sh");
+        cmd.arg("-c");
+
+        // Initialize an empty string to hold the merged commands
+        // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
+        let mut script = String::new();
+        for command in commands {
+            match command {
+                Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)), // Merge raw commands
+                Command::LocalFile(file) => {
+                    if let Some(parent) = file.parent() {
+                        script.push_str(&format!("cd {}\n", parent.display())); // Merge local file path
+                    }
+                    script.push_str(&format!("sh {}\n", file.display()));
                 }
+                Command::None => panic!("Command::None was treated as a command"),
             }
-            Command::None => panic!("Command::None was treated as a command"),
         }
+
+        cmd.arg(script);
 
         // Open a pseudo-terminal with initial size
         let pair = pty_system

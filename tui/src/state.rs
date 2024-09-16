@@ -33,6 +33,8 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
+    multi_select: bool,              // This keeps track of Multi select toggle
+    selected_commands: Vec<Command>, // This field is to store selected commands
 }
 
 pub enum Focus {
@@ -60,6 +62,8 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            multi_select: false,
+            selected_commands: Vec::new(), // Initialize with an empty vector
         };
         state.update_items();
         state
@@ -154,12 +158,29 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(self.theme.dir_color())
+                let is_selected = self.selected_commands.contains(&node.command);
+                let (indicator, style) = if is_selected {
+                    (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(self.theme.cmd_color())
+                    ("", Style::new())
+                };
+                if *has_children {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.dir_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.dir_color())
+                } else {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.cmd_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.cmd_color())
+                    .patch_style(style)
                 }
             },
         ));
@@ -171,11 +192,15 @@ impl AppState {
             } else {
                 Style::new()
             })
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
-            )
+            .block(Block::default().borders(Borders::ALL).title(format!(
+                "Linux Toolbox - {} {}",
+                env!("BUILD_DATE"),
+                if self.multi_select {
+                    "[Multi-Select]"
+                } else {
+                    ""
+                }
+            )))
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -233,11 +258,36 @@ impl AppState {
                 KeyCode::Tab => self.focus = Focus::TabList,
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
             _ => {}
         };
         true
+    }
+    fn toggle_multi_select(&mut self) {
+        if self.is_current_tab_multi_selectable() {
+            self.multi_select = !self.multi_select;
+            if !self.multi_select {
+                self.selected_commands.clear();
+            }
+        }
+    }
+    fn toggle_selection(&mut self) {
+        if let Some(command) = self.get_selected_command() {
+            if self.selected_commands.contains(&command) {
+                self.selected_commands.retain(|c| c != &command);
+            } else {
+                self.selected_commands.push(command);
+            }
+        }
+    }
+    pub fn is_current_tab_multi_selectable(&self) -> bool {
+        let index = self.current_tab.selected().unwrap_or(0);
+        self.tabs
+            .get(index)
+            .map_or(false, |tab| tab.multi_selectable)
     }
     fn update_items(&mut self) {
         self.filter.update_items(
@@ -245,6 +295,10 @@ impl AppState {
             self.current_tab.selected().unwrap(),
             *self.visit_stack.last().unwrap(),
         );
+        if !self.is_current_tab_multi_selectable() {
+            self.multi_select = false;
+            self.selected_commands.clear();
+        }
     }
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
@@ -342,9 +396,15 @@ impl AppState {
         }
     }
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command() {
-            let command = RunningCommand::new(cmd);
+        if self.selected_commands.is_empty() {
+            // If no commands are selected, run the currently by pushing them into vector
+            if let Some(cmd) = self.get_selected_command() {
+                self.selected_commands.push(cmd);
+            }
+
+            let command = RunningCommand::new(self.selected_commands.clone());
             self.spawn_float(command, 80, 80);
+            self.selected_commands.clear();
         } else {
             self.go_to_selected_dir();
         }
