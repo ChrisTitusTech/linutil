@@ -9,7 +9,6 @@ printf "%b\n" "${YELLOW}=================${RC}"
 username=$(promptUsername "" "non-root") || exit 1
 user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
 
-clear
 printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
 printf "%b\n" "${YELLOW}=================${RC}"
 

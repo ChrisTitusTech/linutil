@@ -81,7 +81,7 @@ checkReservedUsername() {
 # Check if user is reserved
 confirmAction() {
     if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
-        printf "%b\n" "${RED}Cancelled operation...${RC}"
+        printf "%b\n" "${RED}Cancelled operation...${RC}" >&2
         exit 1
     fi
 }
@@ -90,7 +90,7 @@ confirmAction() {
 checkGroupAvailabe() {
     for group in $1; do
         if ! echo "$2" | grep -wq "$group"; then
-            printf "%b\n" "${RED}Group $group not avaiable${RC}"
+            printf "%b\n" "${RED}Group $group not avaiable${RC}" >&2
             exit 1
         fi
     done
