@@ -96,4 +96,5 @@ checkGroupAvailabe() {
     done
 }
 
+checkEnv
 checkEscalationTool
