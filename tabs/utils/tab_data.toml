@@ -68,4 +68,19 @@ matches = true
 
 [[data]]
 name = "User Manager"
-script = "user-manager.sh"
+
+[[data.entries]]
+name = "Add User"
+script = "user-control/add_user.sh"
+
+[[data.entries]]
+name = "Delete User"
+script = "user-control/delete_user.sh"
+
+[[data.entries]]
+name = "Change Password"
+script = "user-control/change_password.sh"
+
+[[data.entries]]
+name = "Change User Group"
+script = "user-control/change_user_group.sh"
