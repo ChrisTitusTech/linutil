@@ -139,6 +139,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
             hints.push(Shortcut::new(vec!["t"], "Next theme"));
             hints.push(Shortcut::new(vec!["T"], "Previous theme"));
+            hints.push(Shortcut::new(vec!["r"], "Invert entries"));
             if state.is_current_tab_multi_selectable() {
                 hints.push(Shortcut::new(vec!["v"], "Toggle multi-selection mode"));
                 hints.push(Shortcut::new(vec!["Space"], "Select multiple commands"));
