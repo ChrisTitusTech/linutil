@@ -15,8 +15,8 @@ setupDWM() {
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb
             ;;
-        apt)
-            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libxcb1-dev libx11-xcb1
+        apt-get|nala)
+            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev
             ;;
         dnf)
             $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
@@ -178,7 +178,7 @@ setupDisplayManager() {
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
-        apt)
+        apt-get|nala)
             $ESCALATION_TOOL "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
@@ -206,7 +206,7 @@ setupDisplayManager() {
             pacman)
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
-            apt)
+            apt-get|nala)
                 $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
