@@ -10,7 +10,7 @@ setup_xrandr() {
             pacman)
                 $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm xorg-xrandr
                 ;;
-            apt-get)
+            apt-get|nala)
                 $ESCALATION_TOOL "${PACKAGER}" install -y x11-xserver-utils
                 ;;
             *)
@@ -83,4 +83,5 @@ confirm_action() {
 }
 
 checkEnv
+checkEscalationTool
 setup_xrandr
