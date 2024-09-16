@@ -170,11 +170,12 @@ impl AppState {
                     ("", Style::new())
                 };
 
-                let revert = if let Some(selected) = selected {
-                    selected.selected_reversion
-                } else {
-                    node.revertable && node.default_revertable != self.reversed_items
-                };
+                let revert = node.revertable
+                    && if let Some(selected) = selected {
+                        selected.selected_reversion
+                    } else {
+                        node.default_revertable != self.reversed_items
+                    };
                 let revert_text = if revert { "Revert " } else { "" };
 
                 if *has_children {
