@@ -235,7 +235,9 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         if matches!(self.focus, Focus::TabList | Focus::List) {
-            if key.code == KeyCode::Char('q') {
+            if key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL)
+            {
                 return false;
             }
         }
