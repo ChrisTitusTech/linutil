@@ -10,9 +10,9 @@ setup_git_config() {
     read email
 
     # Prompt for SSH key type
-    echo "Choose your SSH key type:"
-    echo "1. Ed25519 (recommended)"
-    echo "2. RSA (legacy)"
+    printf "Choose your SSH key type:"
+    printf "1. Ed25519 (recommended)"
+    printf "2. RSA (legacy)"
     printf "Enter your choice (1 or 2): "
     read key_type
 
@@ -21,7 +21,7 @@ setup_git_config() {
         1) key_algo="ed25519" ;;
         2) key_algo="rsa" ;;
         *)
-            echo "Invalid choice. Exiting."
+            printf "Invalid choice. Exiting."
             exit 1
             ;;
     esac
@@ -45,9 +45,9 @@ setup_git_config() {
         ssh-add -l >/dev/null 2>&1 || eval "$(ssh-agent -s)"
         ssh-add "$ssh_key_path"
     else
-        echo "Skipping passphrase setup."
+        printf "Skipping passphrase setup."
     fi
-    echo "SSH key generation and setup completed.\nPlease copy the key from your ssh dir and paste it to your corresponding account ssh key add section of your github settings page.\nThen run this command to verify ssh connection:\nssh -T git@github.com"
+    printf "SSH key generation and setup completed.\nPlease copy the key from your ssh dir and paste it to your corresponding account ssh key add section of your github settings page.\nThen run this command to verify ssh connection:\nssh -T git@github.com"
 }
 
 # Main execution
