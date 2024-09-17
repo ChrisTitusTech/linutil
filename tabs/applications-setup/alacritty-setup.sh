@@ -14,7 +14,7 @@ setupAlacritty() {
                 ;;
         esac
     else
-        printf "%b\n" "${RED}alacritty is already installed.${RC}"
+        printf "%b\n" "${GREEN}alacritty is already installed.${RC}"
     fi
 }
 

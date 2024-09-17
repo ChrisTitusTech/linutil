@@ -37,7 +37,7 @@ install_nerd_font() {
 
     # Check if Meslo Nerd-font is already installed
     if [ -n "$FONT_INSTALLED" ]; then
-        printf "%b\n" "${RED}Meslo Nerd-fonts are already installed.${RC}"
+        printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
     fi
 
@@ -168,7 +168,7 @@ configure_backgrounds() {
         printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"    
     else
         # If the backgrounds directory already exists, print a message indicating that the download is being skipped
-        printf "%b\n" "${RED}Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds${RC}"
+        printf "%b\n" "${GREEN}Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds${RC}"
     fi
 }
 
@@ -245,7 +245,7 @@ setupDisplayManager() {
                     printf "%b\n" "${YELLOW}Creating autologin group${RC}"
                     $ESCALATION_TOOL groupadd autologin
                 else
-                    printf "%b\n" "${RED}Autologin group already exists${RC}"
+                    printf "%b\n" "${GREEN}Autologin group already exists${RC}"
                 fi
                 printf "%b\n" "${YELLOW}Adding user with UID 1000 to autologin group${RC}"
                 USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
