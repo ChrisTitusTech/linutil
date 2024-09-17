@@ -5,7 +5,7 @@
 multimedia() {
     case $PACKAGER in
         dnf)
-            if [[ -e /etc/yum.repos.d/rpmfusion-free.repo && -e /etc/yum.repos.d/rpmfusion-nonfree.repo ]]; then
+            if [ -e /etc/yum.repos.d/rpmfusion-free.repo ] && [ -e /etc/yum.repos.d/rpmfusion-nonfree.repo ]; then
             printf "%b\n" ${YELLOW}"Installing Multimedia Codecs...${RC}"
             $ESCALATION_TOOL "$PACKAGER" swap ffmpeg-free ffmpeg --allowerasing -y
             $ESCALATION_TOOL "$PACKAGER" update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin -y
