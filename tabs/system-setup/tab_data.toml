@@ -52,6 +52,3 @@ script = "3-global-theme.sh"
 name = "Remove Snaps"
 script = "4-remove-snaps.sh"
 
-[[data]]
-name = "Git Configuration"
-script = "git-auto-conf-cli.sh"

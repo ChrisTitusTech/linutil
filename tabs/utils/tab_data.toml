@@ -13,6 +13,10 @@ name = "Numlock on Startup"
 script = "numlock.sh"
 
 [[data]]
+name = "Git Configuration"
+script = "git-auto-conf-cli.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
