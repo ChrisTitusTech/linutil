@@ -32,6 +32,14 @@ values =  ["dnf"]
 name = "RPM Fusion Setup"
 script = "fedora/rpm-fusion-setup.sh"
 
+[[data.entries]]
+name = "Configure DNF"
+script = "fedora/configure-dnf.sh"
+
+[[data.entries]]
+name = "Multimedia Setup"
+script = "fedora/multimedia-codecs.sh"
+
 [[data]]
 name = "Full System Update"
 script = "system-update.sh"
