@@ -45,7 +45,7 @@ main_menu() {
         echo "5. Disconnect from a WiFi network"
         echo "6. Remove a WiFi connection"
         echo "0. Exit"
-        echo -n "Choose an option: "
+        printf "Choose an option: "
         read choice
 
         case $choice in
@@ -72,8 +72,8 @@ scan_networks() {
         printf "%b\n" "${GREEN}Top 10 Networks found:${RC}"
         echo "$networks" | sed 's/\\//g' | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read choice
 }
 
 # Function to turn WiFi on
@@ -85,8 +85,8 @@ wifi_on() {
     } || {
         printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read choice
 }
 
 # Function to turn WiFi off
@@ -98,8 +98,8 @@ wifi_off() {
     } || {
         printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read choice
 }
 
 # Function to prompt for WiFi network selection
@@ -114,8 +114,8 @@ prompt_for_network() {
         networks=$(nmcli -t -f SSID dev wifi list | head -n 10)
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
-            echo "Press any key to return to the main menu..."
-            read -n 1
+            printf "Press any key to return to the main menu..."
+            read choice
             return
         fi
         
@@ -127,7 +127,7 @@ prompt_for_network() {
             i=$((i + 1))
         done
         echo "0. Exit to main menu"
-        echo -n "$prompt_msg"
+        printf  "$prompt_msg"
         read choice
 
         # Validate the choice
@@ -135,8 +135,10 @@ prompt_for_network() {
             network=$(echo "$networks" | sed -n "${choice}p")
             ssid=$(echo "$network" | awk -F: '{print $1}')
             if [ "$action" = "connect" ]; then
-                echo -n "Enter password for SSID $ssid: "
-                read -s password
+                printf  "Enter password for SSID $ssid: "
+                stty -echo
+                read password
+                stty echo
                 echo
                 nmcli dev wifi connect "$ssid" password "$password" && {
                     printf "%b\n" "${GREEN}$success_msg${RC}"
@@ -165,8 +167,8 @@ prompt_for_network() {
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
     done
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read choice
 }
 
 # Function to connect to a WiFi network
