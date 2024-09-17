@@ -16,6 +16,9 @@ setupRofi() {
     else
         echo "Rofi is already installed."
     fi
+}
+
+setupRofiConfig() {
     echo "Copy Rofi config files"
     if [ -d "$HOME/.config/rofi" ] && [ ! -d "$HOME/.config/rofi-bak" ]; then
         cp -r "$HOME/.config/rofi" "$HOME/.config/rofi-bak"
@@ -33,3 +36,4 @@ setupRofi() {
 checkEnv
 checkEscalationTool
 setupRofi
+setupRofiConfig
