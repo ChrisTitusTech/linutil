@@ -7,7 +7,7 @@ removeSnaps() {
         pacman)
             $ESCALATION_TOOL ${PACKAGER} -Rns snapd
             ;;
-        apt-get|nala)
+        apt|nala)
             $ESCALATION_TOOL ${PACKAGER} autoremove --purge snapd
             if [ "$ID" = ubuntu ]; then
                 $ESCALATION_TOOL apt-mark hold snapd

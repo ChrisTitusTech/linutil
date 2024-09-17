@@ -19,7 +19,7 @@ setupNeovim() {
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck
             ;;
-        apt)
+        apt|nala)
             $ESCALATION_TOOL "$PACKAGER" install -y neovim ripgrep fd-find python3-venv luarocks golang-go shellcheck
             ;;
         dnf)

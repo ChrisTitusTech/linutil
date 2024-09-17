@@ -17,7 +17,7 @@ installDepend() {
             fi
             $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES"
             ;;
-        apt-get|nala)
+        apt|nala)
             COMPILEDEPS='build-essential'
             $ESCALATION_TOOL "$PACKAGER" update
             $ESCALATION_TOOL dpkg --add-architecture i386
