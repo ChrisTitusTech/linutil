@@ -79,7 +79,7 @@ impl AppState {
                     horizontal_bottom: "*",
                 });
         let str1 = "Linutil ";
-        let str2 = "by Chris Titus";
+        let str2 = "by Harsha";
         let label = Paragraph::new(Line::from(vec![
             Span::styled(str1, Style::default().bold()),
             Span::styled(str2, Style::default().italic()),
