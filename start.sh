@@ -24,10 +24,17 @@ findArch() {
     esac
 }
 
+get_latest_release() {
+  curl --silent "https://api.github.com/repos/harshav167/linutil/releases/latest" | 
+    grep '"tag_name":' |
+    sed -E 's/.*"([^"]+)".*/\1/'
+}
+
 getUrl() {
+    local latest_release=$(get_latest_release)
     case "${arch}" in
-        x86_64) echo "https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil";;
-        *) echo "https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil-${arch}";;
+        x86_64) echo "https://github.com/harshav167/linutil/releases/download/$latest_release/linutil";;
+        *) echo "https://github.com/harshav167/linutil/releases/download/$latest_release/linutil-${arch}";;
     esac
 }
 
