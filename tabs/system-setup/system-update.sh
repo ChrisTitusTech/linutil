@@ -25,7 +25,7 @@ fastUpdate() {
             fi
             ;;
 
-        apt-get|nala)
+        apt|nala)
             $ESCALATION_TOOL apt-get update
             if ! command_exists nala; then
                 $ESCALATION_TOOL apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
@@ -63,7 +63,7 @@ fastUpdate() {
 updateSystem() {
     printf "%b\n" "${GREEN}Updating system${RC}"
     case ${PACKAGER} in
-        nala|apt-get)
+        apt|nala)
             $ESCALATION_TOOL "${PACKAGER}" update -y
             $ESCALATION_TOOL "${PACKAGER}" upgrade -y
             ;;
