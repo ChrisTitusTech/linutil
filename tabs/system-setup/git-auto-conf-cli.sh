@@ -36,16 +36,18 @@ setup_git_config() {
     ssh-keygen -t "$key_algo" -C "$email" -f "$ssh_key_path"
 
     # Prompt for passphrase usage
-    printf "Do you want to use a passphrase? (y/n): "
+    printf "Do you want to use a passphrase? (Y/n): "
     read use_passphrase
-
-    # If user opts for a passphrase, add key to SSH agent
-    if [ "$use_passphrase" = "y" ]; then
-        ssh-add -l >/dev/null 2>&1 || eval "$(ssh-agent -s)"
-        ssh-add "$ssh_key_path"
-    else
-        echo "Skipping passphrase setup."
-    fi
+    
+    case "$use_passphrase" in
+        n|N)
+            echo "Skipping passphrase setup."
+            ;;
+        *)
+            ssh-add -l >/dev/null 2>&1 || eval "$(ssh-agent -s)"
+            ssh-add "$ssh_key_path"
+            ;;
+    esac
 
     echo "SSH key generation and setup completed."
 }
