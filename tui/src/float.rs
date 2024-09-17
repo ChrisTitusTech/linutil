@@ -64,7 +64,9 @@ impl Float {
     // Returns true if the floating window is finished.
     pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
         match key.code {
-            KeyCode::Enter | KeyCode::Char('p') | KeyCode::Esc if self.content.is_finished() => {
+            KeyCode::Enter | KeyCode::Char('p') | KeyCode::Char('a') | KeyCode::Esc
+                if self.content.is_finished() =>
+            {
                 true
             }
             _ => self.content.handle_key_event(key),
