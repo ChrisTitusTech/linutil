@@ -6,7 +6,7 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::{Command, ListNode, Tab};
 use ratatui::{
@@ -210,6 +210,7 @@ impl AppState {
 
         draw_shortcuts(self, frame, vertical[1]);
     }
+
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
@@ -217,31 +218,43 @@ impl AppState {
                     self.focus = Focus::List;
                 }
             }
+
             Focus::Search => match self.filter.handle_key(key) {
                 SearchAction::Exit => self.exit_search(),
                 SearchAction::Update => self.update_items(),
                 _ => {}
             },
-            _ if key.code == KeyCode::Char('q') => return false,
+
+            _ if key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c')
+                    && key.modifiers.contains(KeyModifiers::CONTROL) =>
+            {
+                return false;
+            }
+
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
                     self.focus = Focus::List
                 }
+
                 KeyCode::Char('j') | KeyCode::Down
                     if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
                 {
                     self.current_tab.select_next();
                     self.refresh_tab();
                 }
+
                 KeyCode::Char('k') | KeyCode::Up => {
                     self.current_tab.select_previous();
                     self.refresh_tab();
                 }
+
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
+
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
@@ -262,7 +275,8 @@ impl AppState {
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
-            _ => {}
+
+            _ => (),
         };
         true
     }
@@ -300,12 +314,14 @@ impl AppState {
             self.selected_commands.clear();
         }
     }
+
     /// Checks ehther the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
     pub fn at_root(&self) -> bool {
         self.visit_stack.len() == 1
     }
+
     fn enter_parent_directory(&mut self) {
         self.visit_stack.pop();
         self.selection.select(Some(0));
