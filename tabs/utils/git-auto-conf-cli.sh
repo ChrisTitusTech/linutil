@@ -5,7 +5,7 @@
 
 # Function to prompt for GitHub configuration
 setup_git_config() {
-    checkCommandRequirements "git"
+
     # Prompt for GitHub email
     printf "Enter your GitHub email address: "
     read email
@@ -54,4 +54,5 @@ setup_git_config() {
 
 # Main execution
 checkEnv
+checkCommandRequirements "git"
 setup_git_config
