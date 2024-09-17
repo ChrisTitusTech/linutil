@@ -66,33 +66,20 @@ jobs:
         run: |
           version=$(date +"%Y.%m.%d")
           echo "version=$version" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Generate Release Notes
-        id: generate_notes
-        uses: release-drafter/release-drafter@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-name: release-drafter.yml
-          version: ${{ env.version }}
 
       - name: Create and Upload Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.version }}
-          name: Pre-Release ${{ env.version }}
+          name: Release ${{ env.version }}
           body: |
-            ${{ steps.generate_notes.outputs.body }}
-            
-            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/harshav167/linutil/${{ env.version }}/linutil)
-          append_body: false
+            Changes in this release:
+            - Built and released the latest version of LinUtil
           files: |
             ./build/linutil
             ./start.sh
             ./startdev.sh
-          prerelease: true
         env:
           version: ${{ env.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
