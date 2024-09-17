@@ -3,10 +3,11 @@ name: GitHub Pages Deploy
 on:
   push:
     paths:
-      - 'mkdocs.yml'
+      - '.github/mkdocs.yml'
+      - '.github/requirements.txt'
       - 'docs/**'
       - 'overrides/**'
-      - 'CONTRIBUTING.md'
+      - '.github/CONTRIBUTING.md'
   workflow_dispatch:
 
 jobs:
@@ -29,4 +30,6 @@ jobs:
         run: pip install -r .github/requirements.txt
 
       - name: Build & Deploy using mkdocs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mkdocs gh-deploy --force -f .github/mkdocs.yml
