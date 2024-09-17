@@ -147,5 +147,6 @@ remove_device() {
 
 # Initialize
 checkEnv
+checkEscalationTool
 setupBluetooth
 main_menu

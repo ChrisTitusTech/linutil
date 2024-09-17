@@ -186,5 +186,6 @@ remove_network() {
 
 # Initialize
 checkEnv
+checkEscalationTool
 setupNetworkManager
 main_menu
