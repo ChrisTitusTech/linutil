@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 fastUpdate() {
-    case ${PACKAGER} in
+    case "$PACKAGER" in
         pacman)
 
           $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
