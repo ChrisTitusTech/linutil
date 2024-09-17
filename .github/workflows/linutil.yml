@@ -86,7 +86,7 @@ jobs:
           body: |
             ${{ steps.generate_notes.outputs.body }}
             
-            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)
+            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/harshav167/linutil/${{ env.version }}/linutil)
           append_body: false
           files: |
             ./build/linutil
