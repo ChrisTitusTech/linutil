@@ -1,22 +1,35 @@
 name: GitHub Pages Deploy
+
 on:
-  release:
-    types: [published, prereleased]
-  workflow_dispatch: 
-permissions:
-  contents: write
+  push:
+    paths:
+      - '.github/mkdocs.yml'
+      - '.github/requirements.txt'
+      - 'docs/**'
+      - 'overrides/**'
+      - '.github/CONTRIBUTING.md'
+  workflow_dispatch:
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          python-version: 3.x
-      - uses: actions/cache@v4
+          fetch-depth: '0'  # Fetch all commit history for all branches as well as tags.
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          key: ${{ github.ref }}
-          path: .cache
-      - run: pip install mkdocs-material
-      - run: pip install pillow cairosvg
-      - run: mkdocs gh-deploy --force
+          python-version: 3.x  # Install latest Stable release of Python 3
+          cache: 'pip'  # Caching pip dependencies
+
+      - name: Install Necessary Dependencies
+        run: pip install -r .github/requirements.txt
+
+      - name: Build & Deploy using mkdocs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mkdocs gh-deploy --force -f .github/mkdocs.yml

@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest)
 ![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge)
+[![](https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp)](https://discord.gg/bujFYKAHSp)
 
 ![Preview](docs/assets/preview.png)
 
@@ -30,7 +31,9 @@ For comprehensive information on how to use Linutil, visit the [Linutil Official
 
 ## 🛠 Contributing
 
-We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
+We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](.github/CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
+
+[Official LinUtil Roadmap](https://christitustech.github.io/linutil/roadmap)
 
 ## 🏅 Thanks to All Contributors
 
