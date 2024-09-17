@@ -53,5 +53,5 @@ name = "Remove Snaps"
 script = "4-remove-snaps.sh"
 
 [[data]]
-name = "Git Auto-conf CLI"
+name = "Git Configuration"
 script = "git-auto-conf-cli.sh"
