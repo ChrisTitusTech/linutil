@@ -14,7 +14,7 @@ cloneNeovim() {
 }
 
 installNeovim() {
-    printf "%b\n" "${YELLOW}Installing Neovim...${RC}"
+    echo "Installing Neovim..."
     case "$PACKAGER" in
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck
