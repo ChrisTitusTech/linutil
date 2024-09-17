@@ -16,7 +16,9 @@ setupAlacritty() {
     else
         echo "alacritty is already installed."
     fi
+}
 
+setupAlacrittyConfig() {
     echo "Copy alacritty config files"
     if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
@@ -39,3 +41,4 @@ setupAlacritty() {
 checkEnv
 checkEscalationTool
 setupAlacritty
+setupAlacrittyConfig

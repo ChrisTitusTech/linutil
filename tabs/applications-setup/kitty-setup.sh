@@ -16,6 +16,9 @@ setupKitty() {
     else
         echo "Kitty is already installed."
     fi
+}
+
+setupKittyConfig() {
     echo "Copy Kitty config files"
     if [ -d "${HOME}/.config/kitty" ] && [ ! -d "${HOME}/.config/kitty-bak" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
@@ -28,3 +31,4 @@ setupKitty() {
 checkEnv
 checkEscalationTool
 setupKitty
+setupKittyConfig

@@ -5,7 +5,9 @@ docs_dir: '../docs'
 nav:
   - Introduction: 'index.md'
   - User Guide: 'userguide.md'
-  - Contributing Guide: 'contribute.md'
+  - Contributing:
+      - Contributing Guide: 'contribute.md'
+      - Roadmap: 'roadmap.md'
   - Documentation:
       - Known Issues: 'KnownIssues.md'
   - FAQ: 'faq.md'
