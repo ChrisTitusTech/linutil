@@ -13,8 +13,8 @@ cloneNeovim() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/neovim.git "$HOME/.local/share/neovim"
 }
 
-setupNeovim() {
-    echo "Install Neovim if not already installed"
+installNeovim() {
+    echo "Installing Neovim..."
     case "$PACKAGER" in
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck
@@ -36,6 +36,7 @@ setupNeovim() {
 }
 
 backupNeovimConfig() {
+    echo "Backing up existing configuration files..."
     if [ -d "$HOME/.config/nvim" ] && [ ! -d "$HOME/.config/nvim-backup" ]; then
         cp -r "$HOME/.config/nvim" "$HOME/.config/nvim-backup"
     fi
@@ -43,6 +44,7 @@ backupNeovimConfig() {
 }
 
 linkNeovimConfig() {
+    echo "Linking Neovim configuration files..."
     mkdir -p "$HOME/.config/nvim"
     ln -s "$gitpath/titus-kickstart/"* "$HOME/.config/nvim/" # Wild card is used here to link all contents of titus-kickstart.
 }
@@ -50,6 +52,6 @@ linkNeovimConfig() {
 checkEnv
 checkEscalationTool
 cloneNeovim
-setupNeovim
+installNeovim
 backupNeovimConfig
 linkNeovimConfig

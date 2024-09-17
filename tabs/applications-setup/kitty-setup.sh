@@ -2,8 +2,8 @@
 
 . ../common-script.sh
 
-setupKitty() {
-    echo "Install Kitty if not already installed..."
+installKitty() {
+    echo "Installing Kitty..."
     if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
@@ -19,7 +19,7 @@ setupKitty() {
 }
 
 setupKittyConfig() {
-    echo "Copy Kitty config files"
+    echo "Copying Kitty configuration files..."
     if [ -d "${HOME}/.config/kitty" ] && [ ! -d "${HOME}/.config/kitty-bak" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
     fi
@@ -30,5 +30,5 @@ setupKittyConfig() {
 
 checkEnv
 checkEscalationTool
-setupKitty
+installKitty
 setupKittyConfig
