@@ -25,7 +25,7 @@ installDepend() {
 
             $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES" $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt|nala)
             DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
 
             $ESCALATION_TOOL "$PACKAGER" update
