@@ -5,12 +5,12 @@
 setupFastfetch() {
     echo "Installing Fastfetch if not already installed..."
     if ! command_exists fastfetch; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --needed --noconfirm fastfetch
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm fastfetch
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y fastfetch
+                $ESCALATION_TOOL "$PACKAGER" install -y fastfetch
                 ;;
         esac
     else

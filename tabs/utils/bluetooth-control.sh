@@ -6,12 +6,12 @@
 setupBluetooth() {
     printf "%b\n" "${YELLOW}Installing Bluez...${RC}"
     if ! command_exists bluetoothctl; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm bluez-utils
+                $ESCALATION_TOOL "$PACKAGER" -S --noconfirm bluez-utils
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y bluez
+                $ESCALATION_TOOL "$PACKAGER" install -y bluez
                 ;;
         esac
     else
@@ -147,5 +147,6 @@ remove_device() {
 
 # Initialize
 checkEnv
+checkEscalationTool
 setupBluetooth
 main_menu

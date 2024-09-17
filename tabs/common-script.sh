@@ -81,7 +81,7 @@ checkPackageManager() {
         fi
     done
 
-    if [ -z "${PACKAGER}" ]; then
+    if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
