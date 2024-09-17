@@ -14,7 +14,7 @@ installDepend() {
                 echo "Include = /etc/pacman.d/mirrorlist" | $ESCALATION_TOOL tee -a /etc/pacman.conf
                 $ESCALATION_TOOL "$PACKAGER" -Syu
             else
-                echo "Multilib is already enabled."
+                printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
             fi
 
             DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk2 gtk3 lib32-gtk2 lib32-gtk3 libpulse lib32-libpulse alsa-lib lib32-alsa-lib \
@@ -55,7 +55,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='steam lutris goverlay'
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt|nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
                 tail -n1 |
@@ -64,24 +64,19 @@ installAdditionalDepend() {
             version_no_v=$(echo "$version" | tr -d v)
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
             
-	    # Install the downloaded .deb package
-            echo "Installing lutris_${version_no_v}_all.deb"
+            printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
             $ESCALATION_TOOL "$PACKAGER" update
             $ESCALATION_TOOL "$PACKAGER" install ./lutris_${version_no_v}_all.deb
 
-            # Clean up the downloaded .deb file
             rm lutris_${version_no_v}_all.deb
 
-            echo "Lutris Installation complete."
-            echo "Installing steam..."
+            printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
+            printf "%b\n" "${YELLOW}Installing steam...${RC}"
 
-            # Install steam on Debian
             if lsb_release -i | grep -qi Debian; then
                 $ESCALATION_TOOL apt-add-repository non-free -y
-                # Install steam
                 $ESCALATION_TOOL "$PACKAGER" install steam-installer -y
             else
-                # Install steam on Ubuntu
                 $ESCALATION_TOOL "$PACKAGER" install -y steam
             fi
             ;;
@@ -90,7 +85,7 @@ installAdditionalDepend() {
             $ESCALATION_TOOL "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         zypper)
-            # Flatpak??
+            # Flatpak
             DISTRO_DEPS='lutris'
             $ESCALATION_TOOL "$PACKAGER" -n install $DISTRO_DEPS
             ;;
