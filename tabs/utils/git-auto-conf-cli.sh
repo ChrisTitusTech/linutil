@@ -5,7 +5,6 @@
 
 # Function to prompt for GitHub configuration
 setup_git_config() {
-
     # Prompt for GitHub email
     printf "Enter your GitHub email address: "
     read email
@@ -50,7 +49,6 @@ setup_git_config() {
     fi
     echo "SSH key generation and setup completed.\nPlease copy the key from your ssh dir and paste it to your corresponding account ssh key add section of your github settings page.\nThen run this command to verify ssh connection:\nssh -T git@github.com"
 }
-
 
 # Main execution
 checkEnv
