@@ -17,7 +17,7 @@ installRPMFusion() {
             fi
             ;;
         *)
-            echo "Unsupported distribution: $DTYPE"
+            printf "%b\n" "${RED}Unsupported distribution: $DTYPE${RC}"
             ;;
     esac
 }

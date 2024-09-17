@@ -12,7 +12,7 @@ configureDNF() {
             $ESCALATION_TOOL "$PACKAGER" -y install dnf-plugins-core
             ;;
         *)
-            echo "Unsupported distribution: $DTYPE"
+            printf "%b\n" "${RED}Unsupported distribution: $DTYPE${RC}"
             ;;
     esac
 }
