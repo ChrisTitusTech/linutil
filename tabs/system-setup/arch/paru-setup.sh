@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. "$(dirname "$0")/../../common-script.sh"
+. ../../common-script.sh
 
 installDepend() {
     case $PACKAGER in
@@ -8,8 +8,8 @@ installDepend() {
             if ! command_exists paru; then
                 echo "Installing paru as AUR helper..."
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/paru.git && $ESCALATION_TOOL chown -R "$USER": ./paru
-                cd paru && makepkg --noconfirm -si
+                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/paru-bin.git && $ESCALATION_TOOL chown -R "$USER": ./paru-bin
+                cd paru-bin && makepkg --noconfirm -si
                 echo "Paru installed"
             else
                 echo "Paru already installed"

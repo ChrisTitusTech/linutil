@@ -2,38 +2,42 @@
 
 . ./utility_functions.sh
 
+. ../../common-script.sh
+
 # Function to change monitor orientation
 change_orientation() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
+    monitor_array=$(echo "$monitor_list" | tr '\n' ' ')
 
     clear
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${BLUE}  Change Monitor Orientation${RESET}"
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${YELLOW}Choose a monitor to configure:${RESET}"
-    for i in "${!monitor_array[@]}"; do
-        echo -e "$((i + 1)). ${CYAN}${monitor_array[i]}${RESET}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}  Change Monitor Orientation${RC}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}Choose a monitor to configure:${RC}"
+    i=1
+    for monitor in $monitor_array; do
+        printf "%b\n" "$i. ${GREEN}$monitor${RC}"
+        i=$((i + 1))
     done
 
     read -p "Enter the number of the monitor: " monitor_choice
 
-    if ! [[ "$monitor_choice" =~ ^[0-9]+$ ]] || (( monitor_choice < 1 )) || (( monitor_choice > ${#monitor_array[@]} )); then
-        echo -e "${RED}Invalid selection.${RESET}"
+    if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
+        printf "%b\n" "${RED}Invalid selection.${RC}"
         return
     fi
 
-    monitor_name="${monitor_array[monitor_choice - 1]}"
+    monitor_name=$(echo "$monitor_array" | cut -d' ' -f"$monitor_choice")
 
     clear
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${BLUE}  Set Orientation for $monitor_name${RESET}"
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${YELLOW}Choose orientation:${RESET}"
-    echo -e "1. ${CYAN}Normal${RESET}"
-    echo -e "2. ${CYAN}Left${RESET}"
-    echo -e "3. ${CYAN}Right${RESET}"
-    echo -e "4. ${CYAN}Inverted${RESET}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}  Set Orientation for $monitor_name${RC}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}Choose orientation:${RC}"
+    printf "%b\n" "1. ${GREEN}Normal${RC}"
+    printf "%b\n" "2. ${GREEN}Left${RC}"
+    printf "%b\n" "3. ${GREEN}Right${RC}"
+    printf "%b\n" "4. ${GREEN}Inverted${RC}"
 
     read -p "Enter the number of the orientation: " orientation_choice
 
@@ -42,15 +46,15 @@ change_orientation() {
         2) orientation="left" ;;
         3) orientation="right" ;;
         4) orientation="inverted" ;;
-        *) echo -e "${RED}Invalid selection.${RESET}"; return ;;
+        *) printf "%b\n" "${RED}Invalid selection.${RC}"; return ;;
     esac
 
-    if confirm_action "Change orientation of ${CYAN}$monitor_name${RESET} to ${CYAN}$orientation${RESET}?"; then
-        echo -e "${GREEN}Changing orientation of $monitor_name to $orientation${RESET}"
+    if confirm_action "Change orientation of $monitor_name to $orientation?"; then
+        printf "%b\n" "${GREEN}Changing orientation of $monitor_name to $orientation${RC}"
         execute_command "xrandr --output $monitor_name --rotate $orientation"
-        echo -e "${GREEN}Orientation changed successfully.${RESET}"
+        printf "%b\n" "${GREEN}Orientation changed successfully.${RC}"
     else
-        echo -e "${RED}Action canceled.${RESET}"
+        printf "%b\n" "${RED}Action canceled.${RC}"
     fi
 }
 
