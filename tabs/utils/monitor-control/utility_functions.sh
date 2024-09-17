@@ -83,4 +83,5 @@ confirm_action() {
 }
 
 checkEnv
+checkEscalationTool
 setup_xrandr
