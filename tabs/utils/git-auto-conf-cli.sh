@@ -5,26 +5,26 @@
 
 # Install Git if it's not already present
 installGit() {
-    if ! command_exists git; then
+    if ! command -v git >/dev/null 2>&1; then
         printf "Git is not installed. Installing it now...\n"
 
-        case $PACKAGER in
+        case "$PACKAGER" in
             pacman|xbps-install)
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm git
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm git
                 ;;
             apt-get|nala|dnf|zypper)
-                $ESCALATION_TOOL "$PACKAGER" install -y git
+                "$ESCALATION_TOOL" "$PACKAGER" install -y git
                 ;;
             nix-env)
                 nix-env -iA nixpkgs.git
                 ;;
             *)
-                printf "${RED}Git installation not supported for this package manager${RC}\n"
+                printf "%sGit installation not supported for this package manager%s\n" "$RED" "$RC"
                 exit 1
                 ;;
         esac
 
-        printf "${GREEN}Git installed successfully.${RC}\n"
+        printf "%sGit installed successfully.%s\n" "$GREEN" "$RC"
     else
         printf "Git is already installed.\n"
     fi
@@ -34,14 +34,14 @@ installGit() {
 setup_git_config() {
     # Prompt for GitHub email
     printf "Enter your GitHub email address: "
-    read -r email
+    read email
 
     # Prompt for SSH key type
     printf "Choose your SSH key type:\n"
     printf "1. Ed25519 (recommended)\n"
     printf "2. RSA (legacy)\n"
     printf "Enter your choice (1 or 2): "
-    read -r key_type
+    read key_type
 
     # Set key algorithm based on user choice
     case "$key_type" in
@@ -55,7 +55,7 @@ setup_git_config() {
 
     # Prompt for custom key name
     printf "Enter a custom SSH key name (leave blank for default): "
-    read -r key_name
+    read key_name
 
     # Set the SSH key path based on user input
     ssh_key_path="${HOME}/.ssh/${key_name:-id_$key_algo}"
@@ -65,7 +65,7 @@ setup_git_config() {
 
     # Prompt for passphrase usage
     printf "Do you want to use a passphrase? (y/n): "
-    read -r use_passphrase
+    read use_passphrase
 
     # If user opts for a passphrase, add key to SSH agent
     if [ "$use_passphrase" = "y" ]; then
