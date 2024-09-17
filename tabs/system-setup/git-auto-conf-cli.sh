@@ -5,8 +5,7 @@
 
 # Function to prompt for GitHub configuration
 setup_git_config() {
-    # Prompt for GitHub email
-    printf "Enter your GitHub email address: "
+    printf "Enter your email address: "
     read email
 
     # Prompt for SSH key type
