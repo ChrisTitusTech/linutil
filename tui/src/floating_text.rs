@@ -6,7 +6,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use linutil_core::Command;
 use ratatui::{
     layout::Rect,
-    style::{Style, Stylize},
+    style::{Color, Style, Stylize},
     text::Line,
     widgets::{Block, Borders, List},
     Frame,
@@ -59,7 +59,7 @@ impl FloatContent for FloatingText {
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
-            .style(Style::default());
+            .style(Style::default().fg(Color::Reset));
 
         // Draw the Block first
         frame.render_widget(block.clone(), area);
@@ -74,7 +74,7 @@ impl FloatContent for FloatingText {
             .skip(self.scroll)
             .flat_map(|line| {
                 if line.is_empty() {
-                    return vec![String::new()];
+                    return vec![" ".repeat(inner_area.width as usize)]; // Prevent background text from appearing in the floating window
                 }
                 line.chars()
                     .collect::<Vec<char>>()
@@ -89,7 +89,8 @@ impl FloatContent for FloatingText {
         // Create list widget
         let list = List::new(lines)
             .block(Block::default())
-            .highlight_style(Style::default().reversed());
+            .highlight_style(Style::default().reversed())
+            .style(Style::default().fg(Color::Reset));
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
