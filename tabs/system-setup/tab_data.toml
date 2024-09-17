@@ -51,3 +51,15 @@ script = "3-global-theme.sh"
 [[data]]
 name = "Remove Snaps"
 script = "4-remove-snaps.sh"
+
+[[data]]
+name = "Ubuntu"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["apt-get"]
+
+[[data.entries]]
+name = "Ubuntu Setup with NVIDIA Drivers"
+script = "ubuntu/ubuntu-nvidia-setup.sh"
