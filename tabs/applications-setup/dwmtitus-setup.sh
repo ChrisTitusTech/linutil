@@ -2,21 +2,14 @@
 
 . ../common-script.sh
 
-makeDWM() {
-    cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
-    # This path can be changed (e.g. to linux-toolbox directory)
-    cd dwm-titus/ # Hardcoded path, maybe not the best.
-    $ESCALATION_TOOL make clean install # Run make clean install
-}
-
 setupDWM() {
     echo "Installing DWM-Titus if not already installed"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git
             ;;
         apt-get|nala)
-            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev
+            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git
             ;;
         dnf)
             $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
@@ -27,6 +20,13 @@ setupDWM() {
             exit 1
             ;;
     esac
+}
+
+makeDWM() {
+    cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
+    # This path can be changed (e.g. to linux-toolbox directory)
+    cd dwm-titus/ # Hardcoded path, maybe not the best.
+    $ESCALATION_TOOL make clean install # Run make clean install
 }
 
 install_nerd_font() {
