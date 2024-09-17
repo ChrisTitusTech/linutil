@@ -3,32 +3,59 @@
 # Import common utilities
 . ../common-script.sh
 
+# Install Git if it's not already present
+installGit() {
+    if ! command_exists git; then
+        printf "Git is not installed. Installing it now...\n"
+
+        case $PACKAGER in
+            pacman|xbps-install)
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm git
+                ;;
+            apt-get|nala|dnf|zypper)
+                $ESCALATION_TOOL "$PACKAGER" install -y git
+                ;;
+            nix-env)
+                nix-env -iA nixpkgs.git
+                ;;
+            *)
+                printf "${RED}Git installation not supported for this package manager${RC}\n"
+                exit 1
+                ;;
+        esac
+
+        printf "${GREEN}Git installed successfully.${RC}\n"
+    else
+        printf "Git is already installed.\n"
+    fi
+}
+
 # Function to prompt for GitHub configuration
 setup_git_config() {
     # Prompt for GitHub email
     printf "Enter your GitHub email address: "
-    read email
+    read -r email
 
     # Prompt for SSH key type
-    printf "Choose your SSH key type:"
-    printf "1. Ed25519 (recommended)"
-    printf "2. RSA (legacy)"
+    printf "Choose your SSH key type:\n"
+    printf "1. Ed25519 (recommended)\n"
+    printf "2. RSA (legacy)\n"
     printf "Enter your choice (1 or 2): "
-    read key_type
+    read -r key_type
 
     # Set key algorithm based on user choice
     case "$key_type" in
         1) key_algo="ed25519" ;;
         2) key_algo="rsa" ;;
         *)
-            printf "Invalid choice. Exiting."
+            printf "Invalid choice. Exiting.\n"
             exit 1
             ;;
     esac
 
     # Prompt for custom key name
     printf "Enter a custom SSH key name (leave blank for default): "
-    read key_name
+    read -r key_name
 
     # Set the SSH key path based on user input
     ssh_key_path="${HOME}/.ssh/${key_name:-id_$key_algo}"
@@ -38,19 +65,25 @@ setup_git_config() {
 
     # Prompt for passphrase usage
     printf "Do you want to use a passphrase? (y/n): "
-    read use_passphrase
+    read -r use_passphrase
 
     # If user opts for a passphrase, add key to SSH agent
     if [ "$use_passphrase" = "y" ]; then
-        ssh-add -l >/dev/null 2>&1 || eval "$(ssh-agent -s)"
+        if ! ssh-add -l >/dev/null 2>&1; then
+            eval "$(ssh-agent -s)"
+        fi
         ssh-add "$ssh_key_path"
     else
-        printf "Skipping passphrase setup."
+        printf "Skipping passphrase setup.\n"
     fi
-    printf "SSH key generation and setup completed.\nPlease copy the key from your ssh dir and paste it to your corresponding account ssh key add section of your github settings page.\nThen run this command to verify ssh connection:\nssh -T git@github.com"
+
+    printf "SSH key generation and setup completed.\n"
+    printf "Please copy the SSH key and add it to your GitHub account.\n"
+    printf "Then run this command to verify the SSH connection:\n"
+    printf "ssh -T git@github.com\n"
 }
 
 # Main execution
 checkEnv
-checkCommandRequirements "git"
+installGit
 setup_git_config
