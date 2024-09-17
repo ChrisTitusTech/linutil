@@ -8,13 +8,13 @@ setupNetworkManager() {
     if ! command_exists nmcli; then
         case ${PACKAGER} in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm networkmanager
+                $ESCALATION_TOOL "$PACKAGER" -S --noconfirm networkmanager
                 ;;
             dnf)
-                $ESCALATION_TOOL "${PACKAGER}" install -y NetworkManager-1
+                $ESCALATION_TOOL "$PACKAGER" install -y NetworkManager-1
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y network-manager
+                $ESCALATION_TOOL "$PACKAGER" install -y network-manager
                 ;;
         esac
     else
