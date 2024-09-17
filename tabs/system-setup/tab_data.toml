@@ -51,3 +51,7 @@ script = "3-global-theme.sh"
 [[data]]
 name = "Remove Snaps"
 script = "4-remove-snaps.sh"
+
+[[data]]
+name = "Nerd-fonts Installer"
+script = "nerdfonts-installer.sh"
