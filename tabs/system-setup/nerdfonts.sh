@@ -75,8 +75,8 @@ ZedMono_Nerd_Font
 
 # Function to prompt user for font selection
 prompt_font_selection() {
-    echo "Select fonts to install (separate with spaces):"
-    echo "---------------------------------------------"
+    printf "Select fonts to install (separate with spaces):"
+    printf "---------------------------------------------"
 
     # Set number of columns
     cols=3
@@ -103,13 +103,13 @@ prompt_font_selection() {
     fi
 
     # Display the font list using 'less' for pagination
-    echo -e "$font_list" | less
+    printf -e "$font_list" | less
 
-    echo "---------------------------------------------"
+    printf "---------------------------------------------"
     printf "Enter the numbers of the fonts to install (e.g., '0 1 2'): "
     read font_selection
 
-    echo "Fonts selected: $font_selection"
+    printf "Fonts selected: $font_selection"
 }
 
 
@@ -119,8 +119,8 @@ download_and_install_fonts() {
     for font in $fonts; do
         for selection in $font_selection; do
             if [ "$i" = "$selection" ]; then
-                font_name=$(echo "$font" | sed 's/_/ /g')  # Replace underscores with spaces
-                echo "Downloading and installing $font_name..."
+                font_name=$(printf "$font" | sed 's/_/ /g')  # Replace underscores with spaces
+                printf "Downloading and installing $font_name..."
 
                 # Check if wget and tar are installed, using common-script.sh helper
                 checkCommandRequirements "curl"
@@ -141,7 +141,7 @@ download_and_install_fonts() {
     # Update the font cache
     checkCommandRequirements "fc-cache"
     fc-cache -vf
-    echo "Fonts installed and cache updated."
+    printf "Fonts installed and cache updated."
 }
 
 # Main script execution
