@@ -53,5 +53,5 @@ name = "Remove Snaps"
 script = "4-remove-snaps.sh"
 
 [[data]]
-name = "Nerd-fonts Installer"
-script = "nerdfonts-installer.sh"
+name = "Nerd Fonts"
+script = "nerdfonts.sh"
