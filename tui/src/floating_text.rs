@@ -13,7 +13,7 @@ use ratatui::{
 };
 pub enum FloatingTextMode {
     Preview,
-    About,
+    Description,
 }
 pub struct FloatingText {
     text: Vec<String>,
@@ -67,7 +67,7 @@ impl FloatContent for FloatingText {
         // Define the Block with a border and background color
         let block_title = match self.mode {
             FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::About => "Command Description",
+            FloatingTextMode::Description => "Command Description",
         };
 
         let block = Block::default()

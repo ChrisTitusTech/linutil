@@ -234,7 +234,7 @@ impl AppState {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
                 KeyCode::Char('p') => self.enable_preview(),
-                KeyCode::Char('a') => self.enable_about(),
+                KeyCode::Char('d') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
@@ -376,15 +376,15 @@ impl AppState {
             }
         }
     }
-    fn enable_about(&mut self) {
+    fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let about_content: Vec<String> = vec![]
+            let description_content: Vec<String> = vec![]
                 .into_iter()
                 .chain(command_description.lines().map(|line| line.to_string())) // New line when \n is given in toml
                 .collect();
 
-            let about = FloatingText::new(about_content, FloatingTextMode::About);
-            self.spawn_float(about, 80, 80);
+            let description = FloatingText::new(description_content, FloatingTextMode::Description);
+            self.spawn_float(description, 80, 80);
         }
     }
 
