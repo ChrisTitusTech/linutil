@@ -4,7 +4,7 @@
 
 # Function to install zsh
 install_zsh() {
-  echo "Install ZSH if not already installed..."
+  printf "%b\n" "${YELLOW}Install ZSH if not already installed...${RC}"
     if ! command_exists zsh; then
         case "$PACKAGER" in
             pacman)
@@ -15,7 +15,7 @@ install_zsh() {
                 ;;
         esac
     else
-        echo "ZSH is already installed."
+        printf "%b\n" "${GREEN}ZSH is already installed.${RC}"
     fi
 }
 

@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 setupKitty() {
-    echo "Install Kitty if not already installed..."
+    printf "%b\n" "${YELLOW}Install Kitty if not already installed...${RC}"
     if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
@@ -14,12 +14,12 @@ setupKitty() {
                 ;;
         esac
     else
-        echo "Kitty is already installed."
+        printf "%b\n" "${GREEN}Kitty is already installed.${RC}"
     fi
 }
 
 setupKittyConfig() {
-    echo "Copy Kitty config files"
+    printf "%b\n" "${YELLOW}Copy Kitty config files${RC}"
     if [ -d "${HOME}/.config/kitty" ] && [ ! -d "${HOME}/.config/kitty-bak" ]; then
         cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
     fi

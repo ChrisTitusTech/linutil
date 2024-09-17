@@ -13,7 +13,7 @@ installDepend() {
                 echo "Include = /etc/pacman.d/mirrorlist" | $ESCALATION_TOOL tee -a /etc/pacman.conf
                 $ESCALATION_TOOL "$PACKAGER" -Syu
             else
-                echo "Multilib is already enabled."
+                printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
             fi
             $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES"
             ;;

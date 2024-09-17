@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 setupAlacritty() {
-    echo "Install Alacritty if not already installed..."
+    printf "%b\n" "${YELLOW}Install Alacritty if not already installed...${RC}"
     if ! command_exists alacritty; then
         case ${PACKAGER} in
             pacman)
@@ -14,18 +14,19 @@ setupAlacritty() {
                 ;;
         esac
     else
-        echo "alacritty is already installed."
+        printf "%b\n" "${RED}alacritty is already installed.${RC}"
     fi
 }
 
 setupAlacrittyConfig() {
-    echo "Copy alacritty config files"
+    printf "%b\n" "${YELLOW}Copy alacritty config files${RC}"
     if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
     mkdir -p "${HOME}/.config/alacritty/"
     curl -sSLo "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.toml"
     curl -sSLo "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
+    printf "%b\n" "${GREEN}Alacritty configuration files copied.${RC}"
 }
 
 checkEnv
