@@ -78,7 +78,7 @@ setup_samba() {
 
         # Prompt user for shared directory path
         echo "Enter the path for the Samba share (default: /srv/samba/share): "
-        read SHARED_DIR
+        read -r SHARED_DIR
         SHARED_DIR=${SHARED_DIR:-/srv/samba/share}
 
         # Create the shared directory if it doesn't exist
