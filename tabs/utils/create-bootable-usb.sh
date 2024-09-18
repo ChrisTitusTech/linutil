@@ -52,9 +52,9 @@ fetch_arch_older_isos() {
         
         COUNTER=$((COUNTER + 1))
     done
-    echo ""  # New line after the last row
-
-    read -p "Select an Arch Linux version (1-$((COUNTER - 1))): " ARCH_OPTION
+    printf "\n"  # New line after the last row
+    printf "Select an Arch Linux version (1-%d): " "$((COUNTER - 1))"
+    read -r ARCH_OPTION
     ARCH_DIR=$(echo "$ARCH_VERSIONS" | sed -n "${ARCH_OPTION}p")
     ARCH_URL="${ARCH_BASE_URL}${ARCH_DIR}/archlinux-${ARCH_DIR}-x86_64.iso"
     printf "%b\n" "${GREEN}Selected Arch Linux (older) ISO URL: $ARCH_URL${RC}"
@@ -70,17 +70,19 @@ fetch_debian_latest_iso() {
 # Function to ask whether to use local or online ISO
 choose_iso_source() {
     printf "%b\n" "${YELLOW} Do you want to use a local ISO or download online? ${RC}"
-    echo "1) Download online"
-    echo "2) Use local ISO"
-    echo ""
-    read -p "Select option (1-2): " ISO_SOURCE_OPTION
+    printf "1) Download online\n"
+    printf "2) Use local ISO\n"
+    printf "\n"
+    printf "Select option (1-2): "
+    read -r ISO_SOURCE_OPTION
 
     case $ISO_SOURCE_OPTION in
         1)
             fetch_iso_urls  # Call the function to fetch online ISO URLs
             ;;
         2)
-            read -p "Enter the path to the already downloaded ISO file: " ISO_PATH
+            printf "Enter the path to the already downloaded ISO file: "
+            read -r ISO_PATH
             if [ ! -f "$ISO_PATH" ]; then
                 printf "%b\n" "${RED} ISO file not found: $ISO_PATH ${RC}"
                 exit 1

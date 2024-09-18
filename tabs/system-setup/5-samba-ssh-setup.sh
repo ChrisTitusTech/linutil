@@ -68,8 +68,8 @@ setup_samba() {
 
     if [ -f "$SAMBA_CONFIG" ]; then
         printf "%b\n" "${YELLOW}Samba configuration file already exists in $SAMBA_CONFIG.${RC}"
-        echo "Do you want to modify the existing Samba configuration? (yes/no): "
-        read MODIFY_SAMBA
+        printf "Do you want to modify the existing Samba configuration? (yes/no): "
+        read -r MODIFY_SAMBA
         if [ "$MODIFY_SAMBA" = "yes" ]; then
             "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
         fi
@@ -77,7 +77,7 @@ setup_samba() {
         printf "%b\n" "${YELLOW}No existing Samba configuration found. Setting up a new one...${RC}"
 
         # Prompt user for shared directory path
-        echo "Enter the path for the Samba share (default: /srv/samba/share): "
+        printf "Enter the path for the Samba share (default: /srv/samba/share): "
         read -r SHARED_DIR
         SHARED_DIR=${SHARED_DIR:-/srv/samba/share}
 
@@ -157,19 +157,19 @@ configure_firewall() {
 }
 
 setup_ssh_samba(){
-    echo "Samba and SSH Setup Script"
-    echo "----------------------------"
+    printf "Samba and SSH Setup Script\n"
+    printf "----------------------------\n"
     clear
 
     # Display menu
-    echo "Select an option:"
-    echo "1. Setup SSH"
-    echo "2. Setup Samba"
-    echo "3. Configure Firewall"
-    echo "4. Setup All"
-    echo "5. Exit"
+    printf "Select an option:\n"
+    printf "1. Setup SSH\n"
+    printf "2. Setup Samba\n"
+    printf "3. Configure Firewall\n"
+    printf "4. Setup All\n"
+    printf "5. Exit\n"
 
-    echo "Enter your choice [1-5]: "
+    printf "Enter your choice [1-5]: "
     read CHOICE
 
     case "$CHOICE" in

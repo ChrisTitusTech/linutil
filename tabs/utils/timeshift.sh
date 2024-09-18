@@ -24,34 +24,36 @@ install_timeshift() {
 # Function to display the menu
 display_menu() {
     clear
-    echo "Timeshift CLI Automation"
-    echo "-------------------------"
-    echo "1) List Snapshots"
-    echo "2) List Devices"
-    echo "3) Create Snapshot"
-    echo "4) Restore Snapshot"
-    echo "5) Delete Snapshot"
-    echo "6) Delete All Snapshots"
-    echo "7) Exit"
-    echo ""
+    printf "%b\n" "${CYAN}Timeshift CLI Automation${RC}"
+    printf "%b\n" "${CYAN}\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-"
+    printf "%b\n" "${CYAN}1) List Snapshots${RC}"
+    printf "%b\n" "${CYAN}2) List Devices${RC}"
+    printf "%b\n" "${CYAN}3) Create Snapshot${RC}"
+    printf "%b\n" "${CYAN}4) Restore Snapshot${RC}"
+    printf "%b\n" "${CYAN}5) Delete Snapshot${RC}"
+    printf "%b\n" "${CYAN}6) Delete All Snapshots${RC}"
+    printf "%b\n" "${CYAN}7) Exit${RC}"
+    printf "%b\n" "${CYAN}\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-"
 }
 
 # Function to list snapshots
 list_snapshots() {
-    echo "Listing snapshots..."
+    printf "%b\n" "${CYAN}Listing snapshots...${RC}"
     $ESCALATION_TOOL timeshift --list-snapshots
 }
 
 # Function to list devices
 list_devices() {
-    echo "Listing available devices..."
+    printf "%b\n" "${CYAN}Listing available devices...${RC}"
     $ESCALATION_TOOL timeshift --list-devices
 }
 
 # Function to create a new snapshot
 create_snapshot() {
-    read -p "Enter a comment for the snapshot (optional): " COMMENT
-    read -p "Enter snapshot tag (O,B,H,D,W,M) (leave empty for no tag): " TAG
+    printf "%b" "${CYAN}Enter a comment for the snapshot (optional): ${RC}"
+    read -r COMMENT
+    printf "%b" "${CYAN}Enter snapshot tag (O,B,H,D,W,M) (leave empty for no tag): ${RC}"
+    read -r TAG
 
     if [ -z "$COMMENT" ] && [ -z "$TAG" ]; then
         echo "Creating snapshot with no comment or tag..."
@@ -75,21 +77,25 @@ create_snapshot() {
 restore_snapshot() {
     list_snapshots
 
-    read -p "Enter the snapshot name you want to restore: " SNAPSHOT
-    read -p "Enter the target device (e.g., /dev/sda1): " TARGET_DEVICE
-    read -p "Do you want to skip GRUB reinstall? (yes/no): " SKIP_GRUB
+    printf "%b" "${CYAN}Enter the snapshot name you want to restore: ${RC}"
+    read -r SNAPSHOT
+    printf "%b" "${CYAN}Enter the target device (e.g., /dev/sda1): ${RC}"
+    read -r TARGET_DEVICE
+    printf "%b" "${CYAN}Do you want to skip GRUB reinstall? (yes/no): ${RC}"
+    read -r SKIP_GRUB
 
     if [ "$SKIP_GRUB" = "yes" ]; then
         $ESCALATION_TOOL timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --skip-grub --yes
     else
-        read -p "Enter GRUB device (e.g., /dev/sda): " GRUB_DEVICE
+        printf "%b" "${CYAN}Enter GRUB device (e.g., /dev/sda): ${RC}"
+        read -r GRUB_DEVICE
         $ESCALATION_TOOL timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --grub-device "$GRUB_DEVICE" --yes
     fi
 
     if [ $? -eq 0 ]; then
-        echo "Snapshot restored successfully."
+        printf "%b\n" "${GREEN}Snapshot restored successfully.${RC}"
     else
-        echo "Snapshot restore failed."
+        printf "%b\n" "${RED}Snapshot restore failed.${RC}"
     fi
 }
 
@@ -97,22 +103,24 @@ restore_snapshot() {
 delete_snapshot() {
     list_snapshots
 
-    read -p "Enter the snapshot name you want to delete: " SNAPSHOT
+    printf "%b" "${CYAN}Enter the snapshot name you want to delete: ${RC}"
+    read -r SNAPSHOT
 
-    echo "Deleting snapshot $SNAPSHOT..."
+    printf "%b\n" "${YELLOW}Deleting snapshot $SNAPSHOT...${RC}"
     $ESCALATION_TOOL timeshift --delete --snapshot "$SNAPSHOT" --yes
 
     if [ $? -eq 0 ]; then
-        echo "Snapshot deleted successfully."
+        printf "%b\n" "${GREEN}Snapshot deleted successfully.${RC}"
     else
-        echo "Snapshot deletion failed."
+        printf "%b\n" "${RED}Snapshot deletion failed.${RC}"
     fi
 }
 
 # Function to delete all snapshots
 delete_all_snapshots() {
-    echo "WARNING: This will delete all snapshots!"
-    read -p "Are you sure? (yes/no): " CONFIRMATION
+    printf "%b\n" "${RED}WARNING: This will delete all snapshots!${RC}"
+    printf "%b" "${CYAN}Are you sure? (yes/no): ${RC}"
+    read -r CONFIRMATION
 
     if [ "$CONFIRMATION" = "yes" ]; then
         echo "Deleting all snapshots..."
@@ -130,7 +138,8 @@ delete_all_snapshots() {
 main_menu() {
 while true; do
     display_menu
-    read -p "Select an option (1-7): " OPTION
+    printf "%b" "${CYAN}Select an option (1-7): ${RC}"
+    read -r OPTION
 
     case $OPTION in
         1) list_snapshots ;;
@@ -139,11 +148,11 @@ while true; do
         4) restore_snapshot ;;
         5) delete_snapshot ;;
         6) delete_all_snapshots ;;
-        7) echo "Exiting..."; exit 0 ;;
-        *) echo "Invalid option. Please try again." ;;
+        7) printf "%b\n" "${GREEN}Exiting...${RC}"; exit 0 ;;
+        *) printf "%b\n" "${RED}Invalid option. Please try again.${RC}" ;;
     esac
-
-    read -p "Press Enter to continue..."  
+    printf "%b" "${CYAN}Press Enter to continue...${RC}"
+    read -r dummy
 done
 }
 
