@@ -1,8 +1,0 @@
-name = "Gaming"
-
-[[data]]
-name = "Diablo II Resurrected"
-
-[[data.entries]]
-name = "Loot Filter Install"
-script = "diablo-ii/d2r-loot-filters.sh"
