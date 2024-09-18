@@ -1,0 +1,9 @@
+name = "AI"
+
+[[data]]
+name = "Ollama"
+script = "ollama.sh"
+
+[[data]]
+name = "Anaconda"
+script = "anaconda.sh"

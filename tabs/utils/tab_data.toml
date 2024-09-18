@@ -13,7 +13,6 @@ name = "Numlock on Startup"
 script = "numlock.sh"
 
 [[data]]
-name = "Ollama"
 script = "ollama.sh"
 
 [[data]]
