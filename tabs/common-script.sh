@@ -5,6 +5,7 @@
 RC='\033[0m'
 RED='\033[31m'
 YELLOW='\033[33m'
+CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
@@ -54,7 +55,7 @@ checkEscalationTool() {
             fi
         done
 
-        echo -e "${RED}Can't find a supported escalation tool${RC}"
+        printf "%b\n" "${RED}Can't find a supported escalation tool${RC}"
         exit 1
     fi
 }
@@ -82,7 +83,7 @@ checkPackageManager() {
     done
 
     if [ -z "${PACKAGER}" ]; then
-        echo -e "${RED}Can't find a supported package manager${RC}"
+        printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
 }
