@@ -4,6 +4,28 @@
 
 gitpath="$HOME/.local/share/mybash"
 
+installDepend() {
+    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
+    case "$PACKAGER" in
+        pacman)
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        apt)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        dnf)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        zypper)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}" # The packages above were grabbed out of the original mybash-setup-script.
+            exit 1
+            ;;
+    esac
+}
+
 cloneMyBash() {
     # Check if the dir exists before attempting to clone into it.
     if [ -d "$gitpath" ]; then
@@ -13,35 +35,13 @@ cloneMyBash() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/mybash.git "$gitpath"
 }
 
-installDepend() {
-    echo "Install mybash if not already installed"
-    case "$PACKAGER" in
-        pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        apt)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        dnf)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        zypper)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}" # The packages above were grabbed out of the original mybash-setup-script.
-            exit 1
-            ;;
-    esac
-}
-
 installFont() {
     # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
     FONT_NAME="MesloLGS Nerd Font Mono"
     if fc-list :family | grep -iq "$FONT_NAME"; then
-        echo "Font '$FONT_NAME' is installed."
+        printf "%b\n" "${GREEN}Font '$FONT_NAME' is installed.${RC}"
     else
-        echo "Installing font '$FONT_NAME'"
+        printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
         # Change this URL to correspond with the correct font
         FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
         FONT_DIR="$HOME/.local/share/fonts"
@@ -52,13 +52,13 @@ installFont() {
         mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
         fc-cache -fv
         rm -rf "${TEMP_DIR}"
-        echo "'$FONT_NAME' installed successfully."
+        printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
     fi
 }
 
 installStarshipAndFzf() {
     if command_exists starship; then
-        echo "Starship already installed"
+        printf "%b\n" "${GREEN}Starship already installed${RC}"
         return
     fi
 
@@ -67,7 +67,7 @@ installStarshipAndFzf() {
         exit 1
     fi
     if command_exists fzf; then
-        echo "Fzf already installed"
+        printf "%b\n" "${GREEN}Fzf already installed${RC}"
     else
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         $ESCALATION_TOOL ~/.fzf/install
@@ -76,7 +76,7 @@ installStarshipAndFzf() {
 
 installZoxide() {
     if command_exists zoxide; then
-        echo "Zoxide already installed"
+        printf "%b\n" "${GREEN}Zoxide already installed${RC}"
         return
     fi
 
@@ -110,8 +110,8 @@ linkConfig() {
 
 checkEnv
 checkEscalationTool
-cloneMyBash
 installDepend
+cloneMyBash
 installFont
 installStarshipAndFzf
 installZoxide

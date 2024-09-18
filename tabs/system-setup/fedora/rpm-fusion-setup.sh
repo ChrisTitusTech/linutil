@@ -5,7 +5,7 @@
 # https://rpmfusion.org/Configuration
 
 installRPMFusion() {
-    case $PACKAGER in
+    case "$PACKAGER" in
         dnf)
             if [ ! -e /etc/yum.repos.d/rpmfusion-free.repo ] || [ ! -e /etc/yum.repos.d/rpmfusion-nonfree.repo ]; then
                 echo "Installing RPM Fusion..."

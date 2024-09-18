@@ -21,7 +21,8 @@ enable_monitor() {
         i=$((i + 1))
     done
 
-    read -p "Enter the number of the monitor: " monitor_choice
+    printf "Enter the number of the monitor: "
+    read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
         printf "%b\n" "${RED}Invalid selection.${RC}"

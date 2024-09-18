@@ -5,9 +5,6 @@ Read Contributing Guidelines before opening a PR.
 https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
 -->
 
-## Title
-<!--[Provide a succinct and descriptive title for the pull request.]-->
-
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix

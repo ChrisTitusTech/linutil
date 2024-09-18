@@ -1,0 +1,27 @@
+name: Check for bashisms
+
+on:
+  push:
+    paths:
+      - tabs/**
+    branches: [ "main" ]
+  pull_request:
+    paths:
+      - tabs/**
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  check-bashisms:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install devscripts
+        run: sudo apt install devscripts
+
+      - name: Concatenate all .sh files and check for bashisms
+        working-directory: tabs
+        run: |
+          find . -name '*.sh' -exec checkbashisms {} + > all_scripts.sh
