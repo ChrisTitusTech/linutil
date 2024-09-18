@@ -20,7 +20,8 @@ change_orientation() {
         i=$((i + 1))
     done
 
-    read -p "Enter the number of the monitor: " monitor_choice
+    printf "Enter the number of the monitor: "
+    read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
         printf "%b\n" "${RED}Invalid selection.${RC}"
@@ -39,8 +40,8 @@ change_orientation() {
     printf "%b\n" "3. ${GREEN}Right${RC}"
     printf "%b\n" "4. ${GREEN}Inverted${RC}"
 
-    read -p "Enter the number of the orientation: " orientation_choice
-
+    printf "Enter the number of the orientation: "
+    read -r orientation_choice
     case $orientation_choice in
         1) orientation="normal" ;;
         2) orientation="left" ;;

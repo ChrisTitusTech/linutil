@@ -26,15 +26,16 @@ pub struct AppState {
     tabs: Vec<Tab>,
     /// Current tab
     current_tab: ListState,
-    /// This stack keeps track of our "current dirrectory". You can think of it as `pwd`. but not
+    /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<NodeId>,
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
     filter: Filter,
-    multi_select: bool,              // This keeps track of Multi select toggle
-    selected_commands: Vec<Command>, // This field is to store selected commands
+    multi_select: bool,
+    selected_commands: Vec<Command>,
+    drawable: bool,
 }
 
 pub enum Focus {
@@ -63,12 +64,56 @@ impl AppState {
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
             multi_select: false,
-            selected_commands: Vec::new(), // Initialize with an empty vector
+            selected_commands: Vec::new(),
+            drawable: false,
         };
         state.update_items();
         state
     }
     pub fn draw(&mut self, frame: &mut Frame) {
+        let terminal_size = frame.area();
+        let min_width = 77; // Minimum width threshold
+        let min_height = 19; // Minimum height threshold
+
+        if terminal_size.width < min_width || terminal_size.height < min_height {
+            let size_warning_message = format!(
+                "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
+                terminal_size.width,
+                terminal_size.height,
+                min_width,
+                min_height,
+            );
+
+            let warning_paragraph = Paragraph::new(size_warning_message.clone())
+                .alignment(Alignment::Center)
+                .style(Style::default().fg(ratatui::style::Color::Red).bold())
+                .wrap(ratatui::widgets::Wrap { trim: true });
+
+            // Get the maximum width and height of text lines
+            let text_lines: Vec<String> = size_warning_message
+                .lines()
+                .map(|line| line.to_string())
+                .collect();
+            let max_line_length = text_lines.iter().map(|line| line.len()).max().unwrap_or(0);
+            let num_lines = text_lines.len();
+
+            // Calculate the centered area
+            let centered_area = ratatui::layout::Rect {
+                x: terminal_size.x + (terminal_size.width - max_line_length as u16) / 2,
+                y: terminal_size.y + (terminal_size.height - num_lines as u16) / 2,
+                width: max_line_length as u16,
+                height: num_lines as u16,
+            };
+            frame.render_widget(warning_paragraph, centered_area);
+            self.drawable = false;
+        } else {
+            self.drawable = true;
+        }
+
+        if !self.drawable {
+            return;
+        }
+
         let label_block =
             Block::default()
                 .borders(Borders::all())
@@ -212,6 +257,21 @@ impl AppState {
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
+        // This should be defined first to allow closing
+        // the application even when not drawable ( If terminal is small )
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            if key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL)
+            {
+                return false;
+            }
+        }
+
+        // If UI is not drawable returning true will mark as the key handled
+        if !self.drawable {
+            return true;
+        }
+
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
@@ -315,7 +375,7 @@ impl AppState {
         }
     }
 
-    /// Checks ehther the current tree node is the root node (can we go up the tree or no)
+    /// Checks either the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
     pub fn at_root(&self) -> bool {
