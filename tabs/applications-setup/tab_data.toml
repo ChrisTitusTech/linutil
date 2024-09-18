@@ -1,8 +1,8 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Alacritty"
-script = "alacritty-setup.sh"
+name = "Terminals"
+script = "terminal-setup.sh"
 
 [[data]]
 name = "Bash Prompt"
@@ -11,10 +11,6 @@ script = "mybash-setup.sh"
 [[data]]
 name = "DWM-Titus"
 script = "dwmtitus-setup.sh"
-
-[[data]]
-name = "Kitty"
-script = "kitty-setup.sh"
 
 [[data]]
 name = "Neovim"
