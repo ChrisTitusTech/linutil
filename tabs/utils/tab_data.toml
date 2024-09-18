@@ -16,6 +16,13 @@ script = "numlock.sh"
 name = "SSH Commands"
 script = "ssh.sh"
 
+name = "Ollama"
+script = "ollama.sh"
+
+[[data]]
+name = "Service Manager"
+script = "service-control.sh"
+
 [[data]]
 name = "Monitor Control"
 

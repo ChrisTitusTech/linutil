@@ -3,6 +3,7 @@ name: LinUtil Release
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -59,3 +60,39 @@ jobs:
           file_pattern: "build/linutil"
           add_options: '--force'
         if: success()
+
+      - name: Extract Version
+        id: extract_version
+        run: |
+          version=$(date +"%Y.%m.%d")
+          echo "version=$version" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Generate Release Notes
+        id: generate_notes
+        uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-drafter.yml
+          version: ${{ env.version }}
+
+      - name: Create and Upload Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.version }}
+          name: Pre-Release ${{ env.version }}
+          body: |
+            ${{ steps.generate_notes.outputs.body }}
+            
+            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)
+          append_body: false
+          files: |
+            ./build/linutil
+            ./start.sh
+            ./startdev.sh
+          prerelease: true
+        env:
+          version: ${{ env.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
