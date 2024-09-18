@@ -53,8 +53,8 @@ setupAlacrittyConfig() {
 }
 
 installKitty() {
-    printf "%b\n" "${YELLOW}Install Kitty if not already installed...${RC}"
     if ! command_exists kitty; then
+        printf "%b\n" "${YELLOW}Installing Kitty...${RC}"
         case "$PACKAGER" in
             pacman)
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm kitty
