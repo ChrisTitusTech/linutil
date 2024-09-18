@@ -63,7 +63,7 @@ configure_gdm() {
     echo "Configuring GDM for autologin..."
     
     echo "Enter username for GDM autologin: "
-    read user
+    read -r user
 
     $ESCALATION_TOOL "echo '[daemon]' > /etc/gdm/custom.conf"
     $ESCALATION_TOOL "echo 'AutomaticLoginEnable = true' >> /etc/gdm/custom.conf"
