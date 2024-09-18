@@ -1,56 +1,71 @@
-name: Manage labels based on PR body
+name: Label PRs
 
 on:
   pull_request_target:
     types: [opened, edited, reopened, synchronize]
+  workflow_dispatch:
 
 jobs:
   manage-labels:
     runs-on: ubuntu-latest
     steps:
-      - name: Analyze PR Body and manage labels
+      - name: Set up PR numbers to process
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          body=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
-          labels_to_add=()
-          labels_to_remove=()
-          declare -A label_checks=(
-            ["New feature"]="enhancement"
-            ["Bug fix|Hotfix|Security patch"]="bug"
-            ["Documentation update"]="documentation"
-            ["Refactoring"]="refactor"
-            ["UI/UX improvement"]="UI/UX"
-          )
-          for pattern in "${!label_checks[@]}"; do
-            label="${label_checks[$pattern]}"
-            if echo "$body" | grep -Eq "\- \[x\] ($pattern)"; then
-              labels_to_add+=("$label")
-            else
-              labels_to_remove+=("$label")
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual trigger detected. Fetching all open PRs."
+            prs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&per_page=100" | jq '.[].number')
+            PR_NUMBERS=$(echo $prs | tr '\n' ' ')
+          else
+            echo "Triggered by PR event. Processing current PR."
+            PR_NUMBERS="${{ github.event.pull_request.number }}"
+          fi
+          echo "PR_NUMBERS=$PR_NUMBERS" >> $GITHUB_ENV
+
+      - name: Process PRs
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for PR_NUMBER in $PR_NUMBERS; do
+            echo "Processing PR #$PR_NUMBER"
+            body=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" | jq -r '.body')
+            labels_to_add=()
+            labels_to_remove=()
+            declare -A label_checks=(
+              ["New feature"]="enhancement"
+              ["Bug fix|Hotfix|Security patch"]="bug"
+              ["Documentation update"]="documentation"
+              ["Refactoring"]="refactor"
+              ["UI/UX improvement"]="UI/UX"
+            )
+            for pattern in "${!label_checks[@]}"; do
+              label="${label_checks[$pattern]}"
+              if echo "$body" | grep -Eq "\- \[x\] ($pattern)"; then
+                labels_to_add+=("$label")
+              else
+                labels_to_remove+=("$label")
+              fi
+            done
+
+            if [ ${#labels_to_add[@]} -gt 0 ]; then
+              echo "Adding labels to PR #$PR_NUMBER: ${labels_to_add[*]}"
+              curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                -d "{\"labels\": $(printf '%s\n' "${labels_to_add[@]}" | jq -R . | jq -s .)}" \
+                "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/labels"
             fi
-          done
 
-          echo "LABELS_TO_ADD=$(IFS=,; echo "${labels_to_add[*]}")" >> $GITHUB_ENV
-          echo "LABELS_TO_REMOVE=$(IFS=,; echo "${labels_to_remove[*]}")" >> $GITHUB_ENV
-
-      - name: Add labels if necessary
-        if: env.LABELS_TO_ADD != ''
-        run: |
-          IFS=',' read -ra labels <<< "${LABELS_TO_ADD}"
-          for label in "${labels[@]}"; do
-            curl -s -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"labels\": [\"$label\"]}" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels
-          done
-      - name: Remove labels if necessary
-        if: env.LABELS_TO_REMOVE != ''
-        run: |
-          IFS=',' read -ra labels <<< "${LABELS_TO_REMOVE}"
-          for label in "${labels[@]}"; do
-            curl -s -X DELETE \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/$label
+            for label in "${labels_to_remove[@]}"; do
+              echo "Removing label '$label' from PR #$PR_NUMBER"
+              curl -s -X DELETE \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/labels/$label"
+            done
           done
