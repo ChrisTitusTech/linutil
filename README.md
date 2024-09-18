@@ -5,7 +5,7 @@
 [![](https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp)](https://discord.gg/bujFYKAHSp)
 
 <!-- TODO: crates.io package here + <br> -->
-![linutil AUR Version](https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff) ![linutil-bin AUR Version](https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff)
+[![linutil AUR Version](https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff)](https://aur.archlinux.org/packages/linutil) [![linutil-bin AUR Version](https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff)](https://aur.archlinux.org/packages/linutil-bin)
 
 ![Preview](docs/assets/preview.png)
 
