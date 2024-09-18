@@ -3,8 +3,7 @@
 . ../common-script.sh
 
 installFastfetch() {
-    printf "%b\n" "${YELLOW}Installing Fastfetch if not already installed...${RC}"
-
+    printf "%b\n" "${YELLOW}Installing Fastfetch...${RC}"
     if ! command_exists fastfetch; then
         case "$PACKAGER" in
             pacman)
