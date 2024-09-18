@@ -15,7 +15,7 @@ choose_installation() {
         1) INSTALL_DOCKER=1; INSTALL_COMPOSE=0 ;;
         2) INSTALL_DOCKER=0; INSTALL_COMPOSE=1 ;;
         3) INSTALL_DOCKER=1; INSTALL_COMPOSE=1 ;;
-        *) echo "Invalid choice. Exiting."; exit 1 ;;
+        *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
     esac
 }
 
