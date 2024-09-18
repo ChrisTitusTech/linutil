@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 installAlacritty() {
-    echo "Installing Alacritty..."
+    printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
     if ! command_exists alacritty; then
         case ${PACKAGER} in
             pacman)
@@ -14,7 +14,7 @@ installAlacritty() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}alacritty is already installed.${RC}"
+        printf "%b\n" "${GREEN}Alacritty is already installed.${RC}"
     fi
 }
 
