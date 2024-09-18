@@ -87,7 +87,7 @@ setup_samba() {
 
         # Add a new Samba user
         echo "Enter Samba username: "
-        read SAMBA_USER
+        read -r SAMBA_USER
 
         # Loop until the passwords match
         while true; do
