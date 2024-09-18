@@ -6,19 +6,19 @@ install_theme_tools() {
     printf "%b\n" "${YELLOW}Installing theme tools (qt6ct and kvantum)...${RC}\n"
     case $PACKAGER in
         apt-get)
-            $ESCALATION_TOOL apt-get update
-            $ESCALATION_TOOL apt-get install -y qt6ct kvantum
+            "$ESCALATION_TOOL" apt-get update
+            "$ESCALATION_TOOL" apt-get install -y qt6ct kvantum
             ;;
         zypper)
-            $ESCALATION_TOOL zypper refresh
-            $ESCALATION_TOOL zypper --non-interactive install qt6ct kvantum
+            "$ESCALATION_TOOL" zypper refresh
+            "$ESCALATION_TOOL" zypper --non-interactive install qt6ct kvantum
             ;;
         dnf)
-            $ESCALATION_TOOL dnf update
-            $ESCALATION_TOOL dnf install -y qt6ct kvantum
+            "$ESCALATION_TOOL" dnf update
+            "$ESCALATION_TOOL" dnf install -y qt6ct kvantum
             ;;
         pacman)
-            $ESCALATION_TOOL pacman -S --needed --noconfirm qt6ct kvantum
+            "$ESCALATION_TOOL" pacman -S --needed --noconfirm qt6ct kvantum
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager. Please install qt6ct and kvantum manually.${RC}\n"
@@ -41,7 +41,7 @@ EOF
     # Add QT_QPA_PLATFORMTHEME to /etc/environment
     if ! grep -q "QT_QPA_PLATFORMTHEME=qt6ct" /etc/environment; then
         printf "%b\n" "${YELLOW}Adding QT_QPA_PLATFORMTHEME to /etc/environment...${RC}\n"
-        echo "QT_QPA_PLATFORMTHEME=qt6ct" | $ESCALATION_TOOL tee -a /etc/environment > /dev/null
+        echo "QT_QPA_PLATFORMTHEME=qt6ct" | "$ESCALATION_TOOL" tee -a /etc/environment > /dev/null
         printf "%b\n" "${GREEN}QT_QPA_PLATFORMTHEME added to /etc/environment.${RC}\n"
     else
         printf "%b\n" "${GREEN}QT_QPA_PLATFORMTHEME already set in /etc/environment.${RC}\n"

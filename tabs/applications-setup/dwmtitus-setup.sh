@@ -6,21 +6,21 @@ makeDWM() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
     # This path can be changed (e.g. to linux-toolbox directory)
     cd dwm-titus/ # Hardcoded path, maybe not the best.
-    $ESCALATION_TOOL make clean install # Run make clean install
+    "$ESCALATION_TOOL" make clean install # Run make clean install
 }
 
 setupDWM() {
     echo "Installing DWM-Titus if not already installed"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb
             ;;
         apt-get|nala)
-            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev
+            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
-            $ESCALATION_TOOL "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
+            "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
             ;;
         *)
             echo "Unsupported package manager: $PACKAGER"
@@ -115,7 +115,7 @@ picom_animations() {
     fi
 
     # Install the built binary
-    if ! $ESCALATION_TOOL ninja -C build install; then
+    if ! "$ESCALATION_TOOL" ninja -C build install; then
         echo "Failed to install the built binary"
         return 1
     fi
@@ -176,13 +176,13 @@ setupDisplayManager() {
     echo "Setting up Xorg"
     case "$PACKAGER" in
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
         apt-get|nala)
-            $ESCALATION_TOOL "$PACKAGER" install -y xorg xinit
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
             echo "Unsupported package manager: $PACKAGER"
@@ -204,13 +204,13 @@ setupDisplayManager() {
         echo "No display manager found, installing $DM"
         case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
             apt-get|nala)
-                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
-                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
                 echo "Unsupported package manager: $PACKAGER"
@@ -229,28 +229,28 @@ setupDisplayManager() {
                 echo "Configuring SDDM for autologin"
                 SDDM_CONF="/etc/sddm.conf"
                 if [ ! -f "$SDDM_CONF" ]; then
-                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
                 else
-                    $ESCALATION_TOOL sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
-                    $ESCALATION_TOOL sed -i '/^User=/d' "$SDDM_CONF"
-                    $ESCALATION_TOOL sed -i '/^Session=/d' "$SDDM_CONF"
-                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^User=/d' "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^Session=/d' "$SDDM_CONF"
+                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
                 fi
                 echo "Checking if autologin group exists"
                 if ! getent group autologin > /dev/null; then
                     echo "Creating autologin group"
-                    $ESCALATION_TOOL groupadd autologin
+                    "$ESCALATION_TOOL" groupadd autologin
                 else
                     echo "Autologin group already exists"
                 fi
                 echo "Adding user with UID 1000 to autologin group"
                 USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
                 if [ -n "$USER_UID_1000" ]; then
-                    $ESCALATION_TOOL usermod -aG autologin "$USER_UID_1000"
+                    "$ESCALATION_TOOL" usermod -aG autologin "$USER_UID_1000"
                     echo "User $USER_UID_1000 added to autologin group"
                 else
                     echo "No user with UID 1000 found - Auto login not possible"
@@ -272,7 +272,7 @@ install_slstatus() {
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         echo "Installing slstatus"
         cd "$HOME/dwm-titus/slstatus" || { echo "Failed to change directory to slstatus"; return 1; }
-        if $ESCALATION_TOOL make clean install; then
+        if "$ESCALATION_TOOL" make clean install; then
             echo "slstatus installed successfully"
         else
             echo "Failed to install slstatus"

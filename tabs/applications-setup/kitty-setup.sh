@@ -7,10 +7,10 @@ setupKitty() {
     if ! command_exists kitty; then
         case ${PACKAGER} in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --needed --noconfirm kitty
+                "$ESCALATION_TOOL" "${PACKAGER}" -S --needed --noconfirm kitty
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y kitty
+                "$ESCALATION_TOOL" "${PACKAGER}" install -y kitty
                 ;;
         esac
     else
