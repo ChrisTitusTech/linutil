@@ -12,8 +12,6 @@ script = "bluetooth-control.sh"
 name = "Numlock on Startup"
 script = "numlock.sh"
 
-[[data]]
-script = "ollama.sh"
 
 [[data]]
 name = "Service Manager"
