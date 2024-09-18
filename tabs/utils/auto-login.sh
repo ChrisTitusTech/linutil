@@ -30,7 +30,7 @@ list_sessions() {
         9) session="i3.desktop" ;;
         10) 
             echo "Enter custom session name (e.g., mysession.desktop): "
-            read session ;;
+            read -r session ;;
         *) 
             echo "Invalid option selected." 
             exit 1 ;;
