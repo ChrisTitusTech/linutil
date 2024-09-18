@@ -29,6 +29,10 @@ name = "Bootable Pendrive Maker"
 script = "create-bootable-usb.sh"
 
 [[data]]
+name = "Auto Power Profiling"
+script = "power-profile.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
