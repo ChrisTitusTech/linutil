@@ -82,6 +82,7 @@ jobs:
             - Built and released the latest version of LinUtil
           files: |
             ./build/linutil
+            ./build/linutil-aarch64
             ./start.sh
             ./startdev.sh
         env:

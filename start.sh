@@ -49,7 +49,7 @@ findArch
 temp_file=$(mktemp)
 check $? "Creating the temporary file"
 
-echo "Downloading linutil from $(getUrl)"
+echo "Downloading linutil for ${arch} architecture from $(getUrl)"
 curl -fsL "$(getUrl)" -o "$temp_file"
 check $? "Downloading linutil"
 
