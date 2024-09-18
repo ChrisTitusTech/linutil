@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 installRofi() {
-    echo "Installing Rofi..."
+    printf "%b\n" "${YELLOW}Installing Rofi...${RC}"
     if ! command_exists rofi; then
         case "$PACKAGER" in
             pacman)
@@ -14,12 +14,12 @@ installRofi() {
                 ;;
         esac
     else
-        echo "Rofi is already installed."
+        printf "%b\n" "${GREEN}Rofi is already installed.${RC}"
     fi
 }
 
 setupRofiConfig() {
-    echo "Copying Rofi configuration files..."
+    printf "%b\n" "${YELLOW}Copying Rofi configuration files...${RC}"
     if [ -d "$HOME/.config/rofi" ] && [ ! -d "$HOME/.config/rofi-bak" ]; then
         cp -r "$HOME/.config/rofi" "$HOME/.config/rofi-bak"
     fi
