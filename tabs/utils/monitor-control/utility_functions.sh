@@ -6,15 +6,15 @@
 setup_xrandr() {
     echo "Install xrandr if not already installed..."
     if ! command_exists xrandr; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "${PACKAGER}" -S --noconfirm xorg-xrandr
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm xorg-xrandr
                 ;;
-            apt-get)
-                "$ESCALATION_TOOL" "${PACKAGER}" install -y x11-xserver-utils
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y x11-xserver-utils
                 ;;
             *)
-                "$ESCALATION_TOOL" "${PACKAGER}" install -y xorg-x11-server-utils
+                "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-server-utils
                 ;;
         esac
     else
@@ -36,6 +36,12 @@ execute_command() {
 detect_connected_monitors() {
     xrandr_output=$(xrandr)
     echo "$xrandr_output" | grep " connected" | awk '{print $1}'
+}
+
+# Function to get the current brightness for a monitor
+get_current_brightness() {
+    monitor="$1"
+    xrandr --verbose | grep -A 10 "^$monitor connected" | grep "Brightness:" | awk '{print $2}'
 }
 
 # Function to get resolutions for a monitor
@@ -73,8 +79,9 @@ get_unique_resolutions() {
 # Function to prompt for confirmation
 confirm_action() {
     action="$1"
-    echo "$action"
-    read -p "Are you sure? (y/n): " confirm
+    printf "%b\n" "${CYAN}$action${RC}"
+    printf "%b" "${CYAN}Are you sure? (y/n): ${RC}"
+    read -r confirm
     if echo "$confirm" | grep -qE '^[Yy]$'; then
         return 0
     else
@@ -83,4 +90,5 @@ confirm_action() {
 }
 
 checkEnv
+checkEscalationTool
 setup_xrandr

@@ -60,5 +60,6 @@ numlockSetup() {
   fi
 }
 
+checkEnv
 checkEscalationTool
 numlockSetup

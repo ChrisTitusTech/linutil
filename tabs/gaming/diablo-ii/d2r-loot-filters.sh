@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Search for possible Diablo II Resurrected folder locations
-echo "Searching for Diablo II Resurrected folders..."
+printf "%b\n" "${YELLOW}Searching for Diablo II Resurrected folders...${RC}"
 possible_paths=$(find $HOME -type d -path "*/drive_c/Program Files (x86)/Diablo II Resurrected" 2>/dev/null)
 
 if [ -z "$possible_paths" ]; then
-    echo "Error: No Diablo II Resurrected folders found."
+    printf "%b\n" "${RED}Error: No Diablo II Resurrected folders found.${RC}"
     exit 1
 fi
 
@@ -23,7 +23,7 @@ print_menu() {
     if ((start + max_display > total)); then start=$((total - max_display)); fi
     if ((start < 0)); then start=0; fi
     
-    echo "Please select the Diablo II: Resurrected installation path:"
+    printf "%b\n" "${YELLOW}Please select the Diablo II: Resurrected installation path:${RC}"
     for i in $(seq 0 $((max_display - 1))); do
         if ((i + start >= total)); then break; fi
         if [ $((i + start)) -eq $selected ]; then
@@ -84,17 +84,17 @@ mods_path="$d2r_path/mods"
 mkdir -p "$mods_path"
 
 # Download the latest release
-echo "Downloading the latest loot filter..."
+printf "%b\n" "${YELLOW}Downloading the latest loot filter...${RC}"
 curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip
 
 # Extract the contents to the mods folder
-echo "Extracting loot filter to $mods_path..."
+printf "%b\n" "${YELLOW}Extracting loot filter to $mods_path...${RC}"
 unzip -q -o /tmp/lootfilter.zip -d "$mods_path"
 
 # Clean up
 rm /tmp/lootfilter.zip
 
-echo "Loot filter installed successfully in $mods_path"
+printf "%b\n" "${GREEN}Loot filter installed successfully in $mods_path${RC}"
 
 # Add instructions for setting launch options
 echo
