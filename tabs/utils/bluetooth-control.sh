@@ -68,8 +68,8 @@ scan_devices() {
         printf "%b\n" "${GREEN}Devices found:${RC}"
         echo "$devices"
     fi
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read -r dummy
 }
 
 # Function to prompt for MAC address using numbers
@@ -85,8 +85,8 @@ prompt_for_mac() {
         devices=$(bluetoothctl devices)
         if [ -z "$devices" ]; then
             printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"
-            echo "Press any key to return to the main menu..."
-            read -n 1
+            printf "Press any key to return to the main menu..."
+            read -r dummy
             return
         fi
 
@@ -121,8 +121,8 @@ prompt_for_mac() {
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
     done
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read -r dummy
 }
 
 # Function to pair with a device
