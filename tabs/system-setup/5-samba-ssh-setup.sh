@@ -71,7 +71,7 @@ setup_samba() {
         echo "Do you want to modify the existing Samba configuration? (yes/no): "
         read MODIFY_SAMBA
         if [ "$MODIFY_SAMBA" = "yes" ]; then
-            $ESCALATION_TOOL nano "$SAMBA_CONFIG"
+            "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
         fi
     else
         printf "%b\n" "${YELLOW}No existing Samba configuration found. Setting up a new one...${RC}"
