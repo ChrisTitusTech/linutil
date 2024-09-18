@@ -7,23 +7,23 @@ cleanup_system() {
     case "$PACKAGER" in
         apt|nala)
             "$ESCALATION_TOOL" "$PACKAGER" clean
-            $ESCALATION_TOOL "$PACKAGER" autoremove -y
-            $ESCALATION_TOOL "$PACKAGER" autoclean
-            $ESCALATION_TOOL du -h /var/cache/apt
-            $ESCALATION_TOOL "$PACKAGER" clean
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
+            "$ESCALATION_TOOL" "$PACKAGER" autoclean
+            "$ESCALATION_TOOL" du -h /var/cache/apt
+            "$ESCALATION_TOOL" "$PACKAGER" clean
             ;;
         zypper)
-            $ESCALATION_TOOL "$PACKAGER" clean -a
-            $ESCALATION_TOOL "$PACKAGER" tidy
-            $ESCALATION_TOOL "$PACKAGER" cc -a
+            "$ESCALATION_TOOL" "$PACKAGER" clean -a
+            "$ESCALATION_TOOL" "$PACKAGER" tidy
+            "$ESCALATION_TOOL" "$PACKAGER" cc -a
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" clean all
-            $ESCALATION_TOOL "$PACKAGER" autoremove -y
+            "$ESCALATION_TOOL" "$PACKAGER" clean all
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
             ;;
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -Sc --noconfirm
-            $ESCALATION_TOOL "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm
+            "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
+            "$ESCALATION_TOOL" "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -35,10 +35,10 @@ cleanup_system() {
 }
 
 common_cleanup() {
-    $ESCALATION_TOOL rm -rf /var/tmp/*
-    $ESCALATION_TOOL rm -rf /tmp/*
-    $ESCALATION_TOOL find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
-    $ESCALATION_TOOL journalctl --vacuum-time=3d
+    "$ESCALATION_TOOL" rm -rf /var/tmp/*
+    "$ESCALATION_TOOL" rm -rf /tmp/*
+    "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    "$ESCALATION_TOOL" journalctl --vacuum-time=3d
 }
 
 clean_data() {
