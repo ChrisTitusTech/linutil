@@ -42,7 +42,7 @@ installAlacritty() {
 }
 
 setupAlacrittyConfig() {
-    printf "%b\n" "${YELLOW}Copy alacritty config files${RC}"
+    printf "%b\n" "${YELLOW}Copying alacritty configuration files...${RC}"
     if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
