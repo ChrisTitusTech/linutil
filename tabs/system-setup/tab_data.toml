@@ -33,6 +33,10 @@ name = "RPM Fusion Setup"
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data]]
+name = "Full System Cleanup"
+script = "system-cleanup.sh"
+
+[[data]]
 name = "Full System Update"
 script = "system-update.sh"
 
