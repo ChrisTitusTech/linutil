@@ -3,29 +3,30 @@
 . ../common-script.sh
 
 installAlacritty() {
-    echo "Installing Alacritty..."
+    printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
     if ! command_exists alacritty; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm alacritty
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm alacritty
                 ;;
             *)
-                $ESCALATION_TOOL ${PACKAGER} install -y alacritty
+                $ESCALATION_TOOL "$PACKAGER" install -y alacritty
                 ;;
         esac
     else
-        echo "Alacritty is already installed."
+        printf "%b\n" "${GREEN}Alacritty is already installed.${RC}"
     fi
 }
 
 setupAlacrittyConfig() {
-    echo "Copying Alacritty configuration files..."
+    printf "%b\n" "${YELLOW}Copy alacritty config files${RC}"
     if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
     mkdir -p "${HOME}/.config/alacritty/"
     curl -sSLo "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.toml"
     curl -sSLo "${HOME}/.config/alacritty/nordic.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/nordic.toml"
+    printf "%b\n" "${GREEN}Alacritty configuration files copied.${RC}"
 }
 
 checkEnv

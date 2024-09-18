@@ -3,23 +3,23 @@
 . ../common-script.sh
 
 installFastfetch() {
-    echo "Installing Fastfetch..."
+    printf "%b\n" "${YELLOW}Installing Fastfetch...${RC}"
     if ! command_exists fastfetch; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --needed --noconfirm fastfetch
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm fastfetch
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y fastfetch
+                $ESCALATION_TOOL "$PACKAGER" install -y fastfetch
                 ;;
         esac
     else
-        echo "Fastfetch is already installed."
+        printf "%b\n" "${GREEN}Fastfetch is already installed.${RC}"
     fi
 }
 
 setupFastfetchConfig() {
-    echo "Copying Fastfetch config files..."
+    printf "%b\n" "${YELLOW}Copying Fastfetch config files...${RC}"
     if [ -d "${HOME}/.config/fastfetch" ] && [ ! -d "${HOME}/.config/fastfetch-bak" ]; then
         cp -r "${HOME}/.config/fastfetch" "${HOME}/.config/fastfetch-bak"
     fi

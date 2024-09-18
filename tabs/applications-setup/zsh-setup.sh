@@ -4,19 +4,19 @@
 
 # Function to install zsh
 installZsh() {
-  echo "Installing Zsh..."
-    if ! command_exists zsh; then
-        case "$PACKAGER" in
-            pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm zsh
-                ;;
-            *)
-                $ESCALATION_TOOL "$PACKAGER" install -y zsh
-                ;;
-        esac
-    else
-        echo "ZSH is already installed."
-    fi
+  printf "%b\n" "${YELLOW}Installing Zsh...${RC}"
+  if ! command_exists zsh; then
+      case "$PACKAGER" in
+          pacman)
+              $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm zsh
+              ;;
+          *)
+              $ESCALATION_TOOL "$PACKAGER" install -y zsh
+              ;;
+      esac
+  else
+      printf "%b\n" "${GREEN}ZSH is already installed.${RC}"
+  fi
 }
 
 # Function to setup zsh configuration
