@@ -32,7 +32,17 @@ get_latest_release() {
 
 getUrl() {
     local latest_release=$(get_latest_release)
-    echo "https://github.com/harshav167/linutil/releases/download/$latest_release/linutil"
+    case "${arch}" in
+        x86_64)
+            echo "https://github.com/harshav167/linutil/releases/download/$latest_release/linutil"
+            ;;
+        aarch64)
+            echo "https://github.com/harshav167/linutil/releases/download/$latest_release/linutil-aarch64"
+            ;;
+        *)
+            check 1 "Unsupported architecture"
+            ;;
+    esac
 }
 
 findArch

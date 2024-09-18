@@ -50,6 +50,7 @@ jobs:
       - name: Move binaries to build directory
         run: |
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
+          mv build/aarch64-unknown-linux-gnu/release/linutil build/linutil-aarch64
 
       - name: Pull latest changes
         run: |
