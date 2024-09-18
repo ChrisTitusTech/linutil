@@ -16,6 +16,7 @@ script = "numlock.sh"
 name = "SSH Commands"
 script = "ssh.sh"
 
+[[data]]
 name = "Ollama"
 script = "ollama.sh"
 
