@@ -3,10 +3,10 @@
 . ../common-script.sh
 
 chooseTerminal() {
-    echo "Choose your preferred terminal:"
-    echo "1) Alacritty"
-    echo "2) Kitty"
-    echo "Enter your choice (1-2): "
+    printf "Choose your preferred terminal emulator:\n"
+    printf "1) Alacritty\n"
+    printf "2) Kitty\n"
+    printf "Enter your choice (1-2): "
     read -r choice
 
     case $choice in
