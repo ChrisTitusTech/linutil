@@ -4,6 +4,28 @@
 
 gitpath="$HOME/.local/share/mybash"
 
+installDepend() {
+    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
+    case "$PACKAGER" in
+        pacman)
+            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        apt)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        dnf)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        zypper)
+            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}" # The packages above were grabbed out of the original mybash-setup-script.
+            exit 1
+            ;;
+    esac
+}
+
 cloneMyBash() {
     # Check if the dir exists before attempting to clone into it.
     if [ -d "$gitpath" ]; then
@@ -11,28 +33,6 @@ cloneMyBash() {
     fi
     mkdir -p "$HOME/.local/share" # Only create the dir if it doesn't exist.
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/mybash.git "$gitpath"
-}
-
-installDepend() {
-    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
-    case "$PACKAGER" in
-        pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        apt)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        dnf)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        zypper)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig
-            ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}" # The packages above were grabbed out of the original mybash-setup-script.
-            exit 1
-            ;;
-    esac
 }
 
 installFont() {
@@ -110,8 +110,8 @@ linkConfig() {
 
 checkEnv
 checkEscalationTool
-cloneMyBash
 installDepend
+cloneMyBash
 installFont
 installStarshipAndFzf
 installZoxide
