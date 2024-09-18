@@ -25,16 +25,20 @@ setup_ssh() {
     printf "%b\n" "${YELLOW}Setting up SSH...${RC}"
 
     # Detect package manager and install appropriate SSH package
-    if [ "$PACKAGER" = "apt-get" ]; then
+    case "$PACKAGER" in
+    "apt-get")
         install_package openssh-server
         SSH_SERVICE="ssh"
-    elif [ "$PACKAGER" = "pacman" ]; then
+        ;;
+    "pacman")
         install_package openssh
         SSH_SERVICE="sshd"
-    else
+        ;;
+    *)
         install_package openssh-server
         SSH_SERVICE="sshd"
-    fi
+        ;;
+    esac
 
     # Enable and start the appropriate SSH service
     $ESCALATION_TOOL systemctl enable "$SSH_SERVICE"
