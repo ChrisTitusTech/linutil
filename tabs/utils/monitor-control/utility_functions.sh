@@ -38,6 +38,12 @@ detect_connected_monitors() {
     echo "$xrandr_output" | grep " connected" | awk '{print $1}'
 }
 
+# Function to get the current brightness for a monitor
+get_current_brightness() {
+    monitor="$1"
+    xrandr --verbose | grep -A 10 "^$monitor connected" | grep "Brightness:" | awk '{print $2}'
+}
+
 # Function to get resolutions for a monitor
 get_unique_resolutions() {
     monitor="$1"
