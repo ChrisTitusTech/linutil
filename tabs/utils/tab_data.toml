@@ -33,6 +33,10 @@ name = "Auto Power Profiling"
 script = "power-profile.sh"
 
 [[data]]
+name = "Timeshift Backup"
+script = "timeshift.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
