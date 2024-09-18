@@ -14,7 +14,7 @@ cloneMyBash() {
 }
 
 installDepend() {
-    printf "%b\n" "${YELLOW}Install mybash if not already installed${RC}"
+    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
     case "$PACKAGER" in
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig

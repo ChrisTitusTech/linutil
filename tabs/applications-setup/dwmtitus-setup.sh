@@ -143,27 +143,30 @@ clone_config_folders() {
 }
 
 configure_backgrounds() {
+    # Set the variable PIC_DIR which stores the path for images
+    PIC_DIR="$HOME/Pictures"
+
     # Set the variable BG_DIR to the path where backgrounds will be stored
-    BG_DIR="$HOME/Pictures/backgrounds"
+    BG_DIR="$PIC_DIR/backgrounds"
 
     # Check if the ~/Pictures directory exists
-    if [ ! -d "~/Pictures" ]; then
+    if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         printf "%b\n" "${RED}Pictures directory does not exist${RC}"
         mkdir ~/Pictures
         printf "%b\n" "${GREEN}Directory was created in Home folder${RC}"
     fi
-    
+
     # Check if the backgrounds directory (BG_DIR) exists
     if [ ! -d "$BG_DIR" ]; then
         # If the backgrounds directory doesn't exist, attempt to clone a repository containing backgrounds
-        if ! git clone https://github.com/ChrisTitusTech/nord-background.git ~/Pictures; then
+        if ! git clone https://github.com/ChrisTitusTech/nord-background.git "$PIC_DIR/nord-background"; then
             # If the git clone command fails, print an error message and return with a status of 1
             printf "%b\n" "${RED}Failed to clone the repository${RC}"
             return 1
         fi
         # Rename the cloned directory to 'backgrounds'
-        mv ~/Pictures/nord-background ~/Pictures/backgrounds
+        mv "$PIC_DIR/nord-background" "$PIC_DIR/backgrounds"
         # Print a success message indicating that the backgrounds have been downloaded
         printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"    
     else
@@ -261,9 +264,6 @@ setupDisplayManager() {
                 ;;
         esac
     fi
-    
-
-    
 }
 
 install_slstatus() {

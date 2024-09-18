@@ -2,8 +2,8 @@
 
 . ../common-script.sh
 
-setupAlacritty() {
-    printf "%b\n" "${YELLOW}Install Alacritty if not already installed...${RC}"
+installAlacritty() {
+    echo "Installing Alacritty..."
     if ! command_exists alacritty; then
         case ${PACKAGER} in
             pacman)
@@ -31,5 +31,5 @@ setupAlacrittyConfig() {
 
 checkEnv
 checkEscalationTool
-setupAlacritty
+installAlacritty
 setupAlacrittyConfig

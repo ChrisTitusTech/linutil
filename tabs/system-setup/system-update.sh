@@ -61,7 +61,7 @@ fastUpdate() {
 }
 
 updateSystem() {
-    printf "%b\n" "${GREEN}Updating system${RC}"
+    printf "%b\n" "${YELLOW}Updating system${RC}"
     case ${PACKAGER} in
         nala|apt-get)
             $ESCALATION_TOOL "${PACKAGER}" update -y

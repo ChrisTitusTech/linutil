@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 installPkg() {
-    echo "Install UFW if not already installed..."
+    echo "Installing UFW..."
     if ! command_exists ufw; then
         case ${PACKAGER} in
             pacman)
@@ -19,7 +19,7 @@ installPkg() {
 }
 
 configureUFW() {
-    printf "%b\n" "${GREEN}Using Chris Titus Recommended Firewall Rules${RC}"
+    printf "%b\n" "${YELLOW}Using Chris Titus Recommended Firewall Rules${RC}"
 
     printf "%b\n" "${YELLOW}Disabling UFW${RC}"
     $ESCALATION_TOOL ufw disable
