@@ -12,13 +12,14 @@ check() {
         exit 1
     fi
 
-	unset exit_code
-	unset message
+    unset exit_code
+    unset message
 }
 
 findArch() {
     case "$(uname -m)" in
         x86_64|amd64) arch="x86_64" ;;
+        aarch64|arm64) arch="aarch64" ;;
         *) check 1 "Unsupported architecture"
     esac
 }
@@ -38,12 +39,15 @@ findArch
 temp_file=$(mktemp)
 check $? "Creating the temporary file"
 
+echo "Downloading linutil from $(getUrl)"
 curl -fsL "$(getUrl)" -o "$temp_file"
 check $? "Downloading linutil"
 
+echo "Making linutil executable"
 chmod +x "$temp_file"
 check $? "Making linutil executable"
 
+echo "Executing linutil"
 "$temp_file"
 check $? "Executing linutil"
 
