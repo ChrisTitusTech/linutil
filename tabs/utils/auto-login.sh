@@ -107,7 +107,7 @@ configure_lxdm() {
     echo "Configuring LXDM for autologin..."
     
     echo "Enter username for LXDM autologin: "
-    read user
+    read -r user
     list_sessions  # Show session options
     
     $ESCALATION_TOOL sed -i "s/^#.*autologin=.*$/autologin=${user}/" /etc/lxdm/lxdm.conf
