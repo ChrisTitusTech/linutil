@@ -42,7 +42,7 @@ configure_lightdm() {
     echo "Configuring LightDM for autologin..."
     
     echo "Enter username for LightDM autologin: "
-    read user
+    read -r user
 
     $ESCALATION_TOOL "echo '[Seat:*]' > /etc/lightdm/lightdm.conf.d/50-autologin.conf"
     $ESCALATION_TOOL "echo 'autologin-user=$user' >> /etc/lightdm/lightdm.conf.d/50-autologin.conf"
