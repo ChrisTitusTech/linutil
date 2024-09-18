@@ -33,6 +33,10 @@ name = "RPM Fusion Setup"
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data]]
+name = "Docker"
+script = "docker.sh"
+
+[[data]]
 name = "NAS Setup"
 script = "nas-setup.sh"
 
