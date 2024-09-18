@@ -1,7 +1,7 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Terminals"
+name = "Terminal Emulators"
 script = "terminal-setup.sh"
 
 [[data]]
