@@ -53,5 +53,9 @@ name = "Remove Snaps"
 script = "4-remove-snaps.sh"
 
 [[data]]
+name = "SSH-Samba Setup"
+script = "5-samba-ssh-setup.sh"
+
+[[data]]
 name = "Docker Setup"
 script = "6-docker-setup.sh"
