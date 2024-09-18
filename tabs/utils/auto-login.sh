@@ -85,7 +85,7 @@ configure_sddm() {
     echo "Configuring SDDM for autologin..."
     
     echo "Enter username for SDDM autologin: "
-    read user
+    read -r user
     list_sessions  # Show session options
 
     $ESCALATION_TOOL "echo '[Autologin]' > /etc/sddm.conf"
