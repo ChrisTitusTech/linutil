@@ -25,6 +25,10 @@ name = "Auto Login"
 script = "auto-login.sh"
 
 [[data]]
+name = "Bootable Pendrive Maker"
+script = "create-bootable-usb.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
