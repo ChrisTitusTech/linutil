@@ -21,7 +21,7 @@ installZsh() {
 
 # Function to setup zsh configuration
 setupZshConfig() {
-  echo "Setting up Zsh configuration..."
+  printf "%b\n" "${YELLOW}Setting up Zsh configuration...${RC}"
   CONFIG_DIR="$HOME/.config/zsh"
   ZSHRC_FILE="$CONFIG_DIR/.zshrc"
 
