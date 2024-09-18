@@ -1,8 +1,3 @@
-# Pull Request
-
-## Title
-<!--[Provide a succinct and descriptive title for the pull request.]-->
-
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix
