@@ -20,7 +20,8 @@ manage_arrangement() {
         i=$((i + 1))
     done
 
-    read -p "Enter the number of the monitor to arrange: " monitor_choice
+    printf "Enter the number of the monitor to arrange: "
+    read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
         printf "%b\n" "${RED}Invalid selection.${RC}"
@@ -36,7 +37,8 @@ manage_arrangement() {
     printf "%b\n" "3. ${YELLOW}Above${RC}"
     printf "%b\n" "4. ${YELLOW}Below${RC}"
 
-    read -p "Enter the number of the position: " position_choice
+    printf "Enter the number of the position: "
+    read -r position_choice
 
     case $position_choice in
         1) position="--left-of" ;;
@@ -53,7 +55,8 @@ manage_arrangement() {
         fi
     done
 
-    read -p "Enter the number of the reference monitor: " ref_choice
+    printf "Enter the number of the reference monitor: "
+    read -r ref_choice
 
     if ! echo "$ref_choice" | grep -qE '^[0-9]+$' || [ "$ref_choice" -lt 1 ] || [ "$ref_choice" -gt "$((i - 1))" ] || [ "$ref_choice" -eq "$monitor_choice" ]; then
         printf "%b\n" "${RED}Invalid selection.${RC}"
