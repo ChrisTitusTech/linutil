@@ -10,7 +10,7 @@ if [ -z "$possible_paths" ]; then
 fi
 
 # Display possible paths and allow selection
-echo "Possible Diablo II Resurrected folder locations:"
+printf "%b\n" "${YELLOW}Possible Diablo II Resurrected folder locations:${RC}"
 mapfile -t paths_array <<< "$possible_paths"
 selected=0
 total=${#paths_array[@]}
@@ -75,7 +75,7 @@ select_path
 
 # Validate the path
 if [ ! -d "$d2r_path" ]; then
-    echo "Error: The specified path does not exist."
+    printf "%b\n" "${RED}Error: The specified path does not exist.${RC}"
     exit 1
 fi
 
@@ -96,14 +96,11 @@ rm /tmp/lootfilter.zip
 
 printf "%b\n" "${GREEN}Loot filter installed successfully in $mods_path${RC}"
 
-# Add instructions for setting launch options
-echo
-echo "To complete the setup, please follow these steps to add launch options in Battle.net:"
-echo "1. Open the Battle.net launcher"
-echo "2. Select Diablo II: Resurrected"
-echo "3. Click the gear icon next to the 'Play' button"
-echo "4. Select 'Game Settings'"
-echo "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt"
-echo "6. Click 'Done' to save the changes"
-echo
-echo "After completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter."
+printf "\nTo complete the setup, please follow these steps to add launch options in Battle.net:\n"
+printf "1. Open the Battle.net launcher\n"
+printf "2. Select Diablo II: Resurrected\n"
+printf "3. Click the gear icon next to the 'Play' button\n"
+printf "4. Select 'Game Settings'\n"
+printf "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt\n"
+printf "6. Click 'Done' to save the changes\n"
+printf "\nAfter completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter.\n"
