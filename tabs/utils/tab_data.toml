@@ -19,7 +19,9 @@ script = "service-control.sh"
 
 [[data]]
 name = "Monitor Control"
-
+[[data]]
+name = "NVIDIA Container Toolkit"
+script = "nvidia-container-toolkit.sh"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
