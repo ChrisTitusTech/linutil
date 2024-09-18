@@ -21,6 +21,10 @@ name = "Service Manager"
 script = "service-control.sh"
 
 [[data]]
+name = "Auto Login"
+script = "auto-login.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
@@ -72,4 +76,9 @@ script = "monitor-control/scale_monitor.sh"
 [[data.entries]]
 name = "Reset Scaling"
 script = "monitor-control/reset_scaling.sh"
+matches = true
+
+[[data.entries]]
+name = "Set Brightness"
+script = "monitor-control/set_brightness.sh"
 matches = true
