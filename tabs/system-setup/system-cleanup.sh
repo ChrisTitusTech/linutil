@@ -35,8 +35,8 @@ cleanup_system() {
 }
 
 common_cleanup() {
-    "$ESCALATION_TOOL" rm -rf /var/tmp/*
-    "$ESCALATION_TOOL" rm -rf /tmp/*
+    "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
+    "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
     "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
     "$ESCALATION_TOOL" journalctl --vacuum-time=3d
 }
