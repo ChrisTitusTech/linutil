@@ -1,5 +1,3 @@
-# Pull Request
-
 <!--
 Read Contributing Guidelines before opening a PR.
 https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
@@ -8,7 +6,7 @@ https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix
-- [ ] Documentation Update
+- [ ] Documentation update
 - [ ] Refactoring
 - [ ] Hotfix
 - [ ] Security patch
@@ -23,7 +21,7 @@ https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
 ## Impact
 <!--[Discuss the impact of your changes on the project. This might include effects on performance, new dependencies, or changes in behaviour.]-->
 
-## Issue related to PR
+## Issues / other PRs related
 <!--[What issue/discussion is related to this PR (if any)]-->
 - Resolves #
 
