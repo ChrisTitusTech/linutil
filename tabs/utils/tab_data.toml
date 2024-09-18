@@ -25,7 +25,7 @@ name = "Auto Login"
 script = "auto-login.sh"
 
 [[data]]
-name = "Bootable Pendrive Maker"
+name = "Bootable USB Creator"
 script = "create-bootable-usb.sh"
 
 [[data]]
