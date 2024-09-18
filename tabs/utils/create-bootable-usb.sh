@@ -103,7 +103,8 @@ fetch_iso_urls() {
     echo "2) Arch Linux (older versions)"
     echo "3) Debian Linux (latest)"
     echo ""
-    read -p "Select the ISO you want to download (1-3): " ISO_OPTION
+    printf "Select the ISO you want to download (1-3): "
+    read -r ISO_OPTION
 
     case $ISO_OPTION in
         1)
@@ -144,7 +145,8 @@ write_iso(){
     list_devices
 
     # Prompt user for USB device
-    read -p "Enter the USB device (e.g., /dev/sdX): " USB_DEVICE
+    printf "Enter the USB device (e.g., /dev/sdX): "
+    read -r USB_DEVICE
 
     # Verify that the USB device exists
     if [ ! -b "$USB_DEVICE" ]; then
