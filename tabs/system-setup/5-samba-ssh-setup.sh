@@ -93,7 +93,7 @@ setup_samba() {
         while true; do
             echo "Enter Samba password: "
             stty -echo
-            read SAMBA_PASSWORD
+            read -r SAMBA_PASSWORD
             stty echo
             echo "Confirm Samba password: "
             stty -echo
