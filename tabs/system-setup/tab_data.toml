@@ -33,6 +33,10 @@ name = "RPM Fusion Setup"
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data]]
+name = "NVIDIA Container Toolkit"
+script = "nvidia-container-toolkit.sh"
+
+[[data]]
 name = "Full System Update"
 script = "system-update.sh"
 

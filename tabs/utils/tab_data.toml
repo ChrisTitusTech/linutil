@@ -12,7 +12,6 @@ script = "bluetooth-control.sh"
 name = "Numlock on Startup"
 script = "numlock.sh"
 
-
 [[data]]
 name = "Service Manager"
 script = "service-control.sh"
@@ -20,9 +19,6 @@ script = "service-control.sh"
 [[data]]
 name = "Monitor Control"
 
-[[data]]
-name = "NVIDIA Container Toolkit"
-script = "nvidia-container-toolkit.sh"
 
 [[data.preconditions]]
 matches = true
