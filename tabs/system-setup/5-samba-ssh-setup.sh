@@ -63,7 +63,7 @@ setup_samba() {
     SAMBA_CONFIG="/etc/samba/smb.conf"
 
     if [ -f "$SAMBA_CONFIG" ]; then
-        printf "%b\n" "${YELLOW}Samba configuration file already exists at $SAMBA_CONFIG.${RC}"
+        printf "%b\n" "${YELLOW}Samba configuration file already exists in $SAMBA_CONFIG.${RC}"
         echo "Do you want to modify the existing Samba configuration? (yes/no): "
         read MODIFY_SAMBA
         if [ "$MODIFY_SAMBA" = "yes" ]; then
