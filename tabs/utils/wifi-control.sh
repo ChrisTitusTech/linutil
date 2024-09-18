@@ -65,15 +65,15 @@ main_menu() {
 scan_networks() {
     clear
     printf "%b\n" "${YELLOW}Scanning for WiFi networks...${RC}"
-    networks=$(nmcli -t -f SSID,BSSID,SIGNAL dev wifi list | head -n 10)
+    networks=$(nmcli -t -f SSID,BSSID,SIGNAL dev wifi list | awk -F: '!seen[$1]++' | head -n 10)
     if [ -z "$networks" ]; then
         printf "%b\n" "${RED}No networks found.${RC}"
     else
         printf "%b\n" "${GREEN}Top 10 Networks found:${RC}"
-        echo "$networks" | sed 's/\\//g' | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
+        echo "$networks" | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
     echo "Press any key to return to the main menu..."
-    read -n 1
+    read -r dummy
 }
 
 # Function to turn WiFi on
@@ -86,7 +86,7 @@ wifi_on() {
         printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
     }
     echo "Press any key to return to the main menu..."
-    read -n 1
+    read -r dummy
 }
 
 # Function to turn WiFi off
@@ -99,7 +99,7 @@ wifi_off() {
         printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
     }
     echo "Press any key to return to the main menu..."
-    read -n 1
+    read -r dummy
 }
 
 # Function to prompt for WiFi network selection
@@ -108,65 +108,53 @@ prompt_for_network() {
     prompt_msg=$2
     success_msg=$3
     failure_msg=$4
+    temp_file=$(mktemp)
 
     while true; do
         clear
-        networks=$(nmcli -t -f SSID dev wifi list | head -n 10)
+        networks=$(nmcli -t -f SSID dev wifi list | awk -F: '!seen[$1]++' | grep -v '^$')
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
             echo "Press any key to return to the main menu..."
-            read -n 1
+            read -r dummy
+            rm -f "$temp_file"
             return
         fi
-        
-        # Display networks with numbers
+
+        echo "$networks" > "$temp_file"
+
         i=1
-        echo "$networks" | while IFS= read -r network; do
+        while IFS= read -r network; do
             ssid=$(echo "$network" | awk -F: '{print $1}')
-            echo "$i. SSID: $ssid"
+            printf "%d. SSID: %s\n" "$i" "$ssid"
             i=$((i + 1))
-        done
+        done < "$temp_file"
+
         echo "0. Exit to main menu"
         echo -n "$prompt_msg"
         read choice
 
-        # Validate the choice
-        if echo "$choice" | grep -qE '^[0-9]+$' && [ "$choice" -le "$((i - 1))" ] && [ "$choice" -gt 0 ]; then
-            network=$(echo "$networks" | sed -n "${choice}p")
-            ssid=$(echo "$network" | awk -F: '{print $1}')
+        if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
+            ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
             if [ "$action" = "connect" ]; then
                 echo -n "Enter password for SSID $ssid: "
-                read -s password
+                read password
                 echo
                 nmcli dev wifi connect "$ssid" password "$password" && {
                     printf "%b\n" "${GREEN}$success_msg${RC}"
-                    break
-                } || {
-                    printf "%b\n" "${RED}$failure_msg${RC}"
-                }
-            elif [ "$action" = "disconnect" ]; then
-                nmcli connection down "$ssid" && {
-                    printf "%b\n" "${GREEN}$success_msg${RC}"
-                    break
-                } || {
-                    printf "%b\n" "${RED}$failure_msg${RC}"
-                }
-            elif [ "$action" = "remove" ]; then
-                nmcli connection delete "$ssid" && {
-                    printf "%b\n" "${GREEN}$success_msg${RC}"
-                    break
                 } || {
                     printf "%b\n" "${RED}$failure_msg${RC}"
                 }
             fi
-        elif [ "$choice" -eq 0 ]; then
-            return
         else
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
+
+        echo "Press any key to return to the selection menu..."
+        read -r dummy
     done
-    echo "Press any key to return to the main menu..."
-    read -n 1
+
+    rm -f "$temp_file"
 }
 
 # Function to connect to a WiFi network
