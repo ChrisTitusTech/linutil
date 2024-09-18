@@ -5,6 +5,7 @@
 RC='\033[0m'
 RED='\033[31m'
 YELLOW='\033[33m'
+CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
@@ -81,7 +82,7 @@ checkPackageManager() {
         fi
     done
 
-    if [ -z "${PACKAGER}" ]; then
+    if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
@@ -125,7 +126,7 @@ checkDistro() {
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+    checkPackageManager 'nala apt-get dnf pacman zypper yum xbps-install nix-env'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

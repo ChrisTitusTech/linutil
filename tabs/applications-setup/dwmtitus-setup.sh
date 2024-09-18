@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 setupDWM() {
-    echo "Installing DWM-Titus if not already installed"
+    printf "%b\n" "${YELLOW}Installing DWM-Titus if not already installed${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git
@@ -16,7 +16,7 @@ setupDWM() {
             $ESCALATION_TOOL "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
             ;;
         *)
-            echo "Unsupported package manager: $PACKAGER"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
@@ -37,56 +37,56 @@ install_nerd_font() {
 
     # Check if Meslo Nerd-font is already installed
     if [ -n "$FONT_INSTALLED" ]; then
-        echo "Meslo Nerd-fonts are already installed."
+        printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
     fi
 
-    echo "Installing Meslo Nerd-fonts"
+    printf "%b\n" "${YELLOW}Installing Meslo Nerd-fonts${RC}"
 
     # Create the fonts directory if it doesn't exist
     if [ ! -d "$FONT_DIR" ]; then
         mkdir -p "$FONT_DIR" || {
-            echo "Failed to create directory: $FONT_DIR"
+            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR${RC}"
             return 1
         }
     else
-        echo "$FONT_DIR exists, skipping creation."
+        printf "%b\n" "${GREEN}$FONT_DIR exists, skipping creation.${RC}"
     fi
 
     # Check if the font zip file already exists
     if [ ! -f "$FONT_ZIP" ]; then
         # Download the font zip file
         curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
-            echo "Failed to download Meslo Nerd-fonts from $FONT_URL"
+            printf "%b\n" "${RED}Failed to download Meslo Nerd-fonts from $FONT_URL${RC}"
             return 1
         }
     else
-        echo "Meslo.zip already exists in $FONT_DIR, skipping download."
+        printf "%b\n" "${GREEN}Meslo.zip already exists in $FONT_DIR, skipping download.${RC}"
     fi
 
     # Unzip the font file if it hasn't been unzipped yet
     if [ ! -d "$FONT_DIR/Meslo" ]; then
         unzip "$FONT_ZIP" -d "$FONT_DIR" || {
-            echo "Failed to unzip $FONT_ZIP"
+            printf "%b\n" "${RED}Failed to unzip $FONT_ZIP${RC}"
             return 1
         }
     else
-        echo "Meslo font files already unzipped in $FONT_DIR, skipping unzip."
+        printf "%b\n" "${GREEN}Meslo font files already unzipped in $FONT_DIR, skipping unzip.${RC}"
     fi
 
     # Remove the zip file
     rm "$FONT_ZIP" || {
-        echo "Failed to remove $FONT_ZIP"
+        printf "%b\n" "${RED}Failed to remove $FONT_ZIP${RC}"
         return 1
     }
 
     # Rebuild the font cache
     fc-cache -fv || {
-        echo "Failed to rebuild font cache"
+        printf "%b\n" "${RED}Failed to rebuild font cache${RC}"
         return 1
     }
 
-    echo "Meslo Nerd-fonts installed successfully"
+    printf "%b\n" "${GREEN}Meslo Nerd-fonts installed successfully${RC}"
 }
 
 picom_animations() {
@@ -94,33 +94,33 @@ picom_animations() {
     mkdir -p ~/build
     if [ ! -d ~/build/picom ]; then
         if ! git clone https://github.com/FT-Labs/picom.git ~/build/picom; then
-            echo "Failed to clone the repository"
+            printf "%b\n" "${RED}Failed to clone the repository${RC}"
             return 1
         fi
     else
-        echo "Repository already exists, skipping clone"
+        printf "%b\n" "${GREEN}Repository already exists, skipping clone${RC}"
     fi
 
-    cd ~/build/picom || { echo "Failed to change directory to picom"; return 1; }
+    cd ~/build/picom || { printf "%b\n" "${RED}Failed to change directory to picom${RC}"; return 1; }
 
     # Build the project
     if ! meson setup --buildtype=release build; then
-        echo "Meson setup failed"
+        printf "%b\n" "${RED}Meson setup failed${RC}"
         return 1
     fi
 
     if ! ninja -C build; then
-        echo "Ninja build failed"
+        printf "%b\n" "${RED}Ninja build failed${RC}"
         return 1
     fi
 
     # Install the built binary
     if ! $ESCALATION_TOOL ninja -C build install; then
-        echo "Failed to install the built binary"
+        printf "%b\n" "${RED}Failed to install the built binary${RC}"
         return 1
     fi
 
-    echo "Picom animations installed successfully"
+    printf "%b\n" "${GREEN}Picom animations installed successfully${RC}"
 }
 
 clone_config_folders() {
@@ -135,45 +135,48 @@ clone_config_folders() {
         # Clone the directory to ~/.config/
         if [ -d "$dir" ]; then
             cp -r "$dir" ~/.config/
-            echo "Cloned $dir_name to ~/.config/"
+            printf "%b\n" "${GREEN}Cloned $dir_name to ~/.config/${RC}"
         else
-            echo "Directory $dir_name does not exist, skipping"
+            printf "%b\n" "${RED}Directory $dir_name does not exist, skipping${RC}"
         fi
     done
 }
 
 configure_backgrounds() {
+    # Set the variable PIC_DIR which stores the path for images
+    PIC_DIR="$HOME/Pictures"
+
     # Set the variable BG_DIR to the path where backgrounds will be stored
-    BG_DIR="$HOME/Pictures/backgrounds"
+    BG_DIR="$PIC_DIR/backgrounds"
 
     # Check if the ~/Pictures directory exists
-    if [ ! -d "~/Pictures" ]; then
+    if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
-        echo "Pictures directory does not exist"
+        printf "%b\n" "${RED}Pictures directory does not exist${RC}"
         mkdir ~/Pictures
-        echo "Directory was created in Home folder"
+        printf "%b\n" "${GREEN}Directory was created in Home folder${RC}"
     fi
-    
+
     # Check if the backgrounds directory (BG_DIR) exists
     if [ ! -d "$BG_DIR" ]; then
         # If the backgrounds directory doesn't exist, attempt to clone a repository containing backgrounds
-        if ! git clone https://github.com/ChrisTitusTech/nord-background.git ~/Pictures; then
+        if ! git clone https://github.com/ChrisTitusTech/nord-background.git "$PIC_DIR/nord-background"; then
             # If the git clone command fails, print an error message and return with a status of 1
-            echo "Failed to clone the repository"
+            printf "%b\n" "${RED}Failed to clone the repository${RC}"
             return 1
         fi
         # Rename the cloned directory to 'backgrounds'
-        mv ~/Pictures/nord-background ~/Pictures/backgrounds
+        mv "$PIC_DIR/nord-background" "$PIC_DIR/backgrounds"
         # Print a success message indicating that the backgrounds have been downloaded
-        echo "Downloaded desktop backgrounds to $BG_DIR"    
+        printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"    
     else
         # If the backgrounds directory already exists, print a message indicating that the download is being skipped
-        echo "Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds"
+        printf "%b\n" "${GREEN}Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds${RC}"
     fi
 }
 
 setupDisplayManager() {
-    echo "Setting up Xorg"
+    printf "%b\n" "${YELLOW}Setting up Xorg${RC}"
     case "$PACKAGER" in
         pacman)
             $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
@@ -185,12 +188,12 @@ setupDisplayManager() {
             $ESCALATION_TOOL "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
-            echo "Unsupported package manager: $PACKAGER"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
-    echo "Xorg installed successfully"
-    echo "Setting up Display Manager"
+    printf "%b\n" "${GREEN}Xorg installed successfully${RC}"
+    printf "%b\n" "${YELLOW}Setting up Display Manager${RC}"
     currentdm="none"
     for dm in gdm sddm lightdm; do
         if systemctl is-active --quiet "$dm.service"; then
@@ -198,10 +201,10 @@ setupDisplayManager() {
             break
         fi
     done
-    echo "Current display manager: $currentdm"
+    printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
         DM="sddm"
-        echo "No display manager found, installing $DM"
+        printf "%b\n" "${YELLOW}No display manager found, installing $DM${RC}"
         case "$PACKAGER" in
             pacman)
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm "$DM"
@@ -213,11 +216,11 @@ setupDisplayManager() {
                 $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
                 ;;
             *)
-                echo "Unsupported package manager: $PACKAGER"
+                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
                 exit 1
                 ;;
         esac
-        echo "$DM installed successfully"
+        printf "%b\n" "${GREEN}$DM installed successfully${RC}"
         systemctl enable "$DM"
 
         # Prompt user for auto-login
@@ -226,7 +229,7 @@ setupDisplayManager() {
         read -r answer
         case "$answer" in
             [Yy]*)
-                echo "Configuring SDDM for autologin"
+                printf "%b\n" "${YELLOW}Configuring SDDM for autologin${RC}"
                 SDDM_CONF="/etc/sddm.conf"
                 if [ ! -f "$SDDM_CONF" ]; then
                     echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
@@ -240,46 +243,43 @@ setupDisplayManager() {
                     echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                     echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
                 fi
-                echo "Checking if autologin group exists"
+                printf "%b\n" "{YELLOW}Checking if autologin group exists${RC}"
                 if ! getent group autologin > /dev/null; then
-                    echo "Creating autologin group"
+                    printf "%b\n" "${YELLOW}Creating autologin group${RC}"
                     $ESCALATION_TOOL groupadd autologin
                 else
-                    echo "Autologin group already exists"
+                    printf "%b\n" "${GREEN}Autologin group already exists${RC}"
                 fi
-                echo "Adding user with UID 1000 to autologin group"
+                printf "%b\n" "${YELLOW}Adding user with UID 1000 to autologin group${RC}"
                 USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
                 if [ -n "$USER_UID_1000" ]; then
                     $ESCALATION_TOOL usermod -aG autologin "$USER_UID_1000"
-                    echo "User $USER_UID_1000 added to autologin group"
+                    printf "%b\n" "${GREEN}User $USER_UID_1000 added to autologin group${RC}"
                 else
-                    echo "No user with UID 1000 found - Auto login not possible"
+                    printf "%b\n" "${RED}No user with UID 1000 found - Auto login not possible${RC}"
                 fi
                 ;;
             *)
-                echo "Auto-login configuration skipped"
+                printf "%b\n" "${GREEN}Auto-login configuration skipped${RC}"
                 ;;
         esac
     fi
-    
-
-    
 }
 
 install_slstatus() {
     printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
     read -r response # -r flag to prevent backslashes from being interpreted
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
-        echo "Installing slstatus"
+        printf "%b\n" "${YELLOW}Installing slstatus${RC}"
         cd "$HOME/dwm-titus/slstatus" || { echo "Failed to change directory to slstatus"; return 1; }
         if $ESCALATION_TOOL make clean install; then
-            echo "slstatus installed successfully"
+            printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else
-            echo "Failed to install slstatus"
+            printf "%b\n" "${RED}Failed to install slstatus${RC}"
             return 1
         fi
     else
-        echo "Skipping slstatus installation"
+        printf "%b\n" "${GREEN}Skipping slstatus installation${RC}"
     fi
     cd "$HOME"
 }

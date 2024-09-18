@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installDepend() {
-    case $PACKAGER in
+    case "$PACKAGER" in
         pacman)
             if ! command_exists yay; then
                 echo "Installing yay as AUR helper..."

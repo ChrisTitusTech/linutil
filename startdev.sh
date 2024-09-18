@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 RC='\033[0m'
 RED='\033[0;31m'
@@ -35,7 +35,7 @@ check() {
     local message=$2
 
     if [ $exit_code -ne 0 ]; then
-        echo -e "${RED}ERROR: $message${RC}"
+        printf "%b\n" "${RED}ERROR: $message${RC}"
         exit 1
     fi
 }
