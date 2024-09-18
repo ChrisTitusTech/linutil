@@ -53,17 +53,9 @@ name = "Remove Snaps"
 script = "4-remove-snaps.sh"
 
 [[data]]
-name = "Docker Setup"
-script = "6-docker-setup.sh"
-
-[[data]]
 name = "Automount Drive"
 script = "7-automount.sh"
 
 [[data]]
 name = "Grub Theme Setup"
 script = "8-grub-theme.sh"
-
-[[data]]
-name = "Install Bottles"
-script = "9-bottles-setup"
