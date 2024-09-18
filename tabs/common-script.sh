@@ -82,7 +82,7 @@ checkPackageManager() {
         fi
     done
 
-    if [ -z "${PACKAGER}" ]; then
+    if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
@@ -126,7 +126,7 @@ checkDistro() {
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+    checkPackageManager 'nala apt-get dnf pacman zypper yum xbps-install nix-env'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

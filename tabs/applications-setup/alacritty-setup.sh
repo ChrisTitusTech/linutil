@@ -5,12 +5,12 @@
 installAlacritty() {
     echo "Installing Alacritty..."
     if ! command_exists alacritty; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm alacritty
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm alacritty
                 ;;
             *)
-                $ESCALATION_TOOL ${PACKAGER} install -y alacritty
+                $ESCALATION_TOOL "$PACKAGER" install -y alacritty
                 ;;
         esac
     else

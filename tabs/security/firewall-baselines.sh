@@ -5,12 +5,12 @@
 installPkg() {
     echo "Installing UFW..."
     if ! command_exists ufw; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --needed --noconfirm ufw
+                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm ufw
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y ufw
+                $ESCALATION_TOOL "$PACKAGER" install -y ufw
                 ;;
         esac
     else
