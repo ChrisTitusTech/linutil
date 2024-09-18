@@ -31,7 +31,7 @@ adjust_monitor_brightness() {
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$'; then
             echo "Invalid selection. Please try again."
             echo "Press [Enter] to continue..."
-            read
+            read dummy
             continue
         fi
 
