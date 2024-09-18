@@ -38,7 +38,7 @@ adjust_monitor_brightness() {
         if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$#" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             echo "Press [Enter] to continue..."
-            read
+            read dummy
             continue
         fi
 
