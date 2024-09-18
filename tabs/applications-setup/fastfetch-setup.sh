@@ -2,8 +2,8 @@
 
 . ../common-script.sh
 
-setupFastfetch() {
-    echo "Installing Fastfetch if not already installed..."
+installFastfetch() {
+    echo "Installing Fastfetch..."
     if ! command_exists fastfetch; then
         case ${PACKAGER} in
             pacman)
@@ -29,5 +29,5 @@ setupFastfetchConfig() {
 
 checkEnv
 checkEscalationTool
-setupFastfetch
+installFastfetch
 setupFastfetchConfig

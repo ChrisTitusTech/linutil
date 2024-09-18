@@ -2,8 +2,8 @@
 
 . ../common-script.sh
 
-setupRofi() {
-    echo "Install Rofi if not already installed..."
+installRofi() {
+    echo "Installing Rofi..."
     if ! command_exists rofi; then
         case "$PACKAGER" in
             pacman)
@@ -19,7 +19,7 @@ setupRofi() {
 }
 
 setupRofiConfig() {
-    echo "Copy Rofi config files"
+    echo "Copying Rofi configuration files..."
     if [ -d "$HOME/.config/rofi" ] && [ ! -d "$HOME/.config/rofi-bak" ]; then
         cp -r "$HOME/.config/rofi" "$HOME/.config/rofi-bak"
     fi
@@ -35,5 +35,5 @@ setupRofiConfig() {
 
 checkEnv
 checkEscalationTool
-setupRofi
+installRofi
 setupRofiConfig

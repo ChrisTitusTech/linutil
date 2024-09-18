@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 # Function to install zsh
-install_zsh() {
-  echo "Install ZSH if not already installed..."
+installZsh() {
+  echo "Installing Zsh..."
     if ! command_exists zsh; then
         case "$PACKAGER" in
             pacman)
@@ -20,7 +20,8 @@ install_zsh() {
 }
 
 # Function to setup zsh configuration
-setup_zsh_config() {
+setupZshConfig() {
+  echo "Setting up Zsh configuration..."
   CONFIG_DIR="$HOME/.config/zsh"
   ZSHRC_FILE="$CONFIG_DIR/.zshrc"
 
@@ -48,5 +49,5 @@ EOL
 
 checkEnv
 checkEscalationTool
-install_zsh
-setup_zsh_config
+installZsh
+setupZshConfig
