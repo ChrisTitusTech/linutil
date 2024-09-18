@@ -4,7 +4,7 @@
 
 # Function to check xrandr is installed
 setup_xrandr() {
-    echo "Install xrandr if not already installed..."
+    printf "%b\n" "${YELLOW}Installing xrandr...${RC}"
     if ! command_exists xrandr; then
         case "$PACKAGER" in
             pacman)
@@ -18,24 +18,24 @@ setup_xrandr() {
                 ;;
         esac
     else
-        echo "xrandr is already installed."
+        printf "%b\n" "${GREEN}xrandr is already installed.${RC}"
     fi
 }
 
 # Function to execute xrandr commands and handle errors
 execute_command() {
     command="$1"
-    echo "Executing: $command"
+    printf "Executing: %s\n" "$command"
     eval "$command" 2>&1 | tee /tmp/xrandr.log | tail -n 20
     if [ $? -ne 0 ]; then
-        echo "An error occurred while executing the command. Check /tmp/xrandr.log for details."
+        printf "%b\n" "${RED}An error occurred while executing the command. Check /tmp/xrandr.log for details.${RC}"
     fi
 }
 
 # Function to detect connected monitors
 detect_connected_monitors() {
     xrandr_output=$(xrandr)
-    echo "$xrandr_output" | grep " connected" | awk '{print $1}'
+    printf "%s\n" "$xrandr_output" | grep " connected" | awk '{print $1}'
 }
 
 # Function to get the current brightness for a monitor
@@ -48,31 +48,26 @@ get_current_brightness() {
 get_unique_resolutions() {
     monitor="$1"
     xrandr_output=$(xrandr)
-    # Get available resolutions from xrandr without line limit
-    available_resolutions=$(echo "$xrandr_output" | sed -n "/$monitor connected/,/^[^ ]/p" | grep -oP '\d+x\d+' | sort -u)
+    available_resolutions=$(printf "%s" "$xrandr_output" | sed -n "/$monitor connected/,/^[^ ]/p" | grep -oP '\d+x\d+' | sort -u)
     
-    # Define standard resolutions
     standard_resolutions="1920x1080 1280x720 1600x900 2560x1440 3840x2160"
     
     temp_file=$(mktemp)
-    echo "$available_resolutions" > "$temp_file"
+    printf "%s" "$available_resolutions" > "$temp_file"
     
-    # Filter standard resolutions to include only those available for the monitor
-    filtered_standard_resolutions=$(echo "$standard_resolutions" | tr ' ' '\n' | grep -xF -f "$temp_file")
+    filtered_standard_resolutions=$(printf "%s" "$standard_resolutions" | tr ' ' '\n' | grep -xF -f "$temp_file")
     
     rm "$temp_file"
     
     available_res_file=$(mktemp)
     filtered_standard_res_file=$(mktemp)
-    echo "$available_resolutions" | sort > "$available_res_file"
-    echo "$filtered_standard_resolutions" | sort > "$filtered_standard_res_file"
+    printf "%s" "$available_resolutions" | sort > "$available_res_file"
+    printf "%s" "$filtered_standard_resolutions" | sort > "$filtered_standard_res_file"
     
-    # Get remaining available resolutions (excluding standard ones)
     remaining_resolutions=$(comm -23 "$available_res_file" "$filtered_standard_res_file")
     
     rm "$available_res_file" "$filtered_standard_res_file"
     
-    # Combine filtered standard resolutions and remaining resolutions, and limit to 10 results
     printf "%b\n" "$filtered_standard_resolutions\n$remaining_resolutions" | head -n 10
 }
 

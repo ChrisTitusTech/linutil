@@ -39,7 +39,7 @@ set_resolutions() {
         resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
         temp_res_file=$(mktemp)
-        echo "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
+        printf "%b\n" "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
 
         i=1
         while read -r resolution; do
