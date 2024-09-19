@@ -31,7 +31,7 @@ get_uuid_fstype() {
     fi
 
     if [ -z "$FSTYPE" ]; then
-        printf "%b\n" "Failed to retrieve the filesystem type. Exiting."
+        printf "%b\n" "${RED}Failed to retrieve the filesystem type. Exiting.${RC}"
         exit 1
     fi
 }
