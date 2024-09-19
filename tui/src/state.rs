@@ -17,6 +17,9 @@ use ratatui::{
     Frame,
 };
 
+const MIN_WIDTH: u16 = 77;
+const MIN_HEIGHT: u16 = 19;
+
 pub struct AppState {
     /// Selected theme
     theme: Theme,
@@ -68,16 +71,14 @@ impl AppState {
     }
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
-        let min_width = 77; // Minimum width threshold
-        let min_height = 19; // Minimum height threshold
 
-        if terminal_size.width < min_width || terminal_size.height < min_height {
+        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
             let size_warning_message = format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
                 terminal_size.height,
-                min_width,
-                min_height,
+                MIN_WIDTH,
+                MIN_HEIGHT,
             );
 
             let warning_paragraph = Paragraph::new(size_warning_message.clone())
