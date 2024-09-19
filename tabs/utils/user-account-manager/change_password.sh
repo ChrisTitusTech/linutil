@@ -10,7 +10,8 @@ printf "%b\n" "${YELLOW}=================${RC}"
 username=$(promptUsername "" "root") || exit 1
 password=$(promptPassword) || exit 1
 
-read -p "Are you sure you want to change password for $username? [Y/N]: " confirm
+printf "Are you sure you want to change password for $username? [Y/N]: "
+read -r confirm
 confirmAction || exit 1
 
 echo "$username:$password" | $ESCALATION_TOOL chpasswd

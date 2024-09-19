@@ -20,7 +20,8 @@ checkGroupAvailabe "$groups" "$user_groups" || exit 1
 
 groups_to_remove=$(echo "$groups" | tr ' ' ',')
 
-read -p "Are you sure you want to remove user $username from $groups_to_remove? [Y/N]: " confirm
+printf "Are you sure you want to remove user $username from $groups_to_remove? [Y/N]: "
+read -r confirm
 confirmAction || exit 1
 
 $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
