@@ -35,7 +35,7 @@ checkAURHelper() {
                 AUR_HELPER="yay"
                 AUR_HELPER_CHECKED=true
             else
-                echo -e "${RED}Failed to install AUR helper.${RC}"
+                printf "%b\n" "${RED}Failed to install AUR helper.${RC}"
                 exit 1
             fi
         fi
