@@ -16,7 +16,7 @@ install_package() {
                 ;;
         esac
     else
-        echo "$PACKAGE is already installed."
+        printf "%b\n" "${RED}$PACKAGE is already installed.${RC}"
     fi
 }       
 
