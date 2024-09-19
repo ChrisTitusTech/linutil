@@ -23,4 +23,5 @@ installRPMFusion() {
 }
 
 checkEnv
+checkEscalationTool
 installRPMFusion
