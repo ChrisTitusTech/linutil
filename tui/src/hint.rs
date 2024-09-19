@@ -114,9 +114,11 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             scope_name: "Search bar",
             hints: vec![Shortcut::new(vec!["Enter"], "Finish search")],
         },
+
         Focus::List => {
             let mut hints = Vec::new();
             hints.push(Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"));
+
             if state.at_root() {
                 hints.push(Shortcut::new(vec!["h", "Left", "Tab"], "Focus tab list"));
                 hints.push(get_list_item_shortcut(state));
@@ -131,10 +133,12 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                     hints.push(get_list_item_shortcut(state));
                     if state.selected_item_is_cmd() {
                         hints.push(Shortcut::new(vec!["p"], "Enable preview"));
+                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
                     }
                 }
                 hints.push(Shortcut::new(vec!["Tab"], "Focus tab list"));
             };
+
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
             hints.push(Shortcut::new(vec!["t"], "Next theme"));
@@ -148,6 +152,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 hints,
             }
         }
+
         Focus::TabList => ShortcutList {
             scope_name: "Tab list",
             hints: vec![
@@ -159,6 +164,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 Shortcut::new(vec!["T"], "Previous theme"),
             ],
         },
+
         Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
     }
     .draw(frame, area);

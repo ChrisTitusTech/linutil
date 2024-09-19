@@ -10,14 +10,17 @@ values = ["pacman"]
 
 [[data.entries]]
 name = "Arch Server Setup"
+description = "This command installs a minimal arch server setup under 5 minutes."
 script = "arch/server-setup.sh"
 
 [[data.entries]]
 name = "Paru AUR Helper"
+description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
 
 [[data.entries]]
 name = "Yay AUR Helper"
+description = "Yet Another Yogurt - An AUR Helper Written in Go.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/yay-setup.sh"
 
 [[data]]
@@ -26,30 +29,58 @@ name = "Fedora"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values =  ["dnf"]
+values = ["dnf"]
+
+[[data.entries]]
+name = "Configure DNF"
+description = "Optimizes DNF for parallel downloads"
+script = "fedora/configure-dnf.sh"
+
+[[data.entries]]
+name = "Multimedia Setup"
+script = "fedora/multimedia-codecs.sh"
+
+[[data.entries]]
+name = "Nvidia Proprietary Driver Setup"
+script = "fedora/nvidia-proprietary-driver-setup.sh"
 
 [[data.entries]]
 name = "RPM Fusion Setup"
+description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
 script = "fedora/rpm-fusion-setup.sh"
+
+[[data.entries]]
+name = "Virtualization Setup"
+description = "Enables Virtualization through dnf"
+script = "fedora/virtualization.sh"
+
+[[data]]
+name = "Full System Cleanup"
+script = "system-cleanup.sh"
 
 [[data]]
 name = "Full System Update"
+description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
 
 [[data]]
 name = "Build Prerequisites"
+description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
 script = "1-compile-setup.sh"
 
 [[data]]
 name = "Gaming Dependencies"
+description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions"
 script = "2-gaming-setup.sh"
 
 [[data]]
 name = "Global Theme"
+description = "This script is designed to handle the installation and configuration of global theming"
 script = "3-global-theme.sh"
 
 [[data]]
 name = "Remove Snaps"
+description = "This script is designed to remove snap"
 script = "4-remove-snaps.sh"
 
 [[data]]

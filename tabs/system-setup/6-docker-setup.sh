@@ -9,13 +9,14 @@ choose_installation() {
     printf "%b\n" "1. ${YELLOW}Docker${RC}"
     printf "%b\n" "2. ${YELLOW}Docker Compose${RC}"
     printf "%b\n" "3. ${YELLOW}Both${RC}"
-    read -p "Enter your choice [1-3]: " CHOICE
+    printf "Enter your choice [1-3]: "
+    read -r CHOICE
 
     case "$CHOICE" in
         1) INSTALL_DOCKER=1; INSTALL_COMPOSE=0 ;;
         2) INSTALL_DOCKER=0; INSTALL_COMPOSE=1 ;;
         3) INSTALL_DOCKER=1; INSTALL_COMPOSE=1 ;;
-        *) echo "Invalid choice. Exiting."; exit 1 ;;
+        *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
     esac
 }
 
