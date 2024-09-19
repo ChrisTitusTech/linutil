@@ -23,12 +23,11 @@ ask_for_host_details() {
     read -r host
     printf "%b\n" "Enter Remote User: "
     read -r  user
-    printf "%b\n" "Host $host_alias" >> ~/.ssh/config
-    printf "%b\n" "    HostName $host" >> ~/.ssh/config
-    printf "%b\n" "    User $user" >> ~/.ssh/config
-    printf "%b\n" "    IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
-    printf "%b\n" "    StrictHostKeyChecking no" >> ~/.ssh/config
-    printf "%b\n" "    UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+    {
+        printf "%b\n" "Host $host_alias"
+        printf "%b\n" "    HostName $host"
+        printf "%b\n" "    User $user"
+    } >> ~/.ssh/config
     printf "%b\n" "Host $host_alias added successfully."
 }
 
@@ -187,7 +186,7 @@ sync_directories() {
 
 # Function to check SSH key authentication status
 check_ssh_key_authentication() {
-    printf "%b\n""Enter the alias of the host: "
+    printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
     ssh $host_alias "grep '^PubkeyAuthentication' /etc/ssh/sshd_config"
 }

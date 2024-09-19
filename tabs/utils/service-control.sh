@@ -28,25 +28,25 @@ show_menu() {
 
 # Function to view all services
 view_all_services() {
-    printf "Listing all services...\n"
+    printf "%b\n" "Listing all services..."
     "$ESCALATION_TOOL" systemctl list-units --type=service --all --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view enabled services
 view_enabled_services() {
-    printf "Listing enabled services...\n"
+    printf "%b\n" "Listing enabled services..."
     "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=enabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view disabled services
 view_disabled_services() {
-    printf "Listing disabled services...\n"
+    printf "%b\n" "Listing disabled services..."
     "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=disabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view started services
 view_started_services() {
-    printf "Listing started services:\n"
+    printf "%b\n" "Listing started services: "
     "$ESCALATION_TOOL" systemctl list-units --type=service --state=running --no-pager | head -n -6 | awk 'NR>1 {print $1}' | more
 }
 
@@ -86,9 +86,9 @@ add_service() {
         printf "\n"
         printf "[Service]\n"
         printf "ExecStart=$EXEC_START\n"
-        [ -n "$SERVICE_USER" ] && printf "User=$SERVICE_USER\n"
-        [ -n "$WORKING_DIRECTORY" ] && printf "WorkingDirectory=$WORKING_DIRECTORY\n"
-        [ -n "$RESTART_POLICY" ] && printf "Restart=$RESTART_POLICY\n"
+        [ -n "$SERVICE_USER" ] && printf "%b\n" "User=$SERVICE_USER"
+        [ -n "$WORKING_DIRECTORY" ] && printf "%b\n"  "WorkingDirectory=$WORKING_DIRECTORY"
+        [ -n "$RESTART_POLICY" ] && printf "%b\n" "Restart=$RESTART_POLICY"
         printf "\n"
         printf "[Install]\n"
         printf "WantedBy=multi-user.target\n"
@@ -97,7 +97,7 @@ add_service() {
     # Set permissions and reload systemd
     "$ESCALATION_TOOL" chmod 644 "$SERVICE_FILE"
     "$ESCALATION_TOOL" systemctl daemon-reload
-    printf "Service $SERVICE_NAME has been created and is ready to be started.\n"
+    printf "%b\n" "Service $SERVICE_NAME has been created and is ready to be started."
 
     # Optionally, enable and start the service
     printf "Do you want to start and enable the service now? (y/n)\n"
@@ -106,9 +106,9 @@ add_service() {
     if [ "$START_ENABLE" = "y" ]; then
         "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
         "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
-        printf "Service $SERVICE_NAME has been started and enabled.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been started and enabled."
     else
-        printf "Service $SERVICE_NAME has been created but not started.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been created but not started."
     fi
 }
 
@@ -120,29 +120,29 @@ remove_service() {
     SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 
     if [ -f "$SERVICE_FILE" ]; then
-        printf "Stopping and disabling the service...\n"
+        printf "%b\n" "Stopping and disabling the service..."
         "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"
         "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"
 
-        printf "Removing the service file...\n"
+        printf "%b\n" "Removing the service file...\n"
         "$ESCALATION_TOOL" rm -f "$SERVICE_FILE"
         "$ESCALATION_TOOL" systemctl daemon-reload
-        printf "Service $SERVICE_NAME has been removed.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been removed."
     else
-        printf "Service $SERVICE_NAME does not exist.\n"
+        printf "%b\n" "Service $SERVICE_NAME does not exist."
     fi
 }
 
 # Function to start a service
 start_service() {
     view_disabled_services
-    printf "Enter the name of the service to start (e.g., my_service):\n"
+    printf "%b\n" "Enter the name of the service to start (e.g., my_service): "
     read -r SERVICE_NAME
 
     if "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"; then
-        printf "Service $SERVICE_NAME has been started.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been started."
     else
-        printf "Failed to start service: $SERVICE_NAME.\n"
+        printf "%b\n" "Failed to start service: $SERVICE_NAME."
     fi
 }
 
@@ -153,9 +153,9 @@ stop_service() {
     read -r SERVICE_NAME
 
     if "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"; then
-        printf "Service $SERVICE_NAME has been stopped.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been stopped."
     else
-        printf "Failed to stop service: $SERVICE_NAME.\n"
+        printf "%b\n" "Failed to stop service: $SERVICE_NAME."
     fi
 }
 
@@ -166,9 +166,9 @@ enable_service() {
     read -r SERVICE_NAME
 
     if "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"; then
-        printf "Service $SERVICE_NAME has been enabled.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been enabled."
     else
-        printf "Failed to enable service: $SERVICE_NAME.\n"
+        printf "%b\n" "Failed to enable service: $SERVICE_NAME."
     fi
 }
 
@@ -179,9 +179,9 @@ disable_service() {
     read -r SERVICE_NAME
 
     if "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"; then
-        printf "Service $SERVICE_NAME has been enabled.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been enabled."
     else
-        printf "Failed to enable service: $SERVICE_NAME.\n"
+        printf "%b\n" "Failed to enable service: $SERVICE_NAME."
     fi
 }
 
@@ -202,7 +202,7 @@ create_service_from_external() {
     SERVICE_FILE="$SCRIPT_DIR/$SERVICE_NAME.service"
 
     if [ ! -f "$SERVICE_FILE" ]; then
-        printf "Service file $SERVICE_FILE does not exist.\n"
+        printf "%b\n" "Service file $SERVICE_FILE does not exist."
         return
     fi
 
@@ -230,7 +230,7 @@ create_service_from_external() {
     # Set permissions and reload systemd
     "$ESCALATION_TOOL" chmod 644 "$SYSTEMD_SERVICE_FILE"
     "$ESCALATION_TOOL" systemctl daemon-reload
-    printf "Service $SERVICE_NAME has been created and is ready to be started.\n"
+    printf "%b\n" "Service $SERVICE_NAME has been created and is ready to be started."
 
     # Optionally, enable and start the service
     printf "Do you want to start and enable the service now? (y/n)\n"
@@ -239,9 +239,9 @@ create_service_from_external() {
     if [ "$START_ENABLE" = "y" ]; then
         "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
         "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
-        printf "Service $SERVICE_NAME has been started and enabled.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been started and enabled."
     else
-        printf "Service $SERVICE_NAME has been created but not started.\n"
+        printf "%b\n" "Service $SERVICE_NAME has been created but not started."
     fi
 }
 

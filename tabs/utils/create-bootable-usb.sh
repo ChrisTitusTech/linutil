@@ -5,7 +5,7 @@
 # Function to display usage instructions
 usage() {
     printf "%b\n" "${RED} Usage: $0 ${RC}"
-    printf "No arguments needed. The script will prompt for ISO path and USB device.\n"
+    printf "%b\n" "No arguments needed. The script will prompt for ISO path and USB device."
     exit 1
 }
 
@@ -98,9 +98,9 @@ choose_iso_source() {
 fetch_iso_urls() {
     clear
     printf "%b\n" "${YELLOW}Available ISOs for download:${RC}"
-    printf "1) Arch Linux (latest)\n"
-    printf "2) Arch Linux (older versions)\n"
-    printf "3) Debian Linux (latest)\n"
+    printf "%b\n" "1) Arch Linux (latest)"
+    printf "%b\n" "2) Arch Linux (older versions)"
+    printf "%b\n" "3) Debian Linux (latest)"
     printf "\n"
     printf "Select the ISO you want to download (1-3): "
     read -r ISO_OPTION
