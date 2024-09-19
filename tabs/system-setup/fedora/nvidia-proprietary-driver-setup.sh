@@ -68,7 +68,8 @@ installDriver() {
 
 # NOTE: A confirmation option to proceed or not
 userConfirmation() {
-  read -p "Do you want to continue? (Y/N): " choice
+  printf "%b" "${YELLOW}Do you want to continue? (Y/N): ${RC}"
+  read -r choice
   case "$choice" in
   y | Y)
     checkRepo
