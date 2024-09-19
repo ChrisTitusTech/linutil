@@ -15,7 +15,7 @@ install_chrome() {
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install google-chrome-stable
             ;;
         pacman)
-            "$AUR_HELPER" -S google-chrome
+            "$AUR_HELPER" -S --noconfirm google-chrome
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install fedora-workstation-repositories
