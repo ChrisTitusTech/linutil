@@ -335,7 +335,7 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
+    fn get_selected_node(&self) -> Option<&ListNode> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
@@ -347,27 +347,17 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
-                return Some(item.node.command.clone());
+                return Some(&item.node);
             }
         }
         None
     }
-    fn get_selected_description(&mut self) -> Option<String> {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() && selected_index == 0 {
-            return None;
-        }
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
-
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            if !item.has_children {
-                return Some(item.node.description.clone());
-            }
-        }
-        None
+    pub fn get_selected_command(&self) -> Option<Command> {
+        self.get_selected_node().map(|node| node.command.clone())
+    }
+    fn get_selected_description(&self) -> Option<String> {
+        self.get_selected_node()
+            .map(|node| node.description.clone())
     }
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
