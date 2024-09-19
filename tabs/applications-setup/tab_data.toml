@@ -1,10 +1,6 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Setup Flatpak / Flathub"
-script = "setup-flatpak.sh"
-
-[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -18,6 +14,11 @@ script = "mybash-setup.sh"
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"
+
+[[data]]
+name = "Fastfetch"
+description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
+script = "fastfetch-setup.sh"
 
 [[data]]
 name = "Kitty"
@@ -35,11 +36,10 @@ description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu rep
 script = "rofi-setup.sh"
 
 [[data]]
+name = "Setup Flatpak / Flathub"
+script = "setup-flatpak.sh"
+
+[[data]]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
-
-[[data]]
-name = "Fastfetch"
-description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
-script = "fastfetch-setup.sh"
