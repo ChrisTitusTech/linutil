@@ -2,55 +2,6 @@ name = "Utilities"
 multi_selectable = false
 
 [[data]]
-name = "Auto Login"
-script = "auto-login.sh"
-
-[[data]]
-name = "Auto Power Profiling"
-script = "power-profile.sh"
-
-[[data]]
-name = "Bluetooth Manager"
-description = "This utility is designed to manage bluetooth in your system"
-script = "bluetooth-control.sh"
-
-[[data]]
-name = "Bootable USB Creator"
-script = "create-bootable-usb.sh"
-
-[[data]]
-name = "Crypto tool"
-script = "encrypt_decrypt_tool.sh"
-
-[[data]]
-name = "Numlock on Startup"
-description = "This utility is designed to configure auto enabling of numlock on boot"
-script = "numlock.sh"
-
-[[data]]
-name = "Ollama"
-description = "This utility is designed to manage ollama in your system"
-script = "ollama.sh"
-
-[[data]]
-name = "Service Manager"
-description = "This utility is designed to manage services in your system"
-script = "service-control.sh"
-
-[[data]]
-name = "WiFi Manager"
-description = "This utility is designed to manage wifi in your system"
-script = "wifi-control.sh"
-
-[[data]]
-name = "SSH Commands"
-script = "ssh.sh"
-
-[[data]]
-name = "Timeshift Backup"
-script = "timeshift.sh"
-
-[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
@@ -141,3 +92,53 @@ script = "user-account-manager/add_to_group.sh"
 [[data.entries]]
 name = "Remove User From Groups"
 script = "user-account-manager/remove_from_group.sh"
+
+[[data]]
+name = "Auto Login"
+script = "auto-login.sh"
+
+[[data]]
+name = "Auto Power Profiling"
+script = "power-profile.sh"
+
+[[data]]
+name = "Bluetooth Manager"
+description = "This utility is designed to manage bluetooth in your system"
+script = "bluetooth-control.sh"
+
+[[data]]
+name = "Bootable USB Creator"
+script = "create-bootable-usb.sh"
+
+[[data]]
+name = "Crypto tool"
+script = "encrypt_decrypt_tool.sh"
+
+[[data]]
+name = "Numlock on Startup"
+description = "This utility is designed to configure auto enabling of numlock on boot"
+script = "numlock.sh"
+
+[[data]]
+name = "Ollama"
+description = "This utility is designed to manage ollama in your system"
+script = "ollama.sh"
+
+[[data]]
+name = "Service Manager"
+description = "This utility is designed to manage services in your system"
+script = "service-control.sh"
+
+[[data]]
+name = "WiFi Manager"
+description = "This utility is designed to manage wifi in your system"
+script = "wifi-control.sh"
+
+[[data]]
+name = "SSH Commands"
+script = "ssh.sh"
+
+[[data]]
+name = "Timeshift Backup"
+script = "timeshift.sh"
+
