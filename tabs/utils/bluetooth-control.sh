@@ -41,8 +41,8 @@ main_menu() {
         printf "4. Disconnect from a device\n"
         printf "5. Remove a device\n"
         printf "0. Exit\n"
-        printf -n "Choose an option: "
-        read choice
+        printf "Choose an option: "
+        read -r choice
 
         case $choice in
             1) scan_devices ;;

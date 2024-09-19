@@ -29,6 +29,7 @@ auto_detect_displays() {
         if [ -z "$common_resolutions" ]; then
             printf "%b\n" "${RED}No common resolution found among connected monitors.${RC}"
             return
+        fi
 
         highest_resolution=$(echo "$common_resolutions" | sort -n -t'x' -k1,1 -k2,2 | tail -n 1)
 
