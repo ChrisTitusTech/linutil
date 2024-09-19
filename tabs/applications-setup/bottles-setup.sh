@@ -11,4 +11,4 @@ install_bottles() {
 
 checkEnv
 checkEscalationTool
-install_bottles2
+install_bottles
