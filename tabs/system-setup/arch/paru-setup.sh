@@ -1,22 +1,22 @@
 #!/bin/sh -e
 
-. "$(dirname "$0")/../../common-script.sh"
+. ../../common-script.sh
 
 installDepend() {
-    case $PACKAGER in
+    case "$PACKAGER" in
         pacman)
             if ! command_exists paru; then
-                echo "Installing paru as AUR helper..."
+                printf "%b\n" "${YELLOW}Installing paru as AUR helper...${RC}"
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
                 cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/paru.git && $ESCALATION_TOOL chown -R "$USER": ./paru
                 cd paru && makepkg --noconfirm -si
-                echo "Paru installed"
+                printf "%b\n" "${GREEN}Paru installed${RC}"
             else
-                echo "Paru already installed"
+                printf "%b\n" "${GREEN}Paru already installed${RC}"
             fi
             ;;
         *)
-            echo "Unsupported package manager: $PACKAGER"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             ;;
     esac
 }

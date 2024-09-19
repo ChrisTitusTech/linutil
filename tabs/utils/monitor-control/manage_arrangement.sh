@@ -2,68 +2,75 @@
 
 . ./utility_functions.sh
 
+. ../../common-script.sh
+
 # Function to manage monitor arrangement
 manage_arrangement() {
     monitor_list=$(detect_connected_monitors)
-    IFS=$'\n' read -r -a monitor_array <<<"$monitor_list"
+    monitor_array=$(echo "$monitor_list" | tr '\n' ' ')
 
     clear
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${BLUE}  Manage Monitor Arrangement${RESET}"
-    echo -e "${BLUE}=========================================${RESET}"
-    echo -e "${YELLOW}Choose the monitor to arrange:${RESET}"
-    for i in "${!monitor_array[@]}"; do
-        echo -e "$((i + 1)). ${CYAN}${monitor_array[i]}${RESET}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}  Manage Monitor Arrangement${RC}"
+    printf "%b\n" "${YELLOW}=========================================${RC}"
+    printf "%b\n" "${YELLOW}Choose the monitor to arrange:${RC}"
+    i=1
+    for monitor in $monitor_array; do
+        printf "%b\n" "$i. ${YELLOW}$monitor${RC}"
+        i=$((i + 1))
     done
 
-    read -p "Enter the number of the monitor to arrange: " monitor_choice
+    printf "Enter the number of the monitor to arrange: "
+    read -r monitor_choice
 
-    if ! [[ "$monitor_choice" =~ ^[0-9]+$ ]] || (( monitor_choice < 1 )) || (( monitor_choice > ${#monitor_array[@]} )); then
-        echo -e "${RED}Invalid selection.${RESET}"
+    if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
+        printf "%b\n" "${RED}Invalid selection.${RC}"
         return
     fi
 
-    monitor_name="${monitor_array[monitor_choice - 1]}"
+    monitor_name=$(echo "$monitor_array" | cut -d' ' -f"$monitor_choice")
 
     clear
-    echo -e "${YELLOW}Choose position relative to other monitors:${RESET}"
-    echo -e "1. ${CYAN}Left of${RESET}"
-    echo -e "2. ${CYAN}Right of${RESET}"
-    echo -e "3. ${CYAN}Above${RESET}"
-    echo -e "4. ${CYAN}Below${RESET}"
+    printf "%b\n" "${YELLOW}Choose position relative to other monitors:${RC}"
+    printf "%b\n" "1. ${YELLOW}Left of${RC}"
+    printf "%b\n" "2. ${YELLOW}Right of${RC}"
+    printf "%b\n" "3. ${YELLOW}Above${RC}"
+    printf "%b\n" "4. ${YELLOW}Below${RC}"
 
-    read -p "Enter the number of the position: " position_choice
+    printf "Enter the number of the position: "
+    read -r position_choice
 
     case $position_choice in
         1) position="--left-of" ;;
         2) position="--right-of" ;;
         3) position="--above" ;;
         4) position="--below" ;;
-        *) echo -e "${RED}Invalid selection.${RESET}"; return ;;
+        *) printf "%b\n" "${RED}Invalid selection.${RC}"; return ;;
     esac
 
-    echo -e "${YELLOW}Choose the reference monitor:${RESET}"
-    for i in "${!monitor_array[@]}"; do
-        if [[ "${monitor_array[i]}" != "$monitor_name" ]]; then
-            echo -e "$((i + 1)). ${CYAN}${monitor_array[i]}${RESET}"
+    printf "%b\n" "${YELLOW}Choose the reference monitor:${RC}"
+    for i in $monitor_array; do
+        if [ "$i" != "$monitor_name" ]; then
+            printf "%b\n" "$((i + 1)). ${YELLOW}$i${RC}"
         fi
     done
 
-    read -p "Enter the number of the reference monitor: " ref_choice
+    printf "Enter the number of the reference monitor: "
+    read -r ref_choice
 
-    if ! [[ "$ref_choice" =~ ^[0-9]+$ ]] || (( ref_choice < 1 )) || (( ref_choice > ${#monitor_array[@]} )) || (( ref_choice == monitor_choice )); then
-        echo -e "${RED}Invalid selection.${RESET}"
+    if ! echo "$ref_choice" | grep -qE '^[0-9]+$' || [ "$ref_choice" -lt 1 ] || [ "$ref_choice" -gt "$((i - 1))" ] || [ "$ref_choice" -eq "$monitor_choice" ]; then
+        printf "%b\n" "${RED}Invalid selection.${RC}"
         return
     fi
 
-    ref_monitor="${monitor_array[ref_choice - 1]}"
+    ref_monitor=$(echo "$monitor_array" | cut -d' ' -f"$ref_choice")
 
-    if confirm_action "Arrange ${CYAN}$monitor_name${RESET} ${position} ${CYAN}$ref_monitor${RESET}?"; then
-        echo -e "${GREEN}Arranging $monitor_name ${position} $ref_monitor${RESET}"
+    if confirm_action "Arrange ${YELLOW}$monitor_name${RC} ${position} ${YELLOW}$ref_monitor${RC}?"; then
+        printf "%b\n" "${GREEN}Arranging $monitor_name ${position} $ref_monitor${RC}"
         execute_command "xrandr --output $monitor_name $position $ref_monitor"
-        echo -e "${GREEN}Arrangement updated successfully.${RESET}"
+        printf "%b\n" "${GREEN}Arrangement updated successfully.${RC}"
     else
-        echo -e "${RED}Action canceled.${RESET}"
+        printf "%b\n" "${RED}Action canceled.${RC}"
     fi
 }
 

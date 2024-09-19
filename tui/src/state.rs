@@ -1,12 +1,12 @@
 use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::FloatingText,
+    floating_text::{FloatingText, FloatingTextMode},
     hint::{draw_shortcuts, SHORTCUT_LINES},
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::{Command, ListNode, Tab};
 use ratatui::{
@@ -26,13 +26,14 @@ pub struct AppState {
     tabs: Vec<Tab>,
     /// Current tab
     current_tab: ListState,
-    /// This stack keeps track of our "current dirrectory". You can think of it as `pwd`. but not
+    /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<NodeId>,
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
     filter: Filter,
+    drawable: bool,
 }
 
 pub enum Focus {
@@ -60,11 +61,55 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            drawable: false,
         };
         state.update_items();
         state
     }
     pub fn draw(&mut self, frame: &mut Frame) {
+        let terminal_size = frame.area();
+        let min_width = 77; // Minimum width threshold
+        let min_height = 19; // Minimum height threshold
+
+        if terminal_size.width < min_width || terminal_size.height < min_height {
+            let size_warning_message = format!(
+                "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
+                terminal_size.width,
+                terminal_size.height,
+                min_width,
+                min_height,
+            );
+
+            let warning_paragraph = Paragraph::new(size_warning_message.clone())
+                .alignment(Alignment::Center)
+                .style(Style::default().fg(ratatui::style::Color::Red).bold())
+                .wrap(ratatui::widgets::Wrap { trim: true });
+
+            // Get the maximum width and height of text lines
+            let text_lines: Vec<String> = size_warning_message
+                .lines()
+                .map(|line| line.to_string())
+                .collect();
+            let max_line_length = text_lines.iter().map(|line| line.len()).max().unwrap_or(0);
+            let num_lines = text_lines.len();
+
+            // Calculate the centered area
+            let centered_area = ratatui::layout::Rect {
+                x: terminal_size.x + (terminal_size.width - max_line_length as u16) / 2,
+                y: terminal_size.y + (terminal_size.height - num_lines as u16) / 2,
+                width: max_line_length as u16,
+                height: num_lines as u16,
+            };
+            frame.render_widget(warning_paragraph, centered_area);
+            self.drawable = false;
+        } else {
+            self.drawable = true;
+        }
+
+        if !self.drawable {
+            return;
+        }
+
         let label_block =
             Block::default()
                 .borders(Borders::all())
@@ -185,42 +230,71 @@ impl AppState {
 
         draw_shortcuts(self, frame, vertical[1]);
     }
+
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
+        // This should be defined first to allow closing
+        // the application even when not drawable ( If terminal is small )
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            if key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL)
+            {
+                return false;
+            }
+        }
+
+        // If UI is not drawable returning true will mark as the key handled
+        if !self.drawable {
+            return true;
+        }
+
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
                     self.focus = Focus::List;
                 }
             }
+
             Focus::Search => match self.filter.handle_key(key) {
                 SearchAction::Exit => self.exit_search(),
                 SearchAction::Update => self.update_items(),
                 _ => {}
             },
-            _ if key.code == KeyCode::Char('q') => return false,
+
+            _ if key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c')
+                    && key.modifiers.contains(KeyModifiers::CONTROL) =>
+            {
+                return false;
+            }
+
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
                     self.focus = Focus::List
                 }
+
                 KeyCode::Char('j') | KeyCode::Down
                     if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
                 {
                     self.current_tab.select_next();
                     self.refresh_tab();
                 }
+
                 KeyCode::Char('k') | KeyCode::Up => {
                     self.current_tab.select_previous();
                     self.refresh_tab();
                 }
+
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
+
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
                 KeyCode::Char('p') => self.enable_preview(),
+                KeyCode::Char('d') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
@@ -235,10 +309,12 @@ impl AppState {
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
-            _ => {}
+
+            _ => (),
         };
         true
     }
+
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
@@ -246,12 +322,14 @@ impl AppState {
             *self.visit_stack.last().unwrap(),
         );
     }
-    /// Checks ehther the current tree node is the root node (can we go up the tree or no)
+
+    /// Checks either the current tree node is the root node (can we go up the tree or no)
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
     pub fn at_root(&self) -> bool {
         self.visit_stack.len() == 1
     }
+
     fn enter_parent_directory(&mut self) {
         self.visit_stack.pop();
         self.selection.select(Some(0));
@@ -270,6 +348,23 @@ impl AppState {
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
                 return Some(item.node.command.clone());
+            }
+        }
+        None
+    }
+    fn get_selected_description(&mut self) -> Option<String> {
+        let mut selected_index = self.selection.selected().unwrap_or(0);
+
+        if !self.at_root() && selected_index == 0 {
+            return None;
+        }
+        if !self.at_root() {
+            selected_index = selected_index.saturating_sub(1);
+        }
+
+        if let Some(item) = self.filter.item_list().get(selected_index) {
+            if !item.has_children {
+                return Some(item.node.description.clone());
             }
         }
         None
@@ -336,11 +431,23 @@ impl AppState {
     }
     fn enable_preview(&mut self) {
         if let Some(command) = self.get_selected_command() {
-            if let Some(preview) = FloatingText::from_command(&command) {
+            if let Some(preview) = FloatingText::from_command(&command, FloatingTextMode::Preview) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
+    fn enable_description(&mut self) {
+        if let Some(command_description) = self.get_selected_description() {
+            let description_content: Vec<String> = vec![]
+                .into_iter()
+                .chain(command_description.lines().map(|line| line.to_string())) // New line when \n is given in toml
+                .collect();
+
+            let description = FloatingText::new(description_content, FloatingTextMode::Description);
+            self.spawn_float(description, 80, 80);
+        }
+    }
+
     fn handle_enter(&mut self) {
         if let Some(cmd) = self.get_selected_command() {
             let command = RunningCommand::new(cmd);
