@@ -86,20 +86,20 @@ setup_samba() {
         $ESCALATION_TOOL chmod -R 0777 "$SHARED_DIR"
 
         # Add a new Samba user
-        echo "Enter Samba username: "
+        printf "Enter Samba username: "
         read -r SAMBA_USER
 
         # Loop until the passwords match
         while true; do
-            echo "Enter Samba password: "
+            printf "Enter Samba password: "
             stty -echo
             read -r SAMBA_PASSWORD
             stty echo
-            echo "Confirm Samba password: "
+            printf "Confirm Samba password: "
             stty -echo
             read SAMBA_PASSWORD_CONFIRM
             stty echo
-            echo ""
+            printf "\n"
             if [ "$SAMBA_PASSWORD" = "$SAMBA_PASSWORD_CONFIRM" ]; then
                 printf "%b\n" "${GREEN}Passwords match.${RC}"
                 break
