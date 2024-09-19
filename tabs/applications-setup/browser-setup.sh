@@ -69,7 +69,7 @@ install_brave() {
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install brave-browser
             ;;
         pacman)
-            "$AUR_HELPER" -S brave-bin
+            "$AUR_HELPER" -S --noconfirm brave-bin
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install dnf-plugins-core
