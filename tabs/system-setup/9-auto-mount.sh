@@ -14,7 +14,7 @@ select_drive() {
     if lsblk | grep -q "${drive_name}"; then
         partition="/dev/${drive_name}"
     else
-        printf "%b\n" "Invalid drive/partition name!"
+        printf "%b\n" "${RED}Invalid drive/partition name!${RC}"
         exit 1
     fi
 }
