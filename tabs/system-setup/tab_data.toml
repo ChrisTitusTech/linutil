@@ -37,6 +37,10 @@ description = "RPM Fusion provides software that the Fedora Project or Red Hat d
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data]]
+name = "Full System Cleanup"
+script = "system-cleanup.sh"
+
+[[data]]
 name = "Full System Update"
 description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
