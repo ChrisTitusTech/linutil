@@ -1,5 +1,7 @@
 [package]
 name = "linutil_core"
+description = "The backend of Linutil."
+repository = "https://github.com/ChrisTitusTech/linutil/tree/main/core"
 edition = "2021"
 version.workspace = true
 license.workspace = true
