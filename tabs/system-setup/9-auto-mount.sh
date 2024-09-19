@@ -73,7 +73,7 @@ mount_drive() {
     printf "%b\n" "Mounting the drive..."
     $ESCALATION_TOOL  mount -a
     if mount | grep "$mount_point" > /dev/null; then
-        printf "%b\n" "Drive mounted successfully at $mount_point."
+        printf "%b\n" "${GREEN}Drive mounted successfully at $mount_point${RC}."
     else
         printf "%b\n" "${RED}Failed to mount the drive.${RC}"
         exit 1
