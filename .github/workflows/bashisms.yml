@@ -19,9 +19,8 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Install devscripts
-        run: sudo apt install devscripts
+        run: sudo apt-get update && sudo apt-get install devscripts
 
-      - name: Concatenate all .sh files and check for bashisms
+      - name: Check for bashisms
         working-directory: tabs
-        run: |
-          find . -name '*.sh' -exec checkbashisms {} + > all_scripts.sh
+        run: find . -name '*.sh' | xargs -P 4 -n 1 checkbashisms

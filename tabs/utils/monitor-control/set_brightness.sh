@@ -20,7 +20,7 @@ adjust_monitor_brightness() {
             count=$((count + 1))
         done
 
-        echo "Enter the number of the monitor (or 'q' to quit): "
+        printf "Enter the number of the monitor (or 'q' to quit): "
         read monitor_choice
 
         if [ "$monitor_choice" = "q" ]; then
@@ -29,15 +29,15 @@ adjust_monitor_brightness() {
         fi
 
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$'; then
-            echo "Invalid selection. Please try again."
-            echo "Press [Enter] to continue..."
+            printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
+            printf "Press [Enter] to continue..."
             read dummy
             continue
         fi
 
         if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$#" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
-            echo "Press [Enter] to continue..."
+            printf "Press [Enter] to continue..."
             read dummy
             continue
         fi
@@ -50,7 +50,7 @@ adjust_monitor_brightness() {
         printf "%b\n" "${YELLOW}Current brightness for $monitor_name${RC}: ${GREEN}$current_brightness_percentage%${RC}"
 
         while true; do
-            echo "Enter the new brightness value as a percentage (10 to 100, or 'q' to quit): "
+            printf "Enter the new brightness value as a percentage (10 to 100, or 'q' to quit): "
             read new_brightness_percentage
 
             if [ "$new_brightness_percentage" = "q" ]; then
@@ -67,7 +67,7 @@ adjust_monitor_brightness() {
             # Convert percentage to xrandr brightness value (10% to 0.10)
             new_brightness=$(awk "BEGIN {printf \"%.2f\", $new_brightness_percentage / 100}")
 
-            echo "Set brightness for $monitor_name to $new_brightness_percentage%? (y/n): "
+            printf "Set brightness for $monitor_name to $new_brightness_percentage%? (y/n): "
             read confirm
             if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
                 printf "%b\n" "${GREEN}Setting brightness for $monitor_name to $new_brightness_percentage%${RC}"

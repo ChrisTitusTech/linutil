@@ -8,16 +8,16 @@ installDepend() {
     printf "%b\n" "${YELLOW}Installing Bash...${RC}"
     case "$PACKAGER" in
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
             ;;
         apt)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
         zypper)
-            $ESCALATION_TOOL "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}" # The packages above were grabbed out of the original mybash-setup-script.
@@ -70,7 +70,7 @@ installStarshipAndFzf() {
         printf "%b\n" "${GREEN}Fzf already installed${RC}"
     else
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        $ESCALATION_TOOL ~/.fzf/install
+        "$ESCALATION_TOOL" ~/.fzf/install
     fi
 }
 

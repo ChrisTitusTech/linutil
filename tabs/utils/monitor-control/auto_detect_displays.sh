@@ -18,8 +18,8 @@ auto_detect_displays() {
             temp_common_resolutions=$(mktemp)
             temp_resolutions=$(mktemp)
 
-            echo "$common_resolutions" > "$temp_common_resolutions"
-            echo "$resolutions" > "$temp_resolutions"
+            printf "%s" "$common_resolutions" > "$temp_common_resolutions"
+            printf "%s" "$resolutions" > "$temp_resolutions"
 
             common_resolutions=$(comm -12 "$temp_common_resolutions" "$temp_resolutions")
 
@@ -27,14 +27,13 @@ auto_detect_displays() {
         done
         
         if [ -z "$common_resolutions" ]; then
-            echo "No common resolution found among connected monitors."
+            printf "%b\n" "${RED}No common resolution found among connected monitors.${RC}"
             return
-        fi
 
         highest_resolution=$(echo "$common_resolutions" | sort -n -t'x' -k1,1 -k2,2 | tail -n 1)
 
         for monitor in $monitors; do
-            echo "Setting resolution for $monitor to $highest_resolution"
+            printf "%b\n" "${YELLOW}Setting resolution for $monitor to $highest_resolution...${RC}"
             execute_command "xrandr --output $monitor --mode $highest_resolution"
         done
     fi
