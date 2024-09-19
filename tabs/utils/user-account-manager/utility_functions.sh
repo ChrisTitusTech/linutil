@@ -4,7 +4,8 @@
 
 # Prompt for username
 promptUsername() {
-    read -p "Enter the username: " username
+    printf "Enter the username: "
+    read -r username
 
     checkEmpty "$username";
     
@@ -21,9 +22,11 @@ promptUsername() {
 # Prompt for password
 promptPassword() {
     stty -echo
-    read -p "Enter the password (PASSWORD IS HIDDEN): " password1
+    printf "Enter the password (PASSWORD IS HIDDEN): "
+    read -r password1
     echo >&2
-    read -p "Re-enter the password (PASSWORD IS HIDDEN): " password2
+    printf "Re-enter the password (PASSWORD IS HIDDEN): "
+    read -r password2
     echo >&2
     stty echo
 
