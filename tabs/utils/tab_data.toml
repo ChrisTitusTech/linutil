@@ -16,6 +16,10 @@ description = "This utility is designed to configure auto enabling of numlock on
 script = "numlock.sh"
 
 [[data]]
+name = "Crypto tool"
+script = "encrypt_decrypt_tool.sh"
+
+[[data]]
 name = "Ollama"
 description = "This utility is designed to manage ollama in your system"
 script = "ollama.sh"
