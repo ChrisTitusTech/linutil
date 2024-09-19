@@ -214,10 +214,10 @@ browserSetup() {
         case $ch in
                 1) install_chrome ;;
                 2) install_firefox ;;
-                2) install_librewolf ;;
-                3) install_brave ;;
-                4) install_vivaldi ;;
-                5) install_chromium ;;
+                3) install_librewolf ;;
+                4) install_brave ;;
+                5) install_vivaldi ;;
+                6) install_chromium ;;
                 7) install_thorium ;;
                 8) install_lynx;;
                 *) printf "%b\n" "${RED}Invalid option: $ch ${RC}" ;;
