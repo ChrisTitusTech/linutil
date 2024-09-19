@@ -231,7 +231,7 @@ impl AppState {
             },
         ));
 
-        if let Focus::List = self.focus {
+        let style = if let Focus::List = self.focus {
             Style::default().reversed()
         } else {
             Style::new()
