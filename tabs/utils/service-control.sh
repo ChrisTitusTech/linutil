@@ -29,25 +29,25 @@ show_menu() {
 # Function to view all services
 view_all_services() {
     printf "Listing all services...\n"
-    $ESCALATION_TOOL systemctl list-units --type=service --all --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-units --type=service --all --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view enabled services
 view_enabled_services() {
     printf "Listing enabled services...\n"
-    $ESCALATION_TOOL systemctl list-unit-files --type=service --state=enabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=enabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view disabled services
 view_disabled_services() {
     printf "Listing disabled services...\n"
-    $ESCALATION_TOOL systemctl list-unit-files --type=service --state=disabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=disabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view started services
 view_started_services() {
     printf "Listing started services:\n"
-    $ESCALATION_TOOL systemctl list-units --type=service --state=running --no-pager | head -n -6 | awk 'NR>1 {print $1}' | more
+    "$ESCALATION_TOOL" systemctl list-units --type=service --state=running --no-pager | head -n -6 | awk 'NR>1 {print $1}' | more
 }
 
 # Function to add a new service
@@ -55,8 +55,7 @@ add_service() {
     while [ -z "$SERVICE_NAME" ]; do
         printf "Enter the name of the new service (e.g., my_service):\n"
         read -r SERVICE_NAME
-
-        if $ESCALATION_TOOL systemctl list-units --type=service --all --no-legend | grep -q "$SERVICE_NAME.service"; then
+        if "$ESCALATION_TOOL" systemctl list-units --type=service --all --no-legend | grep -q "$SERVICE_NAME.service"; then
             printf "Service already exists!\n"
             SERVICE_NAME=""
         fi
@@ -105,8 +104,8 @@ add_service() {
     read -r START_ENABLE
 
     if [ "$START_ENABLE" = "y" ]; then
-        $ESCALATION_TOOL systemctl start "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
         printf "Service $SERVICE_NAME has been started and enabled.\n"
     else
         printf "Service $SERVICE_NAME has been created but not started.\n"
@@ -128,7 +127,6 @@ remove_service() {
         printf "Removing the service file...\n"
         $ESCALATION_TOOL rm -f "$SERVICE_FILE"
         $ESCALATION_TOOL systemctl daemon-reload
-
         printf "Service $SERVICE_NAME has been removed.\n"
     else
         printf "Service $SERVICE_NAME does not exist.\n"
@@ -227,7 +225,7 @@ create_service_from_external() {
     fi
 
     # Copy the modified service file to /etc/systemd/system/
-    $ESCALATION_TOOL cp "$SERVICE_FILE" "$SYSTEMD_SERVICE_FILE"
+    "$ESCALATION_TOOL" cp "$SERVICE_FILE" "$SYSTEMD_SERVICE_FILE"
 
     # Set permissions and reload systemd
     $ESCALATION_TOOL chmod 644 "$SYSTEMD_SERVICE_FILE"
