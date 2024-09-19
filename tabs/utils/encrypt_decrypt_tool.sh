@@ -8,16 +8,16 @@ printf "%b\n" "${YELLOW}Ensuring OpenSSL is installed...${RC}"
 if ! command_exists openssl; then
     case $PACKAGER in
         pacman)
-            $ESCALATION_TOOL ${PACKAGER} -Syu --noconfirm openssl
+            "$ESCALATION_TOOL" ${PACKAGER} -Syu --noconfirm openssl
             ;;
         apt-get)
-            $ESCALATION_TOOL ${PACKAGER} update && $ESCALATION_TOOL ${PACKAGER} install -y openssl
+            "$ESCALATION_TOOL" ${PACKAGER} update && "$ESCALATION_TOOL" ${PACKAGER} install -y openssl
             ;;
         dnf)
-            $ESCALATION_TOOL ${PACKAGER} install -y openssl
+            "$ESCALATION_TOOL" ${PACKAGER} install -y openssl
             ;;
         zypper)
-            $ESCALATION_TOOL ${PACKAGER} install openssl
+            "$ESCALATION_TOOL" ${PACKAGER} install openssl
             ;;
         *)
             printf "%b\n" "${RED}Your Linux distribution is not supported by this script.${RC}"

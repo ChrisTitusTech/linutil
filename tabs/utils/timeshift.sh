@@ -10,10 +10,10 @@ install_timeshift() {
     if ! command_exists timeshift; then
         case ${PACKAGER} in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm timeshift
+                "$ESCALATION_TOOL" "${PACKAGER}" -S --noconfirm timeshift
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y timeshift
+                "$ESCALATION_TOOL" "${PACKAGER}" install -y timeshift
                 ;;
         esac
     else
@@ -37,13 +37,13 @@ display_menu() {
 # Function to list snapshots
 list_snapshots() {
     printf "%b\n" "${CYAN}Listing snapshots...${RC}"
-    $ESCALATION_TOOL timeshift --list-snapshots
+    "$ESCALATION_TOOL" timeshift --list-snapshots
 }
 
 # Function to list devices
 list_devices() {
     printf "%b\n" "${CYAN}Listing available devices...${RC}"
-    $ESCALATION_TOOL timeshift --list-devices
+    "$ESCALATION_TOOL" timeshift --list-devices
 }
 
 # Function to create a new snapshot
@@ -55,13 +55,13 @@ create_snapshot() {
 
     if [ -z "$COMMENT" ] && [ -z "$TAG" ]; then
         printf "%b\n" "${CYAN}Creating snapshot with no comment or tag...${RC}"
-        $ESCALATION_TOOL timeshift --create
+        "$ESCALATION_TOOL" timeshift --create
     elif [ -z "$TAG" ]; then
         printf "%b\n" "${CYAN}Creating snapshot with no tag...${RC}"
-        $ESCALATION_TOOL timeshift --create --comments "$COMMENT"
+        "$ESCALATION_TOOL" timeshift --create --comments "$COMMENT"
     else
         printf "%b\n" "${CYAN}Creating snapshot with tag: $TAG...${RC}"
-        $ESCALATION_TOOL timeshift --create --comments "$COMMENT" --tags "$TAG"
+        "$ESCALATION_TOOL" timeshift --create --comments "$COMMENT" --tags "$TAG"
     fi
 
     if [ $? -eq 0 ]; then
@@ -83,11 +83,11 @@ restore_snapshot() {
     read -r SKIP_GRUB
 
     if [ "$SKIP_GRUB" = "yes" ]; then
-        $ESCALATION_TOOL timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --skip-grub --yes
+        "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --skip-grub --yes
     else
         printf "%b\n" "${CYAN}Enter GRUB device (e.g., /dev/sda): ${RC}"
         read -r GRUB_DEVICE
-        $ESCALATION_TOOL timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --grub-device "$GRUB_DEVICE" --yes
+        "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --grub-device "$GRUB_DEVICE" --yes
     fi
 
     if [ $? -eq 0 ]; then
@@ -105,7 +105,7 @@ delete_snapshot() {
     read -r SNAPSHOT
 
     printf "%b\n" "${YELLOW}Deleting snapshot $SNAPSHOT...${RC}"
-    $ESCALATION_TOOL timeshift --delete --snapshot "$SNAPSHOT" --yes
+    "$ESCALATION_TOOL" timeshift --delete --snapshot "$SNAPSHOT" --yes
 
     if [ $? -eq 0 ]; then
         printf "%b\n" "${GREEN}Snapshot deleted successfully.${RC}"
@@ -122,7 +122,7 @@ delete_all_snapshots() {
 
     if [ "$CONFIRMATION" = "yes" ]; then
         printf "%b\n" "${CYAN}Deleting all snapshots...${RC}"
-        $ESCALATION_TOOL timeshift --delete-all --yes
+        "$ESCALATION_TOOL" timeshift --delete-all --yes
         if [ $? -eq 0 ]; then
             printf "%b\n" "${GREEN}All snapshots deleted successfully.${RC}"
         else
