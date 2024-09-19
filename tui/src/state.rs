@@ -400,11 +400,10 @@ impl AppState {
             selected_index = selected_index.saturating_sub(1);
         }
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            item.has_children
-        } else {
-            false
-        }
+        self.filter
+            .item_list()
+            .get(selected_index)
+            .map_or(false, |item| item.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
@@ -418,11 +417,10 @@ impl AppState {
             selected_index = selected_index.saturating_sub(1);
         }
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            !item.has_children
-        } else {
-            false
-        }
+        self.filter
+            .item_list()
+            .get(selected_index)
+            .map_or(false, |item| !item.has_children)
     }
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
