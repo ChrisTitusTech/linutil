@@ -83,6 +83,7 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "4-remove-snaps.sh"
 
+[[data]]
 name = "SSH-Samba Setup"
 script = "5-samba-ssh-setup.sh"
 
