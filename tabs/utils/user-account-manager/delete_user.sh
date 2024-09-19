@@ -20,7 +20,8 @@ fi
 read -p "Are you sure you want to delete user $username? [Y/N]: " confirm
 confirmAction || exit 1
 
-$ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
+"$ESCALATION_TOOL" userdel --remove "$username" 2>/dev/null
 printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
 
 checkEnv
+checkEscalationTool

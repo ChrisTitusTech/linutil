@@ -28,8 +28,9 @@ groups_to_add=$(echo "$groups" | tr ' ' ',')
 read -p "Are you sure you want to add user $username to $groups_to_add? [Y/N]: " confirm
 confirmAction || exit 1
 
-$ESCALATION_TOOL usermod -aG $groups_to_add "$username"
+"$ESCALATION_TOOL" usermod -aG $groups_to_add "$username"
 
 printf "%b\n" "${GREEN}User successfully added to the $groups_to_add${RC}"
 
 checkEnv
+checkEscalationTool

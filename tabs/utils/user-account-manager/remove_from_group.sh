@@ -23,8 +23,9 @@ groups_to_remove=$(echo "$groups" | tr ' ' ',')
 read -p "Are you sure you want to remove user $username from $groups_to_remove? [Y/N]: " confirm
 confirmAction || exit 1
 
-$ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+"$ESCALATION_TOOL" usermod -rG $groups_to_remove "$username"
 
 printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
 
 checkEnv
+checkEscalationTool
