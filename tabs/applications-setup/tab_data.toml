@@ -31,3 +31,7 @@ script = "zsh-setup.sh"
 [[data]]
 name = "Fastfetch"
 script = "fastfetch-setup.sh"
+
+[[data]]
+name = "Bottles setup"
+script = "bottles-setup.sh"
