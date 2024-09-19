@@ -25,7 +25,8 @@ checkGroupAvailabe "$groups" "$available_groups" || exit 1
 
 groups_to_add=$(echo "$groups" | tr ' ' ',')
 
-read -p "Are you sure you want to add user $username to $groups_to_add? [Y/N]: " confirm
+printf "Are you sure you want to add user $username to $groups_to_add? [Y/N]: "
+read -r confirm
 confirmAction || exit 1
 
 $ESCALATION_TOOL usermod -aG $groups_to_add "$username"
