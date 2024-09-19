@@ -16,7 +16,7 @@ setupDWM() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
@@ -188,7 +188,7 @@ setupDisplayManager() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
@@ -216,7 +216,7 @@ setupDisplayManager() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
                 exit 1
                 ;;
         esac

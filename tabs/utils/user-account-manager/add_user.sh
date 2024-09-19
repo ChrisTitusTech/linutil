@@ -18,7 +18,7 @@ fi
 password=$(promptPassword) || exit 1
 
 $ESCALATION_TOOL useradd -m "$username" -g users -s /bin/bash
-echo "$username:$password" | $ESCALATION_TOOL chpasswd
+echo "$username:$password" | "$ESCALATION_TOOL" chpasswd
 
 printf "%b\n" "${GREEN}User $username created successfully${RC}"
 printf "%b\n" "${GREEN}To add additional groups use Add User To Groups${RC}"

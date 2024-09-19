@@ -59,11 +59,11 @@ disable_password_auth() {
     read -r host_alias
     printf "%b\n"
     ssh $host_alias "
-        $ESCALATION_TOOL -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S systemctl restart sshd
+        "$ESCALATION_TOOL" -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S systemctl restart sshd
     "
     printf "%b\n" "PasswordAuthentication set to no and PubkeyAuthentication set to yes."
 }
@@ -74,11 +74,11 @@ enable_password_auth() {
     read -r host_alias
     printf "\n"
     ssh $host_alias "
-        $ESCALATION_TOOL  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        $ESCALATION_TOOL  -S systemctl restart sshd
+        "$ESCALATION_TOOL"  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
+        "$ESCALATION_TOOL"  -S systemctl restart sshd
     "
     printf "%b\n" "PasswordAuthentication set to yes and PubkeyAuthentication set to no."
 }

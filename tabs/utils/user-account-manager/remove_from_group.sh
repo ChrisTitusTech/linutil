@@ -13,7 +13,8 @@ user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
 printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
 printf "%b\n" "${YELLOW}=================${RC}"
 
-read -p "Enter the groups you want to remove user from $username (space-separated): " groups
+printf "%b\n" "${YELLOW}Enter the groups you want to remove user $username from (space-separated):${RC} "
+read -r groups
 
 checkEmpty "$groups" || exit 1
 checkGroupAvailabe "$groups" "$user_groups" || exit 1

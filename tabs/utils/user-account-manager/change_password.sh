@@ -14,7 +14,7 @@ printf "Are you sure you want to change password for $username? [Y/N]: "
 read -r confirm
 confirmAction || exit 1
 
-echo "$username:$password" | $ESCALATION_TOOL chpasswd
+echo "$username:$password" | "$ESCALATION_TOOL" chpasswd
 printf "%b\n" "${GREEN}Password changed successfully${RC}"
 
 checkEnv

@@ -4,10 +4,10 @@
 
 # Install virtualization tools to enable virtual machines
 configureVirtualization() {
-    case $PACKAGER in
+    case "$PACKAGER" in
         dnf)
             printf "%b\n" ${YELLOW}"Installing virtualization tools...${RC}"
-            $ESCALATION_TOOL "$PACKAGER" install -y @virtualization 
+            "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
             printf "%b\n" "${GREEN}Installed virtualization tools...${RC}"
             ;;
         *)

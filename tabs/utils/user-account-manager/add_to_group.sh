@@ -18,7 +18,8 @@ available_groups=$(cut -d: -f1 /etc/group | sort | tr '\n' ' ')
 printf "%b\n" "${YELLOW}Available groups:${RC} $available_groups"
 printf "%b\n" "${YELLOW}=================${RC}"
 
-read -p "Enter the groups you want to add user $username to (space-separated): " groups
+printf "%b\n" "${YELLOW}Enter the groups you want to add user $username to (space-separated):${RC} "
+read -r groups
 
 checkEmpty "$groups" || exit 1
 checkGroupAvailabe "$groups" "$available_groups" || exit 1

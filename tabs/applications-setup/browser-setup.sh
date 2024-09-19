@@ -31,7 +31,7 @@ install_chrome() {
 
 install_thorium() {
     printf "%b\n" "${YELLOW}Installing Thorium Browser...${RC}"
-    case $PACKAGER in
+    case "$PACKAGER" in
 	apt-get|nala)
 	    "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
             "$ESCALATION_TOOL" wget --no-hsts -P /etc/apt/sources.list.d/ http://dl.thorium.rocks/debian/dists/stable/thorium.list
@@ -79,7 +79,7 @@ install_firefox() {
 
 install_librewolf() {
 	printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
-	case $PACKAGER in
+	case "$PACKAGER" in
 		apt-get|nala)
 			"$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y wget gnupg lsb-release apt-transport-https ca-certificates
 			distro=`if echo " una bookworm vanessa focal jammy bullseye vera uma " | grep -q " $(lsb_release -sc) "; then lsb_release -sc; else echo focal; fi`
