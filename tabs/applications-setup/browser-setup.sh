@@ -39,9 +39,9 @@ install_thorium() {
 			"$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
 			;;
 		zypper|dnf)
-		    url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
-            echo $url && curl -L $url -o thorium-latest.rpm
-            "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
+		        url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
+                        echo $url && curl -L $url -o thorium-latest.rpm
+                        "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
 			;;
 		pacman)
 			"$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
