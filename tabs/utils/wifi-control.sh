@@ -46,7 +46,7 @@ main_menu() {
         printf "6. Remove a WiFi connection\n"
         printf "0. Exit\n"
         printf "Choose an option: "
-        read choice
+        read -r choice
 
         case $choice in
             1) wifi_on ;;
@@ -132,13 +132,13 @@ prompt_for_network() {
 
         printf "0. Exit to main menu\n"
         printf "%s" "$prompt_msg"
-        read choice
+        read -r choice
 
         if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
             ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
             if [ "$action" = "connect" ]; then
                 printf "Enter password for SSID %s: " "$ssid"
-                read password
+                read -r password
                 printf "\n"
                 nmcli dev wifi connect "$ssid" password "$password" && {
                     printf "%b\n" "${GREEN}$success_msg${RC}"

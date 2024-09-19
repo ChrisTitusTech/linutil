@@ -99,7 +99,7 @@ prompt_for_mac() {
         done
         printf "0. Exit to main menu\n"
         printf "%s\n" "$prompt_msg"
-        read choice
+        read -r choice
 
         # Validate the choice
         if echo "$choice" | grep -qE '^[0-9]+$' && [ "$choice" -le "$((i - 1))" ] && [ "$choice" -gt 0 ]; then
