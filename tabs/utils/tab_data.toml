@@ -21,6 +21,10 @@ name = "Service Manager"
 script = "service-control.sh"
 
 [[data]]
+name = "SSH Commands"
+script = "ssh.sh"
+
+[[data]]
 name = "Monitor Control"
 
 [[data.preconditions]]
