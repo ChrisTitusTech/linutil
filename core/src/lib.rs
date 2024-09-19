@@ -16,6 +16,7 @@ pub enum Command {
 pub struct Tab {
     pub name: String,
     pub tree: Tree<ListNode>,
+    pub multi_selectable: bool,
 }
 
 #[derive(Clone, Hash, Eq, PartialEq)]

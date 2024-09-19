@@ -33,6 +33,8 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
+    multi_select: bool,
+    selected_commands: Vec<Command>,
     drawable: bool,
 }
 
@@ -61,6 +63,8 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            multi_select: false,
+            selected_commands: Vec::new(),
             drawable: false,
         };
         state.update_items();
@@ -199,12 +203,29 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(self.theme.dir_color())
+                let is_selected = self.selected_commands.contains(&node.command);
+                let (indicator, style) = if is_selected {
+                    (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(self.theme.cmd_color())
+                    ("", Style::new())
+                };
+                if *has_children {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.dir_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.dir_color())
+                } else {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.cmd_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.cmd_color())
+                    .patch_style(style)
                 }
             },
         ));
@@ -216,11 +237,15 @@ impl AppState {
             } else {
                 Style::new()
             })
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
-            )
+            .block(Block::default().borders(Borders::ALL).title(format!(
+                "Linux Toolbox - {} {}",
+                env!("BUILD_DATE"),
+                if self.multi_select {
+                    "[Multi-Select]"
+                } else {
+                    ""
+                }
+            )))
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -254,7 +279,7 @@ impl AppState {
             match key.code {
                 KeyCode::Tab => {
                     if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
-                        self.current_tab.select_first(); // Select first tab when it is at last
+                        self.current_tab.select_first();
                     } else {
                         self.current_tab.select_next();
                     }
@@ -262,7 +287,7 @@ impl AppState {
                 }
                 KeyCode::BackTab => {
                     if self.current_tab.selected().unwrap() == 0 {
-                        self.current_tab.select(Some(self.tabs.len() - 1)); // Select last tab when it is at first
+                        self.current_tab.select(Some(self.tabs.len() - 1));
                     } else {
                         self.current_tab.select_previous();
                     }
@@ -329,6 +354,8 @@ impl AppState {
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
 
@@ -336,13 +363,39 @@ impl AppState {
         };
         true
     }
-
+    fn toggle_multi_select(&mut self) {
+        if self.is_current_tab_multi_selectable() {
+            self.multi_select = !self.multi_select;
+            if !self.multi_select {
+                self.selected_commands.clear();
+            }
+        }
+    }
+    fn toggle_selection(&mut self) {
+        if let Some(command) = self.get_selected_command() {
+            if self.selected_commands.contains(&command) {
+                self.selected_commands.retain(|c| c != &command);
+            } else {
+                self.selected_commands.push(command);
+            }
+        }
+    }
+    pub fn is_current_tab_multi_selectable(&self) -> bool {
+        let index = self.current_tab.selected().unwrap_or(0);
+        self.tabs
+            .get(index)
+            .map_or(false, |tab| tab.multi_selectable)
+    }
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
             *self.visit_stack.last().unwrap(),
         );
+        if !self.is_current_tab_multi_selectable() {
+            self.multi_select = false;
+            self.selected_commands.clear();
+        }
     }
 
     /// Checks either the current tree node is the root node (can we go up the tree or no)
@@ -471,9 +524,15 @@ impl AppState {
     }
 
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command() {
-            let command = RunningCommand::new(cmd);
+        if self.selected_item_is_cmd() {
+            if self.selected_commands.is_empty() {
+                if let Some(cmd) = self.get_selected_command() {
+                    self.selected_commands.push(cmd);
+                }
+            }
+            let command = RunningCommand::new(self.selected_commands.clone());
             self.spawn_float(command, 80, 80);
+            self.selected_commands.clear();
         } else {
             self.go_to_selected_dir();
         }
