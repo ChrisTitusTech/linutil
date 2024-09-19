@@ -51,7 +51,7 @@ create_mount_point() {
 # Function to update /etc/fstab with a comment on the first line and the actual entry on the second line
 update_fstab() {
     printf "%b\n" "Adding entry to /etc/fstab..."
-    $ESCALATION_TOOL  cp /etc/fstab /etc/fstab.bak # Backup fstab
+    $ESCALATION_TOOL cp /etc/fstab /etc/fstab.bak # Backup fstab
 
     # Prepare the comment and the fstab entry
     comment="# Mount for /dev/$NAME"
