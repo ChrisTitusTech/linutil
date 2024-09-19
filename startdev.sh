@@ -53,6 +53,7 @@ findArch() {
     case "$(uname -m)" in
         x86_64|amd64) arch="x86_64" ;;
         aarch64|arm64) arch="aarch64" ;;
+        riscv64|arm64) arch="riscv64" ;;
         *) check 1 "Unsupported architecture"
     esac
 }
