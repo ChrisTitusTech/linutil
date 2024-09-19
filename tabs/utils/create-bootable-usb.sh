@@ -5,16 +5,16 @@
 # Function to display usage instructions
 usage() {
     printf "%b\n" "${RED} Usage: $0 ${RC}"
-    echo "No arguments needed. The script will prompt for ISO path and USB device."
+    printf "No arguments needed. The script will prompt for ISO path and USB device.\n"
     exit 1
 }
 
 # Function to display all available block devices
 list_devices() {
     printf "%b\n" "${YELLOW} Available devices and partitions: ${RC}"
-    echo ""
+    printf "\n"
     $ESCALATION_TOOL lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL
-    echo ""
+    printf "\n"
 }
 
 # Function to fetch the latest Arch Linux ISO
@@ -47,7 +47,7 @@ fetch_arch_older_isos() {
         printf "%-5s${YELLOW}%-15s ${RC}" "$COUNTER)" "$VERSION"
         
         if [ $(( COUNTER % ROW_ITEMS )) -eq 0 ]; then
-            echo ""  # New line after every 6 versions
+            printf "\n"  # New line after every 6 versions
         fi
         
         COUNTER=$((COUNTER + 1))
@@ -59,7 +59,6 @@ fetch_arch_older_isos() {
     ARCH_URL="${ARCH_BASE_URL}${ARCH_DIR}/archlinux-${ARCH_DIR}-x86_64.iso"
     printf "%b\n" "${GREEN}Selected Arch Linux (older) ISO URL: $ARCH_URL${RC}"
 }
-
 
 # Function to fetch the latest Debian Linux ISO
 fetch_debian_latest_iso() {
@@ -99,11 +98,12 @@ choose_iso_source() {
 fetch_iso_urls() {
     clear
     printf "%b\n" "${YELLOW}Available ISOs for download:${RC}"
-    echo "1) Arch Linux (latest)"
-    echo "2) Arch Linux (older versions)"
-    echo "3) Debian Linux (latest)"
-    echo ""
-    read -p "Select the ISO you want to download (1-3): " ISO_OPTION
+    printf "1) Arch Linux (latest)\n"
+    printf "2) Arch Linux (older versions)\n"
+    printf "3) Debian Linux (latest)\n"
+    printf "\n"
+    printf "Select the ISO you want to download (1-3): "
+    read -r ISO_OPTION
 
     case $ISO_OPTION in
         1)
@@ -144,7 +144,8 @@ write_iso(){
     list_devices
 
     # Prompt user for USB device
-    read -p "Enter the USB device (e.g., /dev/sdX): " USB_DEVICE
+    printf "Enter the USB device (e.g., /dev/sdX): "
+    read -r USB_DEVICE
 
     # Verify that the USB device exists
     if [ ! -b "$USB_DEVICE" ]; then

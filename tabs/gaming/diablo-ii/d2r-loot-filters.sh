@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh -e
+
+. ../../common-script.sh
 
 # Search for possible Diablo II Resurrected folder locations
 printf "%b\n" "${YELLOW}Searching for Diablo II Resurrected folders...${RC}"
