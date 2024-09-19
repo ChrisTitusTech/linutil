@@ -36,7 +36,8 @@ description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu rep
 script = "rofi-setup.sh"
 
 [[data]]
-name = "Setup Flatpak / Flathub"
+name = "Flatpak"
+description = "Flatpak is a universal application sandbox for Linux that uses isolated packages to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command enables Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 
 [[data]]
