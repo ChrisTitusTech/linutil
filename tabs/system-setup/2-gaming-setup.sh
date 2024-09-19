@@ -23,7 +23,7 @@ installDepend() {
                 ncurses lib32-ncurses vulkan-icd-loader lib32-vulkan-icd-loader ocl-icd lib32-ocl-icd libva lib32-libva \
                 gst-plugins-base-libs lib32-gst-plugins-base-libs sdl2"
 
-            $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES" $DISTRO_DEPS
+            "$AUR_HELPER" -S --needed --noconfirm "$DEPENDENCIES" $DISTRO_DEPS
             ;;
         apt-get|nala)
             DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
