@@ -29,15 +29,14 @@ impl ShortcutList {
             .title(self.scope_name)
             .borders(Borders::all());
         let inner_area = area.inner(Margin::new(1, 1));
-        let mut shortcut_list: Vec<Vec<Span>> = self.hints.iter().map(|h| h.to_spans()).collect();
+        let shortcut_spans: Vec<Vec<Span>> = self.hints.iter().map(|h| h.to_spans()).collect();
 
-        let mut lines = vec![Line::default(); SHORTCUT_LINES];
-        let mut idx = 0;
+        let mut lines: Vec<Line> = Vec::with_capacity(SHORTCUT_LINES);
 
-        while idx < SHORTCUT_LINES - 1 {
-            let split_idx = shortcut_list
+        let shortcut_list = (0..SHORTCUT_LINES - 1).fold(shortcut_spans, |mut acc, _| {
+            let split_idx = acc
                 .iter()
-                .scan(0usize, |total_len, s| {
+                .scan(0_usize, |total_len, s| {
                     *total_len += span_vec_len(s);
                     if *total_len > inner_area.width as usize {
                         None
@@ -47,25 +46,28 @@ impl ShortcutList {
                     }
                 })
                 .count();
-            let new_shortcut_list = shortcut_list.split_off(split_idx);
-            let line: Vec<_> = shortcut_list
+
+            let new_shortcut_list = acc.split_off(split_idx);
+            lines.push(
+                acc.into_iter()
+                    .flat_map(|mut s| {
+                        s.push(Span::default().content("    "));
+                        s
+                    })
+                    .collect(),
+            );
+
+            new_shortcut_list
+        });
+        lines.push(
+            shortcut_list
                 .into_iter()
                 .flat_map(|mut s| {
                     s.push(Span::default().content("    "));
                     s
                 })
-                .collect();
-            shortcut_list = new_shortcut_list;
-            lines[idx] = line.into();
-            idx += 1;
-        }
-        lines[idx] = shortcut_list
-            .into_iter()
-            .flat_map(|mut s| {
-                s.push(Span::default().content("    "));
-                s
-            })
-            .collect();
+                .collect(),
+        );
 
         let p = Paragraph::new(lines).block(block);
         frame.render_widget(p, area);
