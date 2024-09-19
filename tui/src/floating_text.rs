@@ -102,10 +102,6 @@ impl FloatContent for FloatingText {
             .map(Line::from)
             .collect();
 
-        // Prevents background text from appearing after the floating content
-        while lines.len() < inner_area.height as usize {
-            lines.push(Line::from(" ".repeat(inner_area.width as usize)));
-        }
         // Create list widget
         let list = List::new(lines)
             .block(Block::default())
