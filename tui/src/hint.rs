@@ -122,21 +122,20 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             if state.at_root() {
                 hints.push(Shortcut::new(vec!["h", "Left"], "Focus tab list"));
                 hints.push(get_list_item_shortcut(state));
+            } else if state.selected_item_is_up_dir() {
+                hints.push(Shortcut::new(
+                    vec!["l", "Right", "Enter", "h", "Left"],
+                    "Go to parent directory",
+                ));
             } else {
-                if state.selected_item_is_up_dir() {
-                    hints.push(Shortcut::new(
-                        vec!["l", "Right", "Enter", "h", "Left"],
-                        "Go to parent directory",
-                    ));
-                } else {
-                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
-                    hints.push(get_list_item_shortcut(state));
-                    if state.selected_item_is_cmd() {
-                        hints.push(Shortcut::new(vec!["p"], "Enable preview"));
-                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
-                    }
-                }
+                hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
+                hints.push(get_list_item_shortcut(state));
             };
+
+            if state.selected_item_is_cmd() {
+                hints.push(Shortcut::new(vec!["p"], "Enable preview"));
+                hints.push(Shortcut::new(vec!["d"], "Command Description"));
+            }
 
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
