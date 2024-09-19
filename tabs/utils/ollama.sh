@@ -6,13 +6,12 @@ installollama() {
     clear
     printf "%b\n" "${YELLOW}Checking if ollama is already installed...${RC}"
 
-    # Check if ollama is already installed
     if command_exists ollama; then
         printf "%b\n" "${GREEN}ollama is already installed.${RC}"
     else
         printf "%b\n" "${YELLOW}Installing ollama...${RC}"
         curl -fsSL https://ollama.com/install.sh | sh
-        $ESCALATION_TOOL systemctl start ollama 
+        "$ESCALATION_TOOL" systemctl start ollama 
     fi
 }
 
@@ -32,7 +31,6 @@ show_model_info() {
     ollama show "$model_name"
 }
 
-# Function to display available models
 display_models() {
     clear
     printf "%b\n" "${RED}Available Models${RC}"
@@ -58,23 +56,23 @@ display_models() {
 select_model() {
     local choice="$1"
     case $choice in
-        1) echo "llama3.1";;
-        2) echo "llama3.1:70b";;
-        3) echo "llama3.1:405b";;
-        4) echo "phi3";;
-        5) echo "phi3:medium";;
-        6) echo "gemma2:2b";;
-        7) echo "gemma2";;
-        8) echo "gemma2:27b";;
-        9) echo "mistral";;
-        10) echo "moondream";;
-        11) echo "neural-chat";;
-        12) echo "starling-lm";;
-        13) echo "codellama";;
-        14) echo "llama2-uncensored";;
-        15) echo "llava";;
-        16) echo "solar";;
-        *) echo "$choice";;  # Treat any other input as a custom model name
+        1) printf "%b\n" "llama3.1";;
+        2) printf "%b\n" "llama3.1:70b";;
+        3) printf "%b\n" "llama3.1:405b";;
+        4) printf "%b\n" "phi3";;
+        5) printf "%b\n" "phi3:medium";;
+        6) printf "%b\n" "gemma2:2b";;
+        7) printf "%b\n" "gemma2";;
+        8) printf "%b\n" "gemma2:27b";;
+        9) printf "%b\n" "mistral";;
+        10) printf "%b\n" "moondream";;
+        11) printf "%b\n" "neural-chat";;
+        12) printf "%b\n" "starling-lm";;
+        13) printf "%b\n" "codellama";;
+        14) printf "%b\n" "llama2-uncensored";;
+        15) printf "%b\n" "llava";;
+        16) printf "%b\n" "solar";;
+        *) printf "%b\n" "$choice";;
     esac
 }
 
@@ -98,7 +96,6 @@ run_model() {
 
     printf "%b\n" "${YELLOW}Running the model: $model...${RC}"
     ollama run "$model"
-
 }
 
 create_model() {
@@ -184,7 +181,7 @@ menu() {
         printf "5) Remove a model\n"
         printf "6) Exit\n"
 
-        printf "%b" "${YELLOW}Enter your choice (1-5): ${RC}"
+        printf "%b\n" "${YELLOW}Enter your choice (1-5): ${RC}"
         read -r choice
 
         case $choice in

@@ -1,16 +1,18 @@
-#!/bin/bash
+#!/bin/sh -e
+
+. ../../common-script.sh
 
 # Search for possible Diablo II Resurrected folder locations
-echo "Searching for Diablo II Resurrected folders..."
+printf "%b\n" "${YELLOW}Searching for Diablo II Resurrected folders...${RC}"
 possible_paths=$(find $HOME -type d -path "*/drive_c/Program Files (x86)/Diablo II Resurrected" 2>/dev/null)
 
 if [ -z "$possible_paths" ]; then
-    echo "Error: No Diablo II Resurrected folders found."
+    printf "%b\n" "${RED}Error: No Diablo II Resurrected folders found.${RC}"
     exit 1
 fi
 
 # Display possible paths and allow selection
-echo "Possible Diablo II Resurrected folder locations:"
+printf "%b\n" "${YELLOW}Possible Diablo II Resurrected folder locations:${RC}"
 mapfile -t paths_array <<< "$possible_paths"
 selected=0
 total=${#paths_array[@]}
@@ -23,7 +25,7 @@ print_menu() {
     if ((start + max_display > total)); then start=$((total - max_display)); fi
     if ((start < 0)); then start=0; fi
     
-    echo "Please select the Diablo II: Resurrected installation path:"
+    printf "%b\n" "${YELLOW}Please select the Diablo II: Resurrected installation path:${RC}"
     for i in $(seq 0 $((max_display - 1))); do
         if ((i + start >= total)); then break; fi
         if [ $((i + start)) -eq $selected ]; then
@@ -75,7 +77,7 @@ select_path
 
 # Validate the path
 if [ ! -d "$d2r_path" ]; then
-    echo "Error: The specified path does not exist."
+    printf "%b\n" "${RED}Error: The specified path does not exist.${RC}"
     exit 1
 fi
 
@@ -84,26 +86,23 @@ mods_path="$d2r_path/mods"
 mkdir -p "$mods_path"
 
 # Download the latest release
-echo "Downloading the latest loot filter..."
+printf "%b\n" "${YELLOW}Downloading the latest loot filter...${RC}"
 curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip
 
 # Extract the contents to the mods folder
-echo "Extracting loot filter to $mods_path..."
+printf "%b\n" "${YELLOW}Extracting loot filter to $mods_path...${RC}"
 unzip -q -o /tmp/lootfilter.zip -d "$mods_path"
 
 # Clean up
 rm /tmp/lootfilter.zip
 
-echo "Loot filter installed successfully in $mods_path"
+printf "%b\n" "${GREEN}Loot filter installed successfully in $mods_path${RC}"
 
-# Add instructions for setting launch options
-echo
-echo "To complete the setup, please follow these steps to add launch options in Battle.net:"
-echo "1. Open the Battle.net launcher"
-echo "2. Select Diablo II: Resurrected"
-echo "3. Click the gear icon next to the 'Play' button"
-echo "4. Select 'Game Settings'"
-echo "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt"
-echo "6. Click 'Done' to save the changes"
-echo
-echo "After completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter."
+printf "\nTo complete the setup, please follow these steps to add launch options in Battle.net:\n"
+printf "1. Open the Battle.net launcher\n"
+printf "2. Select Diablo II: Resurrected\n"
+printf "3. Click the gear icon next to the 'Play' button\n"
+printf "4. Select 'Game Settings'\n"
+printf "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt\n"
+printf "6. Click 'Done' to save the changes\n"
+printf "\nAfter completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter.\n"

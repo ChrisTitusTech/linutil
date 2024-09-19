@@ -21,6 +21,7 @@
 
 ## Applications Setup
 
+- **Flathub**: Installs / Uninstalls Flatpak and Flathub.
 - **Alacritty Setup**: Installs and configures Alacritty for you.
 - **DwmTitus Setup**: Sets up the Dwm window manager.
 - **Kitty Setup**: Installs and configures Kitty for you.
@@ -30,3 +31,11 @@
 ## Security Features
 
 - **Firewall Baselines**: Sets up firewall rules.
+
+## Utilities
+
+- **Monitor Control**: Controls monitor settings on X11.
+- **Bluetooth Control**: Controls Bluetooth settings.
+- **Wifi Control**: Controls WiFi settings.
+- **Numlock Control**: Sets up Numlock on boot.
+- **User Account Manager**: Manage users and groups.
