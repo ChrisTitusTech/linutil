@@ -2,60 +2,47 @@
 
 . ../common-script.sh
 
-# Function to check bluetoothctl is installed
+# Function to check Bluez is installed
 setupBluetooth() {
-    echo "Install bluetoothctl if not already installed..."
+    printf "%b\n" "${YELLOW}Installing Bluez...${RC}"
     if ! command_exists bluetoothctl; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm bluez-utils
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez-utils
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y bluez
+                "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
                 ;;
         esac
     else
-        echo "Bluetoothctl is already installed."
+        printf "%b\n" "${GREEN}Bluez is already installed.${RC}"
     fi
 
     # Check if bluetooth service is running
     if ! systemctl is-active --quiet bluetooth; then
-        echo "Bluetooth service is not running. Starting it now..."
-        $ESCALATION_TOOL systemctl start bluetooth
+        printf "%b\n" "${YELLOW}Bluetooth service is not running. Starting it now...${RC}"
+        "$ESCALATION_TOOL" systemctl start bluetooth
         
         if systemctl is-active --quiet bluetooth; then
-            echo "bluetooth service started successfully."
+            printf "%b\n" "${GREEN}Bluetooth service started successfully.${RC}"
         fi
     fi
-}
-
-# Function to display colored text
-colored_echo() {
-    local color=$1
-    local text=$2
-    case $color in
-        red) echo -e "\033[31m$text\033[0m" ;;
-        green) echo -e "\033[32m$text\033[0m" ;;
-        yellow) echo -e "\033[33m$text\033[0m" ;;
-        blue) echo -e "\033[34m$text\033[0m" ;;
-        *) echo "$text" ;;
-    esac
 }
 
 # Function to display the main menu
 main_menu() {
     while true; do
         clear
-        colored_echo blue "Bluetooth Manager"
-        colored_echo blue "================="
-        echo "1. Scan for devices"
-        echo "2. Pair with a device"
-        echo "3. Connect to a device"
-        echo "4. Disconnect from a device"
-        echo "5. Remove a device"
-        echo "0. Exit"
-        echo -n "Choose an option: "
-        read -e choice
+        printf "%b\n" "${YELLOW}Bluetooth Manager${RC}"
+        printf "%b\n" "${YELLOW}=================${RC}"
+        printf "1. Scan for devices\n"
+        printf "2. Pair with a device\n"
+        printf "3. Connect to a device\n"
+        printf "4. Disconnect from a device\n"
+        printf "5. Remove a device\n"
+        printf "0. Exit\n"
+        printf -n "Choose an option: "
+        read choice
 
         case $choice in
             1) scan_devices ;;
@@ -64,7 +51,7 @@ main_menu() {
             4) disconnect_device ;;
             5) remove_device ;;
             0) exit 0 ;;
-            *) colored_echo red "Invalid option. Please try again." ;;
+            *) printf "%b\n" "${RED}Invalid option. Please try again.${RC}" ;;
         esac
     done
 }
@@ -72,68 +59,70 @@ main_menu() {
 # Function to scan for devices
 scan_devices() {
     clear
-    colored_echo yellow "Scanning for devices..."
+    printf "%b\n" "${YELLOW}Scanning for devices...${RC}"
     bluetoothctl --timeout 10 scan on
     devices=$(bluetoothctl devices)
     if [ -z "$devices" ]; then
-        colored_echo red "No devices found."
+        printf "%b\n" "${RED}No devices found.${RC}"
     else
-        colored_echo green "Devices found:"
-        echo "$devices"
+        printf "%b\n" "${GREEN}Devices found:${RC}"
+        printf "%s\n" "$devices"
     fi
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read -r dummy
 }
 
 # Function to prompt for MAC address using numbers
 prompt_for_mac() {
-    local action=$1
-    local command=$2
-    local prompt_msg=$3
-    local success_msg=$4
-    local failure_msg=$5
+    action=$1
+    command=$2
+    prompt_msg=$3
+    success_msg=$4
+    failure_msg=$5
 
     while true; do
         clear
         devices=$(bluetoothctl devices)
         if [ -z "$devices" ]; then
-            colored_echo red "No devices available. Please scan for devices first."
-            echo "Press any key to return to the main menu..."
-            read -n 1
+            printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"
+            printf "Press any key to return to the main menu..."
+            read -r dummy
             return
         fi
 
         # Display devices with numbers
-        IFS=$'\n' read -r -a device_list <<<"$devices"
-        for i in "${!device_list[@]}"; do
-            echo "$((i+1)). ${device_list[$i]}"
+        device_list=$(echo "$devices" | tr '\n' '\n')
+        i=1
+        echo "$device_list" | while IFS= read -r device; do
+            printf "%d. %s\n" "$i" "$device"
+            i=$((i + 1))
         done
-        echo "0. Exit to main menu"
-        echo -n "$prompt_msg"
-        read -e choice
+        printf "0. Exit to main menu\n"
+        printf "%s\n" "$prompt_msg"
+        read choice
 
         # Validate the choice
-        if [[ $choice =~ ^[0-9]+$ ]] && [ "$choice" -le "${#device_list[@]}" ] && [ "$choice" -gt 0 ]; then
-            device=${device_list[$((choice-1))]}
+        if echo "$choice" | grep -qE '^[0-9]+$' && [ "$choice" -le "$((i - 1))" ] && [ "$choice" -gt 0 ]; then
+            device=$(echo "$device_list" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
             if bluetoothctl info "$mac" > /dev/null 2>&1; then
                 bluetoothctl $command "$mac" && {
-                    colored_echo green "$success_msg"
+                    printf "%b\n" "${GREEN}$success_msg${RC}"
                     break
                 } || {
-                    colored_echo red "$failure_msg"
+                    printf "%b\n" "${RED}$failure_msg${RC}"
                 }
             else
-                colored_echo red "Invalid MAC address. Please try again."
+                printf "%b\n" "${RED}Invalid MAC address. Please try again.${RC}"
             fi
         elif [ "$choice" -eq 0 ]; then
             return
         else
-            colored_echo red "Invalid choice. Please try again."
+            printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
     done
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu..."
+    read -r dummy
 }
 
 # Function to pair with a device
@@ -158,5 +147,6 @@ remove_device() {
 
 # Initialize
 checkEnv
+checkEscalationTool
 setupBluetooth
 main_menu
