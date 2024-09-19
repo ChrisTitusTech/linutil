@@ -41,6 +41,10 @@ description = "Flatpak is a universal application sandbox for Linux that uses is
 script = "setup-flatpak.sh"
 
 [[data]]
+name = "Bottles setup"
+script = "bottles-setup.sh"
+
+[[data]]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
