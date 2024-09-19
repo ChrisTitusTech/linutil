@@ -407,20 +407,7 @@ impl AppState {
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() && selected_index == 0 {
-            return false;
-        }
-
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
-
-        self.filter
-            .item_list()
-            .get(selected_index)
-            .map_or(false, |item| !item.has_children)
+        !self.selected_item_is_dir()
     }
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
