@@ -32,17 +32,23 @@ data = "command_exists"
 values =  ["dnf"]
 
 [[data.entries]]
-name = "RPM Fusion Setup"
-description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
-script = "fedora/rpm-fusion-setup.sh"
-
-[[data.entries]]
 name = "Configure DNF"
+description = "Optimizes DNF for parallel downloads"
 script = "fedora/configure-dnf.sh"
 
 [[data.entries]]
 name = "Multimedia Setup"
 script = "fedora/multimedia-codecs.sh"
+
+[[data.entries]]
+name = "RPM Fusion Setup"
+description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
+script = "fedora/rpm-fusion-setup.sh"
+
+[[data.entries]]
+name = "Virtualization Setup"
+description = "Enables Virtualization through dnf"
+script = "fedora/virtualization.sh"
 
 [[data]]
 name = "Full System Cleanup"
