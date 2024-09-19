@@ -8,12 +8,12 @@ install_timeshift() {
     printf "%b\n" "${YELLOW}Checking if Timeshift is installed...${RC}"
 
     if ! command_exists timeshift; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm timeshift
+                $ESCALATION_TOOL "$PACKAGER" -S --noconfirm timeshift
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y timeshift
+                $ESCALATION_TOOL "$PACKAGER" install -y timeshift
                 ;;
         esac
     else

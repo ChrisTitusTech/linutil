@@ -15,12 +15,12 @@ installAutoCpufreq() {
         # Install git if not already installed
         if ! command_exists git; then
             printf "%b\n" "${YELLOW}git not found. Installing git...${RC}"
-            case ${PACKAGER} in
+            case "$PACKAGER" in
                 pacman)
-                    $ESCALATION_TOOL ${PACKAGER} -S --needed --noconfirm git
+                    $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm git
                     ;;
                 *)
-                    $ESCALATION_TOOL ${PACKAGER} install -y git
+                    $ESCALATION_TOOL "$PACKAGER" install -y git
                     ;;
             esac
         fi
@@ -31,7 +31,7 @@ installAutoCpufreq() {
             git clone https://github.com/AdnanHodzic/auto-cpufreq.git
         fi
 
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             *)
                 cd auto-cpufreq
                 printf "%b\n" "${YELLOW}Running auto-cpufreq installer...${RC}"
