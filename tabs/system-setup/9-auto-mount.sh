@@ -44,7 +44,7 @@ create_mount_point() {
         printf "%b\n" "Mount point doesn't exist. Creating it..."
         $ESCALATION_TOOL mkdir -p "$mount_point"
     else
-        printf "%b\n" "Mount point already exists."
+        printf "%b\n" "${RED}Mount point already exists.${RC}"
     fi
 }
 
