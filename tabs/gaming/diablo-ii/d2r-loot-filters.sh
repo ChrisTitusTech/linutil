@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -e
 
 . ../../common-script.sh
 
