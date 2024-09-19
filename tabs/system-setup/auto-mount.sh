@@ -6,9 +6,9 @@
 select_drive() {
     clear
     printf "%b\n" "Available drives and partitions:"
-    lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID | grep -v 'loop' # list all non-loop devices
+    lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,UUID | grep -v 'loop' | more # list all non-loop devices
     printf "\n"
-    printf "%b\n" "Enter the drive/partition name (e.g., sda1, sdb1): "
+    printf "%b" "Enter the drive/partition name (e.g., sda1, sdb1): "
     read -r drive_name
     # Check if the input is valid
     if lsblk | grep -q "${drive_name}"; then
