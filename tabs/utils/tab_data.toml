@@ -30,6 +30,10 @@ description = "This utility is designed to manage services in your system"
 script = "service-control.sh"
 
 [[data]]
+name = "SSH Commands"
+script = "ssh.sh"
+
+[[data]]
 name = "Auto Login"
 script = "auto-login.sh"
 
