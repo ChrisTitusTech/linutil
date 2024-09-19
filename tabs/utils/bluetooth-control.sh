@@ -35,13 +35,13 @@ main_menu() {
         clear
         printf "%b\n" "${YELLOW}Bluetooth Manager${RC}"
         printf "%b\n" "${YELLOW}=================${RC}"
-        echo "1. Scan for devices"
-        echo "2. Pair with a device"
-        echo "3. Connect to a device"
-        echo "4. Disconnect from a device"
-        echo "5. Remove a device"
-        echo "0. Exit"
-        echo -n "Choose an option: "
+        printf "1. Scan for devices\n"
+        printf "2. Pair with a device\n"
+        printf "3. Connect to a device\n"
+        printf "4. Disconnect from a device\n"
+        printf "5. Remove a device\n"
+        printf "0. Exit\n"
+        printf -n "Choose an option: "
         read choice
 
         case $choice in
@@ -66,7 +66,7 @@ scan_devices() {
         printf "%b\n" "${RED}No devices found.${RC}"
     else
         printf "%b\n" "${GREEN}Devices found:${RC}"
-        echo "$devices"
+        printf "%s\n" "$devices"
     fi
     printf "Press any key to return to the main menu..."
     read -r dummy
@@ -94,11 +94,11 @@ prompt_for_mac() {
         device_list=$(echo "$devices" | tr '\n' '\n')
         i=1
         echo "$device_list" | while IFS= read -r device; do
-            echo "$i. $device"
+            printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
-        echo "0. Exit to main menu"
-        echo -n "$prompt_msg"
+        printf "0. Exit to main menu\n"
+        printf "%s\n" "$prompt_msg"
         read choice
 
         # Validate the choice
