@@ -54,7 +54,7 @@ display_models() {
 
 # Function to select model based on user input
 select_model() {
-    local choice="$1"
+    choice="$1"
     case $choice in
         1) printf "%b\n" "llama3.1";;
         2) printf "%b\n" "llama3.1:70b";;
