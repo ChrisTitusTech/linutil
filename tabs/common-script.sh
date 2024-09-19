@@ -5,10 +5,11 @@
 RC='\033[0m'
 RED='\033[31m'
 YELLOW='\033[33m'
+CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-    which "$1" >/dev/null 2>&1
+    command -v "$1" >/dev/null 2>&1
 }
 
 checkAURHelper() {
@@ -19,22 +20,22 @@ checkAURHelper() {
             for helper in ${AUR_HELPERS}; do
                 if command_exists "${helper}"; then
                     AUR_HELPER=${helper}
-                    echo "Using ${helper} as AUR helper"
+                    printf "Using ${helper} as AUR helper"
                     AUR_HELPER_CHECKED=true
                     return 0
                 fi
             done
 
-            echo "Installing yay as AUR helper..."
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-            cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER":"$USER" ./yay-git
-            cd yay-git && makepkg --noconfirm -si
+            printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel
+            cd /opt && "$ESCALATION_TOOL" git clone https://aur.archlinux.org/yay-bin.git && "$ESCALATION_TOOL" chown -R "$USER":"$USER" ./yay-bin
+            cd yay-bin && makepkg --noconfirm -si
 
             if command_exists yay; then
                 AUR_HELPER="yay"
                 AUR_HELPER_CHECKED=true
             else
-                echo -e "${RED}Failed to install AUR helper.${RC}"
+                printf "%b\n" "${RED}Failed to install AUR helper.${RC}"
                 exit 1
             fi
         fi
@@ -48,7 +49,7 @@ checkEscalationTool() {
         for tool in ${ESCALATION_TOOLS}; do
             if command_exists "${tool}"; then
                 ESCALATION_TOOL=${tool}
-                echo "Using ${tool} for privilege escalation"
+                printf "Using ${tool} for privilege escalation"
                 ESCALATION_TOOL_CHECKED=true
                 return 0
             fi
@@ -64,7 +65,7 @@ checkCommandRequirements() {
     REQUIREMENTS=$1
     for req in ${REQUIREMENTS}; do
         if ! command_exists "${req}"; then
-            echo "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
+            printf "%b\n" "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
             exit 1
         fi
     done
@@ -76,12 +77,12 @@ checkPackageManager() {
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists "${pgm}"; then
             PACKAGER=${pgm}
-            echo "Using ${pgm}"
+            printf "Using ${pgm}"
             break
         fi
     done
 
-    if [ -z "${PACKAGER}" ]; then
+    if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
@@ -93,14 +94,14 @@ checkSuperUser() {
     for sug in ${SUPERUSERGROUP}; do
         if groups | grep -q "${sug}"; then
             SUGROUP=${sug}
-            echo "Super user group ${SUGROUP}"
+            printf "Super user group ${SUGROUP}"
             break
         fi
     done
 
     ## Check if member of the sudo group.
     if ! groups | grep -q "${SUGROUP}"; then
-        echo "${RED}You need to be a member of the sudo group to run me!${RC}"
+        printf "%b\n" "${RED}You need to be a member of the sudo group to run me!${RC}"
         exit 1
     fi
 }
@@ -109,7 +110,7 @@ checkCurrentDirectoryWritable() {
     ## Check if the current directory is writable.
     GITPATH="$(dirname "$(realpath "$0")")"
     if [ ! -w "$GITPATH" ]; then
-        echo "${RED}Can't write to $GITPATH${RC}"
+        printf "%b\n" "${RED}Can't write to $GITPATH${RC}"
         exit 1
     fi
 }
@@ -125,7 +126,7 @@ checkDistro() {
 
 checkEnv() {
     checkCommandRequirements 'curl groups sudo'
-    checkPackageManager 'apt-get nala dnf pacman zypper yum xbps-install nix-env'
+    checkPackageManager 'nala apt-get dnf pacman zypper yum xbps-install nix-env'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

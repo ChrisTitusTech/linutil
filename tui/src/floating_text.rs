@@ -8,21 +8,29 @@ use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, List},
+    widgets::{Block, Borders, Clear, List},
     Frame,
 };
-
+pub enum FloatingTextMode {
+    Preview,
+    Description,
+}
 pub struct FloatingText {
     text: Vec<String>,
+    mode: FloatingTextMode,
     scroll: usize,
 }
 
 impl FloatingText {
-    pub fn new(text: Vec<String>) -> Self {
-        Self { text, scroll: 0 }
+    pub fn new(text: Vec<String>, mode: FloatingTextMode) -> Self {
+        Self {
+            text,
+            scroll: 0,
+            mode,
+        }
     }
 
-    pub fn from_command(command: &Command) -> Option<Self> {
+    pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
         let lines = match command {
             Command::Raw(cmd) => {
                 // Reconstruct the line breaks and file formatting after the
@@ -38,7 +46,7 @@ impl FloatingText {
             // If command is a folder, we don't display a preview
             Command::None => return None,
         };
-        Some(Self::new(lines))
+        Some(Self::new(lines, mode))
     }
 
     fn scroll_down(&mut self) {
@@ -57,8 +65,16 @@ impl FloatingText {
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         // Define the Block with a border and background color
+        let block_title = match self.mode {
+            FloatingTextMode::Preview => "Command Preview",
+            FloatingTextMode::Description => "Command Description",
+        };
+
         let block = Block::default()
             .borders(Borders::ALL)
+            .title(block_title)
+            .title_alignment(ratatui::layout::Alignment::Center)
+            .title_style(Style::default().reversed())
             .style(Style::default());
 
         // Draw the Block first
@@ -68,7 +84,7 @@ impl FloatContent for FloatingText {
         let inner_area = block.inner(area);
 
         // Create the list of lines to be displayed
-        let lines: Vec<Line> = self
+        let mut lines: Vec<Line> = self
             .text
             .iter()
             .skip(self.scroll)
@@ -90,6 +106,9 @@ impl FloatContent for FloatingText {
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
+
+        // Clear the text underneath the floats rendered area
+        frame.render_widget(Clear, inner_area);
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
