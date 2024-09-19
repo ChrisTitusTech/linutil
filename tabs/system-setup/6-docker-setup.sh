@@ -27,14 +27,14 @@ install_docker() {
             curl -fsSL https://get.docker.com | sh 
             ;;
         zypper)
-            $ESCALATION_TOOL ${PACKAGER} --non-interactive install docker
-            $ESCALATION_TOOL systemctl enable docker
-            $ESCALATION_TOOL systemctl start docker
+            "$ESCALATION_TOOL" ${PACKAGER} --non-interactive install docker
+            "$ESCALATION_TOOL" systemctl enable docker
+            "$ESCALATION_TOOL" systemctl start docker
             ;;
         pacman)
-            $ESCALATION_TOOL ${PACKAGER} -S --noconfirm docker
-            $ESCALATION_TOOL systemctl enable docker
-            $ESCALATION_TOOL systemctl start docker
+            "$ESCALATION_TOOL" ${PACKAGER} -S --noconfirm docker
+            "$ESCALATION_TOOL" systemctl enable docker
+            "$ESCALATION_TOOL" systemctl start docker
             ;;
         *)
             printf "${RED}Unsupported package manager. Please install Docker manually.${RC}\n"
@@ -47,14 +47,14 @@ install_docker_compose() {
     printf "%b\n" "${YELLOW}Installing Docker Compose...${RC}"
     case $PACKAGER in
         apt-get | yum)
-            $ESCALATION_TOOL ${PACKAGER} update
-            $ESCALATION_TOOL ${PACKAGER} install -y docker-compose-plugin
+            "$ESCALATION_TOOL" ${PACKAGER} update
+            "$ESCALATION_TOOL" ${PACKAGER} install -y docker-compose-plugin
             ;;
         zypper)
-            $ESCALATION_TOOL ${PACKAGER} --non-interactive install docker-compose
+            "$ESCALATION_TOOL" ${PACKAGER} --non-interactive install docker-compose
             ;;
         pacman)
-            $ESCALATION_TOOL ${PACKAGER} -S --noconfirm docker-compose
+            "$ESCALATION_TOOL" ${PACKAGER} -S --noconfirm docker-compose
             ;;
         *)
             printf "${RED}Unsupported package manager. Please install Docker Compose manually.${RC}\n"
