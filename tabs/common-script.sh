@@ -9,7 +9,7 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-    which "$1" >/dev/null 2>&1
+    command -v "$1" >/dev/null 2>&1
 }
 
 checkAURHelper() {
