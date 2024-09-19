@@ -4,6 +4,9 @@
 ![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge)
 [![](https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp)](https://discord.gg/bujFYKAHSp)
 
+<!-- TODO: crates.io package here + <br> -->
+[![linutil AUR Version](https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff)](https://aur.archlinux.org/packages/linutil) [![linutil-bin AUR Version](https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff)](https://aur.archlinux.org/packages/linutil-bin)
+
 ![Preview](docs/assets/preview.png)
 
 **Linutil** is a distro-agnostic toolbox designed to simplify everyday Linux tasks. It helps you set up applications and optimize your system for specific use cases. The utility is actively developed in Rust 🦀, providing performance and reliability.
@@ -31,7 +34,9 @@ For comprehensive information on how to use Linutil, visit the [Linutil Official
 
 ## 🛠 Contributing
 
-We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
+We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](.github/CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
+
+[Official LinUtil Roadmap](https://christitustech.github.io/linutil/roadmap)
 
 ## 🏅 Thanks to All Contributors
 

@@ -4,62 +4,49 @@
 
 # Function to check if NetworkManager is installed
 setupNetworkManager() {
-    echo "Install NetworkManger if not already installed..."
+    printf "%b\n" "${YELLOW}Installing NetworkManager...${RC}"
     if ! command_exists nmcli; then
-        case ${PACKAGER} in
+        case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "${PACKAGER}" -S --noconfirm networkmanager
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm networkmanager
                 ;;
             dnf)
-                $ESCALATION_TOOL "${PACKAGER}" install -y NetworkManager-1
+                "$ESCALATION_TOOL" "$PACKAGER" install -y NetworkManager-1
                 ;;
             *)
-                $ESCALATION_TOOL "${PACKAGER}" install -y network-manager
+                "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
                 ;;
         esac
     else
-        echo "NetworkManager is already installed."
+        printf "%b\n" "${YELLOW}NetworkManager is already installed.${RC}"
     fi
     
     # Check if NetworkManager service is running
     if ! systemctl is-active --quiet NetworkManager; then
-        echo "NetworkManager service is not running. Starting it now..."
-        $ESCALATION_TOOL systemctl start NetworkManager
+        printf "%b\n" "${YELLOW}NetworkManager service is not running. Starting it now...${RC}"
+        "$ESCALATION_TOOL" systemctl start NetworkManager
         
         if systemctl is-active --quiet NetworkManager; then
-            echo "NetworkManager service started successfully."
+            printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"
         fi
     fi
-}
-
-# Function to display colored text
-colored_echo() {
-    local color=$1
-    local text=$2
-    case $color in
-        red) echo -e "\033[31m$text\033[0m" ;;
-        green) echo -e "\033[32m$text\033[0m" ;;
-        yellow) echo -e "\033[33m$text\033[0m" ;;
-        blue) echo -e "\033[34m$text\033[0m" ;;
-        *) echo "$text" ;;
-    esac
 }
 
 # Function to display the main menu
 main_menu() {
     while true; do
         clear
-        colored_echo blue "WiFi Manager"
-        colored_echo blue "============"
-        echo "1. Turn WiFi On"
-        echo "2. Turn WiFi Off"
-        echo "3. Scan for WiFi networks"
-        echo "4. Connect to a WiFi network"
-        echo "5. Disconnect from a WiFi network"
-        echo "6. Remove a WiFi connection"
-        echo "0. Exit"
-        echo -n "Choose an option: "
-        read -e choice
+        printf "%b\n" "${YELLOW}WiFi Manager${RC}"
+        printf "%b\n" "${YELLOW}============${RC}"
+        printf "1. Turn WiFi On\n"
+        printf "2. Turn WiFi Off\n"
+        printf "3. Scan for WiFi networks\n"
+        printf "4. Connect to a WiFi network\n"
+        printf "5. Disconnect from a WiFi network\n"
+        printf "6. Remove a WiFi connection\n"
+        printf "0. Exit\n"
+        printf "Choose an option: "
+        read choice
 
         case $choice in
             1) wifi_on ;;
@@ -69,7 +56,7 @@ main_menu() {
             5) disconnect_network ;;
             6) remove_network ;;
             0) exit 0 ;;
-            *) colored_echo red "Invalid option. Please try again." ;;
+            *) printf "%b\n" "${RED}Invalid option. Please try again.${RC}" ;;
         esac
     done
 }
@@ -77,108 +64,97 @@ main_menu() {
 # Function to scan for WiFi networks
 scan_networks() {
     clear
-    colored_echo yellow "Scanning for WiFi networks..."
-    networks=$(nmcli -t -f SSID,BSSID,SIGNAL dev wifi list | head -n 10)
+    printf "%b\n" "${YELLOW}Scanning for WiFi networks...${RC}"
+    networks=$(nmcli -t -f SSID,BSSID,SIGNAL dev wifi list | awk -F: '!seen[$1]++' | head -n 10)
     if [ -z "$networks" ]; then
-        colored_echo red "No networks found."
+        printf "%b\n" "${RED}No networks found.${RC}"
     else
-        colored_echo green "Top 10 Networks found:"
-        echo "$networks" | sed 's/\\//g' | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
+        printf "%b\n" "${GREEN}Top 10 Networks found:${RC}"
+        echo "$networks" | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu...\n"
+    read -r dummy
 }
 
 # Function to turn WiFi on
 wifi_on() {
     clear
-    colored_echo yellow "Turning WiFi on..."
+    printf "%b\n" "${YELLOW}Turning WiFi on...${RC}"
     nmcli radio wifi on && {
-        colored_echo green "WiFi is now turned on."
+        printf "%b\n" "${GREEN}WiFi is now turned on.${RC}"
     } || {
-        colored_echo red "Failed to turn on WiFi."
+        printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu...\n"
+    read -r dummy
 }
 
 # Function to turn WiFi off
 wifi_off() {
     clear
-    colored_echo yellow "Turning WiFi off..."
+    printf "%b\n" "${YELLOW}Turning WiFi off...${RC}"
     nmcli radio wifi off && {
-        colored_echo green "WiFi is now turned off."
+        printf "%b\n" "${GREEN}WiFi is now turned off.${RC}"
     } || {
-        colored_echo red "Failed to turn off WiFi."
+        printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
-    read -n 1
+    printf "Press any key to return to the main menu...\n"
+    read -r dummy
 }
 
 # Function to prompt for WiFi network selection
 prompt_for_network() {
-    local action=$1
-    local prompt_msg=$2
-    local success_msg=$3
-    local failure_msg=$4
+    action=$1
+    prompt_msg=$2
+    success_msg=$3
+    failure_msg=$4
+    temp_file=$(mktemp)
 
     while true; do
         clear
-        networks=$(nmcli -t -f SSID dev wifi list | head -n 10)
+        networks=$(nmcli -t -f SSID dev wifi list | awk -F: '!seen[$1]++' | grep -v '^$')
         if [ -z "$networks" ]; then
-            colored_echo red "No networks available. Please scan for networks first."
-            echo "Press any key to return to the main menu..."
-            read -n 1
+            printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
+            printf "Press any key to return to the main menu...\n"
+            read -r dummy
+            rm -f "$temp_file"
             return
         fi
 
-        # Display networks with numbers
-        IFS=$'\n' read -r -a network_list <<<"$networks"
-        for i in "${!network_list[@]}"; do
-            ssid=$(echo "${network_list[$i]}" | awk -F: '{print $1}')
-            echo "$((i+1)). SSID: $ssid"
-        done
-        echo "0. Exit to main menu"
-        echo -n "$prompt_msg"
-        read -e choice
+        echo "$networks" > "$temp_file"
 
-        # Validate the choice
-        if [[ $choice =~ ^[0-9]+$ ]] && [ "$choice" -le "${#network_list[@]}" ] && [ "$choice" -gt 0 ]; then
-            network=${network_list[$((choice-1))]}
+        i=1
+        while IFS= read -r network; do
             ssid=$(echo "$network" | awk -F: '{print $1}')
-            if [ "$action" == "connect" ]; then
-                echo -n "Enter password for SSID $ssid: "
-                read -s password
-                echo
+            printf "%d. SSID: %s\n" "$i" "$ssid"
+            i=$((i + 1))
+        done < "$temp_file"
+
+        printf "0. Exit to main menu\n"
+        printf "%s" "$prompt_msg"
+        read choice
+
+        if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
+            ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
+            if [ "$action" = "connect" ]; then
+                printf "Enter password for SSID %s: " "$ssid"
+                read password
+                printf "\n"
                 nmcli dev wifi connect "$ssid" password "$password" && {
-                    colored_echo green "$success_msg"
-                    break
+                    printf "%b\n" "${GREEN}$success_msg${RC}"
                 } || {
-                    colored_echo red "$failure_msg"
-                }
-            elif [ "$action" == "disconnect" ]; then
-                nmcli connection down "$ssid" && {
-                    colored_echo green "$success_msg"
-                    break
-                } || {
-                    colored_echo red "$failure_msg"
-                }
-            elif [ "$action" == "remove" ]; then
-                nmcli connection delete "$ssid" && {
-                    colored_echo green "$success_msg"
-                    break
-                } || {
-                    colored_echo red "$failure_msg"
+                    printf "%b\n" "${RED}$failure_msg${RC}"
                 }
             fi
-        elif [ "$choice" -eq 0 ]; then
-            return
         else
-            colored_echo red "Invalid choice. Please try again."
+            printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
+
+        printf "Press any key to return to the selection menu...\n"
+        read -r dummy
     done
-    echo "Press any key to return to the main menu..."
-    read -n 1
+
+    rm -f "$temp_file"
 }
 
 # Function to connect to a WiFi network
@@ -198,5 +174,6 @@ remove_network() {
 
 # Initialize
 checkEnv
+checkEscalationTool
 setupNetworkManager
 main_menu

@@ -14,7 +14,6 @@ use std::{
 use crate::theme::Theme;
 use clap::Parser;
 use crossterm::{
-    cursor::RestorePosition,
     event::{self, DisableMouseCapture, Event, KeyEventKind},
     style::ResetColor,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -38,7 +37,7 @@ struct Args {
     override_validation: bool,
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> io::Result<()> {
     let args = Args::parse();
 
     let mut state = AppState::new(args.theme, args.override_validation);
@@ -55,8 +54,8 @@ fn main() -> std::io::Result<()> {
     terminal.backend_mut().execute(LeaveAlternateScreen)?;
     terminal.backend_mut().execute(DisableMouseCapture)?;
     terminal.backend_mut().execute(ResetColor)?;
-    terminal.backend_mut().execute(RestorePosition)?;
     terminal.show_cursor()?;
+
     Ok(())
 }
 
