@@ -131,15 +131,13 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 } else {
                     hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
                     hints.push(get_list_item_shortcut(state));
+                    if state.selected_item_is_cmd() {
+                        hints.push(Shortcut::new(vec!["p"], "Enable preview"));
+                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
+                    }
                 }
-
                 hints.push(Shortcut::new(vec!["Tab"], "Focus tab list"));
             };
-
-            if state.selected_item_is_cmd() {
-                hints.push(Shortcut::new(vec!["p"], "Enable preview"));
-                hints.push(Shortcut::new(vec!["d"], "Command Description"));
-            }
 
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
