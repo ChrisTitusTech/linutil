@@ -21,7 +21,7 @@ adjust_monitor_brightness() {
         done
 
         printf "Enter the number of the monitor (or 'q' to quit): "
-        read monitor_choice
+        read -r monitor_choice
 
         if [ "$monitor_choice" = "q" ]; then
             printf "%b\n" "${RED}Exiting...${RC}"
@@ -31,14 +31,14 @@ adjust_monitor_brightness() {
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$'; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "Press [Enter] to continue..."
-            read dummy
+            read -r dummy
             continue
         fi
 
         if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$#" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "Press [Enter] to continue..."
-            read dummy
+            read -r dummy
             continue
         fi
 
@@ -51,7 +51,7 @@ adjust_monitor_brightness() {
 
         while true; do
             printf "Enter the new brightness value as a percentage (10 to 100, or 'q' to quit): "
-            read new_brightness_percentage
+            read -r new_brightness_percentage
 
             if [ "$new_brightness_percentage" = "q" ]; then
                 printf "%b\n" "${RED}Exiting...${RC}"
@@ -68,7 +68,7 @@ adjust_monitor_brightness() {
             new_brightness=$(awk "BEGIN {printf \"%.2f\", $new_brightness_percentage / 100}")
 
             printf "Set brightness for $monitor_name to $new_brightness_percentage%? (y/n): "
-            read confirm
+            read -r confirm
             if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
                 printf "%b\n" "${GREEN}Setting brightness for $monitor_name to $new_brightness_percentage%${RC}"
                 execute_command "xrandr --output $monitor_name --brightness $new_brightness"

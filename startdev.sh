@@ -11,32 +11,31 @@ get_latest_release() {
     grep -oP '"tag_name": "\K[^"]*' | 
     head -n 1)
   if [ -z "$latest_release" ]; then
-    echo "Error fetching release data" >&2
+    printf "%b\n" "Error fetching release data" >&2
     return 1
   fi
-  echo "$latest_release"
+  printf "%b\n" "$latest_release"
 }
 
 # Function to redirect to the latest pre-release version
 redirect_to_latest_pre_release() {
-  local latest_release
   latest_release=$(get_latest_release)
   if [ -n "$latest_release" ]; then
     url="https://github.com/ChrisTitusTech/linutil/releases/download/$latest_release/linutil"
   else
-    echo 'Unable to determine latest pre-release version.' >&2
-    echo "Using latest Full Release"
+    printf "%b\n" 'Unable to determine latest pre-release version.' >&2
+    printf "%b\n" "Using latest Full Release"
     url="https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil"
   fi
   addArch
-  echo "Using URL: $url"  # Log the URL being used
+  printf "%b\n" "Using URL: $url"
 }
 
 check() {
-    local exit_code=$1
-    local message=$2
+    exit_code=$1
+    message=$2
 
-    if [ $exit_code -ne 0 ]; then
+    if [ "$exit_code" -ne 0 ]; then
         printf "%b\n" "${RED}ERROR: $message${RC}"
         exit 1
     fi
@@ -63,16 +62,16 @@ redirect_to_latest_pre_release
 TMPFILE=$(mktemp)
 check $? "Creating the temporary file"
 
-echo "Downloading linutil from $url"  # Log the download attempt
-curl -fsL $url -o $TMPFILE
+printf "%b\n" "Downloading linutil from $url"
+curl -fsL "$url" -o "$TMPFILE"
 check $? "Downloading linutil"
 
-chmod +x $TMPFILE
+chmod +x "$TMPFILE"
 check $? "Making linutil executable"
 
 "$TMPFILE"
 check $? "Executing linutil"
 
-rm -f $TMPFILE
+rm -f "$TMPFILE"
 check $? "Deleting the temporary file"
 } # End of wrapping

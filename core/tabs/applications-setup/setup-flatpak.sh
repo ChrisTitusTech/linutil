@@ -51,7 +51,7 @@ setup_flatpak() {
         if command -v flatpak >/dev/null 2>&1; then
             if ! flatpak remotes | grep -q "flathub"; then
                 printf "%b\n" "${YELLOW}Detected Flatpak package manager but Flathub remote is not added. Would you like to add it? (y/n)${RC}"
-                read add_remote
+                read -r add_remote
                 case "$add_remote" in
                     [Yy]*)
                         printf "%b\n" "Adding Flathub remote..."
@@ -71,14 +71,14 @@ setup_flatpak() {
         # So in case the user wants to use a GUI siftware manager they can setup it here
         if [ "$DE" = "GNOME" ]; then
             printf "%b\n" "${YELLOW}Detected GNOME desktop environment. Would you like to install GNOME Software plugin for Flatpak? (y/n)${RC}"
-            read install_gnome
+            read -r install_gnome
             if [ "$install_gnome" = "y" ] || [ "$install_gnome" = "Y" ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y gnome-software-plugin-flatpak
             fi
         # Useful for Debian KDE spin as well
         elif [ "$DE" = "KDE" ]; then
             printf "%b\n" "${YELLOW}Detected KDE desktop environment. Would you like to install KDE Plasma Discover backend for Flatpak? (y/n)${RC}"
-            read install_kde
+            read -r install_kde
             if [ "$install_kde" = "y" ] || [ "$install_kde" = "Y" ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y plasma-discover-backend-flatpak
             fi
