@@ -1,0 +1,85 @@
+#!/bin/sh -e
+
+. ./utility_functions.sh
+
+# Function to adjust brightness for a selected monitor
+adjust_monitor_brightness() {
+    while true; do
+        monitor_list=$(detect_connected_monitors)
+        monitor_array=$(echo "$monitor_list" | tr '\n' ' ')
+        set -- $monitor_array
+        count=1
+
+        clear
+        printf "%b\n" "${YELLOW}=========================================${RC}"
+        printf "%b\n" "${YELLOW}  Adjust Monitor Brightness${RC}"
+        printf "%b\n" "${YELLOW}=========================================${RC}"
+        printf "%b\n" "${YELLOW}Choose a monitor to adjust brightness:${RC}"
+        for monitor in "$@"; do
+            echo "$count. $monitor"
+            count=$((count + 1))
+        done
+
+        printf "Enter the number of the monitor (or 'q' to quit): "
+        read monitor_choice
+
+        if [ "$monitor_choice" = "q" ]; then
+            printf "%b\n" "${RED}Exiting...${RC}"
+            return
+        fi
+
+        if ! echo "$monitor_choice" | grep -qE '^[0-9]+$'; then
+            printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
+            printf "Press [Enter] to continue..."
+            read dummy
+            continue
+        fi
+
+        if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$#" ]; then
+            printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
+            printf "Press [Enter] to continue..."
+            read dummy
+            continue
+        fi
+
+        monitor_name=$(eval echo "\${$monitor_choice}")
+        current_brightness=$(get_current_brightness "$monitor_name")
+
+        # Correctly calculate the brightness percentage
+        current_brightness_percentage=$(awk "BEGIN {printf \"%.0f\", $current_brightness * 100}")
+        printf "%b\n" "${YELLOW}Current brightness for $monitor_name${RC}: ${GREEN}$current_brightness_percentage%${RC}"
+
+        while true; do
+            printf "Enter the new brightness value as a percentage (10 to 100, or 'q' to quit): "
+            read new_brightness_percentage
+
+            if [ "$new_brightness_percentage" = "q" ]; then
+                printf "%b\n" "${RED}Exiting...${RC}"
+                return
+            fi
+
+            # Validate brightness input: accept only values above 10
+            if ! echo "$new_brightness_percentage" | grep -qE '^[0-9]+$' || [ "$new_brightness_percentage" -lt 10 ] || [ "$new_brightness_percentage" -gt 100 ]; then
+                printf "%b\n" "${RED}Invalid brightness value. Please enter a value between 10 and 100.${RC}"
+                continue
+            fi
+
+            # Convert percentage to xrandr brightness value (10% to 0.10)
+            new_brightness=$(awk "BEGIN {printf \"%.2f\", $new_brightness_percentage / 100}")
+
+            printf "Set brightness for $monitor_name to $new_brightness_percentage%? (y/n): "
+            read confirm
+            if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+                printf "%b\n" "${GREEN}Setting brightness for $monitor_name to $new_brightness_percentage%${RC}"
+                execute_command "xrandr --output $monitor_name --brightness $new_brightness"
+                printf "%b\n" "${GREEN}Brightness for $monitor_name set to $new_brightness_percentage% successfully.${RC}"
+                break
+            else
+                printf "%b\n" "${RED}Action canceled. Please choose a different brightness value.${RC}"
+            fi
+        done
+    done
+}
+
+# Call the adjust_monitor_brightness function
+adjust_monitor_brightness

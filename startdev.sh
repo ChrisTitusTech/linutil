@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/sh -e
 
+# Prevent execution if this script was only partially downloaded
+{
 RC='\033[0m'
 RED='\033[0;31m'
 
@@ -35,7 +37,7 @@ check() {
     local message=$2
 
     if [ $exit_code -ne 0 ]; then
-        echo -e "${RED}ERROR: $message${RC}"
+        printf "%b\n" "${RED}ERROR: $message${RC}"
         exit 1
     fi
 }
@@ -73,3 +75,4 @@ check $? "Executing linutil"
 
 rm -f $TMPFILE
 check $? "Deleting the temporary file"
+} # End of wrapping

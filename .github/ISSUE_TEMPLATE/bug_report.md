@@ -24,3 +24,9 @@ If applicable, add screenshots to help explain your problem.
 
 ## Additional context
 Add any other context about the problem here.
+
+## Checklist
+- [ ] I checked for duplicate issues.
+- [ ] I checked already existing discussions.
+- [ ] This issue is not included in the roadmap.
+- [ ] This issue is present on both stable and development branches.

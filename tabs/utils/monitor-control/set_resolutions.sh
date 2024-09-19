@@ -22,7 +22,8 @@ set_resolutions() {
             i=$((i + 1))
         done
 
-        read -p "Enter the choice (or 'q' to quit): " monitor_choice
+        printf "%b\n" "Enter the choice (or 'q' to quit): "
+        read -r monitor_choice
 
         if [ "$monitor_choice" = "q" ]; then
             printf "%b\n" "${RED}Exiting...${RC}"
@@ -31,7 +32,8 @@ set_resolutions() {
 
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
-            read -p "Press [Enter] to continue..."
+            printf "%b\n" "Press [Enter] to continue..."
+            read -r dummy
             continue
         fi
 
@@ -39,11 +41,11 @@ set_resolutions() {
         resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
         temp_res_file=$(mktemp)
-        echo "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
+        printf "%b\n" "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
 
         i=1
         while read -r resolution; do
-            resolution_map[$i]="$resolution"
+            echo "$resolution" >> "$temp_res_file"
             i=$((i + 1))
         done < "$temp_res_file"
 
@@ -54,7 +56,8 @@ set_resolutions() {
         awk '{print $1 ". " $2}' "$temp_res_file"
 
         while true; do
-            read -p "Enter the choice (or 'q' to quit): " resolution_choice
+            printf "%b\n" "Enter the choice (or 'q' to quit): "
+            read -r resolution_choice
 
             if [ "$resolution_choice" = "q" ]; then
                 printf "%b\n" "${RED}Exiting...${RC}"
@@ -67,10 +70,10 @@ set_resolutions() {
                 continue
             fi
 
-            # Map the index to the actual resolution
-            selected_resolution=${resolution_map[$resolution_choice]}
+            selected_resolution=$(awk "NR==$resolution_choice" "$temp_res_file")
 
-            read -p "Set resolution for $monitor_name to $selected_resolution? (y/n): " confirm
+            printf "%b\n" "Set resolution for $monitor_name to $selected_resolution? (y/n): "
+            read -r confirm
             if echo "$confirm" | grep -qE '^[Yy]$'; then
                 printf "%b\n" "${GREEN}Setting resolution for $monitor_name to $selected_resolution${RC}"
                 execute_command "xrandr --output $monitor_name --mode $selected_resolution"
