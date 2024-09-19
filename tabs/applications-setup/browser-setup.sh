@@ -172,6 +172,7 @@ install_chromium() {
         *)
             printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
             ;;
+    esac
 }
 
 install_lynx() {
@@ -192,6 +193,7 @@ install_lynx() {
         *)
             printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
             ;;
+    esac
 }
 
 browserSetup() {
