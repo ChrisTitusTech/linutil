@@ -1,9 +1,7 @@
 name: Differential ShellCheck
 
 on:
-  push:
   pull_request:
-    branches: [main]
     paths:
       - "**/*.sh"
   merge_group:
