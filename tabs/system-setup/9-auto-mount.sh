@@ -41,7 +41,7 @@ create_mount_point() {
     printf "%b\n" "Enter the mount point path (e.g., /mnt/hdd): "
     read -r mount_point
     if [ ! -d "$mount_point" ]; then
-        printf "%b\n" "Mount point doesn't exist. Creating it..."
+        printf "%b\n" "${YELLOW}Mount point doesn't exist. Creating it..${RC}."
         $ESCALATION_TOOL mkdir -p "$mount_point"
     else
         printf "%b\n" "${RED}Mount point already exists.${RC}"
