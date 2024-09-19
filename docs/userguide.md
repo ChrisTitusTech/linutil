@@ -30,3 +30,11 @@
 ## Security Features
 
 - **Firewall Baselines**: Sets up firewall rules.
+
+## Utilities
+
+- **Monitor Control**: Controls monitor settings on X11.
+- **Bluetooth Control**: Controls Bluetooth settings.
+- **Wifi Control**: Controls WiFi settings.
+- **Numlock Control**: Sets up Numlock on boot.
+- **User Account Manager**: Manage users and groups.
