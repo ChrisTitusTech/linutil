@@ -11,6 +11,15 @@ description = "The .bashrc file is a script that runs every time a new terminal 
 script = "mybash-setup.sh"
 
 [[data]]
+name = "Bottles setup"
+script = "bottles-setup.sh"
+
+[[data]]
+name = "Browser Setup"
+description = "An interactive script to install popular browsers."
+script = "browser-setup.sh"
+
+[[data]]
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"
@@ -19,6 +28,11 @@ script = "dwmtitus-setup.sh"
 name = "Fastfetch"
 description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
+
+[[data]]
+name = "Flatpak / Flathub"
+description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
+script = "setup-flatpak.sh"
 
 [[data]]
 name = "Kitty"
@@ -36,20 +50,6 @@ description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu rep
 script = "rofi-setup.sh"
 
 [[data]]
-name = "Flatpak / Flathub"
-description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
-script = "setup-flatpak.sh"
-
-[[data]]
-name = "Bottles setup"
-script = "bottles-setup.sh"
-
-[[data]]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
-
-[[data]]
-name = "Browser Setup"
-description = "An interactive script to install popular browsers."
-script = "browser-setup.sh"
