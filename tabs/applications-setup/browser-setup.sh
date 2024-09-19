@@ -57,7 +57,7 @@ install_thorium() {
 install_firefox() {
     printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
     case "$PACKAGER" in
-        apt-get)
+        apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
             ;;

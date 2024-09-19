@@ -23,7 +23,7 @@ choose_installation() {
 install_docker() {
     printf "%b\n" "${YELLOW}Installing Docker...${RC}"
     case "$PACKAGER" in
-        apt-get | yum)
+        apt-get|nala|yum)
             curl -fsSL https://get.docker.com | sh 
             ;;
         zypper)
@@ -46,7 +46,7 @@ install_docker() {
 install_docker_compose() {
     printf "%b\n" "${YELLOW}Installing Docker Compose...${RC}"
     case "$PACKAGER" in
-        apt-get | yum)
+        apt-get|nala|yum)
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
             ;;

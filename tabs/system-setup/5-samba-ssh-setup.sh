@@ -26,7 +26,7 @@ setup_ssh() {
 
     # Detect package manager and install appropriate SSH package
     case "$PACKAGER" in
-    "apt-get")
+    "apt-get|nala")
         install_package openssh-server
         SSH_SERVICE="ssh"
         ;;

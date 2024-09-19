@@ -10,7 +10,7 @@ if ! command_exists openssl; then
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm openssl
             ;;
-        apt-get)
+        apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         dnf)
