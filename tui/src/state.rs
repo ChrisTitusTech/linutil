@@ -234,12 +234,12 @@ impl AppState {
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
-        if matches!(self.focus, Focus::TabList | Focus::List) {
-            if key.code == KeyCode::Char('q')
-                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL)
-            {
-                return false;
-            }
+        // Exit on 'q' or 'Ctrl-c' input
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && (key.code == KeyCode::Char('q')
+                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        {
+            return false;
         }
 
         // If UI is not drawable returning true will mark as the key handled
@@ -253,20 +253,11 @@ impl AppState {
                     self.focus = Focus::List;
                 }
             }
-
             Focus::Search => match self.filter.handle_key(key) {
                 SearchAction::Exit => self.exit_search(),
                 SearchAction::Update => self.update_items(),
                 _ => {}
             },
-
-            _ if key.code == KeyCode::Char('q')
-                || key.code == KeyCode::Char('c')
-                    && key.modifiers.contains(KeyModifiers::CONTROL) =>
-            {
-                return false;
-            }
-
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
                     self.focus = Focus::List
@@ -289,7 +280,6 @@ impl AppState {
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
-
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
@@ -309,7 +299,6 @@ impl AppState {
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
-
             _ => (),
         };
         true
