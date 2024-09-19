@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "**/*.sh"
+  merge_group:
   workflow_dispatch:
 
 jobs:
