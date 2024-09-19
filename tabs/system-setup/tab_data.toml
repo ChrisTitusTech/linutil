@@ -29,7 +29,7 @@ name = "Fedora"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values =  ["dnf"]
+values = ["dnf"]
 
 [[data.entries]]
 name = "Configure DNF"
@@ -39,6 +39,10 @@ script = "fedora/configure-dnf.sh"
 [[data.entries]]
 name = "Multimedia Setup"
 script = "fedora/multimedia-codecs.sh"
+
+[[data.entries]]
+name = "Nvidia Proprietary Driver Setup"
+script = "fedora/nvidia-proprietary-driver-setup.sh"
 
 [[data.entries]]
 name = "RPM Fusion Setup"
