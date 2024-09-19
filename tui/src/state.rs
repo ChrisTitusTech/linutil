@@ -209,13 +209,15 @@ impl AppState {
             },
         ));
 
+        let style = if let Focus::List = self.focus {
+            Style::default().reversed()
+        } else {
+            Style::new()
+        };
+
         // Create the list widget with items
         let list = List::new(items)
-            .highlight_style(if let Focus::List = self.focus {
-                Style::default().reversed()
-            } else {
-                Style::new()
-            })
+            .highlight_style(style)
             .block(
                 Block::default()
                     .borders(Borders::ALL)
