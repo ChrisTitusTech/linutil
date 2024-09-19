@@ -10,7 +10,7 @@ installDepend() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
             ;;
-        aptget|nala)
+        apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
         dnf)
