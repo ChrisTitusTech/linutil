@@ -120,7 +120,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             hints.push(Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"));
 
             if state.at_root() {
-                hints.push(Shortcut::new(vec!["h", "Left", "Tab"], "Focus tab list"));
+                hints.push(Shortcut::new(vec!["h", "Left"], "Focus tab list"));
                 hints.push(get_list_item_shortcut(state));
             } else {
                 if state.selected_item_is_up_dir() {
@@ -136,7 +136,6 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                         hints.push(Shortcut::new(vec!["d"], "Command Description"));
                     }
                 }
-                hints.push(Shortcut::new(vec!["Tab"], "Focus tab list"));
             };
 
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
@@ -147,6 +146,8 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 hints.push(Shortcut::new(vec!["v"], "Toggle multi-selection mode"));
                 hints.push(Shortcut::new(vec!["Space"], "Select multiple commands"));
             }
+            hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
+            hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
             ShortcutList {
                 scope_name: "Item list",
                 hints,
@@ -157,11 +158,13 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             scope_name: "Tab list",
             hints: vec![
                 Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"),
-                Shortcut::new(vec!["l", "Right", "Tab", "Enter"], "Focus action list"),
+                Shortcut::new(vec!["l", "Right", "Enter"], "Focus action list"),
                 Shortcut::new(vec!["k", "Up"], "Select item above"),
                 Shortcut::new(vec!["j", "Down"], "Select item below"),
                 Shortcut::new(vec!["t"], "Next theme"),
                 Shortcut::new(vec!["T"], "Previous theme"),
+                Shortcut::new(vec!["Tab"], "Next tab"),
+                Shortcut::new(vec!["Shift-Tab"], "Previous tab"),
             ],
         },
 
