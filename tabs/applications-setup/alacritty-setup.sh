@@ -5,7 +5,7 @@
 installAlacritty() {
     printf "%b" "${YELLOW}Do you want to install Alacritty? (Y/n): ${RC}"
     read -r install_choice
-    if [ "$install_choice" != "n" ]; then
+    if [ "$install_choice" != "n" ] && [ "$install_choice" != "N" ]; then
         printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
         if ! command_exists alacritty; then
             case "$PACKAGER" in
@@ -27,7 +27,7 @@ installAlacritty() {
 setupAlacrittyConfig() {
     printf "%b" "${YELLOW}Do you want to backup existing configuration files? (Y/n): ${RC}"
     read -r backup_choice
-    if [ "$backup_choice" != "n" ]; then
+    if [ "$backup_choice" != "n" ] && [ "$backup_choice" != "N" ]; then
         printf "%b\n" "${YELLOW}Backing up existing Alacritty config files...${RC}"
         if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
             cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
