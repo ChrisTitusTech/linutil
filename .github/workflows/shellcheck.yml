@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'tabs/**/*.sh'
+  workflow_dispatch:
 
 jobs:
   shellcheck:
