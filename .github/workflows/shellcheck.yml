@@ -13,9 +13,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
 
-    permissions:
-      security-events: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,12 +22,3 @@ jobs:
       - id: ShellCheck
         name: Differential ShellCheck
         uses: redhat-plumbers-in-action/differential-shellcheck@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - if: ${{ always() }}
-        name: Upload artifact with ShellCheck defects in SARIF format
-        uses: actions/upload-artifact@v4
-        with:
-          name: Differential ShellCheck SARIF
-          path: ${{ steps.ShellCheck.outputs.sarif }}
