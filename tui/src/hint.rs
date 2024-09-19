@@ -20,6 +20,15 @@ pub struct Shortcut {
     pub desc: &'static str,
 }
 
+fn add_spacing(list: Vec<Vec<Span>>) -> Line {
+    list.into_iter()
+        .flat_map(|mut s| {
+            s.push(Span::default().content("    "));
+            s
+        })
+        .collect()
+}
+
 pub fn span_vec_len(span_vec: &[Span]) -> usize {
     span_vec.iter().rfold(0, |init, s| init + s.width())
 }
@@ -48,26 +57,11 @@ impl ShortcutList {
                 .count();
 
             let new_shortcut_list = acc.split_off(split_idx);
-            lines.push(
-                acc.into_iter()
-                    .flat_map(|mut s| {
-                        s.push(Span::default().content("    "));
-                        s
-                    })
-                    .collect(),
-            );
+            lines.push(add_spacing(acc));
 
             new_shortcut_list
         });
-        lines.push(
-            shortcut_list
-                .into_iter()
-                .flat_map(|mut s| {
-                    s.push(Span::default().content("    "));
-                    s
-                })
-                .collect(),
-        );
+        lines.push(add_spacing(shortcut_list));
 
         let p = Paragraph::new(lines).block(block);
         frame.render_widget(p, area);
