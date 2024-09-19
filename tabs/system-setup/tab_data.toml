@@ -90,3 +90,7 @@ script = "5-samba-ssh-setup.sh"
 [[data]]
 name = "Docker Setup"
 script = "6-docker-setup.sh"
+
+[[data]]
+name = "Auto Mount Drive"
+script = "9-auto-mount.sh"
