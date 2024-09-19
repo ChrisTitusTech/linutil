@@ -26,7 +26,7 @@ get_uuid_fstype() {
     NAME=$(lsblk -no NAME "${partition}")
 
     if [ -z "$UUID" ]; then
-        printf "%b\n" "Failed to retrieve the UUID. Exiting."
+        printf "%b\n" "${RED}Failed to retrieve the UUID. Exiting.${RC}"
         exit 1
     fi
 
