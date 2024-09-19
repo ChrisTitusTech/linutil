@@ -29,25 +29,25 @@ show_menu() {
 # Function to view all services
 view_all_services() {
     echo "Listing all services..."
-    $ESCALATION_TOOL systemctl list-units --type=service --all --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-units --type=service --all --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view enabled services
 view_enabled_services() {
     echo "Listing enabled services..."
-    $ESCALATION_TOOL systemctl list-unit-files --type=service --state=enabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=enabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view disabled services
 view_disabled_services() {
     echo "Listing disabled services..."
-    $ESCALATION_TOOL systemctl list-unit-files --type=service --state=disabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
+    "$ESCALATION_TOOL" systemctl list-unit-files --type=service --state=disabled --no-legend | awk '{print $1}' | sed 's/\.service//' | more
 }
 
 # Function to view started services
 view_started_services() {
     echo "Listing started services:"
-    $ESCALATION_TOOL systemctl list-units --type=service --state=running --no-pager | head -n -6 | awk 'NR>1 {print $1}' | more
+    "$ESCALATION_TOOL" systemctl list-units --type=service --state=running --no-pager | head -n -6 | awk 'NR>1 {print $1}' | more
 }
 
 # Function to add a new service
@@ -56,7 +56,7 @@ add_service() {
         echo "Enter the name of the new service (e.g., my_service):"
         read -r SERVICE_NAME
 
-        if $ESCALATION_TOOL systemctl list-units --type=service --all --no-legend | grep -q "$SERVICE_NAME.service"; then
+        if "$ESCALATION_TOOL" systemctl list-units --type=service --all --no-legend | grep -q "$SERVICE_NAME.service"; then
             echo "Service already exists!"
             SERVICE_NAME=""
         fi
@@ -93,11 +93,11 @@ add_service() {
         echo ""
         echo "[Install]"
         echo "WantedBy=multi-user.target"
-    } | $ESCALATION_TOOL tee "$SERVICE_FILE" > /dev/null
+    } | "$ESCALATION_TOOL" tee "$SERVICE_FILE" > /dev/null
 
     # Set permissions and reload systemd
-    $ESCALATION_TOOL chmod 644 "$SERVICE_FILE"
-    $ESCALATION_TOOL systemctl daemon-reload
+    "$ESCALATION_TOOL" chmod 644 "$SERVICE_FILE"
+    "$ESCALATION_TOOL" systemctl daemon-reload
     echo "Service $SERVICE_NAME has been created and is ready to be started."
 
     # Optionally, enable and start the service
@@ -105,8 +105,8 @@ add_service() {
     read -r START_ENABLE
 
     if [ "$START_ENABLE" = "y" ]; then
-        $ESCALATION_TOOL systemctl start "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
         echo "Service $SERVICE_NAME has been started and enabled."
     else
         echo "Service $SERVICE_NAME has been created but not started."
@@ -122,12 +122,12 @@ remove_service() {
 
     if [ -f "$SERVICE_FILE" ]; then
         echo "Stopping and disabling the service..."
-        $ESCALATION_TOOL systemctl stop "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl disable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"
 
         echo "Removing the service file..."
-        $ESCALATION_TOOL rm -f "$SERVICE_FILE"
-        $ESCALATION_TOOL systemctl daemon-reload
+        "$ESCALATION_TOOL" rm -f "$SERVICE_FILE"
+        "$ESCALATION_TOOL" systemctl daemon-reload
 
         echo "Service $SERVICE_NAME has been removed."
     else
@@ -141,7 +141,7 @@ start_service() {
     echo "Enter the name of the service to start (e.g., my_service):"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl start "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"; then
         echo "Service $SERVICE_NAME has been started."
     else
         echo "Failed to start service: $SERVICE_NAME."
@@ -154,7 +154,7 @@ stop_service() {
     echo "Enter the name of the service to stop (e.g., my_service):"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl stop "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"; then
         echo "Service $SERVICE_NAME has been stopped."
     else
         echo "Failed to stop service: $SERVICE_NAME."
@@ -167,7 +167,7 @@ enable_service() {
     echo "Enter the name of the service to enable (e.g., my_service):"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"; then
         echo "Service $SERVICE_NAME has been enabled."
     else
         echo "Failed to enable service: $SERVICE_NAME."
@@ -180,7 +180,7 @@ disable_service() {
     echo "Enter the name of the service to disable (e.g., my_service):"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl disable "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"; then
         echo "Service $SERVICE_NAME has been enabled."
     else
         echo "Failed to enable service: $SERVICE_NAME."
@@ -227,11 +227,11 @@ create_service_from_external() {
     fi
 
     # Copy the modified service file to /etc/systemd/system/
-    $ESCALATION_TOOL cp "$SERVICE_FILE" "$SYSTEMD_SERVICE_FILE"
+    "$ESCALATION_TOOL" cp "$SERVICE_FILE" "$SYSTEMD_SERVICE_FILE"
 
     # Set permissions and reload systemd
-    $ESCALATION_TOOL chmod 644 "$SYSTEMD_SERVICE_FILE"
-    $ESCALATION_TOOL systemctl daemon-reload
+    "$ESCALATION_TOOL" chmod 644 "$SYSTEMD_SERVICE_FILE"
+    "$ESCALATION_TOOL" systemctl daemon-reload
     echo "Service $SERVICE_NAME has been created and is ready to be started."
 
     # Optionally, enable and start the service
@@ -239,8 +239,8 @@ create_service_from_external() {
     read -r START_ENABLE
 
     if [ "$START_ENABLE" = "y" ]; then
-        $ESCALATION_TOOL systemctl start "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
         echo "Service $SERVICE_NAME has been started and enabled."
     else
         echo "Service $SERVICE_NAME has been created but not started."
