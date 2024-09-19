@@ -20,7 +20,8 @@ disable_monitor() {
         i=$((i + 1))
     done
 
-    read -p "Enter the number of the monitor: " monitor_choice
+    printf "%b\n" "Enter the number of the monitor: "
+    read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
         printf "%b\n" "${RED}Invalid selection.${RC}"
@@ -44,7 +45,8 @@ disable_monitor() {
 confirm_action() {
     action="$1"
     printf "%b\n" "${YELLOW}$action${RC}"
-    read -p "Are you sure? (y/n): " confirm
+    printf "%b\n" "Are you sure? (y/n): "
+    read -r confirm
     if echo "$confirm" | grep -qE '^[Yy]$'; then
         return 0
     else
