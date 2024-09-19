@@ -13,7 +13,7 @@ username=$(promptUsername "" "non-root") || exit 1
 if [ "$username" = "$USER" ]; then
     printf "%b\n" "${RED}Cannot delete the current user${RC}"
     printf "%b\n" "${RED}Press [Enter] to continue...${RC}"
-    read dummy
+    read -r dummy
     return
 fi
 
