@@ -6,6 +6,11 @@ description = "Alacritty is a modern terminal emulator that comes with sensible 
 script = "alacritty-setup.sh"
 
 [[data]]
+name = "Web Browsers"
+description= "Universal Web Browser installer. No need to waste time searching how to install a specific browser for a specific distribution. \nThis command installs your prefered web browser from the given list."
+script = "browser-setup.sh"
+
+[[data]]
 name = "Bash Prompt"
 description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.\nIt is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.\nThis command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "mybash-setup.sh"
