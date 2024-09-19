@@ -92,5 +92,9 @@ name = "Docker Setup"
 script = "6-docker-setup.sh"
 
 [[data]]
+name = "Grub Theme Setup"
+script = "7-grub-theme.sh"
+
+[[data]]
 name = "Auto Mount Drive"
 script = "9-auto-mount.sh"

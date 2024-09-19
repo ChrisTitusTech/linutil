@@ -17,7 +17,8 @@ if [ "$username" = "$USER" ]; then
     return
 fi
 
-read -p "Are you sure you want to delete user $username? [Y/N]: " confirm
+printf "Are you sure you want to delete user $username? [Y/N]: "
+read -r confirm
 confirmAction || exit 1
 
 $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
