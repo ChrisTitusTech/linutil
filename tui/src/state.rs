@@ -1,7 +1,7 @@
 use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::FloatingText,
+    floating_text::{FloatingText, FloatingTextMode},
     hint::{draw_shortcuts, SHORTCUT_LINES},
     running_command::RunningCommand,
     theme::Theme,
@@ -294,6 +294,7 @@ impl AppState {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
                 KeyCode::Char('p') => self.enable_preview(),
+                KeyCode::Char('d') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
@@ -347,6 +348,23 @@ impl AppState {
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
                 return Some(item.node.command.clone());
+            }
+        }
+        None
+    }
+    fn get_selected_description(&mut self) -> Option<String> {
+        let mut selected_index = self.selection.selected().unwrap_or(0);
+
+        if !self.at_root() && selected_index == 0 {
+            return None;
+        }
+        if !self.at_root() {
+            selected_index = selected_index.saturating_sub(1);
+        }
+
+        if let Some(item) = self.filter.item_list().get(selected_index) {
+            if !item.has_children {
+                return Some(item.node.description.clone());
             }
         }
         None
@@ -413,11 +431,23 @@ impl AppState {
     }
     fn enable_preview(&mut self) {
         if let Some(command) = self.get_selected_command() {
-            if let Some(preview) = FloatingText::from_command(&command) {
+            if let Some(preview) = FloatingText::from_command(&command, FloatingTextMode::Preview) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
+    fn enable_description(&mut self) {
+        if let Some(command_description) = self.get_selected_description() {
+            let description_content: Vec<String> = vec![]
+                .into_iter()
+                .chain(command_description.lines().map(|line| line.to_string())) // New line when \n is given in toml
+                .collect();
+
+            let description = FloatingText::new(description_content, FloatingTextMode::Description);
+            self.spawn_float(description, 80, 80);
+        }
+    }
+
     fn handle_enter(&mut self) {
         if let Some(cmd) = self.get_selected_command() {
             let command = RunningCommand::new(cmd);
