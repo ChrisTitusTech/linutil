@@ -316,8 +316,8 @@ impl AppState {
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
-                KeyCode::Char('p') => self.enable_preview(),
-                KeyCode::Char('d') => self.enable_description(),
+                KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
+                KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
