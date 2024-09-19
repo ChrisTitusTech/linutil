@@ -5,7 +5,7 @@ use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 
-const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/../tabs");
+const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
 pub fn get_tabs(validate: bool) -> Vec<Tab> {
     let tab_files = TabList::get_tabs();

@@ -3,6 +3,11 @@ name = "linutil_core"
 edition = "2021"
 version.workspace = true
 license.workspace = true
+include = [
+    "src/*.rs",
+    "Cargo.toml",
+    "tabs/**",
+]
 
 [dependencies]
 include_dir = "0.7.4"
