@@ -114,11 +114,13 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             scope_name: "Search bar",
             hints: vec![Shortcut::new(vec!["Enter"], "Finish search")],
         },
+
         Focus::List => {
             let mut hints = Vec::new();
             hints.push(Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"));
+
             if state.at_root() {
-                hints.push(Shortcut::new(vec!["h", "Left", "Tab"], "Focus tab list"));
+                hints.push(Shortcut::new(vec!["h", "Left"], "Focus tab list"));
                 hints.push(get_list_item_shortcut(state));
             } else {
                 if state.selected_item_is_up_dir() {
@@ -131,30 +133,37 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                     hints.push(get_list_item_shortcut(state));
                     if state.selected_item_is_cmd() {
                         hints.push(Shortcut::new(vec!["p"], "Enable preview"));
+                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
                     }
                 }
-                hints.push(Shortcut::new(vec!["Tab"], "Focus tab list"));
             };
+
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
             hints.push(Shortcut::new(vec!["t"], "Next theme"));
             hints.push(Shortcut::new(vec!["T"], "Previous theme"));
+            hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
+            hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
             ShortcutList {
                 scope_name: "Item list",
                 hints,
             }
         }
+
         Focus::TabList => ShortcutList {
             scope_name: "Tab list",
             hints: vec![
                 Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"),
-                Shortcut::new(vec!["l", "Right", "Tab", "Enter"], "Focus action list"),
+                Shortcut::new(vec!["l", "Right", "Enter"], "Focus action list"),
                 Shortcut::new(vec!["k", "Up"], "Select item above"),
                 Shortcut::new(vec!["j", "Down"], "Select item below"),
                 Shortcut::new(vec!["t"], "Next theme"),
                 Shortcut::new(vec!["T"], "Previous theme"),
+                Shortcut::new(vec!["Tab"], "Next tab"),
+                Shortcut::new(vec!["Shift-Tab"], "Previous tab"),
             ],
         },
+
         Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
     }
     .draw(frame, area);

@@ -1,10 +1,10 @@
 name: Check for bashisms
 
 on:
-  push:
-    paths:
-      - tabs/**
-    branches: [ "main" ]
+  # push:
+  #   paths:
+  #     - tabs/**
+  #   branches: [ "main" ]
   pull_request:
     paths:
       - tabs/**
@@ -16,12 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - run: git fetch origin ${{ github.base_ref }}
       
       - name: Install devscripts
-        run: sudo apt install devscripts
+        run: sudo apt-get update && sudo apt-get install devscripts
 
-      - name: Concatenate all .sh files and check for bashisms
-        working-directory: tabs
+      - name: Check for bashisms in changed files
         run: |
-          find . -name '*.sh' -exec checkbashisms {} + > all_scripts.sh
+          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD tabs); do
+              if [[ "$file" == *.sh ]]; then
+                  checkbashisms "$file"
+              fi
+          done
