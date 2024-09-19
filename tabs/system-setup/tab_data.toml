@@ -1,4 +1,5 @@
 name = "System Setup"
+multi_selectable = false
 
 [[data]]
 name = "Arch Linux"
