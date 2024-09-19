@@ -502,12 +502,13 @@ impl AppState {
     }
 
     fn handle_enter(&mut self) {
-        if self.selected_commands.is_empty() {
-            // If no commands are selected, run the currently by pushing them into vector
-            if let Some(cmd) = self.get_selected_command() {
-                self.selected_commands.push(cmd);
+        if self.selected_item_is_cmd() {
+            // If no commands are selected, run the selected by pushing them into vector
+            if self.selected_commands.is_empty() {
+                if let Some(cmd) = self.get_selected_command() {
+                    self.selected_commands.push(cmd);
+                }
             }
-
             let command = RunningCommand::new(self.selected_commands.clone());
             self.spawn_float(command, 80, 80);
             self.selected_commands.clear();
