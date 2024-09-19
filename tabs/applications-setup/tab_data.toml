@@ -1,6 +1,10 @@
 name = "Applications Setup"
 
 [[data]]
+name = "Setup Flatpak / Flathub"
+script = "setup-flatpak.sh"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"

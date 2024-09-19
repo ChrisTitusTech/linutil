@@ -21,6 +21,7 @@
 
 ## Applications Setup
 
+- **Flathub**: Installs / Uninstalls Flatpak and Flathub.
 - **Alacritty Setup**: Installs and configures Alacritty for you.
 - **DwmTitus Setup**: Sets up the Dwm window manager.
 - **Kitty Setup**: Installs and configures Kitty for you.

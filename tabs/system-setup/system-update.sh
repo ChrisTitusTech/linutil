@@ -93,7 +93,18 @@ updateSystem() {
 
 updateFlatpaks() {
     if command_exists flatpak; then
-        flatpak update -y
+        printf "%b\n" "${YELLOW}Updating installed Flathub apps...${RC}"
+        installed_apps=$(flatpak list --app --columns=application)
+
+        if [ -z "$installed_apps" ]; then
+            printf "%b\n" "${RED}No Flathub apps are installed.${RC}"
+            return
+        fi
+
+        for app in $installed_apps; do
+            printf "%b\n" "${YELLOW}Updating $app...${RC}"
+            flatpak update -y "$app"
+        done
     fi
 }
 
