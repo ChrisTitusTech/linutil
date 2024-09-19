@@ -40,10 +40,6 @@ name = "Setup Flatpak / Flathub"
 script = "setup-flatpak.sh"
 
 [[data]]
-name = "Fastfetch"
-script = "fastfetch-setup.sh"
-
-[[data]]
 name = "Bottles setup"
 script = "bottles-setup.sh"
 
