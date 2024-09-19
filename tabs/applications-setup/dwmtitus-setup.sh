@@ -6,14 +6,14 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus if not already installed${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git
             ;;
         apt-get|nala)
-            $ESCALATION_TOOL "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git
+            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" groupinstall -y "Development Tools"
-            $ESCALATION_TOOL "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
+            "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -26,7 +26,7 @@ makeDWM() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
     # This path can be changed (e.g. to linux-toolbox directory)
     cd dwm-titus/ # Hardcoded path, maybe not the best.
-    $ESCALATION_TOOL make clean install # Run make clean install
+    "$ESCALATION_TOOL" make clean install # Run make clean install
 }
 
 install_nerd_font() {
@@ -115,7 +115,7 @@ picom_animations() {
     fi
 
     # Install the built binary
-    if ! $ESCALATION_TOOL ninja -C build install; then
+    if ! "$ESCALATION_TOOL" ninja -C build install; then
         printf "%b\n" "${RED}Failed to install the built binary${RC}"
         return 1
     fi
@@ -179,13 +179,13 @@ setupDisplayManager() {
     printf "%b\n" "${YELLOW}Setting up Xorg${RC}"
     case "$PACKAGER" in
         pacman)
-            $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
         apt-get|nala)
-            $ESCALATION_TOOL "$PACKAGER" install -y xorg xinit
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
-            $ESCALATION_TOOL "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -207,13 +207,13 @@ setupDisplayManager() {
         printf "%b\n" "${YELLOW}No display manager found, installing $DM${RC}"
         case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
             apt-get|nala)
-                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
-                $ESCALATION_TOOL "$PACKAGER" install -y "$DM"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -232,28 +232,28 @@ setupDisplayManager() {
                 printf "%b\n" "${YELLOW}Configuring SDDM for autologin${RC}"
                 SDDM_CONF="/etc/sddm.conf"
                 if [ ! -f "$SDDM_CONF" ]; then
-                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
                 else
-                    $ESCALATION_TOOL sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
-                    $ESCALATION_TOOL sed -i '/^User=/d' "$SDDM_CONF"
-                    $ESCALATION_TOOL sed -i '/^Session=/d' "$SDDM_CONF"
-                    echo "[Autologin]" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "User=$USER" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | $ESCALATION_TOOL tee -a "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^User=/d' "$SDDM_CONF"
+                    "$ESCALATION_TOOL" sed -i '/^Session=/d' "$SDDM_CONF"
+                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
+                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
                 fi
                 printf "%b\n" "{YELLOW}Checking if autologin group exists${RC}"
                 if ! getent group autologin > /dev/null; then
                     printf "%b\n" "${YELLOW}Creating autologin group${RC}"
-                    $ESCALATION_TOOL groupadd autologin
+                    "$ESCALATION_TOOL" groupadd autologin
                 else
                     printf "%b\n" "${GREEN}Autologin group already exists${RC}"
                 fi
                 printf "%b\n" "${YELLOW}Adding user with UID 1000 to autologin group${RC}"
                 USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
                 if [ -n "$USER_UID_1000" ]; then
-                    $ESCALATION_TOOL usermod -aG autologin "$USER_UID_1000"
+                    "$ESCALATION_TOOL" usermod -aG autologin "$USER_UID_1000"
                     printf "%b\n" "${GREEN}User $USER_UID_1000 added to autologin group${RC}"
                 else
                     printf "%b\n" "${RED}No user with UID 1000 found - Auto login not possible${RC}"
@@ -272,7 +272,7 @@ install_slstatus() {
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
         cd "$HOME/dwm-titus/slstatus" || { printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"; return 1; }
-        if $ESCALATION_TOOL make clean install; then
+        if "$ESCALATION_TOOL" make clean install; then
             printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else
             printf "%b\n" "${RED}Failed to install slstatus${RC}"

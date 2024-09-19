@@ -8,13 +8,13 @@ setupNetworkManager() {
     if ! command_exists nmcli; then
         case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --noconfirm networkmanager
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm networkmanager
                 ;;
             dnf)
-                $ESCALATION_TOOL "$PACKAGER" install -y NetworkManager-1
+                "$ESCALATION_TOOL" "$PACKAGER" install -y NetworkManager-1
                 ;;
             *)
-                $ESCALATION_TOOL "$PACKAGER" install -y network-manager
+                "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
                 ;;
         esac
     else
@@ -24,7 +24,7 @@ setupNetworkManager() {
     # Check if NetworkManager service is running
     if ! systemctl is-active --quiet NetworkManager; then
         printf "%b\n" "${YELLOW}NetworkManager service is not running. Starting it now...${RC}"
-        $ESCALATION_TOOL systemctl start NetworkManager
+        "$ESCALATION_TOOL" systemctl start NetworkManager
         
         if systemctl is-active --quiet NetworkManager; then
             printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"
@@ -38,14 +38,14 @@ main_menu() {
         clear
         printf "%b\n" "${YELLOW}WiFi Manager${RC}"
         printf "%b\n" "${YELLOW}============${RC}"
-        echo "1. Turn WiFi On"
-        echo "2. Turn WiFi Off"
-        echo "3. Scan for WiFi networks"
-        echo "4. Connect to a WiFi network"
-        echo "5. Disconnect from a WiFi network"
-        echo "6. Remove a WiFi connection"
-        echo "0. Exit"
-        echo -n "Choose an option: "
+        printf "1. Turn WiFi On\n"
+        printf "2. Turn WiFi Off\n"
+        printf "3. Scan for WiFi networks\n"
+        printf "4. Connect to a WiFi network\n"
+        printf "5. Disconnect from a WiFi network\n"
+        printf "6. Remove a WiFi connection\n"
+        printf "0. Exit\n"
+        printf "Choose an option: "
         read choice
 
         case $choice in
@@ -72,7 +72,7 @@ scan_networks() {
         printf "%b\n" "${GREEN}Top 10 Networks found:${RC}"
         echo "$networks" | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
-    echo "Press any key to return to the main menu..."
+    printf "Press any key to return to the main menu...\n"
     read -r dummy
 }
 
@@ -85,7 +85,7 @@ wifi_on() {
     } || {
         printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
+    printf "Press any key to return to the main menu...\n"
     read -r dummy
 }
 
@@ -98,7 +98,7 @@ wifi_off() {
     } || {
         printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
     }
-    echo "Press any key to return to the main menu..."
+    printf "Press any key to return to the main menu...\n"
     read -r dummy
 }
 
@@ -115,7 +115,7 @@ prompt_for_network() {
         networks=$(nmcli -t -f SSID dev wifi list | awk -F: '!seen[$1]++' | grep -v '^$')
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
-            echo "Press any key to return to the main menu..."
+            printf "Press any key to return to the main menu...\n"
             read -r dummy
             rm -f "$temp_file"
             return
@@ -130,16 +130,16 @@ prompt_for_network() {
             i=$((i + 1))
         done < "$temp_file"
 
-        echo "0. Exit to main menu"
-        echo -n "$prompt_msg"
+        printf "0. Exit to main menu\n"
+        printf "%s" "$prompt_msg"
         read choice
 
         if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
             ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
             if [ "$action" = "connect" ]; then
-                echo -n "Enter password for SSID $ssid: "
+                printf "Enter password for SSID %s: " "$ssid"
                 read password
-                echo
+                printf "\n"
                 nmcli dev wifi connect "$ssid" password "$password" && {
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                 } || {
@@ -150,7 +150,7 @@ prompt_for_network() {
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
 
-        echo "Press any key to return to the selection menu..."
+        printf "Press any key to return to the selection menu...\n"
         read -r dummy
     done
 
