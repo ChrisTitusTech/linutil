@@ -259,12 +259,11 @@ impl AppState {
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
-        if matches!(self.focus, Focus::TabList | Focus::List) {
-            if key.code == KeyCode::Char('q')
-                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL)
-            {
-                return false;
-            }
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && (key.code == KeyCode::Char('q')
+                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL))
+        {
+            return false;
         }
 
         // If UI is not drawable returning true will mark as the key handled
