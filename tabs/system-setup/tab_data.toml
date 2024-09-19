@@ -57,16 +57,16 @@ script = "fedora/virtualization.sh"
 
 [[data]]
 name = "Auto Mount Drive"
-script = "9-auto-mount.sh"
+script = "auto-mount.sh"
 
 [[data]]
 name = "Build Prerequisites"
 description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
-script = "1-compile-setup.sh"
+script = "compile-setup.sh"
 
 [[data]]
 name = "Docker Setup"
-script = "6-docker-setup.sh"
+script = "docker-setup.sh"
 
 [[data]]
 name = "Full System Cleanup"
@@ -80,22 +80,22 @@ script = "system-update.sh"
 [[data]]
 name = "Gaming Dependencies"
 description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions"
-script = "2-gaming-setup.sh"
+script = "gaming-setup.sh"
 
 [[data]]
 name = "Global Theme"
 description = "This script is designed to handle the installation and configuration of global theming"
-script = "3-global-theme.sh"
+script = "global-theme.sh"
 
 [[data]]
 name = "Grub Theme Setup"
-script = "7-grub-theme.sh"
+script = "grub-theme.sh"
 
 [[data]]
 name = "Remove Snaps"
 description = "This script is designed to remove snap"
-script = "4-remove-snaps.sh"
+script = "remove-snaps.sh"
 
 [[data]]
 name = "SSH-Samba Setup"
-script = "5-samba-ssh-setup.sh"
+script = "samba-ssh-setup.sh"
