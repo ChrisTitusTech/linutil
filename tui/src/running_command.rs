@@ -139,19 +139,18 @@ impl RunningCommand {
     pub fn new(commands: Vec<Command>) -> Self {
         let pty_system = NativePtySystem::default();
 
-        // Create a command to execute all the selected commands
+        // Build the command based on the provided Command enum variant
         let mut cmd: CommandBuilder = CommandBuilder::new("sh");
         cmd.arg("-c");
 
-        // Initialize an empty string to hold the merged commands
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
         let mut script = String::new();
         for command in commands {
             match command {
-                Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)), // Merge raw commands
+                Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)),
                 Command::LocalFile(file) => {
                     if let Some(parent) = file.parent() {
-                        script.push_str(&format!("cd {}\n", parent.display())); // Merge local file path
+                        script.push_str(&format!("cd {}\n", parent.display()));
                     }
                     script.push_str(&format!("sh {}\n", file.display()));
                 }

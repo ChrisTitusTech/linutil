@@ -32,7 +32,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
             )| {
                 let mut tree = Tree::new(ListNode {
                     name: "root".to_string(),
-                    description: "".to_string(),
+                    description: String::new(),
                     command: Command::None,
                 });
                 let mut root = tree.root_mut();

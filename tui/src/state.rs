@@ -279,7 +279,7 @@ impl AppState {
             match key.code {
                 KeyCode::Tab => {
                     if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
-                        self.current_tab.select_first(); // Select first tab when it is at last
+                        self.current_tab.select_first();
                     } else {
                         self.current_tab.select_next();
                     }
@@ -287,7 +287,7 @@ impl AppState {
                 }
                 KeyCode::BackTab => {
                     if self.current_tab.selected().unwrap() == 0 {
-                        self.current_tab.select(Some(self.tabs.len() - 1)); // Select last tab when it is at first
+                        self.current_tab.select(Some(self.tabs.len() - 1));
                     } else {
                         self.current_tab.select_previous();
                     }
@@ -525,7 +525,6 @@ impl AppState {
 
     fn handle_enter(&mut self) {
         if self.selected_item_is_cmd() {
-            // If no commands are selected, run the selected by pushing them into vector
             if self.selected_commands.is_empty() {
                 if let Some(cmd) = self.get_selected_command() {
                     self.selected_commands.push(cmd);
