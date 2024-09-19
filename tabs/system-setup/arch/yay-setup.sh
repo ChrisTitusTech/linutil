@@ -1,22 +1,22 @@
 #!/bin/sh -e
 
-. "$(dirname "$0")/../../common-script.sh"
+. ../../common-script.sh
 
 installDepend() {
-    case $PACKAGER in
+    case "$PACKAGER" in
         pacman)
             if ! command_exists yay; then
-                echo "Installing yay as AUR helper..."
+                printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
                 $ESCALATION_TOOL "$PACKAGER" -S --needed --noconfirm base-devel
-                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-git.git && $ESCALATION_TOOL chown -R "$USER": ./yay-git
-                cd yay-git && makepkg --noconfirm -si
-                echo "Yay installed"
+                cd /opt && $ESCALATION_TOOL git clone https://aur.archlinux.org/yay-bin.git && $ESCALATION_TOOL chown -R "$USER": ./yay-bin
+                cd yay-bin && makepkg --noconfirm -si
+                printf "%b\n" "${GREEN}Yay installed${RC}"
             else
-                echo "Aur helper already installed"
+                printf "%b\n" "${GREEN}Aur helper already installed${RC}"
             fi
             ;;
         *)
-            echo "Unsupported package manager: $PACKAGER"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             ;;
     esac
 }

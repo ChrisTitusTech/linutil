@@ -16,7 +16,7 @@ pub struct ShortcutList {
 }
 
 pub struct Shortcut {
-    pub key_sequenses: Vec<Span<'static>>,
+    pub key_sequences: Vec<Span<'static>>,
     pub desc: &'static str,
 }
 
@@ -75,7 +75,7 @@ impl ShortcutList {
 impl Shortcut {
     pub fn new(key_sequences: Vec<&'static str>, desc: &'static str) -> Self {
         Self {
-            key_sequenses: key_sequences
+            key_sequences: key_sequences
                 .iter()
                 .map(|s| Span::styled(*s, Style::default().bold()))
                 .collect(),
@@ -85,7 +85,7 @@ impl Shortcut {
 
     fn to_spans(&self) -> Vec<Span> {
         let mut ret: Vec<_> = self
-            .key_sequenses
+            .key_sequences
             .iter()
             .flat_map(|seq| {
                 [
@@ -124,13 +124,14 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
                 if state.selected_item_is_up_dir() {
                     hints.push(Shortcut::new(
                         vec!["l", "Right", "Enter", "h", "Left"],
-                        "Go to parrent directory",
+                        "Go to parent directory",
                     ));
                 } else {
-                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parrent directory"));
+                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
                     hints.push(get_list_item_shortcut(state));
                     if state.selected_item_is_cmd() {
                         hints.push(Shortcut::new(vec!["p"], "Enable preview"));
+                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
                     }
                 }
                 hints.push(Shortcut::new(vec!["Tab"], "Focus tab list"));
