@@ -43,28 +43,7 @@ installDepend() {
     esac
 }
 
-install_additional_dependencies() {
-    case $(command -v apt || command -v zypper || command -v dnf || command -v pacman) in
-        *apt)
-            # Add additional dependencies for apt if needed
-            ;;
-        *zypper)
-            # Add additional dependencies for zypper if needed
-            ;;
-        *dnf)
-            # Add additional dependencies for dnf if needed
-            ;;
-        *pacman)
-            # Add additional dependencies for pacman if needed
-            ;;
-        *)
-            # Add additional dependencies for other package managers if needed
-            ;;
-    esac
-}
-
 checkEnv
 checkAURHelper
 checkEscalationTool
 installDepend
-install_additional_dependencies

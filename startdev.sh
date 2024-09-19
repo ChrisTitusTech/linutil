@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+# Prevent execution if this script was only partially downloaded
+{
 RC='\033[0m'
 RED='\033[0;31m'
 
@@ -73,3 +75,4 @@ check $? "Executing linutil"
 
 rm -f $TMPFILE
 check $? "Deleting the temporary file"
+} # End of wrapping

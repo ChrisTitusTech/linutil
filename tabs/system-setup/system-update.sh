@@ -6,7 +6,9 @@ fastUpdate() {
     case "$PACKAGER" in
         pacman)
 
-          $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
+            $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
+
+            printf "%b\n" "${YELLOW}Generating a new list of mirrors using rate-mirrors. This process may take a few seconds...${RC}"
 
             if [ -s /etc/pacman.d/mirrorlist ]; then
                 "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
@@ -54,7 +56,7 @@ fastUpdate() {
             "$ESCALATION_TOOL" "$PACKAGER" -Syu-
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
@@ -83,7 +85,7 @@ updateSystem() {
             "$ESCALATION_TOOL" "$PACKAGER" -Syu
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
@@ -91,7 +93,18 @@ updateSystem() {
 
 updateFlatpaks() {
     if command_exists flatpak; then
-        flatpak update -y
+        printf "%b\n" "${YELLOW}Updating installed Flathub apps...${RC}"
+        installed_apps=$(flatpak list --app --columns=application)
+
+        if [ -z "$installed_apps" ]; then
+            printf "%b\n" "${RED}No Flathub apps are installed.${RC}"
+            return
+        fi
+
+        for app in $installed_apps; do
+            printf "%b\n" "${YELLOW}Updating $app...${RC}"
+            flatpak update -y "$app"
+        done
     fi
 }
 

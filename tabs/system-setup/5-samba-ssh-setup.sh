@@ -9,10 +9,10 @@ install_package() {
     if ! command_exists "$PACKAGE"; then
         case "$PACKAGER" in
             pacman)
-                $ESCALATION_TOOL "$PACKAGER" -S --noconfirm "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm "$PACKAGE"
                 ;;
             *)
-                $ESCALATION_TOOL "$PACKAGER" install -y "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
                 ;;
         esac
     else
@@ -41,8 +41,8 @@ setup_ssh() {
     esac
 
     # Enable and start the appropriate SSH service
-    $ESCALATION_TOOL systemctl enable "$SSH_SERVICE"
-    $ESCALATION_TOOL systemctl start "$SSH_SERVICE"
+    "$ESCALATION_TOOL" systemctl enable "$SSH_SERVICE"
+    "$ESCALATION_TOOL" systemctl start "$SSH_SERVICE"
 
     # Get the local IP address
     LOCAL_IP=$(ip -4 addr show | awk '/inet / {print $2}' | tail -n 1)
@@ -82,8 +82,8 @@ setup_samba() {
         SHARED_DIR=${SHARED_DIR:-/srv/samba/share}
 
         # Create the shared directory if it doesn't exist
-        $ESCALATION_TOOL mkdir -p "$SHARED_DIR"
-        $ESCALATION_TOOL chmod -R 0777 "$SHARED_DIR"
+        "$ESCALATION_TOOL" mkdir -p "$SHARED_DIR"
+        "$ESCALATION_TOOL" chmod -R 0777 "$SHARED_DIR"
 
         # Add a new Samba user
         printf "Enter Samba username: "
@@ -109,10 +109,10 @@ setup_samba() {
         done
 
         # Add the user and set the password
-        $ESCALATION_TOOL smbpasswd -a "$SAMBA_USER"
+        "$ESCALATION_TOOL" smbpasswd -a "$SAMBA_USER"
 
         # Configure Samba settings
-        $ESCALATION_TOOL sh -c "cat > $SAMBA_CONFIG" <<EOL
+        "$ESCALATION_TOOL" sh -c "cat > $SAMBA_CONFIG" <<EOL
 [global]
    workgroup = WORKGROUP
    server string = Samba Server
@@ -130,8 +130,8 @@ EOL
     fi
 
     # Enable and start Samba services
-    $ESCALATION_TOOL systemctl enable smb nmb
-    $ESCALATION_TOOL systemctl start smb nmb
+    "$ESCALATION_TOOL" systemctl enable smb nmb
+    "$ESCALATION_TOOL" systemctl start smb nmb
 
     # Check if Samba is running
     if systemctl is-active --quiet smb && systemctl is-active --quiet nmb; then
@@ -147,9 +147,9 @@ configure_firewall() {
     printf "%b\n" "${BLUE}Configuring firewall...${RC}"
 
     if command_exists ufw; then
-        $ESCALATION_TOOL ufw allow OpenSSH
-        $ESCALATION_TOOL ufw allow Samba
-        $ESCALATION_TOOL ufw enable
+        "$ESCALATION_TOOL" ufw allow OpenSSH
+        "$ESCALATION_TOOL" ufw allow Samba
+        "$ESCALATION_TOOL" ufw enable
         printf "%b\n" "${GREEN}Firewall configured for SSH and Samba.${RC}"
     else
         printf "%b\n" "${YELLOW}UFW is not installed. Skipping firewall configuration.${RC}"

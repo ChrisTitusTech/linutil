@@ -6,18 +6,18 @@ printf "%b\n" "${YELLOW}Ensuring OpenSSL is installed...${RC}"
 
 # Install OpenSSL
 if ! command_exists openssl; then
-    case $PACKAGER in
+    case "$PACKAGER" in
         pacman)
-            $ESCALATION_TOOL ${PACKAGER} -Syu --noconfirm openssl
+            "$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm openssl
             ;;
         apt-get)
-            $ESCALATION_TOOL ${PACKAGER} update && $ESCALATION_TOOL ${PACKAGER} install -y openssl
+            "$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         dnf)
-            $ESCALATION_TOOL ${PACKAGER} install -y openssl
+            "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         zypper)
-            $ESCALATION_TOOL ${PACKAGER} install openssl
+            "$ESCALATION_TOOL" "$PACKAGER" install openssl
             ;;
         *)
             printf "%b\n" "${RED}Your Linux distribution is not supported by this script.${RC}"
@@ -54,8 +54,8 @@ encrypt_file() {
     echo "Enter the path for the encrypted file or directory:"
     read -r OUTPUT_PATH
 
-    echo "Enter the encryption password:"
-    read -s -r PASSWORD
+    printf "Enter the encryption password: "
+    read -r PASSWORD
 
     if [ -d "$INPUT_PATH" ]; then
         # Encrypt each file in the directory
@@ -99,8 +99,8 @@ decrypt_file() {
     echo "Enter the path for the decrypted file or directory:"
     read -r OUTPUT_PATH
 
-    echo "Enter the decryption password:"
-    read -s -r PASSWORD
+    printf "Enter the decryption password: "
+    read -r PASSWORD
 
     if [ -d "$INPUT_PATH" ]; then
         # Decrypt each file in the directory
@@ -145,8 +145,8 @@ main(){
             *) echo "Invalid choice. Please try again." ;;
         esac
 
-        echo "Press [Enter] to continue..."
-        read -r
+        printf "Press [Enter] to continue..."
+        read -r dummy
     done
 }
 

@@ -2,42 +2,62 @@
 
 . ../../common-script.sh
 
+# Check for required commands
+for cmd in find curl unzip stty; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        printf "%s\n" "Error: $cmd is not installed."
+        exit 1
+    fi
+done
+
 # Search for possible Diablo II Resurrected folder locations
-printf "%b\n" "${YELLOW}Searching for Diablo II Resurrected folders...${RC}"
-possible_paths=$(find $HOME -type d -path "*/drive_c/Program Files (x86)/Diablo II Resurrected" 2>/dev/null)
+printf "%s\n" "Searching for Diablo II Resurrected folders..."
+possible_paths=$(find "$HOME" -type d -path "*/drive_c/Program Files (x86)/Diablo II Resurrected" 2>/dev/null)
 
 if [ -z "$possible_paths" ]; then
-    printf "%b\n" "${RED}Error: No Diablo II Resurrected folders found.${RC}"
+    printf "%s\n" "Error: No Diablo II Resurrected folders found."
     exit 1
 fi
 
 # Display possible paths and allow selection
-printf "%b\n" "${YELLOW}Possible Diablo II Resurrected folder locations:${RC}"
-mapfile -t paths_array <<< "$possible_paths"
+printf "%s\n" "Possible Diablo II Resurrected folder locations:"
+paths_string=""
+i=0
+IFS='
+'
+for path in $possible_paths; do
+    paths_string="$paths_string|$path"
+    i=$((i + 1))
+done
+IFS=' '
+paths_string="${paths_string#|}"
+total=$i
 selected=0
-total=${#paths_array[@]}
 
 print_menu() {
-    clear
-    local max_display=$((total < 10 ? total : 10))
-    local start=$((selected - max_display/2))
-    if ((start < 0)); then start=0; fi
-    if ((start + max_display > total)); then start=$((total - max_display)); fi
-    if ((start < 0)); then start=0; fi
+    command -v clear >/dev/null 2>&1 && clear
+    max_display=$((total < 10 ? total : 10))
+    start=$((selected - max_display / 2))
+    if [ $start -lt 0 ]; then start=0; fi
+    if [ $((start + max_display)) -gt $total ]; then start=$((total - max_display)); fi
+    if [ $start -lt 0 ]; then start=0; fi
     
-    printf "%b\n" "${YELLOW}Please select the Diablo II: Resurrected installation path:${RC}"
-    for i in $(seq 0 $((max_display - 1))); do
-        if ((i + start >= total)); then break; fi
-        if [ $((i + start)) -eq $selected ]; then
-            echo "> ${paths_array[$((i + start))]}"
-        else
-            echo "  ${paths_array[$((i + start))]}"
+    printf "%s\n" "Please select the Diablo II: Resurrected installation path:"
+    i=0
+    echo "$paths_string" | tr '|' '\n' | while IFS= read -r path; do
+        if [ $i -ge $start ] && [ $i -lt $((start + max_display)) ]; then
+            if [ $i -eq $selected ]; then
+                printf "> %s\n" "$path"
+            else
+                printf "  %s\n" "$path"
+            fi
         fi
+        i=$((i + 1))
     done
 }
 
 select_path() {
-    local last_selected=-1
+    last_selected=-1
 
     while true; do
         if [ $last_selected -ne $selected ]; then
@@ -45,31 +65,29 @@ select_path() {
             last_selected=$selected
         fi
 
-        read -rsn1 key
+        stty -echo
+        key=$(dd bs=1 count=1 2>/dev/null)
+        stty echo
+
         case "$key" in
-            $'\x1B')  # ESC key
-                read -rsn2 key
-                case "$key" in
-                    '[A' | 'k')
-                        if ((selected > 0)); then
-                            ((selected--))
-                        fi
-                        ;;
-                    '[B' | 'j')
-                        if ((selected < total - 1)); then
-                            ((selected++))
-                        fi
-                        ;;
-                esac
+            $(printf '\033')A | k)
+                if [ $selected -gt 0 ]; then
+                    selected=$((selected - 1))
+                fi
                 ;;
-            '')  # Enter key
-                d2r_path="${paths_array[$selected]}"
+            $(printf '\033')B | j)
+                if [ $selected -lt $((total - 1)) ]; then
+                    selected=$((selected + 1))
+                fi
+                ;;
+            '')
+                d2r_path=$(echo "$paths_string" | cut -d '|' -f $((selected + 1)))
                 break
                 ;;
         esac
     done
 
-    clear  # Clear the screen after selection
+    command -v clear >/dev/null 2>&1 && clear
 }
 
 # Use the select_path function
@@ -77,7 +95,7 @@ select_path
 
 # Validate the path
 if [ ! -d "$d2r_path" ]; then
-    printf "%b\n" "${RED}Error: The specified path does not exist.${RC}"
+    printf "%s\n" "Error: The specified path does not exist."
     exit 1
 fi
 
@@ -86,17 +104,23 @@ mods_path="$d2r_path/mods"
 mkdir -p "$mods_path"
 
 # Download the latest release
-printf "%b\n" "${YELLOW}Downloading the latest loot filter...${RC}"
-curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip
+printf "%s\n" "Downloading the latest loot filter..."
+if ! curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip; then
+    printf "%s\n" "Error: Failed to download the loot filter."
+    exit 1
+fi
 
 # Extract the contents to the mods folder
-printf "%b\n" "${YELLOW}Extracting loot filter to $mods_path...${RC}"
-unzip -q -o /tmp/lootfilter.zip -d "$mods_path"
+printf "%s\n" "Extracting loot filter to $mods_path..."
+if ! unzip -q -o /tmp/lootfilter.zip -d "$mods_path"; then
+    printf "%s\n" "Error: Failed to extract the loot filter."
+    exit 1
+fi
 
 # Clean up
 rm /tmp/lootfilter.zip
 
-printf "%b\n" "${GREEN}Loot filter installed successfully in $mods_path${RC}"
+printf "%s\n" "Loot filter installed successfully in $mods_path"
 
 printf "\nTo complete the setup, please follow these steps to add launch options in Battle.net:\n"
 printf "1. Open the Battle.net launcher\n"

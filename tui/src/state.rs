@@ -36,6 +36,8 @@ pub struct AppState {
     /// widget
     selection: ListState,
     filter: Filter,
+    multi_select: bool,
+    selected_commands: Vec<Command>,
     drawable: bool,
 }
 
@@ -64,6 +66,8 @@ impl AppState {
             visit_stack: vec![root_id],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
+            multi_select: false,
+            selected_commands: Vec::new(),
             drawable: false,
         };
         state.update_items();
@@ -200,12 +204,29 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                if *has_children {
-                    Line::from(format!("{}  {}", self.theme.dir_icon(), node.name))
-                        .style(self.theme.dir_color())
+                let is_selected = self.selected_commands.contains(&node.command);
+                let (indicator, style) = if is_selected {
+                    (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    Line::from(format!("{}  {}", self.theme.cmd_icon(), node.name))
-                        .style(self.theme.cmd_color())
+                    ("", Style::new())
+                };
+                if *has_children {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.dir_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.dir_color())
+                } else {
+                    Line::from(format!(
+                        "{}  {} {}",
+                        self.theme.cmd_icon(),
+                        node.name,
+                        indicator
+                    ))
+                    .style(self.theme.cmd_color())
+                    .patch_style(style)
                 }
             },
         ));
@@ -218,12 +239,20 @@ impl AppState {
 
         // Create the list widget with items
         let list = List::new(items)
-            .highlight_style(style)
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title(format!("Linux Toolbox - {}", env!("BUILD_DATE"))),
-            )
+            .highlight_style(if let Focus::List = self.focus {
+                Style::default().reversed()
+            } else {
+                Style::new()
+            })
+            .block(Block::default().borders(Borders::ALL).title(format!(
+                "Linux Toolbox - {} {}",
+                env!("BUILD_DATE"),
+                if self.multi_select {
+                    "[Multi-Select]"
+                } else {
+                    ""
+                }
+            )))
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -250,6 +279,31 @@ impl AppState {
             return true;
         }
 
+        // Handle key only when Tablist or List is focused
+        // Prevents exiting the application even when a command is running
+        // Add keys here which should work on both TabList and List
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            match key.code {
+                KeyCode::Tab => {
+                    if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
+                        self.current_tab.select_first();
+                    } else {
+                        self.current_tab.select_next();
+                    }
+                    self.refresh_tab();
+                }
+                KeyCode::BackTab => {
+                    if self.current_tab.selected().unwrap() == 0 {
+                        self.current_tab.select(Some(self.tabs.len() - 1));
+                    } else {
+                        self.current_tab.select_previous();
+                    }
+                    self.refresh_tab();
+                }
+                _ => {}
+            }
+        }
+
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
@@ -262,9 +316,7 @@ impl AppState {
                 _ => {}
             },
             Focus::TabList => match key.code {
-                KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right | KeyCode::Tab => {
-                    self.focus = Focus::List
-                }
+                KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
                 KeyCode::Char('j') | KeyCode::Down
                     if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
@@ -286,8 +338,8 @@ impl AppState {
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
-                KeyCode::Char('p') => self.enable_preview(),
-                KeyCode::Char('d') => self.enable_description(),
+                KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
+                KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => {
                     if self.at_root() {
@@ -297,22 +349,49 @@ impl AppState {
                     }
                 }
                 KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Tab => self.focus = Focus::TabList,
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
             _ => (),
         };
         true
     }
-
+    fn toggle_multi_select(&mut self) {
+        if self.is_current_tab_multi_selectable() {
+            self.multi_select = !self.multi_select;
+            if !self.multi_select {
+                self.selected_commands.clear();
+            }
+        }
+    }
+    fn toggle_selection(&mut self) {
+        if let Some(command) = self.get_selected_command() {
+            if self.selected_commands.contains(&command) {
+                self.selected_commands.retain(|c| c != &command);
+            } else {
+                self.selected_commands.push(command);
+            }
+        }
+    }
+    pub fn is_current_tab_multi_selectable(&self) -> bool {
+        let index = self.current_tab.selected().unwrap_or(0);
+        self.tabs
+            .get(index)
+            .map_or(false, |tab| tab.multi_selectable)
+    }
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
             *self.visit_stack.last().unwrap(),
         );
+        if !self.is_current_tab_multi_selectable() {
+            self.multi_select = false;
+            self.selected_commands.clear();
+        }
     }
 
     /// Checks either the current tree node is the root node (can we go up the tree or no)
@@ -416,9 +495,15 @@ impl AppState {
     }
 
     fn handle_enter(&mut self) {
-        if let Some(cmd) = self.get_selected_command() {
-            let command = RunningCommand::new(cmd);
+        if self.selected_item_is_cmd() {
+            if self.selected_commands.is_empty() {
+                if let Some(cmd) = self.get_selected_command() {
+                    self.selected_commands.push(cmd);
+                }
+            }
+            let command = RunningCommand::new(self.selected_commands.clone());
             self.spawn_float(command, 80, 80);
+            self.selected_commands.clear();
         } else {
             self.go_to_selected_dir();
         }

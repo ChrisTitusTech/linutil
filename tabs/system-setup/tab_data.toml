@@ -29,7 +29,20 @@ name = "Fedora"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values =  ["dnf"]
+values = ["dnf"]
+
+[[data.entries]]
+name = "Configure DNF"
+description = "Optimizes DNF for parallel downloads"
+script = "fedora/configure-dnf.sh"
+
+[[data.entries]]
+name = "Multimedia Setup"
+script = "fedora/multimedia-codecs.sh"
+
+[[data.entries]]
+name = "Nvidia Proprietary Driver Setup"
+script = "fedora/nvidia-proprietary-driver-setup.sh"
 
 [[data.entries]]
 name = "RPM Fusion Setup"
@@ -37,12 +50,22 @@ description = "RPM Fusion provides software that the Fedora Project or Red Hat d
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data.entries]]
-name = "Configure DNF"
-script = "fedora/configure-dnf.sh"
+name = "Virtualization Setup"
+description = "Enables Virtualization through dnf"
+script = "fedora/virtualization.sh"
 
-[[data.entries]]
-name = "Multimedia Setup"
-script = "fedora/multimedia-codecs.sh"
+[[data]]
+name = "Auto Mount Drive"
+script = "9-auto-mount.sh"
+
+[[data]]
+name = "Build Prerequisites"
+description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
+script = "1-compile-setup.sh"
+
+[[data]]
+name = "Docker Setup"
+script = "6-docker-setup.sh"
 
 [[data]]
 name = "Full System Cleanup"
@@ -52,11 +75,6 @@ script = "system-cleanup.sh"
 name = "Full System Update"
 description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
-
-[[data]]
-name = "Build Prerequisites"
-description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
-script = "1-compile-setup.sh"
 
 [[data]]
 name = "Gaming Dependencies"
@@ -69,6 +87,10 @@ description = "This script is designed to handle the installation and configurat
 script = "3-global-theme.sh"
 
 [[data]]
+name = "Grub Theme Setup"
+script = "7-grub-theme.sh"
+
+[[data]]
 name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "4-remove-snaps.sh"
@@ -76,7 +98,3 @@ script = "4-remove-snaps.sh"
 [[data]]
 name = "SSH-Samba Setup"
 script = "5-samba-ssh-setup.sh"
-
-[[data]]
-name = "Docker Setup"
-script = "6-docker-setup.sh"

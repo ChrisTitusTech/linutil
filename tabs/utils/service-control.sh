@@ -92,11 +92,11 @@ add_service() {
         printf "\n"
         printf "[Install]\n"
         printf "WantedBy=multi-user.target\n"
-    } | $ESCALATION_TOOL tee "$SERVICE_FILE" > /dev/null
+    } | "$ESCALATION_TOOL" tee "$SERVICE_FILE" > /dev/null
 
     # Set permissions and reload systemd
-    $ESCALATION_TOOL chmod 644 "$SERVICE_FILE"
-    $ESCALATION_TOOL systemctl daemon-reload
+    "$ESCALATION_TOOL" chmod 644 "$SERVICE_FILE"
+    "$ESCALATION_TOOL" systemctl daemon-reload
     printf "Service $SERVICE_NAME has been created and is ready to be started.\n"
 
     # Optionally, enable and start the service
@@ -121,12 +121,12 @@ remove_service() {
 
     if [ -f "$SERVICE_FILE" ]; then
         printf "Stopping and disabling the service...\n"
-        $ESCALATION_TOOL systemctl stop "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl disable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"
 
         printf "Removing the service file...\n"
-        $ESCALATION_TOOL rm -f "$SERVICE_FILE"
-        $ESCALATION_TOOL systemctl daemon-reload
+        "$ESCALATION_TOOL" rm -f "$SERVICE_FILE"
+        "$ESCALATION_TOOL" systemctl daemon-reload
         printf "Service $SERVICE_NAME has been removed.\n"
     else
         printf "Service $SERVICE_NAME does not exist.\n"
@@ -139,7 +139,7 @@ start_service() {
     printf "Enter the name of the service to start (e.g., my_service):\n"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl start "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"; then
         printf "Service $SERVICE_NAME has been started.\n"
     else
         printf "Failed to start service: $SERVICE_NAME.\n"
@@ -152,7 +152,7 @@ stop_service() {
     printf "Enter the name of the service to stop (e.g., my_service):\n"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl stop "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl stop "$SERVICE_NAME"; then
         printf "Service $SERVICE_NAME has been stopped.\n"
     else
         printf "Failed to stop service: $SERVICE_NAME.\n"
@@ -165,7 +165,7 @@ enable_service() {
     printf "Enter the name of the service to enable (e.g., my_service):\n"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"; then
         printf "Service $SERVICE_NAME has been enabled.\n"
     else
         printf "Failed to enable service: $SERVICE_NAME.\n"
@@ -178,7 +178,7 @@ disable_service() {
     printf "Enter the name of the service to disable (e.g., my_service):\n"
     read -r SERVICE_NAME
 
-    if $ESCALATION_TOOL systemctl disable "$SERVICE_NAME"; then
+    if "$ESCALATION_TOOL" systemctl disable "$SERVICE_NAME"; then
         printf "Service $SERVICE_NAME has been enabled.\n"
     else
         printf "Failed to enable service: $SERVICE_NAME.\n"
@@ -228,8 +228,8 @@ create_service_from_external() {
     "$ESCALATION_TOOL" cp "$SERVICE_FILE" "$SYSTEMD_SERVICE_FILE"
 
     # Set permissions and reload systemd
-    $ESCALATION_TOOL chmod 644 "$SYSTEMD_SERVICE_FILE"
-    $ESCALATION_TOOL systemctl daemon-reload
+    "$ESCALATION_TOOL" chmod 644 "$SYSTEMD_SERVICE_FILE"
+    "$ESCALATION_TOOL" systemctl daemon-reload
     printf "Service $SERVICE_NAME has been created and is ready to be started.\n"
 
     # Optionally, enable and start the service
@@ -237,8 +237,8 @@ create_service_from_external() {
     read -r START_ENABLE
 
     if [ "$START_ENABLE" = "y" ]; then
-        $ESCALATION_TOOL systemctl start "$SERVICE_NAME"
-        $ESCALATION_TOOL systemctl enable "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
+        "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
         printf "Service $SERVICE_NAME has been started and enabled.\n"
     else
         printf "Service $SERVICE_NAME has been created but not started.\n"
