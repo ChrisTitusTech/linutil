@@ -17,6 +17,9 @@ use ratatui::{
     Frame,
 };
 
+const MIN_WIDTH: u16 = 77;
+const MIN_HEIGHT: u16 = 19;
+
 pub struct AppState {
     /// Selected theme
     theme: Theme,
@@ -72,16 +75,14 @@ impl AppState {
     }
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
-        let min_width = 77; // Minimum width threshold
-        let min_height = 19; // Minimum height threshold
 
-        if terminal_size.width < min_width || terminal_size.height < min_height {
+        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
             let size_warning_message = format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
                 terminal_size.height,
-                min_width,
-                min_height,
+                MIN_WIDTH,
+                MIN_HEIGHT,
             );
 
             let warning_paragraph = Paragraph::new(size_warning_message.clone())
@@ -230,6 +231,12 @@ impl AppState {
             },
         ));
 
+        let style = if let Focus::List = self.focus {
+            Style::default().reversed()
+        } else {
+            Style::new()
+        };
+
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(if let Focus::List = self.focus {
@@ -259,9 +266,10 @@ impl AppState {
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
+        // Exit on 'q' or 'Ctrl-c' input
         if matches!(self.focus, Focus::TabList | Focus::List)
             && (key.code == KeyCode::Char('q')
-                || key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL))
+                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
         }
@@ -302,20 +310,11 @@ impl AppState {
                     self.focus = Focus::List;
                 }
             }
-
             Focus::Search => match self.filter.handle_key(key) {
                 SearchAction::Exit => self.exit_search(),
                 SearchAction::Update => self.update_items(),
                 _ => {}
             },
-
-            _ if key.code == KeyCode::Char('q')
-                || key.code == KeyCode::Char('c')
-                    && key.modifiers.contains(KeyModifiers::CONTROL) =>
-            {
-                return false;
-            }
-
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
@@ -336,7 +335,6 @@ impl AppState {
                 KeyCode::Char('T') => self.theme.prev(),
                 _ => {}
             },
-
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
@@ -357,7 +355,6 @@ impl AppState {
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
-
             _ => (),
         };
         true
@@ -409,7 +406,7 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
+    fn get_selected_node(&self) -> Option<&ListNode> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
@@ -421,27 +418,17 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
-                return Some(item.node.command.clone());
+                return Some(&item.node);
             }
         }
         None
     }
-    fn get_selected_description(&mut self) -> Option<String> {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() && selected_index == 0 {
-            return None;
-        }
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
-
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            if !item.has_children {
-                return Some(item.node.description.clone());
-            }
-        }
-        None
+    pub fn get_selected_command(&self) -> Option<Command> {
+        self.get_selected_node().map(|node| node.command.clone())
+    }
+    fn get_selected_description(&self) -> Option<String> {
+        self.get_selected_node()
+            .map(|node| node.description.clone())
     }
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
@@ -474,29 +461,14 @@ impl AppState {
             selected_index = selected_index.saturating_sub(1);
         }
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            item.has_children
-        } else {
-            false
-        }
+        self.filter
+            .item_list()
+            .get(selected_index)
+            .map_or(false, |item| item.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() && selected_index == 0 {
-            return false;
-        }
-
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
-
-        if let Some(item) = self.filter.item_list().get(selected_index) {
-            !item.has_children
-        } else {
-            false
-        }
+        !self.selected_item_is_dir()
     }
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);

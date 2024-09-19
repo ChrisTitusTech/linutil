@@ -50,15 +50,7 @@ impl Float {
 
     pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect) {
         let popup_area = self.floating_window(parent_area);
-
-        let content_area = Rect {
-            x: popup_area.x,
-            y: popup_area.y,
-            width: popup_area.width,
-            height: popup_area.height,
-        };
-
-        self.content.draw(frame, content_area);
+        self.content.draw(frame, popup_area);
     }
 
     // Returns true if the floating window is finished.
