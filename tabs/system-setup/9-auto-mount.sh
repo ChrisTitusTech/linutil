@@ -60,7 +60,7 @@ update_fstab() {
     # Append the comment and the entry to /etc/fstab
     printf "%b\n" "$comment" | $ESCALATION_TOOL  tee -a /etc/fstab > /dev/null
     printf "%b\n" "$fstab_entry" | $ESCALATION_TOOL  tee -a /etc/fstab > /dev/null
-    printf "%b\n" "" | $ESCALATION_TOOL tee -a /etc/fstab > /dev/null
+    printf "%b\n" "" | "$ESCALATION_TOOL" tee -a /etc/fstab > /dev/null
 
     printf "%b\n" "Entry added to /etc/fstab:"
     printf "%b\n" "$comment"
