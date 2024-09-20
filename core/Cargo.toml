@@ -1,8 +1,15 @@
 [package]
 name = "linutil_core"
+description = "The backend of Linutil."
+repository = "https://github.com/ChrisTitusTech/linutil/tree/main/core"
 edition = "2021"
 version.workspace = true
 license.workspace = true
+include = [
+    "src/*.rs",
+    "Cargo.toml",
+    "tabs/**",
+]
 
 [dependencies]
 include_dir = "0.7.4"
