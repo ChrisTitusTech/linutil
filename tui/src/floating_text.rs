@@ -179,10 +179,12 @@ impl FloatContent for FloatingText {
 
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
+        let Rect { height, .. } = inner_area;
         let lines = self
             .src
             .lines()
             .skip(self.scroll)
+            .take(height as usize)
             .map(|l| l.into_text().unwrap())
             .collect::<Vec<_>>();
 
