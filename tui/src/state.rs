@@ -9,6 +9,7 @@ use crate::{
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::{Command, ListNode, Tab};
+use rand::Rng;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Style, Stylize},
@@ -39,6 +40,7 @@ pub struct AppState {
     multi_select: bool,
     selected_commands: Vec<Command>,
     drawable: bool,
+    tip: &'static str,
 }
 
 pub enum Focus {
@@ -69,6 +71,7 @@ impl AppState {
             multi_select: false,
             selected_commands: Vec::new(),
             drawable: false,
+            tip: get_random_line(include_str!("../cool_tips.txt").lines().collect()),
         };
         state.update_items();
         state
@@ -246,7 +249,12 @@ impl AppState {
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(style)
-            .block(Block::default().borders(Borders::ALL).title(title))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(title)
+                    .title_bottom(Line::from(self.tip.bold().blue()).right_aligned()),
+            )
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -524,4 +532,14 @@ impl AppState {
         self.selection.select(Some(0));
         self.update_items();
     }
+}
+
+fn get_random_line(lines: Vec<&str>) -> &str {
+    if lines.is_empty() {
+        return "";
+    }
+
+    let mut rng = rand::thread_rng();
+    let random_index = rng.gen_range(0..lines.len());
+    lines[random_index]
 }

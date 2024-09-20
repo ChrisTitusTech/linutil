@@ -11,6 +11,7 @@ include = [
     "src/*.rs",
     "Cargo.toml",
     "build.rs",
+    "cool_tips.txt",
 ]
 build = "build.rs"
 
@@ -23,6 +24,7 @@ portable-pty = "0.8.1"
 ratatui = "0.28.1"
 tui-term = "0.1.12"
 unicode-width = "0.1.13"
+rand =  "0.8.5"
 linutil_core = { path = "../core", version = "24.9.19" }
 
 [build-dependencies]
