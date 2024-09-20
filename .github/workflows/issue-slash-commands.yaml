@@ -42,4 +42,8 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo Closing the issue...
-          gh issue close $ISSUE_NUMBER --repo ${{ github.repository }}
+          if [[ "${{ contains(github.event.comment.body, 'not planned') }}" == "true" ]]; then
+            gh issue close $ISSUE_NUMBER --repo ${{ github.repository }} --reason 'not planned'
+          else
+            gh issue close $ISSUE_NUMBER --repo ${{ github.repository }}
+          fi
