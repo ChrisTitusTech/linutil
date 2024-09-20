@@ -53,3 +53,23 @@ script = "rofi-setup.sh"
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
+
+[[data]]
+name = "Install Linutil"
+description = "Installs a distro-specific Linutil package locally."
+script = "linutil-installer.sh"
+
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = [ "linutil" ]
+
+[[data]]
+name = "Update Linutil"
+description = "Updates your local Linutil crate installation."
+script = "linutil-updater.sh"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "linutil" ]
