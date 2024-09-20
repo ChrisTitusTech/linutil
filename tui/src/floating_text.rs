@@ -1,3 +1,5 @@
+#![allow(soft_unstable)]
+
 use std::io::{Cursor, Read as _, Seek, SeekFrom, Write as _};
 
 use crate::{
@@ -28,9 +30,8 @@ pub enum FloatingTextMode {
 }
 
 pub struct FloatingText {
-    src: String,
+    pub src: Vec<String>,
     scroll: usize,
-    n_lines: usize,
     mode: FloatingTextMode,
 }
 
@@ -111,14 +112,9 @@ fn get_highlighted_string(s: &str) -> Option<String> {
 
 impl FloatingText {
     pub fn new(text: String, mode: FloatingTextMode) -> Self {
-        let mut n_lines = 0;
-
-        text.split("\n").for_each(|_| n_lines += 1);
-
         Self {
-            src: text,
+            src: text.split("\n").map(|s| s.to_string()).collect(),
             scroll: 0,
-            n_lines,
             mode,
         }
     }
@@ -147,7 +143,7 @@ impl FloatingText {
     }
 
     fn scroll_down(&mut self) {
-        if self.scroll + 1 < self.n_lines {
+        if self.scroll + 1 < self.src.len() {
             self.scroll += 1;
         }
     }
@@ -179,12 +175,11 @@ impl FloatContent for FloatingText {
 
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
-        let Rect { height, .. } = inner_area;
         let lines = self
             .src
-            .lines()
+            .iter()
             .skip(self.scroll)
-            .take(height as usize)
+            .take(inner_area.height as usize)
             .map(|l| l.into_text().unwrap())
             .collect::<Vec<_>>();
 
