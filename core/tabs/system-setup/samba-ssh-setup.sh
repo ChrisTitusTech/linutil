@@ -126,6 +126,7 @@ setup_samba() {
    writable = yes
    guest ok = no
    read only = no
+   valid users = $SAMBA_USER
 EOL
     fi
 

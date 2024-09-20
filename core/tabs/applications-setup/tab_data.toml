@@ -35,6 +35,11 @@ description = "Flatpak is a universal application sandbox for Linux that uses is
 script = "setup-flatpak.sh"
 
 [[data]]
+name = "Office Suite Setup"
+description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
+script = "office-suite-setup.sh"
+
+[[data]]
 name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.\nkitty is written in a mix of C and Python programming languages.\n This command installs and configures kitty."
 script = "kitty-setup.sh"

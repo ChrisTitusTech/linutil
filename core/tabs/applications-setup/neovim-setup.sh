@@ -14,6 +14,7 @@ cloneNeovim() {
 }
 
 installNeovim() {
+    if ! command_exists neovim ripgrep git fzf; then
     printf "%b\n" "${YELLOW}Installing Neovim...${RC}"
     case "$PACKAGER" in
         pacman)
@@ -33,6 +34,7 @@ installNeovim() {
             exit 1
             ;;
     esac
+    fi
 }
 
 backupNeovimConfig() {

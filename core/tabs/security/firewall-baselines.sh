@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 installPkg() {
-    printf "%b\n" "${YELLOW}Installing UFW...${RC}"
     if ! command_exists ufw; then
+     printf "%b\n" "${YELLOW}Installing UFW...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm ufw
