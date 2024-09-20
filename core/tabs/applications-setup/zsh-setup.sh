@@ -5,7 +5,7 @@
 # Function to install zsh
 installZsh() {
   if ! command_exists zsh; then
-      printf "%b\n" "${YELLOW}Installing Zsh...${RC}"
+    printf "%b\n" "${YELLOW}Installing Zsh...${RC}"
       case "$PACKAGER" in
           pacman)
               "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm zsh
