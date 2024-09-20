@@ -303,6 +303,7 @@ keymap
 echo "Setting up mirrors for optimal download"
 iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
+pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 setfont ter-v18b
@@ -425,6 +426,7 @@ if ! grep -qs '/mnt' /proc/mounts; then
     echo "Rebooting in 1 Second ..." && sleep 1
     reboot now
 fi
+
 echo -ne "
 -------------------------------------------------------------------------
                     Arch Install on Main Drive
