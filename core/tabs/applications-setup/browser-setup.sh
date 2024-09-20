@@ -4,86 +4,95 @@
 
 install_chrome() {
     printf "%b\n" "${YELLOW}Installing Google Chrome..${RC}."
-    case "$PACKAGER" in
-        apt-get|nala)
-            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            "$ESCALATION_TOOL" dpkg -i google-chrome-stable_current_amd64.deb
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
-            "$ESCALATION_TOOL" "$PACKAGER" refresh
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install google-chrome-stable
-            ;;
-        pacman)
-            "$AUR_HELPER" -S --noconfirm google-chrome
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install fedora-workstation-repositories
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
-            "$ESCALATION_TOOL" "$PACKAGER" install google-chrome-stable
-            ;;
-        *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
-            ;;
-    esac
-
+    if ! command_exists google-chrome; then
+        case "$PACKAGER" in
+            apt-get|nala)
+                curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+                "$ESCALATION_TOOL" dpkg -i google-chrome-stable_current_amd64.deb
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
+                "$ESCALATION_TOOL" "$PACKAGER" refresh
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install google-chrome-stable
+                ;;
+            pacman)
+                "$AUR_HELPER" -S --noconfirm google-chrome
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y fedora-workstation-repositories
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
+                "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
+                ;;
+            *)
+                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Google Chrome Browser is already installed.${RC}"
+    fi
 }
 
 install_thorium() {
     printf "%b\n" "${YELLOW}Installing Thorium Browser...${RC}"
-    case "$PACKAGER" in
-	apt-get|nala)
-	    "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
-            "$ESCALATION_TOOL" wget --no-hsts -P /etc/apt/sources.list.d/ http://dl.thorium.rocks/debian/dists/stable/thorium.list
-	    "$ESCALATION_TOOL" "$PACKAGER" update
-	    "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
-		;;
-	zypper|dnf)
-	    url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
-            echo $url && curl -L $url -o thorium-latest.rpm
-            "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
-		;;
-	pacman)
-	     "$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
-		;;
-		*)
-	        printf "%b\n" "${RED}Unsupported package manager. Please install Thorium manually.${RC}"
-		exit 1
-		;;
-	esac
-	printf "%b\n" "${GREEN}Thorium Browser installed successfully!${RC}"
+    if ! command_exists thorium-browser; then
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
+                "$ESCALATION_TOOL" curl http://dl.thorium.rocks/debian/dists/stable/thorium.list -o /etc/apt/sources.list.d/thorium.list
+                "$ESCALATION_TOOL" "$PACKAGER" update
+                "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
+                ;;
+            zypper|dnf)
+                url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
+                    echo $url && curl -L $url -o thorium-latest.rpm
+                    "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
+                ;;
+            pacman)
+                "$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager. Please install Thorium manually.${RC}"
+            exit 1
+            ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Thorium Browser is already installed.${RC}"
+    fi
 }
 
 install_firefox() {
     printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
-    case "$PACKAGER" in
-        apt-get)
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install MozillaFirefox
-            ;;
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm firefox
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install firefox
-            ;;
-        *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
-            ;;
-    esac
-
+    if ! command_exists firefox; then
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install MozillaFirefox
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm firefox
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
+                ;;
+            *)
+                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Firefox Browser is already installed.${RC}"
+    fi
 }
 
 install_librewolf() {
 	printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
+    if ! command_exists librewolf; then
 	case "$PACKAGER" in
 		apt-get|nala)
-			"$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y wget gnupg lsb-release apt-transport-https ca-certificates
+			"$ESCALATION_TOOL" "$PACKAGER" install -y gnupg lsb-release apt-transport-https ca-certificates
 			distro=`if echo " una bookworm vanessa focal jammy bullseye vera uma " | grep -q " $(lsb_release -sc) "; then lsb_release -sc; else echo focal; fi`
-			wget -O- https://deb.librewolf.net/keyring.gpg | "$ESCALATION_TOOL" gpg --dearmor -o /usr/share/keyrings/librewolf.gpg
+			curl -fsSL https://deb.librewolf.net/keyring.gpg | "$ESCALATION_TOOL" gpg --dearmor -o /usr/share/keyrings/librewolf.gpg
 			echo "Types: deb
 URIs: https://deb.librewolf.net
 Suites: $distro
@@ -113,87 +122,97 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 			exit 1
 			;;
 	esac
-	printf "%b\n" "${GREEN}Librewolf installed successfully!${RC}"
+    else
+        printf "%b\n" "${GREEN}LibreWolf Browser is already installed.${RC}"
+    fi
 }
 
 install_brave() {
     printf "%b\n" "${YELLOW}Installing Brave...${RC}"
-    case "$PACKAGER" in
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER"  install curl
-            "$ESCALATION_TOOL" curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-            "$ESCALATION_TOOL" "$PACKAGER"  update
-            "$ESCALATION_TOOL" "$PACKAGER"  install brave-browser
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER"install curl
-            "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-            "$ESCALATION_TOOL" "$PACKAGER" addrepo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install brave-browser
-            ;;
-        pacman)
-            "$AUR_HELPER" -S --noconfirm brave-bin
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install dnf-plugins-core
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-            "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-            "$ESCALATION_TOOL" "$PACKAGER" install brave-browser
-            ;;
-        *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
-            ;;
-    esac
+    if ! command_exists brave; then
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y curl
+                "$ESCALATION_TOOL" curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+                echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"| "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/brave-browser-release.list
+                "$ESCALATION_TOOL" "$PACKAGER" update
+                "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y curl
+                "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+                "$ESCALATION_TOOL" "$PACKAGER" addrepo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install brave-browser
+                ;;
+            pacman)
+                "$AUR_HELPER" -S --noconfirm brave-bin
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+                "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
+                ;;
+            *)
+                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Brave Browser is already installed.${RC}"
+    fi
 }
 
 install_vivaldi() {
-    printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
-    wget https://downloads.vivaldi.com/snapshot/install-vivaldi.sh
-    sh install-vivaldi.sh
+    if ! command_exists vivaldi; then
+        printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
+        curl -fsSL https://downloads.vivaldi.com/snapshot/install-vivaldi.sh | sh
+        if [ $? -eq 0 ]; then
+                printf "%b\n" "${GREEN}Vivaldi installed successfully!${RC}"
+        else
+                printf "%b\n" "${RED}Vivaldi installation failed!${RC}"
+        fi
+    else
+        printf "%b\n" "${GREEN}Vivaldi Browser is already installed.${RC}"
+    fi
 }
 
 install_chromium() {
     printf "%b\n" "${YELLOW}Installing Chromium...${RC}"
-    case "$PACKAGER" in
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install chromium
-            ;;
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm chromium
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install --assumeyes https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-            "$ESCALATION_TOOL" "$PACKAGER" install chromium
-            ;;
-        *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
-            ;;
-    esac
+    if ! command_exists chromium; then
+        case "$PACKAGER" in
+            apt-get|nala|zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm chromium
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
+                ;;
+            *)
+                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Chromium Browser is already installed.${RC}"
+    fi
 }
 
 install_lynx() {
     printf "%b\n" "${YELLOW}Installing Lynx...${RC}"
-    case "$PACKAGER" in
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" install lynx
-            ;;
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm lynx
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install lynx
-            ;;
-        *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
-            ;;
-    esac
+    if ! command_exists lynx; then
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm lynx
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Lynx TUI Browser is already installed.${RC}"
+    fi
 }
 
 browserSetup() {
