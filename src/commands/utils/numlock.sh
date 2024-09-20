@@ -2,20 +2,28 @@
 
 . ../common-script.sh
 
-# setleds can be used in all distros
 # This method works by calling a script using systemd service
 
 # Create a script to toggle numlock
-
 create_file() {
   echo "Creating script..."
   $ESCALATION_TOOL tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
 #!/bin/bash
 
-for tty in /dev/tty{1..6}
-do
-    /usr/bin/setleds -D +num < "$tty"; 
-done
+# Check if setleds is available and use it to toggle numlock
+if command -v setleds &>/dev/null; then
+  for tty in /dev/tty{1..6}
+  do
+      setleds -D +num < "$tty"; 
+  done
+else
+  # If setleds is not available, use xset for Xorg systems
+  if command -v xset &>/dev/null; then
+    xset led named "Num Lock"
+  else
+    echo "Numlock cannot be toggled on this system."
+  fi
+fi
 EOF
 
   $ESCALATION_TOOL chmod +x /usr/local/bin/numlock
