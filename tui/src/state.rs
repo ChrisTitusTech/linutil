@@ -21,6 +21,7 @@ use ratatui::{
 
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
+const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
 
 pub struct AppState {
     /// Selected theme
@@ -243,15 +244,11 @@ impl AppState {
             Style::new()
         };
 
-        let title = format!(
-            "Linux Toolbox - {} {}",
-            env!("BUILD_DATE"),
-            if self.multi_select {
-                "[Multi-Select]"
-            } else {
-                ""
-            }
-        );
+        let title = if self.multi_select {
+            &format!("{} [Multi-Select]", TITLE)
+        } else {
+            TITLE
+        };
 
         #[cfg(feature = "tips")]
         let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
