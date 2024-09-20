@@ -15,34 +15,9 @@ data = { environment = "DISPLAY" }
 values = [":0", ":1", ":2", ":3", ":4", ":5", ":6", ":7", ":8", ":9"]
 
 [[data.entries]]
-name = "Duplicate Displays"
-description = "This utility is designed to duplicate display among multi-monitor setup in your system"
-script = "monitor-control/duplicate_displays.sh"
-
-[[data.entries]]
-name = "Extend Displays"
-description = "This utility is designed to extend display among multi-monitor setup in your system"
-script = "monitor-control/extend_displays.sh"
-
-[[data.entries]]
 name = "Auto Detect Displays"
 description = "This utility is designed to detect and apply recommended configuration for monitors connected with your system"
 script = "monitor-control/auto_detect_displays.sh"
-
-[[data.entries]]
-name = "Enable Monitor"
-description = "This utility is designed to enable a monitor in your system"
-script = "monitor-control/enable_monitor.sh"
-
-[[data.entries]]
-name = "Disable Monitor"
-description = "This utility is designed to disable a monitor in your system"
-script = "monitor-control/disable_monitor.sh"
-
-[[data.entries]]
-name = "Set Primary Monitor"
-description = "This utility is designed to set a Primary monitor in your system"
-script = "monitor-control/set_primary_monitor.sh"
 
 [[data.entries]]
 name = "Change Orientation"
@@ -50,14 +25,29 @@ description = "This utility is designed to change the orientation of monitors in
 script = "monitor-control/change_orientation.sh"
 
 [[data.entries]]
+name = "Disable Monitor"
+description = "This utility is designed to disable a monitor in your system"
+script = "monitor-control/disable_monitor.sh"
+
+[[data.entries]]
+name = "Duplicate Displays"
+description = "This utility is designed to duplicate display among multi-monitor setup in your system"
+script = "monitor-control/duplicate_displays.sh"
+
+[[data.entries]]
+name = "Enable Monitor"
+description = "This utility is designed to enable a monitor in your system"
+script = "monitor-control/enable_monitor.sh"
+
+[[data.entries]]
+name = "Extend Displays"
+description = "This utility is designed to extend display among multi-monitor setup in your system"
+script = "monitor-control/extend_displays.sh"
+
+[[data.entries]]
 name = "Manage Arrangement"
 description = "This utility is designed to arrange monitors in multi-monitor setup in your system"
 script = "monitor-control/manage_arrangement.sh"
-
-[[data.entries]]
-name = "Scale Monitors"
-description = "This utility is designed to change the scaling of monitors in your system"
-script = "monitor-control/scale_monitor.sh"
 
 [[data.entries]]
 name = "Reset Scaling"
@@ -66,9 +56,19 @@ script = "monitor-control/reset_scaling.sh"
 matches = true
 
 [[data.entries]]
+name = "Scale Monitors"
+description = "This utility is designed to change the scaling of monitors in your system"
+script = "monitor-control/scale_monitor.sh"
+
+[[data.entries]]
 name = "Set Brightness"
 script = "monitor-control/set_brightness.sh"
 matches = true
+
+[[data.entries]]
+name = "Set Primary Monitor"
+description = "This utility is designed to set a Primary monitor in your system"
+script = "monitor-control/set_primary_monitor.sh"
 
 [[data]]
 name = "User Account Manager"
@@ -78,16 +78,16 @@ name = "Add User"
 script = "user-account-manager/add_user.sh"
 
 [[data.entries]]
+name = "Add User To Groups"
+script = "user-account-manager/add_to_group.sh"
+
+[[data.entries]]
 name = "Change Password"
 script = "user-account-manager/change_password.sh"
 
 [[data.entries]]
 name = "Delete User"
 script = "user-account-manager/delete_user.sh"
-
-[[data.entries]]
-name = "Add User To Groups"
-script = "user-account-manager/add_to_group.sh"
 
 [[data.entries]]
 name = "Remove User From Groups"
@@ -130,11 +130,6 @@ description = "This utility is designed to manage services in your system"
 script = "service-control.sh"
 
 [[data]]
-name = "WiFi Manager"
-description = "This utility is designed to manage wifi in your system"
-script = "wifi-control.sh"
-
-[[data]]
 name = "SSH Commands"
 script = "ssh.sh"
 
@@ -142,3 +137,7 @@ script = "ssh.sh"
 name = "Timeshift Backup"
 script = "timeshift.sh"
 
+[[data]]
+name = "WiFi Manager"
+description = "This utility is designed to manage wifi in your system"
+script = "wifi-control.sh"
