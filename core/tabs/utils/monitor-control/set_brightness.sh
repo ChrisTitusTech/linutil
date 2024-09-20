@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./utility_functions.sh
+. ../utility_functions.sh
 
 # Function to adjust brightness for a selected monitor
 adjust_monitor_brightness() {

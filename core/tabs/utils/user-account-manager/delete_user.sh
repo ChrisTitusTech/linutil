@@ -1,27 +1,30 @@
 #!/bin/sh -e
 
 . ../../common-script.sh
-. ./utility_functions.sh
 
-clear
-printf "%b\n" "${YELLOW}Delete a user${RC}"
-printf "%b\n" "${YELLOW}=================${RC}"
+. ../utility_functions.sh
 
-username=$(promptUsername "" "non-root") || exit 1
+deleteUser() {
+    clear
+    printf "%b\n" "${YELLOW}Delete a user${RC}"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-# Check if current user
-if [ "$username" = "$USER" ]; then
-    printf "%b\n" "${RED}Cannot delete the current user${RC}"
-    printf "%b\n" "${RED}Press [Enter] to continue...${RC}"
-    read -r dummy
-    return
-fi
+    printf "%b" "${YELLOW}Enter the username: ${RC}"
+    read -r username
 
-printf "Are you sure you want to delete user $username? [Y/N]: "
-read -r confirm
-confirmAction || exit 1
+    if id "$username" > /dev/null 2>&1; then
+        printf "%b" "${YELLOW}Are you sure you want to delete user ""$username""? [Y/n]: ${RC}"
+        read -r confirm
+        confirmAction || exit 1
 
-$ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
-printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
+        $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
+        printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
+    else
+        printf "%b\n" "${RED}User $username does not exist.${RC}"
+        exit 1
+    fi
+}
 
 checkEnv
+checkEscalationTool
+deleteUser

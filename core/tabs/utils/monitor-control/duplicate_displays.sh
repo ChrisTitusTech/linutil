@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ./utility_functions.sh
+. ../utility_functions.sh
 
 . ../../common-script.sh
 
