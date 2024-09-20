@@ -2,7 +2,7 @@
 
 . ../common-script.sh
 
-installLinutil() {
+updateLinutil() {
     if [ ! -e "$HOME/.cargo/bin/linutil" ]; then
         printf "%b\n" "${RED}This script only updates the binary installed through cargo.\nlinutil_tui is not installed.${RC}"
         exit 1
@@ -42,4 +42,4 @@ installLinutil() {
 checkEnv
 checkEscalationTool
 checkAURHelper
-installLinutil
+updateLinutil
