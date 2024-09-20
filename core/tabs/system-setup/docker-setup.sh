@@ -37,7 +37,7 @@ install_docker() {
             "$ESCALATION_TOOL" systemctl start docker
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager. Please install Docker manually.${RC}\n"
+            printf "${RED}Unsupported package manager. Please install Docker manually.${RC}\n"
             exit 1
             ;;
     esac
@@ -57,7 +57,7 @@ install_docker_compose() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm docker-compose
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager. Please install Docker Compose manually.${RC}\n"
+            printf "${RED}Unsupported package manager. Please install Docker Compose manually.${RC}\n"
             exit 1
             ;;
     esac
