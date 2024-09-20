@@ -1,32 +1,47 @@
 #!/bin/sh -e
 
 . ../../common-script.sh
-. ./utility_functions.sh
 
-clear
-printf "%b\n" "${YELLOW}Remove from group${RC}"
-printf "%b\n" "${YELLOW}=================${RC}"
+. ../utility_functions.sh
 
-username=$(promptUsername "" "non-root") || exit 1
-user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
+removeFromGroup() {
+    clear
+    printf "%b\n" "${YELLOW}Remove from group${RC}"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
-printf "%b\n" "${YELLOW}=================${RC}"
+    printf "%b" "${YELLOW}Enter the username: ${RC}"
+    read -r username
 
-printf "%b\n" "${YELLOW}Enter the groups you want to remove user $username from (space-separated):${RC} "
-read -r groups
+    if ! id "$username" > /dev/null 2>&1; then
+        printf "%b\n" "${RED}User $username does not exist.${RC}"
+        exit 1
+    fi
 
-checkEmpty "$groups" || exit 1
-checkGroupAvailabe "$groups" "$user_groups" || exit 1
+    user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
 
-groups_to_remove=$(echo "$groups" | tr ' ' ',')
+    printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-printf "Are you sure you want to remove user $username from $groups_to_remove? [Y/N]: "
-read -r confirm
-confirmAction || exit 1
+    printf "%b" "${YELLOW}Enter the groups you want to remove user $username from (space-separated): ${RC} "
+    read -r groups
 
-$ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+    checkEmpty "$groups" || exit 1
+    if ! checkGroups "$groups" "$user_groups"; then
+        printf "%b\n" "${RED}One or more specified groups do not exist.${RC}"
+        exit 1
+    fi
 
-printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
+    groups_to_remove=$(echo "$groups" | tr ' ' ',')
+
+    printf "%b" "${YELLOW}Are you sure you want to remove user $username from $groups_to_remove? [Y/n]: ${RC}"
+    read -r confirm
+    confirmAction || exit 1
+
+    $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+
+    printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
+}
 
 checkEnv
+checkEscalationTool
+removeFromGroup

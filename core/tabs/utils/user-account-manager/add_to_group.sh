@@ -1,37 +1,47 @@
 #!/bin/sh -e
 
 . ../../common-script.sh
-. ./utility_functions.sh
 
-clear
-printf "%b\n" "${YELLOW}Add to group${RC}"
-printf "%b\n" "${YELLOW}=================${RC}"
+. ../utility_functions.sh
 
-username=$(promptUsername "" "non-root") || exit 1
-user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
+addToGroup() {
+    clear
+    printf "%b\n" "${YELLOW}Add to group${RC}"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
-printf "%b\n" "${YELLOW}=================${RC}"
+    printf "%b" "${YELLOW}Enter the username: ${RC}"
+    read -r username
+    user_groups=$(groups "$username" | cut -d: -f2 | sort | tr '\n' ' ')
 
-available_groups=$(cut -d: -f1 /etc/group | sort | tr '\n' ' ')
+    printf "%b\n" "${YELLOW}Groups user $username is in:${RC} $user_groups"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-printf "%b\n" "${YELLOW}Available groups:${RC} $available_groups"
-printf "%b\n" "${YELLOW}=================${RC}"
+    available_groups=$(cut -d: -f1 /etc/group | sort | tr '\n' ' ')
 
-printf "%b\n" "${YELLOW}Enter the groups you want to add user $username to (space-separated):${RC} "
-read -r groups
+    printf "%b\n" "${YELLOW}Available groups:${RC} $available_groups"
+    printf "%b\n" "${YELLOW}=================${RC}"
 
-checkEmpty "$groups" || exit 1
-checkGroupAvailabe "$groups" "$available_groups" || exit 1
+    printf "%b" "${YELLOW}Enter the groups you want to add user $username to (space-separated): ${RC}"
+    read -r groups
 
-groups_to_add=$(echo "$groups" | tr ' ' ',')
+    checkEmpty "$groups" || exit 1
+    if ! checkGroups "$groups" "$available_groups"; then
+        printf "%b\n" "${RED}One or more groups are not available.${RC}"
+        exit 1
+    fi
 
-printf "Are you sure you want to add user $username to $groups_to_add? [Y/N]: "
-read -r confirm
-confirmAction || exit 1
+    groups_to_add=$(echo "$groups" | tr ' ' ',')
 
-$ESCALATION_TOOL usermod -aG $groups_to_add "$username"
+    printf "%b" "${YELLOW}Are you sure you want to add user $username to $groups_to_add? [Y/n]: ${RC}"
+    read -r confirm
+    confirmAction || exit 1
 
-printf "%b\n" "${GREEN}User successfully added to the $groups_to_add${RC}"
+    "$ESCALATION_TOOL" usermod -aG "$groups_to_add" "$username"
+
+    printf "%b\n" "${GREEN}User successfully added to the $groups_to_add${RC}"
+}
 
 checkEnv
+checkEscalationTool
+checkGroups
+addToGroup
