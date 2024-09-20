@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 installRofi() {
-    printf "%b\n" "${YELLOW}Installing Rofi...${RC}"
     if ! command_exists rofi; then
+    printf "%b\n" "${YELLOW}Installing Rofi...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rofi

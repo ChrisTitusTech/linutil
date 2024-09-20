@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 installAlacritty() {
-    printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
     if ! command_exists alacritty; then
+    printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm alacritty
@@ -19,7 +19,7 @@ installAlacritty() {
 }
 
 setupAlacrittyConfig() {
-    printf "%b\n" "${YELLOW}Copy alacritty config files${RC}"
+    printf "%b\n" "${YELLOW}Copying alacritty config files...${RC}"
     if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
         cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
     fi
