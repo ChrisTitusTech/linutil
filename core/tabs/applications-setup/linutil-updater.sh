@@ -26,7 +26,7 @@ updateLinutil() {
     fi
 
     INSTALLED_VERSION=$(cargo install --list | grep "linutil_tui" | awk '{print $2}' | tr -d 'v:')
-    LATEST_VERSION=$(curl -s https://crates.io/api/v1/crates/linutil_tui | jq -r '.crate.max_version')
+    LATEST_VERSION=$(curl -s https://crates.io/api/v1/crates/linutil_tui | grep -oP '"max_version":\s*"\K[^"]+')
 
     if [ "$INSTALLED_VERSION" = "$LATEST_VERSION" ]; then
         printf "%b\n" "${GREEN}linutil_tui is up to date.${RC}"
