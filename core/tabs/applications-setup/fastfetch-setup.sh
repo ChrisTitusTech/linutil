@@ -10,7 +10,7 @@ installFastfetch() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm fastfetch
                 ;;
             apt-get|nala)
-                curl -sSLo /tmp/fastfetch.deb https://github.com/fastfetch-cli/fastfetch/releases/download/2.25.0/fastfetch-linux-amd64.deb
+                curl -sSLo /tmp/fastfetch.deb https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb
                 "$ESCALATION_TOOL" dpkg -i /tmp/fastfetch.deb
                 rm /tmp/fastfetch.deb
                 ;;
