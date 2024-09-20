@@ -66,7 +66,7 @@ values = [ "linutil" ]
 
 [[data]]
 name = "Update Linutil"
-description = "Updates your local Linutil installation."
+description = "Updates your local Linutil crate installation."
 script = "linutil-updater.sh"
 
 [[data.preconditions]]
