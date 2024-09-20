@@ -22,6 +22,7 @@ jobs:
           chmod +x shellcheck
 
       - name: Run shellcheck
+        working-directory: ./shellcheck-v0.10.0
         run: |
           for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
               if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
