@@ -15,6 +15,10 @@ include = [
 ]
 build = "build.rs"
 
+[features]
+default = ["tips"]
+tips = []
+
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
 crossterm = "0.28.1"
