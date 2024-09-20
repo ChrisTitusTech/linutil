@@ -3,7 +3,7 @@ name: ShellCheck
 on:
   pull_request:
     paths:
-      - 'tabs/**/*.sh'
+      - 'core/tabs/**/*.sh'
   workflow_dispatch:
 
 jobs:
@@ -15,5 +15,5 @@ jobs:
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
       with:
-        scandir: 'tabs'
+        scandir: 'core/tabs'
         severity: error
