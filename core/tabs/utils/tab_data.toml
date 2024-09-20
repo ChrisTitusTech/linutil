@@ -19,6 +19,10 @@ name = "Auto Detect Displays"
 description = "This utility is designed to detect and apply recommended configuration for monitors connected with your system"
 script = "monitor-control/auto_detect_displays.sh"
 
+[[data]]
+name = "Auto Mount Drive"
+script = "auto-mount.sh"
+
 [[data.entries]]
 name = "Change Orientation"
 description = "This utility is designed to change the orientation of monitors in your system"
@@ -54,6 +58,10 @@ name = "Reset Scaling"
 description = "This utility is designed to reset scaling of a monitor in your system"
 script = "monitor-control/reset_scaling.sh"
 matches = true
+
+[[data]]
+name = "SSH-Samba Setup"
+script = "samba-ssh-setup.sh"
 
 [[data.entries]]
 name = "Scale Monitors"

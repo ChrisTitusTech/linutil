@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 install_chrome() {
-    printf "%b\n" "${YELLOW}Installing Google Chrome..${RC}."
     if ! command_exists google-chrome; then
+    printf "%b\n" "${YELLOW}Installing Google Chrome..${RC}."
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -33,8 +33,8 @@ install_chrome() {
 }
 
 install_thorium() {
-    printf "%b\n" "${YELLOW}Installing Thorium Browser...${RC}"
     if ! command_exists thorium-browser; then
+    printf "%b\n" "${YELLOW}Installing Thorium Browser...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
@@ -61,8 +61,8 @@ install_thorium() {
 }
 
 install_firefox() {
-    printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
     if ! command_exists firefox; then
+    printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
@@ -86,8 +86,8 @@ install_firefox() {
 }
 
 install_librewolf() {
-	printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
     if ! command_exists librewolf; then
+    printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
 	case "$PACKAGER" in
 		apt-get|nala)
 			"$ESCALATION_TOOL" "$PACKAGER" install -y gnupg lsb-release apt-transport-https ca-certificates
@@ -128,8 +128,8 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 }
 
 install_brave() {
-    printf "%b\n" "${YELLOW}Installing Brave...${RC}"
     if ! command_exists brave; then
+    printf "%b\n" "${YELLOW}Installing Brave...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
@@ -177,8 +177,8 @@ install_vivaldi() {
 }
 
 install_chromium() {
-    printf "%b\n" "${YELLOW}Installing Chromium...${RC}"
     if ! command_exists chromium; then
+    printf "%b\n" "${YELLOW}Installing Chromium...${RC}"
         case "$PACKAGER" in
             apt-get|nala|zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
@@ -200,8 +200,8 @@ install_chromium() {
 }
 
 install_lynx() {
-    printf "%b\n" "${YELLOW}Installing Lynx...${RC}"
     if ! command_exists lynx; then
+    printf "%b\n" "${YELLOW}Installing Lynx...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm lynx
@@ -229,7 +229,7 @@ browserSetup() {
     printf "%b\n" "7. Thorium"
     printf "%b\n" "8. Lynx"
     printf "%b\n" "----------------------------"
-    printf "%b\n"  "Enter your choices (e.g., 1 3 5): "
+    printf "%b"  "Enter your choices (e.g., 1 3 5): "
     read -r choice
     for ch in $choice; do
         case $ch in
