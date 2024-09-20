@@ -25,7 +25,7 @@ jobs:
       - name: Check for bashisms in changed files
         run: |
           for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
-              if [[ "$file" == *.sh ]] && [[ -f "$file" ]];; then
+              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
                   checkbashisms "$file"
               fi
           done
