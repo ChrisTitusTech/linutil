@@ -28,4 +28,6 @@ changePassword() {
     fi
 }
 
+checkEnv
+checkEscalationTool
 changePassword

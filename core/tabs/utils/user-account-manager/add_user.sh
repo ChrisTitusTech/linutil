@@ -34,4 +34,5 @@ createUser() {
 }
 
 checkEnv
+checkEscalationTool
 createUser
