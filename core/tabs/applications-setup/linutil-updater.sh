@@ -29,7 +29,7 @@ installLinutil() {
     LATEST_VERSION=$(curl -s https://crates.io/api/v1/crates/linutil_tui | jq -r '.crate.max_version')
 
     if [ "$INSTALLED_VERSION" = "$LATEST_VERSION" ]; then
-        printf "%b\n" "${GREEN}linutil_tui is up to date."
+        printf "%b\n" "${GREEN}linutil_tui is up to date.${RC}"
         exit 0
     fi
 
