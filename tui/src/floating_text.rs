@@ -41,7 +41,7 @@ macro_rules! style {
     }};
 }
 
-const SYNTAX_HIGHLIGHT_STYLES: [(&'static str, anstyle::Style); 8] = [
+const SYNTAX_HIGHLIGHT_STYLES: [(&str, anstyle::Style); 8] = [
     ("function", style!(220, 220, 170)), // yellow
     ("string", style!(206, 145, 120)),   // brown
     ("property", style!(156, 220, 254)), // light blue
