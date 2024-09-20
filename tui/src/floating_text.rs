@@ -52,7 +52,7 @@ const SYNTAX_HIGHLIGHT_STYLES: [(&'static str, anstyle::Style); 8] = [
     ("number", style!(181, 206, 168)),   // light green
 ];
 
-fn get_highlighted_string<'a>(s: &'a str) -> Option<String> {
+fn get_highlighted_string(s: &str) -> Option<String> {
     let mut hl_conf = hl::HighlightConfiguration::new(
         hl_bash::LANGUAGE.into(),
         "bash",
