@@ -84,7 +84,7 @@ impl FloatContent for FloatingText {
         let inner_area = block.inner(area);
 
         // Create the list of lines to be displayed
-        let mut lines: Vec<Line> = self
+        let lines: Vec<Line> = self
             .text
             .iter()
             .skip(self.scroll)

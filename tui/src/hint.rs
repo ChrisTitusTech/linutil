@@ -20,6 +20,15 @@ pub struct Shortcut {
     pub desc: &'static str,
 }
 
+fn add_spacing(list: Vec<Vec<Span>>) -> Line {
+    list.into_iter()
+        .flat_map(|mut s| {
+            s.push(Span::default().content("    "));
+            s
+        })
+        .collect()
+}
+
 pub fn span_vec_len(span_vec: &[Span]) -> usize {
     span_vec.iter().rfold(0, |init, s| init + s.width())
 }
@@ -29,15 +38,14 @@ impl ShortcutList {
             .title(self.scope_name)
             .borders(Borders::all());
         let inner_area = area.inner(Margin::new(1, 1));
-        let mut shortcut_list: Vec<Vec<Span>> = self.hints.iter().map(|h| h.to_spans()).collect();
+        let shortcut_spans: Vec<Vec<Span>> = self.hints.iter().map(|h| h.to_spans()).collect();
 
-        let mut lines = vec![Line::default(); SHORTCUT_LINES];
-        let mut idx = 0;
+        let mut lines: Vec<Line> = Vec::with_capacity(SHORTCUT_LINES);
 
-        while idx < SHORTCUT_LINES - 1 {
-            let split_idx = shortcut_list
+        let shortcut_list = (0..SHORTCUT_LINES - 1).fold(shortcut_spans, |mut acc, _| {
+            let split_idx = acc
                 .iter()
-                .scan(0usize, |total_len, s| {
+                .scan(0_usize, |total_len, s| {
                     *total_len += span_vec_len(s);
                     if *total_len > inner_area.width as usize {
                         None
@@ -47,25 +55,13 @@ impl ShortcutList {
                     }
                 })
                 .count();
-            let new_shortcut_list = shortcut_list.split_off(split_idx);
-            let line: Vec<_> = shortcut_list
-                .into_iter()
-                .flat_map(|mut s| {
-                    s.push(Span::default().content("    "));
-                    s
-                })
-                .collect();
-            shortcut_list = new_shortcut_list;
-            lines[idx] = line.into();
-            idx += 1;
-        }
-        lines[idx] = shortcut_list
-            .into_iter()
-            .flat_map(|mut s| {
-                s.push(Span::default().content("    "));
-                s
-            })
-            .collect();
+
+            let new_shortcut_list = acc.split_off(split_idx);
+            lines.push(add_spacing(acc));
+
+            new_shortcut_list
+        });
+        lines.push(add_spacing(shortcut_list));
 
         let p = Paragraph::new(lines).block(block);
         frame.render_widget(p, area);
@@ -100,11 +96,18 @@ impl Shortcut {
     }
 }
 
-fn get_list_item_shortcut(state: &AppState) -> Shortcut {
+fn get_list_item_shortcut(state: &AppState) -> Vec<Shortcut> {
     if state.selected_item_is_dir() {
-        Shortcut::new(vec!["l", "Right", "Enter"], "Go to selected dir")
+        vec![Shortcut::new(
+            vec!["l", "Right", "Enter"],
+            "Go to selected dir",
+        )]
     } else {
-        Shortcut::new(vec!["l", "Right", "Enter"], "Run selected command")
+        vec![
+            Shortcut::new(vec!["l", "Right", "Enter"], "Run selected command"),
+            Shortcut::new(vec!["p"], "Enable preview"),
+            Shortcut::new(vec!["d"], "Command Description"),
+        ]
     }
 }
 
@@ -121,27 +124,24 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
 
             if state.at_root() {
                 hints.push(Shortcut::new(vec!["h", "Left"], "Focus tab list"));
-                hints.push(get_list_item_shortcut(state));
+                hints.extend(get_list_item_shortcut(state));
+            } else if state.selected_item_is_up_dir() {
+                hints.push(Shortcut::new(
+                    vec!["l", "Right", "Enter", "h", "Left"],
+                    "Go to parent directory",
+                ));
             } else {
-                if state.selected_item_is_up_dir() {
-                    hints.push(Shortcut::new(
-                        vec!["l", "Right", "Enter", "h", "Left"],
-                        "Go to parent directory",
-                    ));
-                } else {
-                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
-                    hints.push(get_list_item_shortcut(state));
-                    if state.selected_item_is_cmd() {
-                        hints.push(Shortcut::new(vec!["p"], "Enable preview"));
-                        hints.push(Shortcut::new(vec!["d"], "Command Description"));
-                    }
-                }
-            };
-
+                hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
+                hints.extend(get_list_item_shortcut(state));
+            }
             hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
             hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
             hints.push(Shortcut::new(vec!["t"], "Next theme"));
             hints.push(Shortcut::new(vec!["T"], "Previous theme"));
+            if state.is_current_tab_multi_selectable() {
+                hints.push(Shortcut::new(vec!["v"], "Toggle multi-selection mode"));
+                hints.push(Shortcut::new(vec!["Space"], "Select multiple commands"));
+            }
             hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
             hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
             ShortcutList {

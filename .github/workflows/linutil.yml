@@ -44,9 +44,13 @@ jobs:
       - name: Build x86_64 binary
         run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl
 
+      - name: Build aarch64 binary
+        run: cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl
+
       - name: Move binaries to build directory
         run: |
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
+          mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
 
       - name: Pull latest changes
         run: |
@@ -57,7 +61,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
-          file_pattern: "build/linutil"
+          file_pattern: "build/linutil build/linutil-aarch64"
           add_options: '--force'
         if: success()
 
@@ -87,9 +91,12 @@ jobs:
             ${{ steps.generate_notes.outputs.body }}
             
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)
+            ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil-aarch64)
+
           append_body: false
           files: |
             ./build/linutil
+            ./build/linutil-aarch64
             ./start.sh
             ./startdev.sh
           prerelease: true

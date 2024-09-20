@@ -1,8 +1,18 @@
 [package]
 name = "linutil_tui"
+description = "Chris Titus Tech's Linux Toolbox - Linutil is a distro-agnostic toolbox designed to simplify everyday Linux tasks."
+documentation = "https://christitustech.github.io/linutil"
+readme = "../README.md"
 edition = "2021"
-version.workspace = true
 license.workspace = true
+repository = "https://github.com/ChrisTitusTech/linutil/tree/main/tui"
+version.workspace = true
+include = [
+    "src/*.rs",
+    "Cargo.toml",
+    "build.rs",
+]
+build = "build.rs"
 
 [dependencies]
 clap = { version = "4.5.16", features = ["derive"] }
@@ -13,7 +23,7 @@ portable-pty = "0.8.1"
 ratatui = "0.28.1"
 tui-term = "0.1.12"
 unicode-width = "0.1.13"
-linutil_core = { path = "../core" }
+linutil_core = { path = "../core", version = "24.9.19" }
 
 [build-dependencies]
 chrono = "0.4.33"
