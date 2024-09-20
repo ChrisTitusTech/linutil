@@ -3,11 +3,11 @@ name: Check for bashisms
 on:
   # push:
   #   paths:
-  #     - tabs/**
+  #     - core/tabs/**
   #   branches: [ "main" ]
   pull_request:
     paths:
-      - tabs/**
+      - core/tabs/**
   merge_group:
   workflow_dispatch:
 
@@ -24,8 +24,8 @@ jobs:
 
       - name: Check for bashisms in changed files
         run: |
-          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD tabs); do
-              if [[ "$file" == *.sh ]]; then
+          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
+              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
                   checkbashisms "$file"
               fi
           done

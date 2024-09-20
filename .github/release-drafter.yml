@@ -53,4 +53,4 @@ replacers:
 exclude-labels:
   - 'skip-changelog'
 
-filter-by-commitish: true
+filter-by-commitish: false

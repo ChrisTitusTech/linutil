@@ -3,7 +3,7 @@ name: ShellCheck
 on:
   pull_request:
     paths:
-      - 'tabs/**/*.sh'
+      - 'core/tabs/**/*.sh'
   workflow_dispatch:
 
 jobs:
@@ -11,9 +11,20 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@master
-      with:
-        scandir: 'tabs'
-        severity: error
+      - uses: actions/checkout@v4
+      - run: git fetch origin ${{ github.base_ref }}
+
+      - name: Download and set up shellcheck
+        run : |
+          wget https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
+          tar -xf shellcheck-v0.10.0.linux.x86_64.tar.xz
+          cd shellcheck-v0.10.0
+          chmod +x shellcheck
+
+      - name: Run shellcheck
+        run: |
+          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
+              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
+                  ./shellcheck-v0.10.0/shellcheck -S error "$file"
+              fi
+          done
