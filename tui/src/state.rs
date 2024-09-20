@@ -246,7 +246,11 @@ impl AppState {
         let title = format!(
             "Linux Toolbox - {} {}",
             env!("BUILD_DATE"),
-            self.multi_select.then(|| "[Multi-Select]").unwrap_or("")
+            if self.multi_select {
+                "[Multi-Select]"
+            } else {
+                ""
+            }
         );
 
         #[cfg(feature = "tips")]
