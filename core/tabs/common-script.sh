@@ -12,10 +12,6 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-file_exists() {
-    [ -e "$1" ]
-}
-
 checkAURHelper() {
     ## Check & Install AUR helper
     if [ "$PACKAGER" = "pacman" ]; then
