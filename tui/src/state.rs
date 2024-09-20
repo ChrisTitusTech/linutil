@@ -9,6 +9,7 @@ use crate::{
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::{Command, ListNode, Tab};
+#[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
@@ -40,6 +41,7 @@ pub struct AppState {
     multi_select: bool,
     selected_commands: Vec<Command>,
     drawable: bool,
+    #[cfg(feature = "tips")]
     tip: &'static str,
 }
 
@@ -71,6 +73,7 @@ impl AppState {
             multi_select: false,
             selected_commands: Vec::new(),
             drawable: false,
+            #[cfg(feature = "tips")]
             tip: get_random_line(include_str!("../cool_tips.txt").lines().collect()),
         };
         state.update_items();
@@ -246,6 +249,11 @@ impl AppState {
             self.multi_select.then(|| "[Multi-Select]").unwrap_or("")
         );
 
+        #[cfg(feature = "tips")]
+        let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
+        #[cfg(not(feature = "tips"))]
+        let bottom_title = "";
+
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(style)
@@ -253,7 +261,7 @@ impl AppState {
                 Block::default()
                     .borders(Borders::ALL)
                     .title(title)
-                    .title_bottom(Line::from(self.tip.bold().blue()).right_aligned()),
+                    .title_bottom(bottom_title),
             )
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
@@ -534,6 +542,7 @@ impl AppState {
     }
 }
 
+#[cfg(feature = "tips")]
 fn get_random_line(lines: Vec<&str>) -> &str {
     if lines.is_empty() {
         return "";
