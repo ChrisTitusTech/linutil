@@ -35,19 +35,39 @@ description = "Flatpak is a universal application sandbox for Linux that uses is
 script = "setup-flatpak.sh"
 
 [[data]]
-name = "Office Suite Setup"
-description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
-script = "office-suite-setup.sh"
-
-[[data]]
 name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.\nkitty is written in a mix of C and Python programming languages.\n This command installs and configures kitty."
 script = "kitty-setup.sh"
 
 [[data]]
+name = "Linutil Installer"
+description = "Installs a distro-specific Linutil package locally."
+script = "linutil-installer.sh"
+
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = [ "linutil" ]
+
+[[data]]
+name = "Linutil Updater"
+description = "Updates your local Linutil crate installation."
+script = "linutil-updater.sh"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "linutil" ]
+
+[[data]]
 name = "Neovim"
 description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
 script = "neovim-setup.sh"
+
+[[data]]
+name = "Office Suite"
+description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
+script = "office-suite-setup.sh"
 
 [[data]]
 name = "Rofi"
@@ -58,23 +78,3 @@ script = "rofi-setup.sh"
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
-
-[[data]]
-name = "Install Linutil"
-description = "Installs a distro-specific Linutil package locally."
-script = "linutil-installer.sh"
-
-[[data.preconditions]]
-matches = false
-data = "command_exists"
-values = [ "linutil" ]
-
-[[data]]
-name = "Update Linutil"
-description = "Updates your local Linutil crate installation."
-script = "linutil-updater.sh"
-
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = [ "linutil" ]
