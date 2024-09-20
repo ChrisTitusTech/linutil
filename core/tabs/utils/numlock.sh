@@ -8,7 +8,7 @@
 # Create a script to toggle numlock
 
 create_file() {
-  printf "Creating script...\n"
+  printf "%b\n" "Creating script..."
   "$ESCALATION_TOOL" tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
 #!/bin/bash
 
@@ -23,7 +23,7 @@ EOF
 
 # Create a systemd service to run the script on boot
 create_service() {
-  printf "Creating service...\n"
+  printf "%b\n" "Creating service..."
   "$ESCALATION_TOOL" tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
 [Unit]
 Description=numlock
@@ -48,14 +48,14 @@ numlockSetup() {
     create_service
   fi
 
-  printf "Do you want to enable Numlock on boot? (y/n): "
+  printf "%b\n" "Do you want to enable Numlock on boot? (y/n): "
   read -r confirm
   if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
     "$ESCALATION_TOOL" systemctl enable numlock.service --quiet
-    printf "Numlock will be enabled on boot\n"
+    printf "%b\n" "Numlock will be enabled on boot"
   else
     "$ESCALATION_TOOL" systemctl disable numlock.service --quiet
-    printf "Numlock will not be enabled on boot\n"
+    printf "%b\n" "Numlock will not be enabled on boot"
   fi
 }
 

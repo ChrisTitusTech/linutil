@@ -1,4 +1,5 @@
 #!/bin/sh -e
+
 . ../common-script.sh
 
 themeinstall(){

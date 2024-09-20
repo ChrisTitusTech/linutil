@@ -157,8 +157,8 @@ configure_firewall() {
 }
 
 setup_ssh_samba(){
-    printf "Samba and SSH Setup Script\n"
-    printf "----------------------------\n"
+    printf "%b\n" "Samba and SSH Setup Script"
+    printf "%b\n" "--------------------------"
     clear
 
     # Display menu
