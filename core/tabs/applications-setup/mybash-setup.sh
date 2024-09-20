@@ -5,6 +5,7 @@
 gitpath="$HOME/.local/share/mybash"
 
 installDepend() {
+    if ! command_exists bash bash-completion tar bat tree unzip fontconfig git; then
     printf "%b\n" "${YELLOW}Installing Bash...${RC}"
     case "$PACKAGER" in
         pacman)
@@ -24,6 +25,7 @@ installDepend() {
             exit 1
             ;;
     esac
+    fi
 }
 
 cloneMyBash() {

@@ -2,13 +2,20 @@
 
 . ../common-script.sh
 
-install_bottles() {
+installBottles() {
+    if ! command_exists flatpak; then
     printf "%b\n" "${YELLOW}Installing Bottles...${RC}"
-    . ./setup-flatpak.sh
-    flatpak install -y flathub com.usebottles.bottles
-    printf "%b\n" "${GREEN}Bottles installed successfully. Restart the system to apply changes...${RC}"
+        case "$PACKAGER" in
+            *)
+                . ./setup-flatpak.sh
+                flatpak install -y flathub com.usebottles.bottles
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Bottles is already installed.${RC}"
+    fi
 }
 
 checkEnv
 checkEscalationTool
-install_bottles
+installBottles
