@@ -45,8 +45,8 @@ configureShell() {
   printf "%b\n" "${CYAN} Setting up your shell. ${RC}"
   if [ -e "$HOME/.bashrc" ]; then
     printf "%b\n" "${CYAN} Setting up bash to use starship as default prompt ${RC}"
-    printf "%s\n" 'eval "$(starship init bash)"' >>"$HOME/.bashrc"
-    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >>"$HOME/.bashrc"
+    printf "%s\n" 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
+    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >> "$HOME/.bashrc"
     cmdCheck
   fi
 
