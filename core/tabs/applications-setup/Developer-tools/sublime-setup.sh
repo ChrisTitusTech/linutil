@@ -30,7 +30,7 @@ installSublime() {
                     printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                     exit 1
                     ;;
-        esac
+            esac
         else
             printf "%b\n" "${GREEN}Sublime is already installed.${RC}"
         fi
