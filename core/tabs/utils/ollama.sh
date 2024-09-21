@@ -87,7 +87,7 @@ run_model() {
     printf "%b\n" "${YELLOW}Custom Models${RC}"
     custom_models=$(ollama list | grep 'custom-model-prefix') 
 
-    printf "%b" "Please select a model to run: "
+    printf "%b" "Select a model to run: "
     printf "%b" "Enter the number corresponding to the model or enter the name of a custom model: "
 
     read -r model_choice
