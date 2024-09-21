@@ -21,7 +21,7 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}" # The packages above were grabbed out of the original mybash-setup-script.
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
