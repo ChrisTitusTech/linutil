@@ -24,7 +24,8 @@ LinUtil is also available as a package in various repositories:
 
 <details>
   <summary>Arch Linux</summary>
-LinUtil can be installed on <a href="https://archlinux.org" target="_blank">Arch Linux</a> with three different <a href="https://aur.archlinux.org" target="_blank">AUR</a> packages:
+
+LinUtil can be installed on [Arch Linux](https://archlinux.org) with three different [AUR](https://aur.archlinux.org) packages:
 
 - `linutil` - Stable release compiled from source
 - `linutil-bin` - Stable release pre-compiled
@@ -40,13 +41,26 @@ makepkg -si
 
 Replace `<package>` with your preferred package.
 
-If you use [yay](https://github.com/Jguer/yay), [paru](https://github.com/Morganamilo/paru) or any other [AUR Helper](https://wiki.archlinux.org/title/AUR_helpers) it's even simplier:
+If you use [yay](https://github.com/Jguer/yay), [paru](https://github.com/Morganamilo/paru) or any other [AUR Helper](https://wiki.archlinux.org/title/AUR_helpers), it's even simplier:
 
 ```bash
 paru -S linutil
 ```
 
 Replace `paru` with your preferred helper and `linutil` with your preferred package.
+
+</details>
+
+<details>
+  <summary>Cargo</summary>
+
+LinUtil can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
+
+```bash
+cargo install linutil
+```
+
+Note that crates installed using `cargo install` require manual updating with `cargo install --force` (update functionality is [included in LinUtil](https://christitustech.github.io/linutil/userguide/#applications-setup))
 
 </details>
 
