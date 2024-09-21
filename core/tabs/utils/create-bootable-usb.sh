@@ -53,7 +53,7 @@ fetch_arch_older_isos() {
         COUNTER=$((COUNTER + 1))
     done
     printf "\n"  # New line after the last row
-    printf "Select an Arch Linux version (1-%d): " "$((COUNTER - 1))"
+    printf "%b" "Select an Arch Linux version (1-$((COUNTER - 1))): "
     read -r ARCH_OPTION
     ARCH_DIR=$(echo "$ARCH_VERSIONS" | sed -n "${ARCH_OPTION}p")
     ARCH_URL="${ARCH_BASE_URL}${ARCH_DIR}/archlinux-${ARCH_DIR}-x86_64.iso"
@@ -72,7 +72,7 @@ choose_iso_source() {
     printf "1) Download online\n"
     printf "2) Use local ISO\n"
     printf "\n"
-    printf "Select option (1-2): "
+    printf "%b" "Select option (1-2): "
     read -r ISO_SOURCE_OPTION
 
     case $ISO_SOURCE_OPTION in
@@ -102,7 +102,7 @@ fetch_iso_urls() {
     printf "%b\n" "2) Arch Linux (older versions)"
     printf "%b\n" "3) Debian Linux (latest)"
     printf "\n"
-    printf "Select the ISO you want to download (1-3): "
+    printf "%b" "Select the ISO you want to download (1-3): "
     read -r ISO_OPTION
 
     case $ISO_OPTION in
@@ -144,7 +144,7 @@ write_iso(){
     list_devices
 
     # Prompt user for USB device
-    printf "Enter the USB device (e.g., /dev/sdX): "
+    printf "%b" "Enter the USB device (e.g., /dev/sdX): "
     read -r USB_DEVICE
 
     # Verify that the USB device exists
@@ -154,7 +154,7 @@ write_iso(){
     fi
 
     # Confirm the device selection with the user
-    printf "%b\n" "${RED}WARNING: This will erase all data on ${USB_DEVICE}. Are you sure you want to continue? (yes/no)${RC}"
+    printf "%b" "${RED}WARNING: This will erase all data on ${USB_DEVICE}. Are you sure you want to continue? (y/N): ${RC}"
     read -r CONFIRMATION
 
     if [ "$CONFIRMATION" != "yes" ]; then

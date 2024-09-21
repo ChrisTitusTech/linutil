@@ -20,9 +20,8 @@ if ! command_exists openssl; then
             "$ESCALATION_TOOL" "$PACKAGER" install openssl
             ;;
         *)
-            printf "%b\n" "${RED}Your Linux distribution is not supported by this script.${RC}"
-            printf "%b\n" "${YELLOW}You can try installing OpenSSL manually:${RC}"
-            printf "%b\n" "1. Refer to your distribution's documentation."
+            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            exit 1
             ;;
     esac
 fi
@@ -43,7 +42,7 @@ show_menu() {
 
 # Function to encrypt a file
 encrypt_file() {
-    printf "%b\n" "Enter the path to the file or directory to encrypt:"
+    printf "%b" "Enter the path to the file or directory to encrypt: "
     read -r INPUT_PATH
 
     if [ ! -e "$INPUT_PATH" ]; then
@@ -51,10 +50,10 @@ encrypt_file() {
         return
     fi
     
-    printf "%b\n" "Enter the path for the encrypted file or directory:"
+    printf "%b" "Enter the path for the encrypted file or directory: "
     read -r OUTPUT_PATH
 
-    printf "%b\n" "Enter the encryption password: "
+    printf "%b" "Enter the encryption password: "
     read -r PASSWORD
 
     if [ -d "$INPUT_PATH" ]; then
@@ -88,7 +87,7 @@ encrypt_file() {
 
 # Function to decrypt a file
 decrypt_file() {
-    printf "%b\n" "Enter the path to the file or directory to decrypt:"
+    printf "%b" "Enter the path to the file or directory to decrypt: "
     read -r INPUT_PATH
 
     if [ ! -e "$INPUT_PATH" ]; then
@@ -96,10 +95,10 @@ decrypt_file() {
         return
     fi
 
-    printf "%b\n" "Enter the path for the decrypted file or directory:"
+    printf "%b" "Enter the path for the decrypted file or directory: "
     read -r OUTPUT_PATH
 
-    printf "%b\n" "Enter the decryption password: "
+    printf "%b" "Enter the decryption password: "
     read -r PASSWORD
 
     if [ -d "$INPUT_PATH" ]; then
@@ -135,7 +134,7 @@ main(){
     clear
     while true; do
         show_menu
-        printf "%b\n" "Enter your choice:"
+        printf "%b" "Enter your choice: "
         read -r CHOICE
 
         case $CHOICE in

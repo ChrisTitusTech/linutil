@@ -18,7 +18,7 @@ install_onlyoffice() {
                 "$AUR_HELPER" -S --needed --noconfirm onlyoffice
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
@@ -42,7 +42,7 @@ install_libreoffice() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
@@ -89,7 +89,7 @@ install_freeoffice() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y softmaker-freeoffice-2024
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
@@ -176,7 +176,7 @@ officeSuiteSetup() {
     printf "%b\n" "7. PDF Studio Viewer"
     printf "%b\n" "8. PDF Studio (Paid Software)"
     printf "%b\n" "----------------------------"
-    printf "%b\n"  "Enter your choices (e.g., 1 3 5): "
+    printf "%b"  "Enter your choices (e.g., 1 3 5): "
     read -r choice
     for ch in $choice; do
         case $ch in

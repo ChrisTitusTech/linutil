@@ -22,7 +22,7 @@ set_resolutions() {
             i=$((i + 1))
         done
 
-        printf "%b\n" "Enter the choice (or 'q' to quit): "
+        printf "%b" "Enter the choice (or 'q' to quit): "
         read -r monitor_choice
 
         if [ "$monitor_choice" = "q" ]; then
@@ -56,7 +56,7 @@ set_resolutions() {
         awk '{print $1 ". " $2}' "$temp_res_file"
 
         while true; do
-            printf "%b\n" "Enter the choice (or 'q' to quit): "
+            printf "%b" "Enter the choice (or 'q' to quit): "
             read -r resolution_choice
 
             if [ "$resolution_choice" = "q" ]; then
@@ -72,7 +72,7 @@ set_resolutions() {
 
             selected_resolution=$(awk "NR==$resolution_choice" "$temp_res_file")
 
-            printf "%b\n" "Set resolution for $monitor_name to $selected_resolution? (y/n): "
+            printf "%b" "Set resolution for $monitor_name to $selected_resolution? (y/N): "
             read -r confirm
             if echo "$confirm" | grep -qE '^[Yy]$'; then
                 printf "%b\n" "${GREEN}Setting resolution for $monitor_name to $selected_resolution${RC}"

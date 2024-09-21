@@ -75,7 +75,7 @@ get_unique_resolutions() {
 confirm_action() {
     action="$1"
     printf "%b\n" "${CYAN}$action${RC}"
-    printf "%b" "${CYAN}Are you sure? (y/n): ${RC}"
+    printf "%b" "${CYAN}Are you sure? (y/N): ${RC}"
     read -r confirm
     if echo "$confirm" | grep -qE '^[Yy]$'; then
         return 0

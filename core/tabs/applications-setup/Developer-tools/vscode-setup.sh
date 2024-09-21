@@ -28,7 +28,7 @@ installVsCode() {
                 "$ESCALATION_TOOL" "$PACKAGER" install code
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac

@@ -13,14 +13,14 @@ change_orientation() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Change Monitor Orientation${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b\n" "${YELLOW}Choose a monitor to configure:${RC}"
+    printf "%b" "${YELLOW}Choose a monitor to configure: ${RC}"
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"
         i=$((i + 1))
     done
 
-    printf "Enter the number of the monitor: "
+    printf "%b" "Enter the number of the monitor: "
     read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
@@ -40,7 +40,7 @@ change_orientation() {
     printf "%b\n" "3. ${GREEN}Right${RC}"
     printf "%b\n" "4. ${GREEN}Inverted${RC}"
 
-    printf "Enter the number of the orientation: "
+    printf "%b" "Enter the number of the orientation: "
     read -r orientation_choice
     case $orientation_choice in
         1) orientation="normal" ;;

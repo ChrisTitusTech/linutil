@@ -25,7 +25,7 @@ installGithubDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install github-desktop
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac

@@ -15,7 +15,7 @@ list_sessions() {
     printf "%b\n" "8) Openbox (openbox.desktop)"
     printf "%b\n" "9) i3 (i3.desktop)"
     printf "%b\n" "10) Custom session"
-    printf "%b\n" "Enter your choice [1-10]: "
+    printf "%b" "Enter your choice [1-10]: "
     read -r session_choice
 
     case "$session_choice" in
@@ -29,7 +29,7 @@ list_sessions() {
         8) session="openbox.desktop" ;;
         9) session="i3.desktop" ;;
         10) 
-            printf "%b\n" "Enter custom session name (e.g., mysession.desktop): "
+            printf "%b" "Enter custom session name (e.g., mysession.desktop): "
             read -r session ;;
         *) 
             printf "%b\n" "Invalid option selected."
@@ -40,7 +40,7 @@ list_sessions() {
 # Function to configure LightDM
 configure_lightdm() {
     printf "%b\n" "Configuring LightDM for autologin..."
-    printf "%b\n" "Enter username for LightDM autologin: "
+    printf "%b" "Enter username for LightDM autologin: "
     read -r user
 
     "$ESCALATION_TOOL" "printf '[Seat:*]' > /etc/lightdm/lightdm.conf.d/50-autologin.conf"
@@ -60,7 +60,7 @@ remove_lightdm_autologin() {
 # Function to configure GDM
 configure_gdm() {
     printf "%b\n" "Configuring GDM for autologin..."
-    printf "%b\n" "Enter username for GDM autologin: "
+    printf "%b" "Enter username for GDM autologin: "
     read -r user
 
     "$ESCALATION_TOOL" "printf '[daemon]' > /etc/gdm/custom.conf"
@@ -81,7 +81,7 @@ remove_gdm_autologin() {
 # Function to configure SDDM
 configure_sddm() {
     printf "%b\n" "Configuring SDDM for autologin..."
-    printf "%b\n" "Enter username for SDDM autologin: "
+    printf "%b" "Enter username for SDDM autologin: "
     read -r user
     list_sessions  # Show session options
 
@@ -102,7 +102,7 @@ remove_sddm_autologin() {
 # Function to configure LXDM
 configure_lxdm() {
     printf "%b\n" "Configuring LXDM for autologin..."
-    printf "%b\n" "Enter username for LXDM autologin: "
+    printf "%b" "Enter username for LXDM autologin: "
     read -r user
     list_sessions  # Show session options
     
@@ -125,7 +125,7 @@ configure_or_remove_autologin() {
     printf "%b\n" "Do you want to add or remove autologin?"
     printf "%b\n" "1) Add autologin"
     printf "%b\n" "2) Remove autologin"
-    printf "%b\n" "Enter your choice [1-2]: "
+    printf "%b" "Enter your choice [1-2]: "
     read -r action_choice
 
     if [ "$action_choice" = "1" ]; then
@@ -134,7 +134,7 @@ configure_or_remove_autologin() {
         printf "%b\n" "2) GDM"
         printf "%b\n" "3) SDDM"
         printf "%b\n" "4) LXDM"
-        printf "%b\n" "Enter your choice [1-4]: "
+        printf "%b" "Enter your choice [1-4]: "
         read -r choice
 
         case "$choice" in
@@ -150,7 +150,7 @@ configure_or_remove_autologin() {
         printf "%b\n" "2) GDM"
         printf "%b\n" "3) SDDM"
         printf "%b\n" "4) LXDM"
-        printf "%b\n" "Enter your choice [1-4]: "
+        printf "%b" "Enter your choice [1-4]: "
         read -r choice
 
         case "$choice" in

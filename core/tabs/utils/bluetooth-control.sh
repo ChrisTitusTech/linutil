@@ -35,13 +35,13 @@ main_menu() {
         clear
         printf "%b\n" "${YELLOW}Bluetooth Manager${RC}"
         printf "%b\n" "${YELLOW}=================${RC}"
-        printf "1. Scan for devices\n"
-        printf "2. Pair with a device\n"
-        printf "3. Connect to a device\n"
-        printf "4. Disconnect from a device\n"
-        printf "5. Remove a device\n"
-        printf "0. Exit\n"
-        printf "Choose an option: "
+        printf "%b\n" "1. Scan for devices"
+        printf "%b\n" "2. Pair with a device"
+        printf "%b\n" "3. Connect to a device"
+        printf "%b\n" "4. Disconnect from a device"
+        printf "%b\n" "5. Remove a device"
+        printf "%b\n" "0. Exit"
+        printf "%b" "Choose an option: "
         read -r choice
 
         case $choice in
@@ -68,7 +68,7 @@ scan_devices() {
         printf "%b\n" "${GREEN}Devices found:${RC}"
         printf "%s\n" "$devices"
     fi
-    printf "Press any key to return to the main menu..."
+    printf "%b" "Press any key to return to the main menu..."
     read -r dummy
 }
 
@@ -85,7 +85,7 @@ prompt_for_mac() {
         devices=$(bluetoothctl devices)
         if [ -z "$devices" ]; then
             printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"
-            printf "Press any key to return to the main menu..."
+            printf "%b" "Press any key to return to the main menu..."
             read -r dummy
             return
         fi
@@ -97,7 +97,7 @@ prompt_for_mac() {
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
-        printf "0. Exit to main menu\n"
+        printf "%b\n" "0. Exit to main menu"
         printf "%s\n" "$prompt_msg"
         read -r choice
 
@@ -106,7 +106,7 @@ prompt_for_mac() {
             device=$(echo "$device_list" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
             if bluetoothctl info "$mac" > /dev/null 2>&1; then
-                bluetoothctl $command "$mac" && {
+                bluetoothctl "$command" "$mac" && {
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                     break
                 } || {
@@ -121,7 +121,7 @@ prompt_for_mac() {
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
     done
-    printf "Press any key to return to the main menu..."
+    printf "%b" "Press any key to return to the main menu..."
     read -r dummy
 }
 
