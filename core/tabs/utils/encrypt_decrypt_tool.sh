@@ -20,7 +20,7 @@ if ! command_exists openssl; then
             "$ESCALATION_TOOL" "$PACKAGER" install openssl
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
