@@ -4,7 +4,7 @@ use include_dir::{include_dir, Dir};
 use serde::Deserialize;
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Read},
     path::{Path, PathBuf},
 };
 use tempdir::TempDir;
@@ -203,15 +203,16 @@ fn get_shebang(script: &Path) -> (String, Vec<String>) {
     let default_executable = || ("sh".into(), vec!["-e".into()]);
 
     let script = File::open(script).expect("Failed to open script file");
-    let reader = BufReader::new(script);
+    let mut reader = BufReader::new(script);
+
+    // Take the first 2 characters from the reader; check whether it's a shebang
+    let mut two_chars = [0; 2];
+    if reader.read_exact(&mut two_chars).is_err() || two_chars != *b"#!" {
+        return default_executable();
+    }
 
     // Handle empty or unreadable first line
     let Some(Ok(first_line)) = reader.lines().next() else {
-        return default_executable();
-    };
-
-    // Handle whether or not the first line is a shebang
-    let Some(first_line) = first_line.trim().strip_prefix("#!") else {
         return default_executable();
     };
 
