@@ -1,0 +1,239 @@
+ls: Lists files and directories in the current directory.
+cd: Changes the current directory.
+pwd: Prints the current working directory.
+mkdir: Creates a new directory.   
+rmdir: Removes an empty directory.
+cp: Copies files or directories.   
+mv: Moves or renames files or directories.
+rm: Removes files or directories.
+touch: Creates an empty file or updates the timestamp of an existing file.
+cat: Displays the content of a file.
+less: Views the content of a file, one page at a time.
+head: Displays the first few lines of a file.
+tail: Displays the last few lines of a file.
+find: Searches for files in a directory hierarchy.
+grep: Searches for a specific pattern in files.
+chmod: Changes file or directory permissions.
+chown: Changes file or directory ownership.
+ln: Creates hard or symbolic links to files.
+df: Displays disk space usage.
+du: Shows disk usage of files and directories.
+top: Displays real-time system processes.
+ps: Shows running processes.
+kill: Terminates a process by PID.
+man: Displays the manual page for a command.
+history: Shows the history of commands you've run.
+sudo: Executes a command with superuser privileges.
+apt-get: Installs, updates, or removes packages on Debian-based systems.
+yum: Installs, updates, or removes packages on Red Hat-based systems.
+wget: Downloads files from the web.
+curl: Transfers data from or to a server using various protocols.
+ssh: Connects to a remote machine securely via SSH.
+ping: Tests connectivity to a network host.
+ifconfig: Displays or configures network interfaces.
+ip: Displays and manages network interfaces, routing, and more.
+netstat: Displays network connections, routing tables, and interface statistics.
+echo: Prints text to the terminal or writes text to files.
+date: Displays or sets the system date and time.
+shutdown: Shuts down or reboots the system.
+reboot: Reboots the system.
+alias: Creates a shortcut for a command.
+diff: Compares the contents of two files line by line.
+cmp: Compares two files byte by byte.
+sort: Sorts the lines of a file alphabetically or numerically.
+uniq: Removes duplicate lines from a sorted file.
+wc: Counts words, lines, and characters in a file.
+cut: Cuts sections from each line of a file or output.
+tr: Translates or deletes characters from input.
+xargs: Builds and executes command lines from standard input.
+tee: Reads from standard input and writes to both standard output and files.
+basename: Strips directory and suffix from filenames.
+dirname: Extracts the directory path from a file path.
+read: Reads input from the user or file.
+tar: Archives and extracts files using tar format.
+zip: Compresses files into a zip archive.
+unzip: Extracts files from a zip archive.
+gzip: Compresses files using the gzip format.
+gunzip: Decompresses gzip-compressed files.
+rsync: Synchronizes files and directories between two locations.
+iptables: Configures the IP packet filter rules of the Linux kernel.
+ufw: Simplified firewall management tool (Uncomplicated Firewall).
+systemctl: Controls the systemd system and service manager.
+journalctl: Views systemd logs.
+dmesg: Displays kernel ring buffer messages.
+who: Shows who is logged into the system.
+last: Displays a list of last logged-in users.
+at: Schedules a one-time task to run at a specific time.
+awk: Pattern scanning and processing language used for text processing.
+sed: Stream editor for filtering and transforming text.
+chroot: Changes the root directory for a command or shell.
+lsof: Lists open files and the processes that opened them.
+nc: A versatile networking tool often used for testing and debugging.
+sftp: A secure file transfer program over SSH.
+ncdu: Disk usage analyzer with a user-friendly interface.
+dig: Performs DNS lookups.
+nslookup: Queries DNS information.
+hostname: Displays or sets the system’s hostname.
+curl ifconfig.me: Gets your public IP address.
+adduser: Adds a new user to the system.
+deluser: Removes a user from the system.
+groupadd: Adds a new group to the system.
+usermod: Modifies user account details.
+groups: Displays the groups the current user belongs to.
+sudo su: Switches to the root user.
+nohup: Runs a command that will continue running after logging out.
+jobs: Lists all active jobs in the current session.
+fg: Brings a background job to the foreground.
+bg: Resumes a stopped job in the background.
+ctrl + z: Pauses a foreground job, allowing it to run in the background.
+locate: Quickly finds files by name.
+updatedb: Updates the database used by the locate command.
+alias ll='ls -la': Creates an alias ll for a long-format list of files.
+unalias: Removes an alias for a command.
+export: Sets or exports environment variables.
+env: Displays the current environment variables.
+crontab: Manages cron jobs for automating tasks.
+watch: Repeatedly runs a command at regular intervals.
+vmstat: Reports virtual memory statistics.
+mpstat: Displays CPU usage statistics.
+htop: An interactive process viewer (more user-friendly than top).
+uptime: Displays the system uptime and load average.
+ulimit: Displays or sets resource limits for user processes.
+ip link: Manages network interfaces.
+ss: A faster alternative to netstat for displaying network connections.
+traceroute: Traces the route packets take to a network host.
+ping6: Tests connectivity to a network host using IPv6.
+scp: Securely copies files between hosts over SSH.
+bc: A command-line calculator.
+dd: Converts and copies files, useful for creating disk images.
+arp: Displays or modifies the system's ARP table.
+md5sum: Computes and verifies MD5 hashes.
+sha256sum: Computes and verifies SHA-256 hashes.
+hostnamectl: Controls the system's hostname.
+ip a: Displays IP addresses of the system's network interfaces.
+ip r: Displays the routing table.
+journalctl -f: Follows the system logs in real time.
+tshark: A command-line network packet analyzer.
+lspci: Lists PCI devices connected to the system.
+lsusb: Lists USB devices connected to the system.
+modprobe: Adds or removes modules from the Linux kernel.
+parted: A disk partitioning tool.
+mkfs: Creates a file system on a partition or device.
+fsck: Checks and repairs a file system.
+tune2fs: Adjusts tunable file system parameters on ext filesystems.
+swapoff: Disables swap space on a device.
+swapon: Enables swap space on a device.
+fuser: Identifies processes using files or sockets.
+nmcli: Command-line tool for managing NetworkManager.
+w: Displays logged-in users and their active processes.
+wall: Sends a message to all logged-in users.
+passwd: Changes user passwords.
+stat: Displays detailed information about a file or file system.
+chage: Changes user password expiration information.
+pmap: Reports memory map of a process.
+ionice: Sets or gets I/O scheduling class and priority.
+nc (netcat): Reads and writes data across network connections.
+dstat: Combines and displays system resource statistics, such as CPU, disk, and network usage.
+sar: Collects, reports, or saves system activity information.
+iostat: Reports CPU and I/O statistics for devices and partitions.
+iotop: Displays real-time disk I/O usage by processes.
+inotifywait: Waits for changes to files or directories using inotify.
+inotifywatch: Watches for changes in a file or directory using inotify.
+nice: Runs a command with a modified scheduling priority.
+renice: Alters the priority of running processes.
+lsblk: Lists information about block devices.
+hdparm: Configures and displays information about SATA/IDE devices.
+smartctl: Monitors the health of hard drives using SMART.
+fallocate: Preallocates space to a file.
+wipe: Securely erases files or partitions.
+file: Determines file type based on content.
+shred: Securely deletes a file by overwriting it.
+ncftpput: Uploads files to an FTP server.
+ncftpget: Downloads files from an FTP server.
+ufw: Simplified firewall utility for managing iptables rules.
+ethtool: Configures and displays Ethernet device settings.
+brctl: Manages Ethernet bridges.
+xkill: Terminates a window by clicking on it.
+xrandr: Configures display screen resolution, rotation, and reflection.
+xset: Manages X display settings.
+xdg-open: Opens a file or URL in the user's preferred application.
+apropos: Searches the manual page names and descriptions for keywords.
+systemd-analyze: Displays system boot performance statistics.
+timedatectl: Manages system time and date settings.
+fwupdmgr: Firmware update manager for updating hardware firmware.
+lscpu: Displays information about the CPU architecture.
+getfacl: Displays file access control lists (ACLs).
+setfacl: Sets file access control lists (ACLs).
+pv: Monitors the progress of data through a pipeline.
+logrotate: Manages the automatic rotation and compression of log files.
+xclip: Interfaces with the X clipboard from the command line.
+cups: Manages printers (Common Unix Printing System).
+lp: Sends a file to the printer.
+lprm: Removes print jobs from the queue.
+lpstat: Displays the status of the print system.
+strace: Traces system calls and signals.
+tcpdump: Captures network traffic for analysis.
+envsubst: Substitutes environment variables in shell commands.
+tput: Initializes terminal capabilities, such as clearing the screen.
+xargs: Builds and executes command lines from standard input.
+dmesg | tail: Displays recent kernel messages (useful for hardware or system errors).
+lsns: Lists all active Linux namespaces.
+ss -tuln: Lists open network ports (TCP and UDP).
+iptables-save: Outputs current iptables rules to a file.
+iptables-restore: Restores iptables rules from a file.
+tac: Displays a file in reverse line order (opposite of cat).
+nl: Numbers the lines of a file.
+yes: Repeatedly outputs a string until stopped (e.g., yes y).
+split: Splits a file into pieces.
+csplit: Splits a file into pieces based on context.
+paste: Merges lines of files side by side.
+comm: Compares two sorted files line by line.
+shuf: Shuffles lines of text in random order.
+factor: Prints the prime factors of a given number.
+seq: Prints numbers in a sequence.
+pr: Converts text files for printing, adding headers and footers.
+column: Formats output into columns.
+od: Displays files in octal, decimal, hexadecimal, or ASCII.
+hexdump: Displays files in hexadecimal format.
+xxd: Creates a hex dump of a file or converts a hex dump back to binary.
+watch: Runs a command repeatedly, displaying the output and updates.
+timeout: Runs a command with a time limit.
+stdbuf: Alters the buffering of input/output for a command.
+rename: Renames files using a regular expression.
+prlimit: Displays or modifies resource limits of running processes.
+uuidgen: Generates a new universally unique identifier (UUID).
+vipw: Safely edits the /etc/passwd file.
+vigr: Safely edits the /etc/group file.
+getent: Retrieves entries from databases like passwd, group, or hosts.
+addgroup: Creates a new user group.
+pwgen: Generates random passwords.
+expire: Forces a password change after a specific period.
+showmount: Displays information about an NFS server.
+exportfs: Maintains the NFS server's exported file systems.
+rpcinfo: Displays information about RPC services on a networked system.
+lsmod: Lists currently loaded kernel modules.
+insmod: Inserts a module into the Linux kernel.
+rmmod: Removes a module from the Linux kernel.
+depmod: Generates modules dependency and map files.
+kmod: Interfaces with kernel modules from the command line.
+e2fsck: Checks the integrity of an ext2/ext3/ext4 file system.
+blkid: Displays block device attributes, including UUID.
+mount: Mounts a file system.
+umount: Unmounts a file system.
+parted: A command-line partition editor.
+gparted: A graphical partition editor (based on parted).
+cryptsetup: Manages encrypted devices.
+losetup: Configures loopback devices.
+mkswap: Sets up a swap area on a device or file.
+tmux: Terminal multiplexer for managing multiple terminal sessions.
+finger: Displays user information (if installed).
+lastb: Shows failed login attempts.
+pidof: Finds the process ID (PID) of a running program.
+pgrep: Searches for processes by name.
+curl -I: Fetches the HTTP headers from a URL.
+chattr: Changes file attributes on a Linux file system.
+lsattr: Lists file attributes on a Linux file system.
+join: Joins lines of two files based on a common field.
+tree: Displays a directory structure in a tree-like format.
+col: Filters reverse line feeds from input.
+free: Displays memory usage.
