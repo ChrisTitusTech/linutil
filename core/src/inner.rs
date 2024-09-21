@@ -211,10 +211,7 @@ fn get_shebang(script: &Path) -> (String, Vec<String>) {
         return default_executable();
     }
 
-    // Handle empty or unreadable first line
-    let Some(Ok(first_line)) = reader.lines().next() else {
-        return default_executable();
-    };
+    let first_line = reader.lines().next().unwrap().unwrap();
 
     let mut parts = first_line.split_whitespace();
 
