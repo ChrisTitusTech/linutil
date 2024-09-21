@@ -1,5 +1,3 @@
-#![allow(soft_unstable)]
-
 use std::{
     borrow::Cow,
     collections::VecDeque,
