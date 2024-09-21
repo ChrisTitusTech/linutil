@@ -11,7 +11,7 @@ if ! command_exists openssl; then
             "$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm openssl
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
+            "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
