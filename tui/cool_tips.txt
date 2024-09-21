@@ -150,7 +150,6 @@ file: Determines file type based on content.
 shred: Securely deletes a file by overwriting it.
 ncftpput: Uploads files to an FTP server.
 ncftpget: Downloads files from an FTP server.
-ufw: Simplified firewall utility for managing iptables rules.
 ethtool: Configures and displays Ethernet device settings.
 brctl: Manages Ethernet bridges.
 xkill: Terminates a window by clicking on it.
@@ -175,7 +174,6 @@ strace: Traces system calls and signals.
 tcpdump: Captures network traffic for analysis.
 envsubst: Substitutes environment variables in shell commands.
 tput: Initializes terminal capabilities, such as clearing the screen.
-xargs: Builds and executes command lines from standard input.
 dmesg | tail: Displays recent kernel messages (useful for hardware or system errors).
 lsns: Lists all active Linux namespaces.
 ss -tuln: Lists open network ports (TCP and UDP).
@@ -196,7 +194,6 @@ column: Formats output into columns.
 od: Displays files in octal, decimal, hexadecimal, or ASCII.
 hexdump: Displays files in hexadecimal format.
 xxd: Creates a hex dump of a file or converts a hex dump back to binary.
-watch: Runs a command repeatedly, displaying the output and updates.
 timeout: Runs a command with a time limit.
 stdbuf: Alters the buffering of input/output for a command.
 rename: Renames files using a regular expression.
@@ -220,7 +217,6 @@ e2fsck: Checks the integrity of an ext2/ext3/ext4 file system.
 blkid: Displays block device attributes, including UUID.
 mount: Mounts a file system.
 umount: Unmounts a file system.
-parted: A command-line partition editor.
 gparted: A graphical partition editor (based on parted).
 cryptsetup: Manages encrypted devices.
 losetup: Configures loopback devices.

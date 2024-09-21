@@ -1,0 +1,25 @@
+name: Check for duplicates in cool_tips.txt
+
+on:
+  push:
+    paths:
+      - tui/cool_tips.txt
+  pull_request:
+    paths:
+      - tui/cool_tips.txt
+  merge_group:
+  workflow_dispatch:
+
+jobs:
+  check-duplicates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for duplicates in cool_tips.txt
+        run: |
+          duplicates=$(grep -o '^[^:]*:' tui/cool_tips.txt | sort | uniq -d)
+          if [ -n "$duplicates" ]; then
+            echo "$duplicates"
+            exit 1
+          fi
