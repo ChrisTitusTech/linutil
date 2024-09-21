@@ -15,7 +15,7 @@ list_sessions() {
     printf "%b\n" "8) Openbox (openbox.desktop)"
     printf "%b\n" "9) i3 (i3.desktop)"
     printf "%b\n" "10) Custom session"
-    printf "%b" "Enter your choice [1-10]: "
+    printf "%b" "Enter your choice (1-10): "
     read -r session_choice
 
     case "$session_choice" in
