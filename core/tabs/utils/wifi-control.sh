@@ -126,7 +126,7 @@ prompt_for_network() {
         i=1
         while IFS= read -r network; do
             ssid=$(echo "$network" | awk -F: '{print $1}')
-            printf "%b" "$i. SSID: " "$ssid"
+            printf "%b\n" "$i. SSID: " "$ssid"
             i=$((i + 1))
         done < "$temp_file"
 
