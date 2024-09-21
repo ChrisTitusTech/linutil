@@ -125,7 +125,7 @@ configure_or_remove_autologin() {
     printf "%b\n" "Do you want to add or remove autologin?"
     printf "%b\n" "1) Add autologin"
     printf "%b\n" "2) Remove autologin"
-    printf "%b" "Enter your choice [1-2]: "
+    printf "%b" "Enter your choice (1-2): "
     read -r action_choice
 
     if [ "$action_choice" = "1" ]; then
