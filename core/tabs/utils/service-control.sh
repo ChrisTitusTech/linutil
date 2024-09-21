@@ -100,10 +100,10 @@ add_service() {
     printf "%b\n" "Service $SERVICE_NAME has been created and is ready to be started."
 
     # Optionally, enable and start the service
-    printf "%b" "Do you want to start and enable the service now? (Y/n): "
+    printf "%b" "Do you want to start and enable the service now? (y/N): "
     read -r START_ENABLE
 
-    if [ "$START_ENABLE" = "y" ]; then
+    if [ "$START_ENABLE" = "y" ] || [ "$START_ENABLE" = "Y" ]; then
         "$ESCALATION_TOOL" systemctl start "$SERVICE_NAME"
         "$ESCALATION_TOOL" systemctl enable "$SERVICE_NAME"
         printf "%b\n" "Service $SERVICE_NAME has been started and enabled."
