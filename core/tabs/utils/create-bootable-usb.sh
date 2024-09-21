@@ -144,7 +144,7 @@ write_iso(){
     list_devices
 
     # Prompt user for USB device
-    printf "%b" "Enter the USB device (e.g., /dev/sdX): "
+    printf "%b" "Enter the USB device (e.g. /dev/sdX): "
     read -r USB_DEVICE
 
     # Verify that the USB device exists
