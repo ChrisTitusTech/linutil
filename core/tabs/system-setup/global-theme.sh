@@ -18,7 +18,7 @@ install_theme_tools() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qt6ct kvantum
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
