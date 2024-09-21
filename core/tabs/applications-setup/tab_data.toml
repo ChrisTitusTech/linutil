@@ -47,7 +47,7 @@ script = "linutil-installer.sh"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = ["linutil"]
+values = [ "linutil" ]
 
 [[data]]
 name = "Linutil Updater"
@@ -57,7 +57,7 @@ script = "linutil-updater.sh"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = ["linutil"]
+values = [ "linutil" ]
 
 [[data]]
 name = "Neovim"
