@@ -10,7 +10,7 @@ data = "command_exists"
 values = ["pacman"]
 
 [[data.entries]]
-name = "Arch Server Setup"
+name = "Arch-Titus"
 description = "This command installs a minimal arch server setup under 5 minutes."
 script = "arch/server-setup.sh"
 
@@ -38,20 +38,20 @@ description = "Optimizes DNF for parallel downloads"
 script = "fedora/configure-dnf.sh"
 
 [[data.entries]]
-name = "Multimedia Setup"
+name = "Multimedia Codecs"
 script = "fedora/multimedia-codecs.sh"
 
 [[data.entries]]
-name = "Nvidia Proprietary Driver Setup"
+name = "Nvidia Proprietary Driver"
 script = "fedora/nvidia-proprietary-driver-setup.sh"
 
 [[data.entries]]
-name = "RPM Fusion Setup"
+name = "RPM Fusion"
 description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
 script = "fedora/rpm-fusion-setup.sh"
 
 [[data.entries]]
-name = "Virtualization Setup"
+name = "Virtualization"
 description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 
