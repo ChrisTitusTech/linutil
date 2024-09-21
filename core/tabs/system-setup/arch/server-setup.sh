@@ -79,7 +79,7 @@ select_option() {
             echo "Please select an option using the arrow keys and Enter:"
         fi
         for i in "${!options[@]}"; do
-            if [ $i -eq $selected ]; then
+            if [ "$i" -eq $selected ]; then
                 echo "> ${options[$i]}"
             else
                 echo "  ${options[$i]}"
@@ -154,6 +154,7 @@ filesystem () {
     *) echo "Wrong option please select again"; filesystem;;
     esac
 }
+
 # @description Detects and sets timezone. 
 timezone () {
     # Added this from arch wiki https://wiki.archlinux.org/title/System_time
@@ -171,7 +172,7 @@ timezone () {
         export TIMEZONE=$time_zone;;
         n|N|no|NO|No)
         echo "Please enter your desired timezone e.g. Europe/London :" 
-        read new_timezone
+        read -r new_timezone
         echo "${new_timezone} set as timezone"
         export TIMEZONE=$new_timezone;;
         *) echo "Wrong option. Try again";timezone;;
@@ -240,7 +241,7 @@ userinfo () {
     # Loop through user input until the user gives a valid username
     while true
     do 
-            read -p "Please enter username:" username
+            read -r -p "Please enter username: " username
             if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
             then 
                     break
@@ -266,14 +267,14 @@ userinfo () {
      # Loop through user input until the user gives a valid hostname, but allow the user to force save 
     while true
     do 
-            read -p "Please name your machine:" name_of_machine
+            read -r -p "Please name your machine: " name_of_machine
             # hostname regex (!!couldn't find spec for computer name!!)
             if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
             then 
                     break 
             fi 
             # if validation fails allow the user to force saving of the hostname
-            read -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
+            read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
             if [[ "${force,,}" = "y" ]]
             then 
                     break 
@@ -303,6 +304,7 @@ keymap
 echo "Setting up mirrors for optimal download"
 iso=$(curl -4 ifconfig.co/country-iso)
 timedatectl set-ntp true
+pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 setfont ter-v18b
@@ -314,7 +316,7 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -c "$iso" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 if [ ! -d "/mnt" ]; then
     mkdir /mnt
 fi
@@ -331,17 +333,17 @@ echo -ne "
 "
 umount -A --recursive /mnt # make sure everything is unmounted before we start
 # disk prep
-sgdisk -Z ${DISK} # zap all on disk
-sgdisk -a 2048 -o ${DISK} # new gpt disk 2048 alignment
+sgdisk -Z "${DISK}" # zap all on disk
+sgdisk -a 2048 -o "${DISK}" # new gpt disk 2048 alignment
 
 # create partitions
-sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' ${DISK} # partition 1 (BIOS Boot Partition)
-sgdisk -n 2::+1GiB --typecode=2:ef00 --change-name=2:'EFIBOOT' ${DISK} # partition 2 (UEFI Boot Partition)
-sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' ${DISK} # partition 3 (Root), default start, remaining
+sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' "${DISK}" # partition 1 (BIOS Boot Partition)
+sgdisk -n 2::+1GiB --typecode=2:ef00 --change-name=2:'EFIBOOT' "${DISK}" # partition 2 (UEFI Boot Partition)
+sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' "${DISK}" # partition 3 (Root), default start, remaining
 if [[ ! -d "/sys/firmware/efi" ]]; then # Checking for bios system
-    sgdisk -A 1:set:2 ${DISK}
+    sgdisk -A 1:set:2 "${DISK}"
 fi
-partprobe ${DISK} # reread partition table to ensure it is correct
+partprobe "${DISK}" # reread partition table to ensure it is correct
 
 # make filesystems
 echo -ne "
@@ -353,17 +355,11 @@ echo -ne "
 createsubvolumes () {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
-    btrfs subvolume create /mnt/@var
-    btrfs subvolume create /mnt/@tmp
-    btrfs subvolume create /mnt/@.snapshots
 }
 
 # @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol () {
-    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
-    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
-    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
-    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
+    mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
 }
 
 # @description BTRFS subvolulme creation and mounting. 
@@ -373,9 +369,9 @@ subvolumesetup () {
 # unmount root to remount with subvolume 
     umount /mnt
 # mount @ subvolume
-    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
+    mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
 # make directories home, .snapshots, var, tmp
-    mkdir -p /mnt/{home,var,tmp,.snapshots}
+    mkdir -p /mnt/home
 # mount subvolumes
     mountallsubvol
 }
@@ -389,24 +385,24 @@ else
 fi
 
 if [[ "${FS}" == "btrfs" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
-    mkfs.btrfs -L ROOT ${partition3} -f
-    mount -t btrfs ${partition3} /mnt
+    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.btrfs -L ROOT "${partition3}" -f
+    mount -t btrfs "${partition3}" /mnt
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
-    mkfs.ext4 -L ROOT ${partition3}
-    mount -t ext4 ${partition3} /mnt
+    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.ext4 -L ROOT "${partition3}"
+    mount -t ext4 "${partition3}" /mnt
 elif [[ "${FS}" == "luks" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
+    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat ${partition3} -
+    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder 
-    echo -n "${LUKS_PASSWORD}" | cryptsetup open ${partition3} ROOT -
+    echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
-    mkfs.btrfs -L ROOT ${partition3}
+    mkfs.btrfs -L ROOT "${partition3}"
 # create subvolumes for btrfs
-    mount -t btrfs ${partition3} /mnt
+    mount -t btrfs "${partition3}" /mnt
     subvolumesetup
 fi
 
@@ -425,6 +421,7 @@ if ! grep -qs '/mnt' /proc/mounts; then
     echo "Rebooting in 1 Second ..." && sleep 1
     reboot now
 fi
+
 echo -ne "
 -------------------------------------------------------------------------
                     Arch Install on Main Drive
@@ -449,7 +446,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 if [[ ! -d "/sys/firmware/efi" ]]; then
-    grub-install --boot-directory=/mnt/boot ${DISK}
+    grub-install --boot-directory=/mnt/boot "${DISK}"
 fi
 echo -ne "
 -------------------------------------------------------------------------
@@ -474,7 +471,7 @@ fi
 
 gpu_type=$(lspci | grep -E "VGA|3D|Display")
 
-arch-chroot /mnt /bin/bash <<EOF
+arch-chroot /mnt /bin/bash -c "KEYMAP='${KEYMAP}' /bin/bash" <<EOF
 
 echo -ne "
 -------------------------------------------------------------------------
@@ -516,8 +513,11 @@ timedatectl --no-ask-password set-timezone ${TIMEZONE}
 timedatectl --no-ask-password set-ntp 1
 localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_TIME="en_US.UTF-8"
 ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+
 # Set keymaps
-localectl --no-ask-password set-keymap ${KEYMAP}
+echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
+echo "XKBLAYOUT=${KEYMAP}" >> /etc/vconsole.conf
+echo "Keymap set to: ${KEYMAP}"
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
