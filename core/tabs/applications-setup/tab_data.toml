@@ -1,6 +1,44 @@
 name = "Applications Setup"
 
 [[data]]
+name = "Developer TOols"
+
+[[data.entries]]
+name = "Install Github Desktop"
+description = "GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes."
+script = "Developer-tools/githubdesktop-setup.sh"
+
+[[data.entries]]
+name = "Setup Neovim"
+description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
+script = "Developer-tools/neovim-setup.sh"
+
+[[data.entries]]
+name = "Install Sublime"
+description = "Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages."
+script = "Developer-tools/sublime-setup.sh"
+
+[[data.entries]]
+name = "Install VS Code"
+description = "Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks."
+script = "Developer-tools/vscode-setup.sh"
+
+[[data.entries]]
+name = "Install VS Codium"
+description = "VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding."
+script = "Developer-tools/vscodium-setup.sh"
+
+[[data.entries]]
+name = "Install Meld"
+description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
+script = "Developer-tools/meld-setup.sh"
+
+[[data.entries]]
+name = "Install Ngrok"
+description = "Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development."
+script = "Developer-tools/ngrok-setup.sh"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -58,11 +96,6 @@ script = "linutil-updater.sh"
 matches = true
 data = "command_exists"
 values = [ "linutil" ]
-
-[[data]]
-name = "Neovim"
-description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
-script = "neovim-setup.sh"
 
 [[data]]
 name = "Office Suite"
