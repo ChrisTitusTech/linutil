@@ -16,11 +16,12 @@ To get started, run the following command in your terminal:
 curl -fsSL https://christitus.com/linux | sh
 ```
 ---
+
+### Installation
+
 LinUtil is also available as a package in various repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/linutil.svg)](https://repology.org/project/linutil/versions)
-
-### Installation
 
 <details>
   <summary>Arch Linux</summary>
