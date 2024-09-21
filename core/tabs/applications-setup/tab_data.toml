@@ -75,7 +75,7 @@ description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu rep
 script = "rofi-setup.sh"
 
 [[data]]
-name = "Titus Starship Prompt Setup"
+name = "Titus Starship Prompt"
 description = "Starship is a multi-terminal prompt based on rust.\nThis command installs and configures starship with configuration from CTT's mybash repo.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "titus-starship-prompt-setup.sh"
 
