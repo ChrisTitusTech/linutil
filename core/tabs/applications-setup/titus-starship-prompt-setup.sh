@@ -42,7 +42,7 @@ setupStarshipTomlFile() {
 
 # NOTE: Checking if starship config line exist in particular shell
 configureShell() {
-  printf "%b\n" "${CYAN} Setting up your shell.\n${YELLOW}NOTE: currently this script only support bash and zsh. ${RC}"
+  printf "%b\n" "${CYAN} Setting up your shell. ${RC}"
   if [ -e "$HOME/.bashrc" ]; then
     printf "%b\n" "${CYAN} Setting up bash to use starship as default prompt ${RC}"
     printf "%s\n" 'eval "$(starship init bash)"' >>"$HOME/.bashrc"
@@ -68,6 +68,7 @@ configureShell() {
 }
 
 checkEnv
+printf "%b\n" "${YELLOW}NOTE: currently this script only support bash and zsh."
 installStarship
 setupStarshipTomlFile
 configureShell
