@@ -20,7 +20,7 @@ checkAURHelper() {
             for helper in ${AUR_HELPERS}; do
                 if command_exists "${helper}"; then
                     AUR_HELPER=${helper}
-                    printf "%b\n" "Using ${helper} as AUR helper"
+                    printf "%b\n" "${CYAN}Using ${helper} as AUR helper${RC}"
                     AUR_HELPER_CHECKED=true
                     return 0
                 fi
@@ -49,7 +49,7 @@ checkEscalationTool() {
         for tool in ${ESCALATION_TOOLS}; do
             if command_exists "${tool}"; then
                 ESCALATION_TOOL=${tool}
-                printf "%b\n" "Using ${tool} for privilege escalation"
+                printf "%b\n" "${CYAN}Using ${tool} for privilege escalation${RC}"
                 ESCALATION_TOOL_CHECKED=true
                 return 0
             fi
@@ -77,7 +77,7 @@ checkPackageManager() {
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists "${pgm}"; then
             PACKAGER=${pgm}
-            printf "%b\n" "Using ${pgm}"
+            printf "%b\n" "${CYAN}Using ${pgm} as package manager${RC}"
             break
         fi
     done
@@ -94,7 +94,7 @@ checkSuperUser() {
     for sug in ${SUPERUSERGROUP}; do
         if groups | grep -q "${sug}"; then
             SUGROUP=${sug}
-            printf "%b\n" "Super user group ${SUGROUP}"
+            printf "%b\n" "${CYAN}Super user group ${SUGROUP}${RC}"
             break
         fi
     done
