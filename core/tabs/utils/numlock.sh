@@ -48,7 +48,7 @@ numlockSetup() {
     create_service
   fi
 
-  printf "%b\n" "Do you want to enable Numlock on boot? (Y/n): "
+  printf "%b" "Do you want to enable Numlock on boot? (y/N): "
   read -r confirm
   if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
     "$ESCALATION_TOOL" systemctl enable numlock.service --quiet
