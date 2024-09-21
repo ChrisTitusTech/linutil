@@ -1,6 +1,10 @@
 #![allow(soft_unstable)]
 
-use std::io::{Cursor, Read as _, Seek, SeekFrom, Write as _};
+use std::{
+    borrow::Cow,
+    collections::VecDeque,
+    io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
+};
 
 use crate::{
     float::FloatContent,
@@ -14,6 +18,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
+    text::Line,
     widgets::{Block, Borders, Clear, List},
     Frame,
 };
@@ -31,7 +36,9 @@ pub enum FloatingTextMode {
 
 pub struct FloatingText {
     pub src: Vec<String>,
-    scroll: usize,
+    max_line_width: usize,
+    v_scroll: usize,
+    h_scroll: usize,
     mode: FloatingTextMode,
 }
 
@@ -110,47 +117,92 @@ fn get_highlighted_string(s: &str) -> Option<String> {
     Some(output)
 }
 
+macro_rules! max_width {
+    ($($lines:tt)+) => {{
+        $($lines)+.iter().fold(0, |accum, val| accum.max(val.len()))
+    }}
+}
+
+#[inline]
+fn get_lines(s: &str) -> Vec<&str> {
+    s.lines().collect::<Vec<_>>()
+}
+
+#[inline]
+fn get_lines_owned(s: &str) -> Vec<String> {
+    get_lines(s).iter().map(|s| s.to_string()).collect()
+}
+
 impl FloatingText {
     pub fn new(text: String, mode: FloatingTextMode) -> Self {
+        let src = get_lines(&text)
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<_>>();
+
+        let max_line_width = max_width!(src);
+
         Self {
-            src: text.split("\n").map(|s| s.to_string()).collect(),
-            scroll: 0,
+            src,
             mode,
+            max_line_width,
+            v_scroll: 0,
+            h_scroll: 0,
         }
     }
 
     pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
-        let src = match command {
+        let (max_line_width, src) = match command {
             Command::Raw(cmd) => {
                 // just apply highlights directly
-                get_highlighted_string(cmd)
+                (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
 
             Command::LocalFile(file_path) => {
                 // have to read from tmp dir to get cmd src
-                let file_contents = std::fs::read_to_string(file_path)
+                let raw = std::fs::read_to_string(file_path)
                     .map_err(|_| format!("File not found: {:?}", file_path))
                     .unwrap();
 
-                get_highlighted_string(&file_contents)
+                (max_width!(get_lines(&raw)), Some(raw))
             }
 
             // If command is a folder, we don't display a preview
-            Command::None => None,
+            Command::None => (0usize, None),
         };
 
-        Some(Self::new(src?, mode))
+        let src = get_lines_owned(&get_highlighted_string(&src?)?);
+
+        Some(Self {
+            src,
+            mode,
+            max_line_width,
+            h_scroll: 0,
+            v_scroll: 0,
+        })
     }
 
     fn scroll_down(&mut self) {
-        if self.scroll + 1 < self.src.len() {
-            self.scroll += 1;
+        if self.v_scroll + 1 < self.src.len() {
+            self.v_scroll += 1;
         }
     }
 
     fn scroll_up(&mut self) {
-        if self.scroll > 0 {
-            self.scroll -= 1;
+        if self.v_scroll > 0 {
+            self.v_scroll -= 1;
+        }
+    }
+
+    fn scroll_left(&mut self) {
+        if self.h_scroll > 0 {
+            self.h_scroll -= 1;
+        }
+    }
+
+    fn scroll_right(&mut self) {
+        if self.h_scroll + 1 < self.max_line_width {
+            self.h_scroll += 1;
         }
     }
 }
@@ -175,12 +227,42 @@ impl FloatContent for FloatingText {
 
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
+        let Rect { height, .. } = inner_area;
         let lines = self
             .src
             .iter()
-            .skip(self.scroll)
-            .take(inner_area.height as usize)
-            .map(|l| l.into_text().unwrap())
+            .skip(self.v_scroll)
+            .take(height as usize)
+            .flat_map(|l| l.into_text().unwrap())
+            .map(|line| {
+                let mut skipped = 0;
+                let mut spans = line
+                    .into_iter()
+                    .skip_while(|span| {
+                        let skip = (skipped + span.content.len()) <= self.h_scroll;
+                        if skip {
+                            skipped += span.content.len();
+                            true
+                        } else {
+                            false
+                        }
+                    })
+                    .collect::<VecDeque<_>>();
+
+                if spans.is_empty() {
+                    Line::raw(Cow::Owned(String::new()))
+                } else {
+                    if skipped < self.h_scroll {
+                        let to_split = spans.pop_front().unwrap();
+                        let new_content = to_split.content.clone().into_owned()
+                            [self.h_scroll - skipped..]
+                            .to_owned();
+                        spans.push_front(to_split.content(Cow::Owned(new_content)));
+                    }
+
+                    Line::from(Vec::from(spans))
+                }
+            })
             .collect::<Vec<_>>();
 
         // Create list widget
@@ -196,9 +278,12 @@ impl FloatContent for FloatingText {
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        use KeyCode::*;
         match key.code {
-            KeyCode::Down | KeyCode::Char('j') => self.scroll_down(),
-            KeyCode::Up | KeyCode::Char('k') => self.scroll_up(),
+            Down | Char('j') => self.scroll_down(),
+            Up | Char('k') => self.scroll_up(),
+            Left | Char('h') => self.scroll_left(),
+            Right | Char('l') => self.scroll_right(),
             _ => {}
         }
         false
@@ -214,7 +299,9 @@ impl FloatContent for FloatingText {
             hints: vec![
                 Shortcut::new(vec!["j", "Down"], "Scroll down"),
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
-                Shortcut::new(vec!["Enter", "q"], "Close window"),
+                Shortcut::new(vec!["h", "Left"], "Scroll left"),
+                Shortcut::new(vec!["l", "Right"], "Scroll right"),
+                Shortcut::new(vec!["Enter", "p", "d"], "Close window"),
             ],
         }
     }
