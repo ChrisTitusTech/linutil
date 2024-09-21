@@ -120,7 +120,7 @@ delete_all_snapshots() {
     printf "%b" "${CYAN}Are you sure? (y/N): ${RC}"
     read -r CONFIRMATION
 
-    if [ "$CONFIRMATION" = "yes" ]; then
+    if [ "$CONFIRMATION" = "y" ] || [ "$CONFIRMATION" = "Y" ]; then
         printf "%b\n" "${CYAN}Deleting all snapshots...${RC}"
         "$ESCALATION_TOOL" timeshift --delete-all --yes
         if [ $? -eq 0 ]; then
