@@ -4,7 +4,7 @@
 
 # Check for required commands
 for cmd in find curl unzip stty; do
-    if ! command_exists "$cmd" >/dev/null 2>&1; then
+    if ! command_exists "$cmd"; then
         printf "%b\n" "${RED}$cmd is not installed.${RC}"
         exit 1
     fi
