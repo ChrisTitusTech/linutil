@@ -9,7 +9,7 @@ install_package() {
     if ! command_exists "$PACKAGE"; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
@@ -68,9 +68,9 @@ setup_samba() {
 
     if [ -f "$SAMBA_CONFIG" ]; then
         printf "%b\n" "${YELLOW}Samba configuration file already exists in $SAMBA_CONFIG.${RC}"
-        printf "%b" "Do you want to modify the existing Samba configuration? (Y/n): "
+        printf  "%b" "Do you want to modify the existing Samba configuration? (Y/n): "
         read -r MODIFY_SAMBA
-        if [ "$MODIFY_SAMBA" = "yes" ]; then
+        if [ "$MODIFY_SAMBA" = "Y" ]; then
             "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
         fi
     else
@@ -97,7 +97,7 @@ setup_samba() {
             stty echo
             printf "Confirm Samba password: "
             stty -echo
-            read SAMBA_PASSWORD_CONFIRM
+            read -r SAMBA_PASSWORD_CONFIRM
             stty echo
             printf "\n"
             if [ "$SAMBA_PASSWORD" = "$SAMBA_PASSWORD_CONFIRM" ]; then
@@ -171,7 +171,7 @@ setup_ssh_samba(){
     printf "%b\n" "5. Exit"
 
     printf "%b" "Enter your choice [1-5]: "
-    read CHOICE
+    read -r CHOICE
 
     case "$CHOICE" in
         1)
