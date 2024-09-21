@@ -7,7 +7,7 @@ pub mod state;
 mod theme;
 
 use std::{
-    io::{self, stdout},
+    io::{self, stdout, Stdout},
     time::Duration,
 };
 
@@ -19,10 +19,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use ratatui::{
-    backend::{Backend, CrosstermBackend},
-    Terminal,
-};
+use ratatui::{backend::CrosstermBackend, Terminal};
 use state::AppState;
 
 // Linux utility toolbox
@@ -59,7 +56,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, state: &mut AppState) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> io::Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
