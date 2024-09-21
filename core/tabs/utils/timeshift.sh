@@ -79,10 +79,10 @@ restore_snapshot() {
     read -r SNAPSHOT
     printf "%b" "${CYAN}Enter the target device (e.g., /dev/sda1): ${RC}"
     read -r TARGET_DEVICE
-    printf "%b" "${CYAN}Do you want to skip GRUB reinstall? (Y/n): ${RC}"
+    printf "%b" "${CYAN}Do you want to skip GRUB reinstall? (y/N): ${RC}"
     read -r SKIP_GRUB
 
-    if [ "$SKIP_GRUB" = "yes" ]; then
+    if [ "$SKIP_GRUB" = "y" ] || [ "$SKIP_GRUB" = "Y" ]; then
         "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --skip-grub --yes
     else
         printf "%b\n" "${CYAN}Enter GRUB device (e.g., /dev/sda): ${RC}"
