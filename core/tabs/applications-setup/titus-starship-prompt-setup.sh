@@ -30,7 +30,7 @@ setupStarshipTomlFile() {
     cmdCheck
     printf "%b\n" "${CYAN} Download Titus starship prompt file ${RC}"
     mkdir -p "$HOME/.config/starship/"
-    curl -sSLo "${HOME}/.config/starship/starship.toml" "https://github.com/ChrisTitusTech/mybash/raw/main/starship.toml"
+    curl -sSLo "$HOME/.config/starship/starship.toml" "https://github.com/ChrisTitusTech/mybash/raw/main/starship.toml"
     cmdCheck
   else
     printf "%b\n" "${CYAN} Download Titus starship prompt file ${RC}"
