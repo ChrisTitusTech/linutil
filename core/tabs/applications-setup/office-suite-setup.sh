@@ -15,7 +15,7 @@ install_onlyoffice() {
                 flatpak install -y flathub org.onlyoffice.desktopeditors
                 ;;
             pacman)
-                "$AUR_HELPER" -S --noconfirm onlyoffice
+                "$AUR_HELPER" -S --needed --noconfirm onlyoffice
                 ;;
             *)
                 printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
@@ -38,7 +38,7 @@ install_libreoffice() {
             flatpak install -y flathub org.libreoffice.LibreOffice
             ;;
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm libreoffice-fresh
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
             ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager. Please install Thorium manually.${RC}"
@@ -85,8 +85,7 @@ install_freeoffice() {
             ;;
         dnf)
             "$ESCALATION_TOOL" curl -O -qO /etc/yum.repos.d/softmaker.repo https://shop.softmaker.com/repo/softmaker.repo
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install softmaker-freeoffice-2024
+            "$ESCALATION_TOOL" "$PACKAGER" install -y softmaker-freeoffice-2024
             ;;
         *)
             printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
