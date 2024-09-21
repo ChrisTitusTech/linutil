@@ -74,7 +74,7 @@ impl AppState {
             selected_commands: Vec::new(),
             drawable: false,
             #[cfg(feature = "tips")]
-            tip: get_random_line(include_str!("../cool_tips.txt").lines().collect()),
+            tip: get_random_tip(),
         };
         state.update_items();
         state
@@ -543,12 +543,16 @@ impl AppState {
 }
 
 #[cfg(feature = "tips")]
-fn get_random_line(lines: Vec<&str>) -> &str {
-    if lines.is_empty() {
+const TIPS: &str = include_str!("../cool_tips.txt");
+
+#[cfg(feature = "tips")]
+fn get_random_tip() -> &'static str {
+    let tips: Vec<&str> = TIPS.lines().collect();
+    if tips.is_empty() {
         return "";
     }
 
     let mut rng = rand::thread_rng();
-    let random_index = rng.gen_range(0..lines.len());
-    lines[random_index]
+    let random_index = rng.gen_range(0..tips.len());
+    tips[random_index]
 }
