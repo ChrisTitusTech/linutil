@@ -42,7 +42,7 @@ makepkg -si
 
 Replace `<package>` with your preferred package.
 
-If you use [yay](https://github.com/Jguer/yay), [paru](https://github.com/Morganamilo/paru) or any other [AUR Helper](https://wiki.archlinux.org/title/AUR_helpers), it's even simplier:
+If you use [yay](https://github.com/Jguer/yay), [paru](https://github.com/Morganamilo/paru) or any other [AUR Helper](https://wiki.archlinux.org/title/AUR_helpers), it's even simpler:
 
 ```bash
 paru -S linutil

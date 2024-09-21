@@ -26,14 +26,14 @@ curl -fsSL https://christitus.com/linuxdev | sh
 ```
 ## ⬇️ Installation
 
-LinUtil is also available as a package in various repositories:
+Linutil is also available as a package in various repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/linutil.svg)](https://repology.org/project/linutil/versions)
 
 <details>
   <summary>Arch Linux</summary>
 
-LinUtil can be installed on [Arch Linux](https://archlinux.org) with three different [AUR](https://aur.archlinux.org) packages:
+Linutil can be installed on [Arch Linux](https://archlinux.org) with three different [AUR](https://aur.archlinux.org) packages:
 
 - `linutil` - Stable release compiled from source
 - `linutil-bin` - Stable release pre-compiled
@@ -62,7 +62,7 @@ Replace `paru` with your preferred helper and `linutil` with your preferred pack
 <details>
   <summary>Cargo</summary>
 
-LinUtil can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
+Linutil can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
 
 ```bash
 cargo install linutil
