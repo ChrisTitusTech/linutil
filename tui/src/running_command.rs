@@ -148,11 +148,19 @@ impl RunningCommand {
         for command in commands {
             match command {
                 Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)),
-                Command::LocalFile(file) => {
-                    if let Some(parent) = file.parent() {
-                        script.push_str(&format!("cd {}\n", parent.display()));
+                Command::LocalFile {
+                    executable,
+                    args,
+                    file,
+                } => {
+                    if let Some(parent_directory) = file.parent() {
+                        script.push_str(&format!("cd {}\n", parent_directory.display()));
                     }
-                    script.push_str(&format!("sh {}\n", file.display()));
+                    script.push_str(&executable);
+                    for arg in args {
+                        script.push(' ');
+                        script.push_str(&arg);
+                    }
                 }
                 Command::None => panic!("Command::None was treated as a command"),
             }

@@ -37,9 +37,9 @@ impl FloatingText {
                 // 'include_str!()' call in the node
                 cmd.lines().map(|line| line.to_string()).collect()
             }
-            Command::LocalFile(file_path) => {
-                let file_contents = std::fs::read_to_string(file_path)
-                    .map_err(|_| format!("File not found: {:?}", file_path))
+            Command::LocalFile { file, .. } => {
+                let file_contents = std::fs::read_to_string(file)
+                    .map_err(|_| format!("File not found: {:?}", file))
                     .unwrap();
                 file_contents.lines().map(|line| line.to_string()).collect()
             }

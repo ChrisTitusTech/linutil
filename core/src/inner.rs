@@ -2,7 +2,11 @@ use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
 use include_dir::{include_dir, Dir};
 use serde::Deserialize;
-use std::path::{Path, PathBuf};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    path::{Path, PathBuf},
+};
 use tempdir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
@@ -173,18 +177,50 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
                 });
             }
             EntryType::Script(script) => {
-                let dir = command_dir.join(script);
-                if !dir.exists() {
-                    panic!("Script {} does not exist", dir.display());
+                let script = command_dir.join(script);
+                if !script.exists() {
+                    panic!("Script {} does not exist", script.display());
                 }
+
+                let (executable, mut args) = get_shebang(&script);
+                args.push(script.to_string_lossy().to_string());
+
                 node.append(ListNode {
                     name: entry.name,
                     description: entry.description,
-                    command: Command::LocalFile(dir),
+                    command: Command::LocalFile {
+                        executable,
+                        args,
+                        file: script,
+                    },
                 });
             }
         }
     }
+}
+
+fn get_shebang(script: &Path) -> (String, Vec<String>) {
+    let default_executable = || ("sh".into(), vec!["-e".into()]);
+
+    let script = File::open(script).expect("Failed to open script file");
+    let reader = BufReader::new(script);
+
+    // Handle empty or unreadable first line
+    let Some(Ok(first_line)) = reader.lines().next() else {
+        return default_executable();
+    };
+
+    // Handle whether or not the first line is a shebang
+    let Some(first_line) = first_line.trim().strip_prefix("#!") else {
+        return default_executable();
+    };
+
+    let mut parts = first_line.split_whitespace();
+
+    let executable = parts.next().unwrap_or("sh").to_string();
+    let args = parts.map(ToString::to_string).collect();
+
+    (executable, args)
 }
 
 impl TabList {
