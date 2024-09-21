@@ -229,7 +229,7 @@ browserSetup() {
     printf "%b\n" "7. Thorium"
     printf "%b\n" "8. Lynx"
     printf "%b\n" "----------------------------"
-    printf "%b"  "Enter your choices (e.g., 1 3 5): "
+    printf "%b"  "Enter your choices (e.g. 1 3 5): "
     read -r choice
     for ch in $choice; do
         case $ch in
