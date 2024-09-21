@@ -47,7 +47,7 @@ script = "linutil-installer.sh"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Linutil Updater"
@@ -57,7 +57,7 @@ script = "linutil-updater.sh"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Neovim"
@@ -73,6 +73,11 @@ script = "office-suite-setup.sh"
 name = "Rofi"
 description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport.\nThis command installs and configures rofi with configuration from CTT's DWM repo.\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "rofi-setup.sh"
+
+[[data]]
+name = "Titus Starship Prompt Setup"
+description = "Starship is a multi-terminal prompt based on rust.\nThis command installs and configures starship with configuration from CTT's mybash repo.\nhttps://github.com/ChrisTitusTech/mybash"
+script = "titus-starship-prompt-setup.sh"
 
 [[data]]
 name = "ZSH Prompt"
