@@ -70,7 +70,7 @@ setup_samba() {
         printf "%b\n" "${YELLOW}Samba configuration file already exists in $SAMBA_CONFIG.${RC}"
         printf "%b" "Do you want to modify the existing Samba configuration? (Y/n): "
         read -r MODIFY_SAMBA
-        if [ "$MODIFY_SAMBA" = "Y" ]; then
+        if [ "$MODIFY_SAMBA" = "Y" ] || [ "$MODIFY_SAMBA" = "y" ]; then
             "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
         fi
     else
