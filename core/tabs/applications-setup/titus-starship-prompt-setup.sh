@@ -61,8 +61,8 @@ configureShell() {
   # I need to add this config just for that script, if someone has configured their z shell using linutil
   if [ -e "$HOME/.config/.zshrc" ]; then
     printf "%b\n" "${CYAN} Setting up zsh to use starship as default prompt ${RC}"
-    printf "%s\n" 'eval "$(starship init fish)"' >>"$HOME/.config/.zshrc"
-    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >>"$HOME/.config/.zshrc"
+    printf "%s\n" 'eval "$(starship init fish)"' >> "$HOME/.config/.zshrc"
+    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >> "$HOME/.config/.zshrc"
     cmdCheck
   fi
 }
