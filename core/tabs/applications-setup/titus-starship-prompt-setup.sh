@@ -52,8 +52,8 @@ configureShell() {
 
   if [ -e "$HOME/.zshrc" ]; then
     printf "%b\n" "${CYAN} Setting up zsh to use starship as default prompt ${RC}"
-    printf "%s\n" 'eval "$(starship init zsh)"' >>"$HOME/.zshrc"
-    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >>"$HOME/.zshrc"
+    printf "%s\n" 'eval "$(starship init zsh)"' >> "$HOME/.zshrc"
+    printf "%s\n" "export STARSHIP_CONFIG=~/.config/starship/starship.toml" >> "$HOME/.zshrc"
     cmdCheck
   fi
 
