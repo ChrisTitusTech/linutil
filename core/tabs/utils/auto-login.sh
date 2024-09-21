@@ -134,7 +134,7 @@ configure_or_remove_autologin() {
         printf "%b\n" "2) GDM"
         printf "%b\n" "3) SDDM"
         printf "%b\n" "4) LXDM"
-        printf "%b" "Enter your choice [1-4]: "
+        printf "%b" "Enter your choice (1-4): "
         read -r choice
 
         case "$choice" in
