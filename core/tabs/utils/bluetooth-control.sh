@@ -66,7 +66,7 @@ scan_devices() {
         printf "%b\n" "${RED}No devices found.${RC}"
     else
         printf "%b\n" "${GREEN}Devices found:${RC}"
-        printf "%s\n" "$devices"
+        printf "%b\n" "$devices"
     fi
     printf "%b" "Press any key to return to the main menu..."
     read -r dummy
@@ -98,7 +98,7 @@ prompt_for_mac() {
             i=$((i + 1))
         done
         printf "%b\n" "0. Exit to main menu"
-        printf "%s\n" "$prompt_msg"
+        printf "%b\n" "$prompt_msg"
         read -r choice
 
         # Validate the choice
