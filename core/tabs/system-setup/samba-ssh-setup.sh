@@ -112,7 +112,7 @@ setup_samba() {
         "$ESCALATION_TOOL" smbpasswd -a "$SAMBA_USER"
 
         # Configure Samba settings
-        "$ESCALATION_TOOL" sh -c "cat > $SAMBA_CONFIG" <<EOL
+        "$ESCALATION_TOOL" tee "$SAMBA_CONFIG" > /dev/null <<EOL
 [global]
    workgroup = WORKGROUP
    server string = Samba Server
