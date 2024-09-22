@@ -8,7 +8,7 @@ install_chrome() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-                "$ESCALATION_TOOL" dpkg -i google-chrome-stable_current_amd64.deb
+                "$ESCALATION_TOOL" "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
@@ -103,9 +103,6 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 		dnf)
 			curl -fsSL https://rpm.librewolf.net/librewolf-repo.repo | pkexec tee /etc/yum.repos.d/librewolf.repo > /dev/null
 			"$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
-			;;
-		rpm-ostree)
-			rpm-ostree install -y librewolf
 			;;
 		zypper)
 			"$ESCALATION_TOOL" rpm --import https://rpm.librewolf.net/pubkey.gpg

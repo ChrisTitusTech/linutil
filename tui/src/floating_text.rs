@@ -37,7 +37,7 @@ pub struct FloatingText {
     max_line_width: usize,
     v_scroll: usize,
     h_scroll: usize,
-    mode: FloatingTextMode,
+    mode_title: &'static str,
 }
 
 macro_rules! style {
@@ -139,10 +139,9 @@ impl FloatingText {
             .collect::<Vec<_>>();
 
         let max_line_width = max_width!(src);
-
         Self {
             src,
-            mode,
+            mode_title: Self::get_mode_title(mode),
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
@@ -155,11 +154,10 @@ impl FloatingText {
                 // just apply highlights directly
                 (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
-
-            Command::LocalFile(file_path) => {
+            Command::LocalFile { file, .. } => {
                 // have to read from tmp dir to get cmd src
-                let raw = std::fs::read_to_string(file_path)
-                    .map_err(|_| format!("File not found: {:?}", file_path))
+                let raw = std::fs::read_to_string(file)
+                    .map_err(|_| format!("File not found: {:?}", file))
                     .unwrap();
 
                 (max_width!(get_lines(&raw)), Some(raw))
@@ -173,11 +171,18 @@ impl FloatingText {
 
         Some(Self {
             src,
-            mode,
+            mode_title: Self::get_mode_title(mode),
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
         })
+    }
+
+    fn get_mode_title(mode: FloatingTextMode) -> &'static str {
+        match mode {
+            FloatingTextMode::Preview => "Command Preview",
+            FloatingTextMode::Description => "Command Description",
+        }
     }
 
     fn scroll_down(&mut self) {
@@ -208,14 +213,9 @@ impl FloatingText {
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         // Define the Block with a border and background color
-        let block_title = match self.mode {
-            FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::Description => "Command Description",
-        };
-
         let block = Block::default()
             .borders(Borders::ALL)
-            .title(block_title)
+            .title(self.mode_title)
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())
             .style(Style::default());
@@ -293,7 +293,7 @@ impl FloatContent for FloatingText {
 
     fn get_shortcut_list(&self) -> ShortcutList {
         ShortcutList {
-            scope_name: "Floating text",
+            scope_name: self.mode_title,
             hints: vec![
                 Shortcut::new(vec!["j", "Down"], "Scroll down"),
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),

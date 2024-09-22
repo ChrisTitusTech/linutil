@@ -48,13 +48,6 @@ fastUpdate() {
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
             ;;
-        yum)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
-            ;;
-        xbps-install)
-            "$ESCALATION_TOOL" "$PACKAGER" -Syu-
-            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
@@ -65,11 +58,11 @@ fastUpdate() {
 updateSystem() {
     printf "%b\n" "${GREEN}Updating system${RC}"
     case "$PACKAGER" in
-        nala|apt-get)
+        apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" update -y
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
-        yum|dnf)
+        dnf)
             "$ESCALATION_TOOL" "$PACKAGER" update -y
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
@@ -80,9 +73,6 @@ updateSystem() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
-            ;;
-        xbps-install)
-            "$ESCALATION_TOOL" "$PACKAGER" -Syu
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
