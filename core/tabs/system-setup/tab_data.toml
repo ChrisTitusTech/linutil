@@ -97,8 +97,3 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
 task_list = "package removal"
-
-[[data]]
-name = "SSH-Samba"
-script = "samba-ssh-setup.sh"
-task_list = "installation, systemd actions, privileged file modification"
