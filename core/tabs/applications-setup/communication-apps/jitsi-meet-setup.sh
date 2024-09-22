@@ -21,7 +21,7 @@ installJitsi() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Jitsi meet manually.${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
