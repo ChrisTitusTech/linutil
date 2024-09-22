@@ -155,11 +155,10 @@ impl FloatingText {
                 // just apply highlights directly
                 (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
-
-            Command::LocalFile(file_path) => {
+            Command::LocalFile { file, .. } => {
                 // have to read from tmp dir to get cmd src
-                let raw = std::fs::read_to_string(file_path)
-                    .map_err(|_| format!("File not found: {:?}", file_path))
+                let raw = std::fs::read_to_string(file)
+                    .map_err(|_| format!("File not found: {:?}", file))
                     .unwrap();
 
                 (max_width!(get_lines(&raw)), Some(raw))
