@@ -108,6 +108,16 @@ description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu rep
 script = "rofi-setup.sh"
 
 [[data]]
+name = "Waydroid"
+description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
+script = "waydroid-setup.sh"
+
+[[data.preconditions]]
+matches = true
+data = { environment = "XDG_SESSION_TYPE" }
+values = [ "wayland", "Wayland" ]
+
+[[data]]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
