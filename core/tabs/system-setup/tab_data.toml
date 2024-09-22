@@ -70,11 +70,6 @@ script = "compile-setup.sh"
 task_list = "installation"
 
 [[data]]
-name = "Docker"
-script = "docker-setup.sh"
-task_list = "installation, systemd actions"
-
-[[data]]
 name = "Full System Cleanup"
 script = "system-cleanup.sh"
 task_list = "package removal, privileged file modification"
