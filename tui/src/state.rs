@@ -278,6 +278,8 @@ impl AppState {
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
+        let task_list_title = Line::from("Important Actions ").right_aligned();
+
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(style)
@@ -290,9 +292,11 @@ impl AppState {
             .scroll_padding(1);
         frame.render_stateful_widget(list, list_chunks[0], &mut self.selection);
 
-        let disclaimer_list = List::new(task_items)
-            .highlight_style(style)
-            .block(Block::default().borders(Borders::ALL & !Borders::LEFT));
+        let disclaimer_list = List::new(task_items).highlight_style(style).block(
+            Block::default()
+                .borders(Borders::ALL & !Borders::LEFT)
+                .title(task_list_title),
+        );
 
         frame.render_stateful_widget(disclaimer_list, list_chunks[1], &mut self.selection);
 
