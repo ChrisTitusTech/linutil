@@ -7,7 +7,7 @@ pub mod state;
 mod theme;
 
 use std::{
-    io::{self, stdout, Stdout},
+    io::{self, stdout},
     time::Duration,
 };
 
@@ -56,7 +56,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, state: &mut AppState) -> io::Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
