@@ -512,7 +512,8 @@ impl AppState {
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
-        !self.selected_item_is_dir()
+        // Any item that is not a directory or up directory (..) must be a command
+        !(self.selected_item_is_up_dir() || self.selected_item_is_dir())
     }
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
