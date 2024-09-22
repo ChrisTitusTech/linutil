@@ -1,6 +1,6 @@
 [workspace.package]
 license = "MIT"
-version = "24.9.19"
+version = "24.9.22"
 
 [workspace.dependencies]
 ego-tree = "0.6.2"
