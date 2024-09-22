@@ -22,10 +22,13 @@ use ratatui::{
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
 const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
-const ACTIONS_GUIDE: &str = "D  - disk modifications (ex. partitioning) (privileged)
+const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
+
+D  - disk modifications (ex. partitioning) (privileged)
 FI - flatpak installation
 FM - file modification
 I  - installation (privileged)
+MP - package manager actions
 SI - full system installation
 SS - systemd actions (privileged) 
 RP - package removal

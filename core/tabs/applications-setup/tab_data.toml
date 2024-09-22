@@ -7,43 +7,43 @@ name = "Developer Tools"
 name = "Github Desktop"
 description = "GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes."
 script = "Developer-tools/githubdesktop-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Neovim"
 description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
 script = "Developer-tools/neovim-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data.entries]]
 name = "Sublime Text"
 description = "Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages."
 script = "Developer-tools/sublime-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "VS Code"
 description = "Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks."
 script = "Developer-tools/vscode-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "VS Codium"
 description = "VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding."
 script = "Developer-tools/vscodium-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
 script = "Developer-tools/meld-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Ngrok"
 description = "Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development."
 script = "Developer-tools/ngrok-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Communication Apps"
@@ -52,112 +52,112 @@ name = "Communication Apps"
 name = "Discord"
 description = "Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features."
 script = "communication-apps/discord-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Jitsi"
 description = "Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads."
 script = "communication-apps/jitsi-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Signal"
 description = "Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication."
 script = "communication-apps/signal-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Slack"
 description = "Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools."
 script = "communication-apps/slack-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Telegram"
 description = "Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls."
 script = "communication-apps/telegram-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Zoom"
 description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
 script = "communication-apps/zoom-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.entries]]
 name = "Thunderbird"
 description = "Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality."
 script = "communication-apps/thunderbird-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Android Debloater"
 description = "Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience."
 script = "android-debloat.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Bash Prompt"
 description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.\nIt is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.\nThis command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "mybash-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Bottles"
 script = "bottles-setup.sh"
-task_list = "flatpak installation"
+task_list = "FI"
 
 [[data]]
 name = "Web Browsers"
 description = "An interactive script to install popular browsers."
 script = "browser-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"
-task_list = "installation, privileged file modification, systemd actions"
+task_list = "I PFM SS"
 
 [[data]]
 name = "Docker"
 script = "docker-setup.sh"
-task_list = "installation, systemd actions"
+task_list = "I SS"
 
 [[data]]
 name = "Fastfetch"
 description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Flatpak / Flathub"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Grub Theme"
 script = "grub-theme.sh"
-task_list = "privileged file modification"
+task_list = "PFM"
 
 [[data]]
 name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.\nkitty is written in a mix of C and Python programming languages.\n This command installs and configures kitty."
 script = "kitty-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Linutil Installer"
 description = "Installs a distro-specific Linutil package locally."
 script = "linutil-installer.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.preconditions]]
 matches = false
@@ -168,7 +168,7 @@ values = [ "linutil" ]
 name = "Linutil Updater"
 description = "Updates your local Linutil crate installation."
 script = "linutil-updater.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data.preconditions]]
 matches = true
@@ -179,19 +179,19 @@ values = [ "linutil" ]
 name = "Office Suite"
 description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
 script = "office-suite-setup.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Rofi"
 description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport.\nThis command installs and configures rofi with configuration from CTT's DWM repo.\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "rofi-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Waydroid"
 description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
 script = "waydroid-setup.sh"
-task_list = "installation, emulation"
+task_list = "I SS"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
@@ -201,4 +201,4 @@ values = [ "wayland", "Wayland" ]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
-task_list = "installation, file modification"
+task_list = "I FM"

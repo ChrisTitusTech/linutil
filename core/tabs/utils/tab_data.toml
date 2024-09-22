@@ -22,7 +22,7 @@ script = "monitor-control/auto_detect_displays.sh"
 [[data]]
 name = "Auto Mount Drive"
 script = "auto-mount.sh"
-task_list = "privileged file modification"
+task_list = "PFM"
 
 [[data.entries]]
 name = "Change Orientation"
@@ -63,7 +63,7 @@ matches = true
 [[data]]
 name = "SSH-Samba"
 script = "samba-ssh-setup.sh"
-task_list = "installation, systemd actions, privileged file modification"
+task_list = "I SS PFM"
 
 [[data.entries]]
 name = "Scale Monitors"
@@ -111,54 +111,54 @@ task_list = "DE setup"
 [[data]]
 name = "Auto Power Profiling"
 script = "power-profile.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "Bluetooth Manager"
 description = "This utility is designed to manage bluetooth in your system"
 script = "bluetooth-control.sh"
-task_list = "installation, systemd actions"
+task_list = "I SS"
 
 [[data]]
 name = "Bootable USB Creator"
 script = "create-bootable-usb.sh"
-task_list = "disk modification"
+task_list = "D"
 
 [[data]]
 name = "Crypto tool"
 script = "encrypt_decrypt_tool.sh"
-task_list = "installation, file modification"
+task_list = "I FM"
 
 [[data]]
 name = "Numlock on Startup"
 description = "This utility is designed to configure auto enabling of numlock on boot"
 script = "numlock.sh"
-task_list = "privileged file modification, systemd actions"
+task_list = "PFM SS"
 
 [[data]]
 name = "Ollama"
 description = "This utility is designed to manage ollama in your system"
 script = "ollama.sh"
-task_list = "installation, systemd actions"
+task_list = "I SS"
 
 [[data]]
 name = "Service Manager"
 description = "This utility is designed to manage services in your system"
 script = "service-control.sh"
-task_list = "installation, privileged file modification, systemd actions"
+task_list = "I PFM SS"
 
 [[data]]
 name = "SSH Commands"
 script = "ssh.sh"
-task_list = "installation, file modification, systemd actions"
+task_list = "I FM SS"
 
 [[data]]
 name = "Timeshift Backup"
 script = "timeshift.sh"
-task_list = "installation"
+task_list = "I"
 
 [[data]]
 name = "WiFi Manager"
 description = "This utility is designed to manage wifi in your system"
 script = "wifi-control.sh"
-task_list = "installation, systemd actions"
+task_list = "I SS"
