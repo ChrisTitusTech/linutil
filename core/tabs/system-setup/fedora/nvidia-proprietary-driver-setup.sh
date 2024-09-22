@@ -12,7 +12,7 @@
 checkRepo() {
   REPO_ID="rpmfusion-nonfree-nvidia-driver"
 
-  if [ $(dnf repolist enabled 2>/dev/null | grep "$REPO_ID" | wc -l) -gt 0 ]; then
+  if [ "$(dnf repolist enabled 2>/dev/null | grep -c "$REPO_ID")" -gt 0 ]; then
     printf "%b\n" "${GREEN}Nvidia non-free repository is already enabled.${RC}"
   else
     printf "%b\n" "${YELLOW}Nvidia non-free repository is not enabled. Enabling now...${RC}"
@@ -24,7 +24,7 @@ checkRepo() {
     "$ESCALATION_TOOL" dnf makecache
 
     # Verify if the repository is enabled
-    if [ $(dnf repolist enabled 2>/dev/null | grep "$REPO_ID" | wc -l) -gt 0 ]; then
+    if [ "$(dnf repolist enabled 2>/dev/null | grep -c "$REPO_ID")" -gt 0 ]; then
       printf "%b\n" "${GREEN}Nvidia non-free repository is now enabled...${RC}"
     else
       printf "%b\n" "${RED}Failed to enable nvidia non-free repository...${RC}"
@@ -68,7 +68,7 @@ installDriver() {
 
 # NOTE: A confirmation option to proceed or not
 userConfirmation() {
-  printf "%b" "${YELLOW}Do you want to continue? (Y/N): ${RC}"
+  printf "%b" "${YELLOW}Do you want to continue? (y/N): ${RC}"
   read -r choice
   case "$choice" in
   y | Y)
