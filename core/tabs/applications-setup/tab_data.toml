@@ -37,7 +37,7 @@ task_list = "installation"
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
 script = "Developer-tools/meld-setup.sh"
-task_list = "installation to ~/meld"
+task_list = "installation"
 
 [[data.entries]]
 name = "Ngrok"
@@ -100,6 +100,7 @@ task_list = "installation, file modification"
 name = "Android Debloater"
 description = "Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience."
 script = "android-debloat.sh"
+task_list = "installation"
 
 [[data]]
 name = "Bash Prompt"
@@ -167,6 +168,7 @@ values = [ "linutil" ]
 name = "Linutil Updater"
 description = "Updates your local Linutil crate installation."
 script = "linutil-updater.sh"
+task_list = "installation"
 
 [[data.preconditions]]
 matches = true
@@ -189,7 +191,7 @@ task_list = "installation, file modification"
 name = "Waydroid"
 description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
 script = "waydroid-setup.sh"
-
+task_list = "installation, emulation"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
