@@ -19,7 +19,7 @@ installThunderBird() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Thunderbird manually.${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
