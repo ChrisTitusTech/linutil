@@ -34,12 +34,6 @@ setup_flatpak() {
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
-            yum)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
-                ;;
-            xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" install -S flatpak
-                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
