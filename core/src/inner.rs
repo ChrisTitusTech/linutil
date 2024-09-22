@@ -40,7 +40,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                     command: Command::None,
                 });
                 let mut root = tree.root_mut();
-                create_directory(data, &mut root, &directory);
+                create_directory(data, &mut root, &directory, validate);
                 Tab {
                     name,
                     tree,
@@ -158,7 +158,12 @@ fn filter_entries(entries: &mut Vec<Entry>) {
     });
 }
 
-fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+fn create_directory(
+    data: Vec<Entry>,
+    node: &mut NodeMut<ListNode>,
+    command_dir: &Path,
+    validate: bool,
+) {
     for entry in data {
         match entry.entry_type {
             EntryType::Entries(entries) => {
@@ -167,7 +172,7 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
                     description: entry.description,
                     command: Command::None,
                 });
-                create_directory(entries, &mut node, command_dir);
+                create_directory(entries, &mut node, command_dir, validate);
             }
             EntryType::Command(command) => {
                 node.append(ListNode {
@@ -182,27 +187,26 @@ fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir:
                     panic!("Script {} does not exist", script.display());
                 }
 
-                let (executable, mut args) = get_shebang(&script);
-                args.push(script.to_string_lossy().to_string());
-
-                node.append(ListNode {
-                    name: entry.name,
-                    description: entry.description,
-                    command: Command::LocalFile {
-                        executable,
-                        args,
-                        file: script,
-                    },
-                });
+                if let Some((executable, args)) = get_shebang(&script, validate) {
+                    node.append(ListNode {
+                        name: entry.name,
+                        description: entry.description,
+                        command: Command::LocalFile {
+                            executable,
+                            args,
+                            file: script,
+                        },
+                    });
+                }
             }
         }
     }
 }
 
-fn get_shebang(script: &Path) -> (String, Vec<String>) {
-    let default_executable = || ("sh".into(), vec!["-e".into()]);
+fn get_shebang(script_path: &Path, validate: bool) -> Option<(String, Vec<String>)> {
+    let default_executable = || Some(("/bin/sh".into(), vec!["-e".into()]));
 
-    let script = File::open(script).expect("Failed to open script file");
+    let script = File::open(script_path).expect("Failed to open script file");
     let mut reader = BufReader::new(script);
 
     // Take the first 2 characters from the reader; check whether it's a shebang
@@ -215,10 +219,17 @@ fn get_shebang(script: &Path) -> (String, Vec<String>) {
 
     let mut parts = first_line.split_whitespace();
 
-    let executable = parts.next().unwrap_or("sh").to_string();
-    let args = parts.map(ToString::to_string).collect();
+    let Some(executable) = parts.next() else {
+        return default_executable();
+    };
 
-    (executable, args)
+    let is_valid = !validate || Path::new(executable).exists();
+
+    is_valid.then(|| {
+        let mut args: Vec<String> = parts.map(ToString::to_string).collect();
+        args.push(script_path.to_string_lossy().to_string());
+        (executable.to_string(), args)
+    })
 }
 
 impl TabList {
