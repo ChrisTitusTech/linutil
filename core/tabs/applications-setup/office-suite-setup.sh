@@ -8,7 +8,7 @@ install_onlyoffice() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
-                "$ESCALATION_TOOL" dpkg -i onlyoffice-desktopeditors_amd64.deb
+                "$ESCALATION_TOOL" "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
                 ;;
             zypper|dnf)
                 . ./setup-flatpak.sh
@@ -74,7 +74,7 @@ install_freeoffice() {
     case "$PACKAGER" in
         apt-get|nala)
             curl -O https://www.softmaker.net/down/softmaker-freeoffice-2024_1218-01_amd64.deb
-            "$ESCALATION_TOOL" dpkg -i softmaker-freeoffice-2024_1218-01_amd64.deb
+            "$ESCALATION_TOOL" "$PACKAGER" install -y ./softmaker-freeoffice-2024_1218-01_amd64.deb
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://shop.softmaker.com/repo/rpm SoftMaker
