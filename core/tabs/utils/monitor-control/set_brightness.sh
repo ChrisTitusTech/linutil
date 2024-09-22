@@ -67,7 +67,7 @@ adjust_monitor_brightness() {
             # Convert percentage to xrandr brightness value (10% to 0.10)
             new_brightness=$(awk "BEGIN {printf \"%.2f\", $new_brightness_percentage / 100}")
 
-            printf "Set brightness for $monitor_name to $new_brightness_percentage%? (y/n): "
+            printf "Set brightness for $monitor_name to $new_brightness_percentage%%? (y/n): "
             read -r confirm
             if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
                 printf "%b\n" "${GREEN}Setting brightness for $monitor_name to $new_brightness_percentage%${RC}"
