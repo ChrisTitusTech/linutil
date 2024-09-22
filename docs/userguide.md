@@ -9,13 +9,13 @@
 - **Global Theming**: Sets up and manages global themes.
 - **Remove Snaps**: Removes snap packages.
 
-## Arch Setup
+### Arch Setup
 
 - **Paru Setup**: Installs the Paru AUR helper.
 - **Yay Setup**: Installs the Yay AUR helper.
 - **Server Setup**: Installs Arch Linux.
 
-## Fedora Setup
+### Fedora Setup
 
 - **RPM Fusion Setup**: Adds RPM Fusion repositories.
 
@@ -32,7 +32,7 @@
 - **Linutil Installer**: Installs Linutil via Crates.io or AUR.
 - **Office Suite Setup**: Installs various office suites and PDF viewers (OnlyOffice, LibreOffice, WPS Office, FreeOffice, Evince, Okular, PDF Studio Viewer, PDF Studio).
 
-## Developer Tools
+### Developer Tools
 
 - **Meld Setup**: Installs Meld, a visual diff and merge tool.
 - **Ngrok Setup**: Installs Ngrok, a tool for creating secure tunnels to localhost.
@@ -52,7 +52,7 @@
 - **Numlock Control**: Sets up Numlock on boot.
 - **Bluetooth Control**: Controls Bluetooth settings.
 
-## Monitor control
+### Monitor control
 
 - **Reset Scaling**: Resets monitor scaling to native resolution.
 - **Scale Monitor**: Scales smaller monitors to the highest resolution of a bigger monitor.
@@ -67,8 +67,7 @@
 - **Set Primary Monitor**: Sets a selected monitor as the main display.
 - **Auto Detect Displays**: Sets common resolution.
 
-
-## User Account Manager
+### User Account Manager
 
 - **Add User**: Creates a new user account.
 - **Delete User**: Deletes an existing user account.
