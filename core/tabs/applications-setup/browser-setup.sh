@@ -39,12 +39,13 @@ install_thorium() {
             apt-get|nala)
                 "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
                 "$ESCALATION_TOOL" curl http://dl.thorium.rocks/debian/dists/stable/thorium.list -o /etc/apt/sources.list.d/thorium.list
+                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
                 ;;
             zypper|dnf)
                 url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
                     echo "$url" && curl -L "$url" -o thorium-latest.rpm
-                    "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
+                    "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-latest.rpm && rm thorium-latest.rpm
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
@@ -98,6 +99,7 @@ Suites: $distro
 Components: main
 Architectures: amd64
 Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/librewolf.sources > /dev/null
+            "$ESCALATION_TOOL" "$PACKAGER" update
 			"$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
 			;;
 		dnf)
@@ -107,8 +109,8 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 		zypper)
 			"$ESCALATION_TOOL" rpm --import https://rpm.librewolf.net/pubkey.gpg
 			"$ESCALATION_TOOL" zypper ar -ef https://rpm.librewolf.net librewolf
-			"$ESCALATION_TOOL" zypper ref
-			"$ESCALATION_TOOL" zypper in librewolf
+			"$ESCALATION_TOOL" zypper refresh
+			"$ESCALATION_TOOL" zypper --non-interactive install librewolf
 			;;
 		pacman)
 			"$AUR_HELPER" -S --needed --noconfirm librewolf-bin
@@ -131,12 +133,14 @@ install_brave() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
                 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"| "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/brave-browser-release.list
+                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                "$ESCALATION_TOOL" "$PACKAGER" refresh
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install brave-browser
                 ;;
             pacman)
@@ -176,19 +180,11 @@ install_chromium() {
     if ! command_exists chromium; then
     printf "%b\n" "${YELLOW}Installing Chromium...${RC}"
         case "$PACKAGER" in
-            apt-get|nala|zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
-                ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm chromium
                 ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
                 ;;
         esac
     else

@@ -31,13 +31,10 @@ installAutoCpufreq() {
             git clone https://github.com/AdnanHodzic/auto-cpufreq.git
         fi
 
-        case "$PACKAGER" in
-            *)
-                cd auto-cpufreq
-                printf "%b\n" "${YELLOW}Running auto-cpufreq installer...${RC}"
-                "$ESCALATION_TOOL" ./auto-cpufreq-installer
-                ;;
-        esac
+        cd auto-cpufreq
+        printf "%b\n" "${YELLOW}Running auto-cpufreq installer...${RC}"
+        "$ESCALATION_TOOL" ./auto-cpufreq-installer
+
         cd ..
     fi
 }

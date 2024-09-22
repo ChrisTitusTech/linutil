@@ -9,13 +9,10 @@ install_adb() {
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-sdk-platform-tools
                 ;;
-            zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install android-tools
-                ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm android-tools
                 ;;
-            dnf)
+            dnf|zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
             *)

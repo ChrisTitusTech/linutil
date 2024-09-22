@@ -79,7 +79,7 @@ install_freeoffice() {
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://shop.softmaker.com/repo/rpm SoftMaker
-            "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys ref
+            "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys refresh
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install softmaker-freeoffice-2024
             ;;
         pacman)
