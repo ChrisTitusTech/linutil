@@ -40,7 +40,7 @@ common_cleanup() {
 }
 
 clean_data() {
-    printf "%b\n" "${YELLOW}Clean up old cache files and empty the trash? (y/N): ${RC}"
+    printf "%b" "${YELLOW}Clean up old cache files and empty the trash? (y/N): ${RC}"
     read -r clean_response
     case $clean_response in
         y|Y)

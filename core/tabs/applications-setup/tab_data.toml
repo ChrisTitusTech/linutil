@@ -125,6 +125,11 @@ script = "dwmtitus-setup.sh"
 task_list = "installation, privileged file modification, systemd actions"
 
 [[data]]
+name = "Docker"
+script = "docker-setup.sh"
+task_list = "installation, systemd actions"
+
+[[data]]
 name = "Fastfetch"
 description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
@@ -135,6 +140,11 @@ name = "Flatpak / Flathub"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 task_list = "installation"
+
+[[data]]
+name = "Grub Theme"
+script = "grub-theme.sh"
+task_list = "privileged file modification"
 
 [[data]]
 name = "Kitty"

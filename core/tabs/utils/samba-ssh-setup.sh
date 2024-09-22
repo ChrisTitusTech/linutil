@@ -68,16 +68,16 @@ setup_samba() {
 
     if [ -f "$SAMBA_CONFIG" ]; then
         printf "%b\n" "${YELLOW}Samba configuration file already exists in $SAMBA_CONFIG.${RC}"
-        printf "Do you want to modify the existing Samba configuration? (yes/no): "
+        printf "%b" "Do you want to modify the existing Samba configuration? (Y/n): "
         read -r MODIFY_SAMBA
-        if [ "$MODIFY_SAMBA" = "yes" ]; then
+        if [ "$MODIFY_SAMBA" = "Y" ] || [ "$MODIFY_SAMBA" = "y" ]; then
             "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
         fi
     else
         printf "%b\n" "${YELLOW}No existing Samba configuration found. Setting up a new one...${RC}"
 
         # Prompt user for shared directory path
-        printf "Enter the path for the Samba share (default: /srv/samba/share): "
+        printf "%b" "Enter the path for the Samba share (default: /srv/samba/share): "
         read -r SHARED_DIR
         SHARED_DIR=${SHARED_DIR:-/srv/samba/share}
 
@@ -86,7 +86,7 @@ setup_samba() {
         "$ESCALATION_TOOL" chmod -R 0777 "$SHARED_DIR"
 
         # Add a new Samba user
-        printf "Enter Samba username: "
+        printf "%b" "Enter Samba username: "
         read -r SAMBA_USER
 
         # Loop until the passwords match
@@ -97,7 +97,7 @@ setup_samba() {
             stty echo
             printf "Confirm Samba password: "
             stty -echo
-            read SAMBA_PASSWORD_CONFIRM
+            read -r SAMBA_PASSWORD_CONFIRM
             stty echo
             printf "\n"
             if [ "$SAMBA_PASSWORD" = "$SAMBA_PASSWORD_CONFIRM" ]; then
@@ -163,12 +163,12 @@ setup_ssh_samba(){
     clear
 
     # Display menu
-    printf "Select an option:\n"
-    printf "1. Setup SSH\n"
-    printf "2. Setup Samba\n"
-    printf "3. Configure Firewall\n"
-    printf "4. Setup All\n"
-    printf "5. Exit\n"
+    printf "%b\n" "Select an option:"
+    printf "%b\n" "1. Setup SSH"
+    printf "%b\n" "2. Setup Samba"
+    printf "%b\n" "3. Configure Firewall"
+    printf "%b\n" "4. Setup All"
+    printf "%b\n" "5. Exit"
 
     printf "%b" "Enter your choice (1-5): "
     read CHOICE
