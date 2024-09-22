@@ -5,22 +5,22 @@
 # Check for required commands
 for cmd in find curl unzip stty; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
-        printf "%s\n" "Error: $cmd is not installed."
+        printf "%b\n" "Error: $cmd is not installed."
         exit 1
     fi
 done
 
 # Search for possible Diablo II Resurrected folder locations
-printf "%s\n" "Searching for Diablo II Resurrected folders..."
+printf "%b\n" "Searching for Diablo II Resurrected folders..."
 possible_paths=$(find "$HOME" -type d -path "*/drive_c/Program Files (x86)/Diablo II Resurrected" 2>/dev/null)
 
 if [ -z "$possible_paths" ]; then
-    printf "%s\n" "Error: No Diablo II Resurrected folders found."
+    printf "%b\n" "Error: No Diablo II Resurrected folders found."
     exit 1
 fi
 
 # Display possible paths and allow selection
-printf "%s\n" "Possible Diablo II Resurrected folder locations:"
+printf "%b\n" "Possible Diablo II Resurrected folder locations:"
 paths_string=""
 i=0
 IFS='
@@ -42,7 +42,7 @@ print_menu() {
     if [ $((start + max_display)) -gt $total ]; then start=$((total - max_display)); fi
     if [ $start -lt 0 ]; then start=0; fi
     
-    printf "%s\n" "Please select the Diablo II: Resurrected installation path:"
+    printf "%b\n" "Please select the Diablo II: Resurrected installation path:"
     i=0
     echo "$paths_string" | tr '|' '\n' | while IFS= read -r path; do
         if [ $i -ge $start ] && [ $i -lt $((start + max_display)) ]; then
@@ -95,7 +95,7 @@ select_path
 
 # Validate the path
 if [ ! -d "$d2r_path" ]; then
-    printf "%s\n" "Error: The specified path does not exist."
+    printf "%b\n" "Error: The specified path does not exist."
     exit 1
 fi
 
@@ -104,29 +104,29 @@ mods_path="$d2r_path/mods"
 mkdir -p "$mods_path"
 
 # Download the latest release
-printf "%s\n" "Downloading the latest loot filter..."
+printf "%b\n" "Downloading the latest loot filter..."
 if ! curl -sSLo /tmp/lootfilter.zip https://github.com/ChrisTitusTech/d2r-loot-filter/releases/latest/download/lootfilter.zip; then
-    printf "%s\n" "Error: Failed to download the loot filter."
+    printf "%b\n" "Error: Failed to download the loot filter."
     exit 1
 fi
 
 # Extract the contents to the mods folder
-printf "%s\n" "Extracting loot filter to $mods_path..."
+printf "%b\n" "Extracting loot filter to $mods_path..."
 if ! unzip -q -o /tmp/lootfilter.zip -d "$mods_path"; then
-    printf "%s\n" "Error: Failed to extract the loot filter."
+    printf "%b\n" "Error: Failed to extract the loot filter."
     exit 1
 fi
 
 # Clean up
 rm /tmp/lootfilter.zip
 
-printf "%s\n" "Loot filter installed successfully in $mods_path"
+printf "%b\n" "Loot filter installed successfully in $mods_path"
 
-printf "\nTo complete the setup, please follow these steps to add launch options in Battle.net:\n"
-printf "1. Open the Battle.net launcher\n"
-printf "2. Select Diablo II: Resurrected\n"
-printf "3. Click the gear icon next to the 'Play' button\n"
-printf "4. Select 'Game Settings'\n"
-printf "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt\n"
-printf "6. Click 'Done' to save the changes\n"
-printf "\nAfter completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter.\n"
+printf "%b\n" "To complete the setup, please follow these steps to add launch options in Battle.net:"
+printf "%b\n" "1. Open the Battle.net launcher"
+printf "%b\n" "2. Select Diablo II: Resurrected"
+printf "%b\n" "3. Click the gear icon next to the 'Play' button"
+printf "%b\n" "4. Select 'Game Settings'"
+printf "%b\n" "5. In the 'Additional command line arguments' field, enter: -mod lootfilter -txt"
+printf "%b\n" "6. Click 'Done' to save the changes"
+printf "%b\n" "After completing these steps, launch Diablo II: Resurrected through Battle.net to use the loot filter."

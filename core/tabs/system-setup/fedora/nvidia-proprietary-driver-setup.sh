@@ -68,7 +68,7 @@ installDriver() {
 
 # NOTE: A confirmation option to proceed or not
 userConfirmation() {
-  printf "%b" "${YELLOW}Do you want to continue? (Y/N): ${RC}"
+  printf "%b" "${YELLOW}Do you want to continue? (y/N): ${RC}"
   read -r choice
   case "$choice" in
   y | Y)

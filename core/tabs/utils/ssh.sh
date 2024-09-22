@@ -17,11 +17,11 @@ show_available_hosts() {
 
 # Function to ask for host details
 ask_for_host_details() {
-    printf "%b\n" "Enter Host Alias: "
+    printf "%b" "Enter Host Alias: "
     read -r host_alias
-    printf "%b\n" "Enter Remote Host (hostname or IP): " 
+    printf "%b" "Enter Remote Host (hostname or IP): " 
     read -r host
-    printf "%b\n" "Enter Remote User: "
+    printf "%b" "Enter Remote User: "
     read -r  user
     {
         printf "%b\n" "Host $host_alias"
@@ -46,7 +46,7 @@ generate_ssh_key() {
 
 # Function to share the SSH public key with the remote host
 share_ssh_key() {
-    printf "%b\n" "Enter the alias of the host to copy the key to: " 
+    printf "%b" "Enter the alias of the host to copy the key to: " 
     read -r host_alias
     printf "%b\n" "Copying SSH key to $host_alias..."
     ssh-copy-id "$host_alias"
@@ -59,8 +59,8 @@ disable_password_auth() {
     printf "%b\n" "Disabling SSH password authentication and enabling key-only login..."
     printf "%b\n" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n"
-    ssh $host_alias "
+    printf "\n"
+    ssh "$host_alias" "
         "$ESCALATION_TOOL" -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
         "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
         "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
@@ -75,7 +75,7 @@ enable_password_auth() {
     printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
     printf "\n"
-    ssh $host_alias "
+    ssh "$host_alias" "
         "$ESCALATION_TOOL"  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
         "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
         "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
@@ -87,63 +87,63 @@ enable_password_auth() {
 
 # Function to check if password authentication is disabled
 check_password_auth() {
-    printf "%b\n" "Enter the alias of the host: "
+    printf "%b" "Enter the alias of the host: "
     read -r host_alias
-    ssh $host_alias "grep '^PasswordAuthentication' /etc/ssh/sshd_config"
+    ssh "$host_alias" "grep '^PasswordAuthentication' /etc/ssh/sshd_config"
 }
 
 # Function to run a command on a remote server
 run_remote_command() {
-    printf "%b\n" "Enter the alias of the host: " 
+    printf "%b" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n" "Enter the command to run: " 
+    printf "%b" "Enter the command to run: " 
     read -r remote_command
-    ssh $host_alias "$remote_command"
+    ssh "$host_alias" "$remote_command"
 }
 
 # Function to copy a file to a remote server
 copy_file_to_remote() {
-    printf "%b\n" "Enter the local file path: " 
+    printf "%b" "Enter the local file path: " 
     read -r local_file
-    printf "%b\n" "Enter the alias of the host: " 
+    printf "%b" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n" "Enter the remote destination path: "
+    printf "%b" "Enter the remote destination path: "
     read -r remote_path
-    scp $local_file $host_alias:$remote_path
+    scp "$local_file" "$host_alias:$remote_path"
 }
 
 # Function to copy a directory to a remote server
 copy_directory_to_remote() {
-    printf "%b\n" "Enter the local directory path: "
+    printf "%b" "Enter the local directory path: "
     read -r  local_dir
-    printf "%b\n" "Enter the alias of the host: " 
+    printf "%b" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n" "Enter the remote destination path: "
+    printf "%b" "Enter the remote destination path: "
     read -r remote_path
-    scp -r $local_dir $host_alias:$remote_path
+    scp -r "$local_dir" "$host_alias:$remote_path"
 }
 
 
 # Function to move a file to a remote server (copy and delete local)
 move_file_to_remote() {
-    printf "%b\n" "Enter the local file path: "
+    printf "%b" "Enter the local file path: "
     read -r local_file
-    printf "%b\n" "Enter the alias of the host: "
+    printf "%b" "Enter the alias of the host: "
     read -r host_alias
-    printf "%b\n" "Enter the remote destination path: " 
+    printf "%b" "Enter the remote destination path: " 
     read -r remote_path
-    scp $local_file $host_alias:$remote_path && rm $local_file
+    scp "$local_file" "$host_alias:$remote_path" && rm "$local_file"
 }
 
 # Function to move a directory to a remote server (copy and delete local)
 move_directory_to_remote() {
-    printf "%b\n" "Enter the local directory path: " 
+    printf "%b" "Enter the local directory path: " 
     read -r local_dir
-    printf "%b\n" "Enter the alias of the host: " 
+    printf "%b" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n" "Enter the remote destination path: "
+    printf "%b" "Enter the remote destination path: "
     read -r remote_path
-    scp -r $local_dir $host_alias:$remote_path && rm -r $local_dir
+    scp -r "$local_dir" "$host_alias:$remote_path" && rm -r "$local_dir"
 }
 
 # Function to remove a system from SSH configuration
@@ -173,25 +173,25 @@ backup_files() {
     read -r remote_files
     printf "%b\n" "Enter the local backup directory path: "
     read -r local_backup_dir
-    scp -r $host_alias:$remote_files $local_backup_dir
+    scp -r "$host_alias:$remote_files" "$local_backup_dir"
 }
 
 # Function to sync directories with remote host
 sync_directories() {
-    printf "%b\n" "Enter the local directory path: " 
+    printf "%b" "Enter the local directory path: " 
     read -r local_dir
-    printf "%b\n" "Enter the alias of the host: " 
+    printf "%b" "Enter the alias of the host: " 
     read -r host_alias
-    printf "%b\n" "Enter the remote directory path: " 
+    printf "%b" "Enter the remote directory path: " 
     read -r remote_dir
-    rsync -avz $local_dir $host_alias:$remote_dir
+    rsync -avz "$local_dir" "$host_alias:$remote_dir"
 }
 
 # Function to check SSH key authentication status
 check_ssh_key_authentication() {
     printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
-    ssh $host_alias "grep '^PubkeyAuthentication' /etc/ssh/sshd_config"
+    ssh "$host_alias" "grep '^PubkeyAuthentication' /etc/ssh/sshd_config"
 }
 
 # Function to show options for the user
@@ -215,7 +215,7 @@ show_menu() {
     printf "%b\n" "16. Backup files from remote host"
     printf "%b\n" "17. Sync directories with remote host"
     printf "%b\n" "18. Exit"
-    printf "%b\n" "Enter your choice: "
+    printf "%b" "Enter your choice: "
 }
 
 # Function to execute the selected SSH operation
@@ -225,7 +225,7 @@ main() {
     read -r choice
     case $choice in
         1) ask_for_host_details ;;
-        2) show_available_hosts && printf "%b\n" "Enter the alias of the host to connect to: " && read -r  host_alias; ssh $host_alias ;;
+        2) show_available_hosts && printf "%b" "Enter the alias of the host to connect to: " && read -r  host_alias; ssh "$host_alias" ;;
         3) generate_ssh_key ;;
         4) share_ssh_key ;;
         5) disable_password_auth ;;
