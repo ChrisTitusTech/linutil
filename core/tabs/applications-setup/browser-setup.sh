@@ -110,7 +110,7 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 			"$ESCALATION_TOOL" rpm --import https://rpm.librewolf.net/pubkey.gpg
 			"$ESCALATION_TOOL" zypper ar -ef https://rpm.librewolf.net librewolf
 			"$ESCALATION_TOOL" zypper refresh
-			"$ESCALATION_TOOL" zypper install -y librewolf
+			"$ESCALATION_TOOL" zypper --non-interactive install librewolf
 			;;
 		pacman)
 			"$AUR_HELPER" -S --needed --noconfirm librewolf-bin
