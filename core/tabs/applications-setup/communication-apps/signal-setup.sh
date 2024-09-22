@@ -10,6 +10,7 @@ installSignal() {
                 curl -fsSL https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg
                 cat signal-desktop-keyring.gpg | "$ESCALATION_TOOL" tee /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null
                 printf "%b\n" 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/signal-xenial.list
+                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" -y install signal-desktop
                 ;;
             zypper)

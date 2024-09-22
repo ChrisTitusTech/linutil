@@ -32,10 +32,7 @@ installNeovim() {
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fd-find python3-venv luarocks golang-go shellcheck git
             ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
-            ;;
-        zypper)
+        dnf|zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
             ;;
         *)
