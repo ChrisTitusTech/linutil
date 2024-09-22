@@ -13,6 +13,8 @@ categories:
     label: 'documentation'
   - title: '🔒 Security'
     label: 'security'
+  - title: '🧰 GitHub Actions'
+    label: 'github actions'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
   ## Changes
@@ -43,6 +45,14 @@ autolabeler:
   - label: 'security'
     branch:
       - '/security\/.+/'
+
+include-labels:
+  - 'documentation'
+  - 'bug'
+  - 'enhancement'
+  - 'security'
+  - 'github actions'
+
 replacers:
   - search: /"/g
     replace: ''
