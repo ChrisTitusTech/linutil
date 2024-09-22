@@ -27,7 +27,8 @@ installSublime() {
                     "$ESCALATION_TOOL" "$PACKAGER" install sublime-text
                     ;;
                 *)
-                    printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                    printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                    exit 1
                     ;;
             esac
         else

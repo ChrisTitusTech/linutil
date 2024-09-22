@@ -38,14 +38,14 @@ main_menu() {
         clear
         printf "%b\n" "${YELLOW}WiFi Manager${RC}"
         printf "%b\n" "${YELLOW}============${RC}"
-        printf "1. Turn WiFi On\n"
-        printf "2. Turn WiFi Off\n"
-        printf "3. Scan for WiFi networks\n"
-        printf "4. Connect to a WiFi network\n"
-        printf "5. Disconnect from a WiFi network\n"
-        printf "6. Remove a WiFi connection\n"
-        printf "0. Exit\n"
-        printf "Choose an option: "
+        printf "%b\n" "1. Turn WiFi On"
+        printf "%b\n" "2. Turn WiFi Off"
+        printf "%b\n" "3. Scan for WiFi networks"
+        printf "%b\n" "4. Connect to a WiFi network"
+        printf "%b\n" "5. Disconnect from a WiFi network"
+        printf "%b\n" "6. Remove a WiFi connection"
+        printf "%b\n" "0. Exit"
+        printf "%b" "Choose an option: "
         read -r choice
 
         case $choice in
@@ -72,7 +72,7 @@ scan_networks() {
         printf "%b\n" "${GREEN}Top 10 Networks found:${RC}"
         echo "$networks" | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
-    printf "Press any key to return to the main menu...\n"
+    printf "%b\n" "Press any key to return to the main menu..."
     read -r dummy
 }
 
@@ -85,7 +85,7 @@ wifi_on() {
     } || {
         printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
     }
-    printf "Press any key to return to the main menu...\n"
+    printf "%b\n" "Press any key to return to the main menu..."
     read -r dummy
 }
 
@@ -98,7 +98,7 @@ wifi_off() {
     } || {
         printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
     }
-    printf "Press any key to return to the main menu...\n"
+    printf "%b\n" "Press any key to return to the main menu..."
     read -r dummy
 }
 
@@ -115,7 +115,7 @@ prompt_for_network() {
         networks=$(nmcli -t -f SSID dev wifi list | awk -F: '!seen[$1]++' | grep -v '^$')
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
-            printf "Press any key to return to the main menu...\n"
+            printf "%b\n" "Press any key to return to the main menu..."
             read -r dummy
             rm -f "$temp_file"
             return
@@ -126,18 +126,18 @@ prompt_for_network() {
         i=1
         while IFS= read -r network; do
             ssid=$(echo "$network" | awk -F: '{print $1}')
-            printf "%d. SSID: %s\n" "$i" "$ssid"
+            printf "%b\n" "$i. SSID: " "$ssid"
             i=$((i + 1))
         done < "$temp_file"
 
-        printf "0. Exit to main menu\n"
-        printf "%s" "$prompt_msg"
+        printf "%b\n" "0. Exit to main menu"
+        printf "%b" "$prompt_msg"
         read -r choice
 
         if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
             ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
             if [ "$action" = "connect" ]; then
-                printf "Enter password for SSID %s: " "$ssid"
+                printf "%b" "Enter password for SSID: " "$ssid"
                 read -r password
                 printf "\n"
                 nmcli dev wifi connect "$ssid" password "$password" && {
@@ -150,7 +150,7 @@ prompt_for_network() {
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
 
-        printf "Press any key to return to the selection menu...\n"
+        printf "%b\n" "Press any key to return to the selection menu..."
         read -r dummy
     done
 

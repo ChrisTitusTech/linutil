@@ -2,7 +2,12 @@ use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
 use include_dir::{include_dir, Dir};
 use serde::Deserialize;
-use std::path::{Path, PathBuf};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader, Read},
+    os::unix::fs::PermissionsExt,
+    path::{Path, PathBuf},
+};
 use tempdir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
@@ -34,9 +39,10 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                     name: "root".to_string(),
                     description: String::new(),
                     command: Command::None,
+                    task_list: String::new(),
                 });
                 let mut root = tree.root_mut();
-                create_directory(data, &mut root, &directory);
+                create_directory(data, &mut root, &directory, validate);
                 Tab {
                     name,
                     tree,
@@ -77,12 +83,20 @@ struct Entry {
     description: String,
     #[serde(default)]
     preconditions: Option<Vec<Precondition>>,
+    #[serde(flatten)]
+    entry_type: EntryType,
     #[serde(default)]
-    entries: Option<Vec<Entry>>,
-    #[serde(default)]
-    command: Option<String>,
-    #[serde(default)]
-    script: Option<PathBuf>,
+    task_list: String,
+}
+
+#[derive(Deserialize)]
+enum EntryType {
+    #[serde(rename = "entries")]
+    Entries(Vec<Entry>),
+    #[serde(rename = "command")]
+    Command(String),
+    #[serde(rename = "script")]
+    Script(PathBuf),
 }
 
 impl Entry {
@@ -139,7 +153,7 @@ fn filter_entries(entries: &mut Vec<Entry>) {
         if !entry.is_supported() {
             return false;
         }
-        if let Some(entries) = &mut entry.entries {
+        if let EntryType::Entries(entries) = &mut entry.entry_type {
             filter_entries(entries);
             !entries.is_empty()
         } else {
@@ -148,48 +162,87 @@ fn filter_entries(entries: &mut Vec<Entry>) {
     });
 }
 
-fn create_directory(data: Vec<Entry>, node: &mut NodeMut<ListNode>, command_dir: &Path) {
+fn create_directory(
+    data: Vec<Entry>,
+    node: &mut NodeMut<ListNode>,
+    command_dir: &Path,
+    validate: bool,
+) {
     for entry in data {
-        if [
-            entry.entries.is_some(),
-            entry.command.is_some(),
-            entry.script.is_some(),
-        ]
-        .iter()
-        .filter(|&&x| x)
-        .count()
-            > 1
-        {
-            panic!("Entry must have only one data type");
-        }
-
-        if let Some(entries) = entry.entries {
-            let mut node = node.append(ListNode {
-                name: entry.name,
-                description: entry.description,
-                command: Command::None,
-            });
-            create_directory(entries, &mut node, command_dir);
-        } else if let Some(command) = entry.command {
-            node.append(ListNode {
-                name: entry.name,
-                description: entry.description,
-                command: Command::Raw(command),
-            });
-        } else if let Some(script) = entry.script {
-            let dir = command_dir.join(script);
-            if !dir.exists() {
-                panic!("Script {} does not exist", dir.display());
+        match entry.entry_type {
+            EntryType::Entries(entries) => {
+                let mut node = node.append(ListNode {
+                    name: entry.name,
+                    description: entry.description,
+                    command: Command::None,
+                    task_list: String::new(),
+                });
+                create_directory(entries, &mut node, command_dir, validate);
             }
-            node.append(ListNode {
-                name: entry.name,
-                description: entry.description,
-                command: Command::LocalFile(dir),
-            });
-        } else {
-            panic!("Entry must have data");
+            EntryType::Command(command) => {
+                node.append(ListNode {
+                    name: entry.name,
+                    description: entry.description,
+                    command: Command::Raw(command),
+                    task_list: String::new(),
+                });
+            }
+            EntryType::Script(script) => {
+                let script = command_dir.join(script);
+                if !script.exists() {
+                    panic!("Script {} does not exist", script.display());
+                }
+
+                if let Some((executable, args)) = get_shebang(&script, validate) {
+                    node.append(ListNode {
+                        name: entry.name,
+                        description: entry.description,
+                        command: Command::LocalFile {
+                            executable,
+                            args,
+                            file: script,
+                        },
+                        task_list: entry.task_list,
+                    });
+                }
+            }
         }
     }
+}
+
+fn get_shebang(script_path: &Path, validate: bool) -> Option<(String, Vec<String>)> {
+    let default_executable = || Some(("/bin/sh".into(), vec!["-e".into()]));
+
+    let script = File::open(script_path).expect("Failed to open script file");
+    let mut reader = BufReader::new(script);
+
+    // Take the first 2 characters from the reader; check whether it's a shebang
+    let mut two_chars = [0; 2];
+    if reader.read_exact(&mut two_chars).is_err() || two_chars != *b"#!" {
+        return default_executable();
+    }
+
+    let first_line = reader.lines().next().unwrap().unwrap();
+
+    let mut parts = first_line.split_whitespace();
+
+    let Some(executable) = parts.next() else {
+        return default_executable();
+    };
+
+    let is_valid = !validate || is_executable(Path::new(executable));
+
+    is_valid.then(|| {
+        let mut args: Vec<String> = parts.map(ToString::to_string).collect();
+        args.push(script_path.to_string_lossy().to_string());
+        (executable.to_string(), args)
+    })
+}
+
+fn is_executable(path: &Path) -> bool {
+    path.metadata()
+        .map(|metadata| metadata.is_file() && metadata.permissions().mode() & 0o111 != 0)
+        .unwrap_or(false)
 }
 
 impl TabList {

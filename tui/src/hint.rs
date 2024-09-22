@@ -35,7 +35,7 @@ pub fn span_vec_len(span_vec: &[Span]) -> usize {
 impl ShortcutList {
     pub fn draw(&self, frame: &mut Frame, area: Rect) {
         let block = Block::default()
-            .title(self.scope_name)
+            .title(format!(" {} ", self.scope_name))
             .borders(Borders::all());
         let inner_area = area.inner(Margin::new(1, 1));
         let shortcut_spans: Vec<Vec<Span>> = self.hints.iter().map(|h| h.to_spans()).collect();
@@ -145,7 +145,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
             hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
             ShortcutList {
-                scope_name: "Item list",
+                scope_name: "Command list",
                 hints,
             }
         }

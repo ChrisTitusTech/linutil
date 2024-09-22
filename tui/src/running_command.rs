@@ -148,11 +148,19 @@ impl RunningCommand {
         for command in commands {
             match command {
                 Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)),
-                Command::LocalFile(file) => {
-                    if let Some(parent) = file.parent() {
-                        script.push_str(&format!("cd {}\n", parent.display()));
+                Command::LocalFile {
+                    executable,
+                    args,
+                    file,
+                } => {
+                    if let Some(parent_directory) = file.parent() {
+                        script.push_str(&format!("cd {}\n", parent_directory.display()));
                     }
-                    script.push_str(&format!("sh {}\n", file.display()));
+                    script.push_str(&executable);
+                    for arg in args {
+                        script.push(' ');
+                        script.push_str(&arg);
+                    }
                 }
                 Command::None => panic!("Command::None was treated as a command"),
             }
@@ -262,27 +270,25 @@ impl RunningCommand {
     fn handle_passthrough_key_event(&mut self, key: &KeyEvent) {
         let input_bytes = match key.code {
             KeyCode::Char(ch) => {
-                let mut send = vec![ch as u8];
-                let upper = ch.to_ascii_uppercase();
-                if key.modifiers == KeyModifiers::CONTROL {
-                    match upper {
-                        // https://github.com/fyne-io/terminal/blob/master/input.go
-                        // https://gist.github.com/ConnerWill/d4b6c776b509add763e17f9f113fd25b
-                        '2' | '@' | ' ' => send = vec![0],
-                        '3' | '[' => send = vec![27],
-                        '4' | '\\' => send = vec![28],
-                        '5' | ']' => send = vec![29],
-                        '6' | '^' => send = vec![30],
-                        '7' | '-' | '_' => send = vec![31],
-                        char if ('A'..='_').contains(&char) => {
-                            let ascii_val = char as u8;
-                            let ascii_to_send = ascii_val - 64;
-                            send = vec![ascii_to_send];
-                        }
-                        _ => {}
+                let raw_utf8 = || ch.to_string().into_bytes();
+
+                match ch.to_ascii_uppercase() {
+                    _ if key.modifiers != KeyModifiers::CONTROL => raw_utf8(),
+                    // https://github.com/fyne-io/terminal/blob/master/input.go
+                    // https://gist.github.com/ConnerWill/d4b6c776b509add763e17f9f113fd25b
+                    '2' | '@' | ' ' => vec![0],
+                    '3' | '[' => vec![27],
+                    '4' | '\\' => vec![28],
+                    '5' | ']' => vec![29],
+                    '6' | '^' => vec![30],
+                    '7' | '-' | '_' => vec![31],
+                    c if ('A'..='_').contains(&c) => {
+                        let ascii_val = c as u8;
+                        let ascii_to_send = ascii_val - 64;
+                        vec![ascii_to_send]
                     }
+                    _ => raw_utf8(),
                 }
-                send
             }
             KeyCode::Enter => vec![b'\n'],
             KeyCode::Backspace => vec![0x7f],

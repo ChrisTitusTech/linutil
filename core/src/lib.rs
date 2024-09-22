@@ -8,7 +8,12 @@ pub use inner::get_tabs;
 #[derive(Clone, Hash, Eq, PartialEq)]
 pub enum Command {
     Raw(String),
-    LocalFile(PathBuf),
+    LocalFile {
+        executable: String,
+        args: Vec<String>,
+        // The file path is included within the arguments; don't pass this in addition
+        file: PathBuf,
+    },
     None, // Directory
 }
 
@@ -24,4 +29,5 @@ pub struct ListNode {
     pub name: String,
     pub description: String,
     pub command: Command,
+    pub task_list: String,
 }
