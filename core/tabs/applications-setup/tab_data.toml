@@ -1,7 +1,7 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Developer TOols"
+name = "Developer Tools"
 
 [[data.entries]]
 name = "Install Github Desktop"
