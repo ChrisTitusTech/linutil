@@ -22,6 +22,19 @@ use ratatui::{
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
 const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
+
+D  - disk modifications (ex. partitioning) (privileged)
+FI - flatpak installation
+FM - file modification
+I  - installation (privileged)
+MP - package manager actions
+SI - full system installation
+SS - systemd actions (privileged) 
+RP - package removal
+
+P* - privileged *
+";
 
 pub struct AppState {
     /// Selected theme
@@ -188,7 +201,7 @@ impl AppState {
 
         let list_chunks = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(60), Constraint::Percentage(40)].as_ref())
+            .constraints([Constraint::Percentage(70), Constraint::Percentage(30)].as_ref())
             .split(chunks[1]);
 
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
@@ -365,6 +378,7 @@ impl AppState {
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('g') => self.toggle_task_list_guide(),
                 _ => {}
             },
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
@@ -383,6 +397,7 @@ impl AppState {
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
+                KeyCode::Char('g') => self.toggle_task_list_guide(),
                 KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
@@ -557,6 +572,14 @@ impl AppState {
             .id()];
         self.selection.select(Some(0));
         self.update_items();
+    }
+
+    fn toggle_task_list_guide(&mut self) {
+        self.spawn_float(
+            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            80,
+            80,
+        );
     }
 }
 

@@ -30,6 +30,7 @@ use zips::zip_result;
 pub enum FloatingTextMode {
     Preview,
     Description,
+    ActionsGuide,
 }
 
 pub struct FloatingText {
@@ -182,6 +183,7 @@ impl FloatingText {
         match mode {
             FloatingTextMode::Preview => "Command Preview",
             FloatingTextMode::Description => "Command Description",
+            FloatingTextMode::ActionsGuide => "Important Actions Guide",
         }
     }
 
@@ -299,7 +301,7 @@ impl FloatContent for FloatingText {
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
                 Shortcut::new(vec!["h", "Left"], "Scroll left"),
                 Shortcut::new(vec!["l", "Right"], "Scroll right"),
-                Shortcut::new(vec!["Enter", "p", "d"], "Close window"),
+                Shortcut::new(vec!["Enter", "p", "d", "g"], "Close window"),
             ],
         }
     }

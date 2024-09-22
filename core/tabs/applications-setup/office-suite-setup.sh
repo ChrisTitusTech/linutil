@@ -3,8 +3,8 @@
 . ../common-script.sh
 
 install_onlyoffice() {
-    printf "%b\n" "${YELLOW}Installing Only Office..${RC}."
     if ! command_exists onlyoffice-desktopeditors; then
+        printf "%b\n" "${YELLOW}Installing Only Office..${RC}."
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
@@ -28,8 +28,8 @@ install_onlyoffice() {
 }
 
 install_libreoffice() {
-    printf "%b\n" "${YELLOW}Installing Libre Office...${RC}"
     if ! command_exists libreoffice; then
+        printf "%b\n" "${YELLOW}Installing Libre Office...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
@@ -52,8 +52,8 @@ install_libreoffice() {
 }
 
 install_wpsoffice() {
-    printf "%b\n" "${YELLOW}Installing WPS Office...${RC}"
     if ! command_exists com.wps.Office; then
+        printf "%b\n" "${YELLOW}Installing WPS Office...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --noconfirm wps-office
@@ -70,8 +70,9 @@ install_wpsoffice() {
 
 # needs to be updated every year for latest version
 install_freeoffice() {  
-	printf "%b\n" "${YELLOW}Installing Free Office...${RC}"
-    case "$PACKAGER" in
+    if ! command_exists softmaker-freeoffice-2024 freeoffice softmaker; then
+        printf "%b\n" "${YELLOW}Installing Free Office...${RC}"
+        case "$PACKAGER" in
         apt-get|nala)
             curl -O https://www.softmaker.net/down/softmaker-freeoffice-2024_1218-01_amd64.deb
             "$ESCALATION_TOOL" "$PACKAGER" install -y ./softmaker-freeoffice-2024_1218-01_amd64.deb
@@ -92,12 +93,15 @@ install_freeoffice() {
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
-    esac
+        esac
+    else
+        printf "%b\n" "${GREEN}Free Office is already installed.${RC}"
+    fi
 }
 
 install_evince() {
-    printf "%b\n" "${YELLOW}Installing Evince...${RC}"
     if ! command_exists evince; then
+        printf "%b\n" "${YELLOW}Installing Evince...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm evince
@@ -112,8 +116,8 @@ install_evince() {
 }
 
 install_okular() {
-    printf "%b\n" "${YELLOW}Installing Evince...${RC}"
     if ! command_exists okular; then
+        printf "%b\n" "${YELLOW}Installing Okular...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm okular
@@ -128,8 +132,8 @@ install_okular() {
 }
 
 install_pdfstudioviewer() {
-    printf "%b\n" "${YELLOW}Installing PDF Studio Viewer...${RC}"
     if ! command_exists pdfstudioviewer2024/pdfstudioviewer2024; then
+        printf "%b\n" "${YELLOW}Installing PDF Studio Viewer...${RC}"
         curl -O https://download.qoppa.com/pdfstudioviewer/PDFStudioViewer_linux64.sh
         "$ESCALATION_TOOL" chmod +x PDFStudioViewer_linux64.sh
         if sh PDFStudioViewer_linux64.sh; then
@@ -144,8 +148,8 @@ install_pdfstudioviewer() {
 }
 
 install_pdfstudio() {
-    printf "%b\n" "${YELLOW}Installing PDF Studio Viewer...${RC}"
     if ! command_exists pdfstudio2024/pdfstudio2024; then
+        printf "%b\n" "${YELLOW}Installing PDF Studio...${RC}"
         curl -O https://download.qoppa.com/pdfstudio/PDFStudio_linux64.sh
         "$ESCALATION_TOOL" chmod +x PDFStudio_linux64.sh
         if sh PDFStudio_linux64.sh; then
@@ -158,7 +162,6 @@ install_pdfstudio() {
         printf "%b\n" "${GREEN}PDF Studio is already installed.${RC}"
     fi
 }
-
 
 officeSuiteSetup() {
     clear

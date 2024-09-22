@@ -25,24 +25,14 @@ setup_flatpak() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
                 ;;
-            apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
-                ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak # Fedora should have flatpak already installed, this is just a failsafe
-                ;;
-            zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
         esac
         printf "%b\n" "Adding Flathub remote..."
         "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     else
-        if command -v flatpak >/dev/null 2>&1; then
+        if command_exists flatpak; then
             if ! flatpak remotes | grep -q "flathub"; then
                 printf "%b" "${YELLOW}Detected Flatpak package manager but Flathub remote is not added. Would you like to add it? (y/N): ${RC}"
                 read -r add_remote
