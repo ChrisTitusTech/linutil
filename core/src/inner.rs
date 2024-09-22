@@ -39,6 +39,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                     name: "root".to_string(),
                     description: String::new(),
                     command: Command::None,
+                    task_list: String::new(),
                 });
                 let mut root = tree.root_mut();
                 create_directory(data, &mut root, &directory, validate);
@@ -84,6 +85,8 @@ struct Entry {
     preconditions: Option<Vec<Precondition>>,
     #[serde(flatten)]
     entry_type: EntryType,
+    #[serde(default)]
+    task_list: String,
 }
 
 #[derive(Deserialize)]
@@ -172,6 +175,7 @@ fn create_directory(
                     name: entry.name,
                     description: entry.description,
                     command: Command::None,
+                    task_list: String::new(),
                 });
                 create_directory(entries, &mut node, command_dir, validate);
             }
@@ -180,6 +184,7 @@ fn create_directory(
                     name: entry.name,
                     description: entry.description,
                     command: Command::Raw(command),
+                    task_list: String::new(),
                 });
             }
             EntryType::Script(script) => {
@@ -197,6 +202,7 @@ fn create_directory(
                             args,
                             file: script,
                         },
+                        task_list: entry.task_list,
                     });
                 }
             }

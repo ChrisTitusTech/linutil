@@ -170,7 +170,7 @@ setup_ssh_samba(){
     printf "4. Setup All\n"
     printf "5. Exit\n"
 
-    printf "Enter your choice [1-5]: "
+    printf "%b" "Enter your choice (1-5): "
     read CHOICE
 
     case "$CHOICE" in

@@ -18,14 +18,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: git fetch origin ${{ github.base_ref }}
+
+      - name: Get a list of changed script files
+        run : |
+          sh_files=$(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs | grep '\.sh$' || true)
+          echo "sh_files=$sh_files" >> $GITHUB_ENV
       
       - name: Install devscripts
+        if: env.sh_files != ''
         run: sudo apt-get update && sudo apt-get install devscripts
 
-      - name: Check for bashisms in changed files
+      - name: Check for bashisms
+        if: env.sh_files != ''
         run: |
-          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
-              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
+          for file in ${{ env.sh_files }}; do
+              if [[ -f "$file" ]]; then
                   checkbashisms "$file"
               fi
           done

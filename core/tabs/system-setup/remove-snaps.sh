@@ -20,7 +20,8 @@ removeSnaps() {
             "$ESCALATION_TOOL" "$PACKAGER" remove snapd
             ;;
         *)
-            printf "%b\n" "${RED}Removing snapd not implemented for this package manager${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+            exit 1
             ;;
     esac
 }

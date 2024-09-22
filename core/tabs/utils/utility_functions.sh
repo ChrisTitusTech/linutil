@@ -35,7 +35,7 @@ execute_command() {
 # Function to detect connected monitors
 detect_connected_monitors() {
     xrandr_output=$(xrandr)
-    printf "%s\n" "$xrandr_output" | grep " connected" | awk '{print $1}'
+    printf "%b\n" "$xrandr_output" | grep " connected" | awk '{print $1}'
 }
 
 # Function to get the current brightness for a monitor
@@ -75,7 +75,7 @@ get_unique_resolutions() {
 confirm_action() {
     action="$1"
     printf "%b\n" "${CYAN}$action${RC}"
-    printf "%b" "${CYAN}Are you sure? (y/n): ${RC}"
+    printf "%b" "${CYAN}Are you sure? (y/N): ${RC}"
     read -r confirm
     if echo "$confirm" | grep -qE '^[Yy]$'; then
         return 0

@@ -24,7 +24,7 @@ list_models() {
 show_model_info() {
     clear
     list_models
-    printf "%b\n" "${YELLOW}Enter the name of the model you want to show information for (e.g., llama3.1):${RC}"
+    printf "%b" "Enter the name of the model you want to show information for (e.g., llama3.1): "
     read -r model_name
 
     printf "%b\n" "${YELLOW}Showing information for model '$model_name'...${RC}"
@@ -34,22 +34,22 @@ show_model_info() {
 display_models() {
     clear
     printf "%b\n" "${RED}Available Models${RC}"
-    printf "1. Llama 3.1 - 8B (4.7GB)\n"
-    printf "2. Llama 3.1 - 70B (40GB)\n"
-    printf "3. Llama 3.1 - 405B (231GB)\n"
-    printf "4. Phi 3 Mini - 3.8B (2.3GB)\n"
-    printf "5. Phi 3 Medium - 14B (7.9GB)\n"
-    printf "6. Gemma 2 - 2B (1.6GB)\n"
-    printf "7. Gemma 2 - 9B (5.5GB)\n"
-    printf "8. Gemma 2 - 27B (16GB)\n"
-    printf "9. Mistral - 7B (4.1GB)\n"
-    printf "10. Moondream 2 - 1.4B (829MB)\n"
-    printf "11. Neural Chat - 7B (4.1GB)\n"
-    printf "12. Starling - 7B (4.1GB)\n"
-    printf "13. Code Llama - 7B (3.8GB)\n"
-    printf "14. Llama 2 Uncensored - 7B (3.8GB)\n"
-    printf "15. LLaVA - 7B (4.5GB)\n"
-    printf "16. Solar - 10.7B (6.1GB)\n"
+    printf "%b\n" "1. Llama 3.1 - 8B (4.7GB)"
+    printf "%b\n" "2. Llama 3.1 - 70B (40GB)"
+    printf "%b\n" "3. Llama 3.1 - 405B (231GB)"
+    printf "%b\n" "4. Phi 3 Mini - 3.8B (2.3GB)"
+    printf "%b\n" "5. Phi 3 Medium - 14B (7.9GB)"
+    printf "%b\n" "6. Gemma 2 - 2B (1.6GB)"
+    printf "%b\n" "7. Gemma 2 - 9B (5.5GB)"
+    printf "%b\n" "8. Gemma 2 - 27B (16GB)"
+    printf "%b\n" "9. Mistral - 7B (4.1GB)"
+    printf "%b\n" "10. Moondream 2 - 1.4B (829MB)"
+    printf "%b\n" "11. Neural Chat - 7B (4.1GB)"
+    printf "%b\n" "12. Starling - 7B (4.1GB)"
+    printf "%b\n" "13. Code Llama - 7B (3.8GB)"
+    printf "%b\n" "14. Llama 2 Uncensored - 7B (3.8GB)"
+    printf "%b\n" "15. LLaVA - 7B (4.5GB)"
+    printf "%b\n" "16. Solar - 10.7B (6.1GB)"
 }
 
 # Function to select model based on user input
@@ -87,8 +87,8 @@ run_model() {
     printf "%b\n" "${YELLOW}Custom Models${RC}"
     custom_models=$(ollama list | grep 'custom-model-prefix') 
 
-    printf "%b\n" "${YELLOW}Please select a model to run:${RC}"
-    printf "%b\n" "${YELLOW}Enter the number corresponding to the model or enter the name of a custom model:${RC}"
+    printf "%b" "Select a model to run: "
+    printf "%b" "Enter the number corresponding to the model or enter the name of a custom model: "
 
     read -r model_choice
 
@@ -104,7 +104,7 @@ create_model() {
     display_models
 
     # Prompt for base model
-    printf "%b\n" "${YELLOW}Enter the base model (e.g. '13' for codellama):${RC}"
+    printf "%b" "Enter the base model (e.g. '13' for codellama): "
     read -r base_model
 
     model=$(select_model "$base_model")
@@ -113,11 +113,11 @@ create_model() {
     ollama pull "$model"
 
     # Prompt for custom model name
-    printf "%b\n" "${YELLOW}Enter a name for the new customized model:${RC}"
+    printf "%b" "Enter a name for the new customized model: "
     read -r custom_model_name
 
     # Prompt for temperature setting
-    printf "%b\n" "${YELLOW}Enter the desired temperature (higher values are more creative, lower values are more coherent, e.g., 1):${RC}"
+    printf "%b" "Enter the desired temperature (higher values are more creative, lower values are more coherent, e.g., 1): "
     read -r temperature
 
     if [ -z "$temperature" ]; then
@@ -125,7 +125,7 @@ create_model() {
     fi
 
     # Prompt for system message
-    printf "%b\n" "${YELLOW}Enter the system message for the model customization (e.g., 'You are Mario from Super Mario Bros. Answer as Mario, the assistant, only.'):${RC}"
+    printf "%b" "Enter the system message for the model customization (e.g., 'You are Mario from Super Mario Bros. Answer as Mario, the assistant, only.'): "
     read -r system_message
 
     # Create the Modelfile
@@ -155,8 +155,8 @@ remove_model() {
     installed_models=$(ollama list)
     printf "%b\n" "${installed_models}"
 
-    printf "%b\n" "${YELLOW}Please select a model to remove:${RC}"
-    printf "%b\n" "${YELLOW}Enter the name of the model you want to remove:${RC}"
+    printf "%b" "Please select a model to remove: "
+    printf "%b" "Enter the name of the model you want to remove: "
 
     read -r model_to_remove
 
@@ -174,14 +174,14 @@ menu() {
     while true; do
         clear
         printf "%b\n" "${YELLOW}Please select an option:${RC}"
-        printf "1) List all models\n"
-        printf "2) Show model information\n"
-        printf "3) Create a new model\n"
-        printf "4) Run a model\n"
-        printf "5) Remove a model\n"
-        printf "6) Exit\n"
+        printf "%b\n" "1) List all models"
+        printf "%b\n" "2) Show model information"
+        printf "%b\n" "3) Create a new model"
+        printf "%b\n" "4) Run a model"
+        printf "%b\n" "5) Remove a model"
+        printf "%b\n" "6) Exit"
 
-        printf "%b\n" "${YELLOW}Enter your choice (1-5): ${RC}"
+        printf "%b" "${YELLOW}Enter your choice (1-5): ${RC}"
         read -r choice
 
         case $choice in

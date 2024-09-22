@@ -18,7 +18,8 @@ install_onlyoffice() {
                 "$AUR_HELPER" -S --needed --noconfirm onlyoffice
                 ;;
             *)
-                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
     else
@@ -30,20 +31,20 @@ install_libreoffice() {
     printf "%b\n" "${YELLOW}Installing Libre Office...${RC}"
     if ! command_exists libreoffice; then
         case "$PACKAGER" in
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
-            ;;
-        zypper|dnf)
-            . ./setup-flatpak.sh
-            flatpak install -y flathub org.libreoffice.LibreOffice
-            ;;
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
-            ;;
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
+                ;;
+            zypper|dnf)
+                . ./setup-flatpak.sh
+                flatpak install -y flathub org.libreoffice.LibreOffice
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
+                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Thorium manually.${RC}"
-            exit 1
-            ;;
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
         esac
     else
         printf "%b\n" "${GREEN}Libre Office is already installed.${RC}"
@@ -88,7 +89,8 @@ install_freeoffice() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y softmaker-freeoffice-2024
             ;;
         *)
-            printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+            exit 1
             ;;
     esac
 }
@@ -174,7 +176,7 @@ officeSuiteSetup() {
     printf "%b\n" "7. PDF Studio Viewer"
     printf "%b\n" "8. PDF Studio (Paid Software)"
     printf "%b\n" "----------------------------"
-    printf "%b\n"  "Enter your choices (e.g., 1 3 5): "
+    printf "%b"  "Enter your choices (e.g., 1 3 5): "
     read -r choice
     for ch in $choice; do
         case $ch in

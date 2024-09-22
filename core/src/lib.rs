@@ -29,4 +29,5 @@ pub struct ListNode {
     pub name: String,
     pub description: String,
     pub command: Command,
+    pub task_list: String,
 }
