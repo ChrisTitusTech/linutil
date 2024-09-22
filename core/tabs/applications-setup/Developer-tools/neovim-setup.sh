@@ -4,6 +4,15 @@
 
 gitpath="$HOME/.local/share/neovim"
 
+checkNeovimVer() {
+    # lazy.nvim requires nvim >= 0.8.0
+    nvim_version=$(nvim --version | head -n 1 | awk '{print $2}')
+    if [ "$(printf "%s\n" "$nvim_version" "0.8.0" | sort -V | head -n 1)" != "0.8.0" ]; then
+        printf "%b\n" "${RED}Neovim version $nvim_version not supported.${RC}"
+        exit 1
+    fi
+}
+
 cloneNeovim() {
     # Check if the dir exists before attempting to clone into it.
     if [ -d "$gitpath" ]; then
@@ -54,6 +63,7 @@ linkNeovimConfig() {
 checkEnv
 checkEscalationTool
 installNeovim
+checkNeovimVer
 cloneNeovim
 backupNeovimConfig
 linkNeovimConfig
