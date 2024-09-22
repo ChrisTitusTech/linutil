@@ -43,7 +43,7 @@ by running:
 
 ```bash
 git clone https://aur.archlinux.org/<package>.git
-cd linutil
+cd <package>
 makepkg -si
 ```
 
