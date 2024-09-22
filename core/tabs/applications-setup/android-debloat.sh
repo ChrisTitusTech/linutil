@@ -35,7 +35,7 @@ install_universal_android_debloater() {
         "$ESCALATION_TOOL" chmod +x "${HOME}/uad"
         "$ESCALATION_TOOL" mv "${HOME}/uad" /usr/local/bin/uad
     else
-        printf "%b\n" "${GREEN}Universal Android Debloater is already installed. Run 'uad' command to execute...${RC}"      
+        printf "%b\n" "${GREEN}Universal Android Debloater is already installed. Run 'uad' command to execute.${RC}"
     fi
 }                   
 
