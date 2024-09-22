@@ -82,6 +82,7 @@ task_list = "installation"
 name = "Install Zoom"
 description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
 script = "communication-apps/zoom-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Thunderbird"
