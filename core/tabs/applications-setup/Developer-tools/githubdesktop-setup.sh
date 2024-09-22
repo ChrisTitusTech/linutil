@@ -17,7 +17,7 @@ installGithubDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" ref && "$ESCALATION_TOOL" "$PACKAGER" install github-desktop
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm github-desktop
+                "$AUR_HELPER" -S --needed --noconfirm github-desktop-bin
                 ;;
             dnf)
                 "$ESCALATION_TOOL" rpm --import https://rpm.packages.shiftkey.dev/gpg.key
