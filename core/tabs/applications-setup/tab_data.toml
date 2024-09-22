@@ -79,8 +79,6 @@ description = "DWM is a dynamic window manager for X.\nIt manages windows in til
 script = "dwmtitus-setup.sh"
 task_list = "installation, privileged file modification, systemd actions"
 
-task_list = "installation"
-
 [[data]]
 name = "Docker"
 script = "docker-setup.sh"
@@ -97,8 +95,6 @@ name = "Flatpak / Flathub"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 task_list = "installation"
-
-task_list = "installation, privileged file modification"
 
 [[data]]
 name = "Grub Theme"

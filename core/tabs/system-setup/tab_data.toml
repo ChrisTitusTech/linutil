@@ -63,8 +63,6 @@ description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 task_list = "installation"
 
-task_list = "installation"
-
 [[data]]
 name = "Build Prerequisites"
 description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
@@ -98,11 +96,6 @@ name = "Global Theme"
 description = "This script is designed to handle the installation and configuration of global theming"
 script = "global-theme.sh"
 task_list = "installation, privileged file modification"
-
-[[data]]
-name = "Grub Theme"
-script = "grub-theme.sh"
-task_list = "privileged file modification"
 
 [[data]]
 name = "Remove Snaps"
