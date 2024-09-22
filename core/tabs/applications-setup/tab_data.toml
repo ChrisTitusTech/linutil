@@ -52,26 +52,31 @@ name = "Communication Apps"
 name = "Install Discord"
 description = "Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features."
 script = "communication-apps/discord-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Jitsi"
 description = "Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads."
 script = "communication-apps/jitsi-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Signal"
 description = "Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication."
 script = "communication-apps/signal-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Slack"
 description = "Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools."
 script = "communication-apps/slack-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Telegram"
 description = "Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls."
 script = "communication-apps/telegram-setup.sh"
+task_list = "installation"
 
 [[data.entries]]
 name = "Install Zoom"
@@ -82,6 +87,7 @@ script = "communication-apps/zoom-setup.sh"
 name = "Install Thunderbird"
 description = "Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality."
 script = "communication-apps/thunderbird-setup.sh"
+task_list = "installation"
 
 [[data]]
 name = "Alacritty"
