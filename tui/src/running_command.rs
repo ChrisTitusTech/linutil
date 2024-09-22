@@ -161,6 +161,7 @@ impl RunningCommand {
                         script.push(' ');
                         script.push_str(&arg);
                     }
+                    script.push('\n'); // Ensures that each command is properly separated for execution preventing directory errors
                 }
                 Command::None => panic!("Command::None was treated as a command"),
             }
