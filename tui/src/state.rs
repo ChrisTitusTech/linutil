@@ -84,42 +84,30 @@ impl AppState {
         let terminal_size = frame.area();
 
         if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
-            let size_warning_message = format!(
+            let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
                 terminal_size.height,
                 MIN_WIDTH,
                 MIN_HEIGHT,
-            );
-
-            let warning_paragraph = Paragraph::new(size_warning_message.clone())
+            ))
                 .alignment(Alignment::Center)
                 .style(Style::default().fg(ratatui::style::Color::Red).bold())
                 .wrap(ratatui::widgets::Wrap { trim: true });
 
-            // Get the maximum width and height of text lines
-            let text_lines: Vec<String> = size_warning_message
-                .lines()
-                .map(|line| line.to_string())
-                .collect();
-            let max_line_length = text_lines.iter().map(|line| line.len()).max().unwrap_or(0);
-            let num_lines = text_lines.len();
+            let centered_layout = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([
+                    Constraint::Percentage(40),
+                    Constraint::Min(1),
+                    Constraint::Percentage(10),
+                ])
+                .split(terminal_size);
 
-            // Calculate the centered area
-            let centered_area = ratatui::layout::Rect {
-                x: terminal_size.x + (terminal_size.width - max_line_length as u16) / 2,
-                y: terminal_size.y + (terminal_size.height - num_lines as u16) / 2,
-                width: max_line_length as u16,
-                height: num_lines as u16,
-            };
-            frame.render_widget(warning_paragraph, centered_area);
             self.drawable = false;
+            return frame.render_widget(warning, centered_layout[1]);
         } else {
             self.drawable = true;
-        }
-
-        if !self.drawable {
-            return;
         }
 
         let label_block =
