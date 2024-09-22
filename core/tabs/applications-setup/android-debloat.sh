@@ -7,16 +7,16 @@ install_adb() {
         printf "%b\n" "${YELLOW}Installing ADB...${RC}."
         case "$PACKAGER" in
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install android-sdk-platform-tools
+                "$ESCALATION_TOOL" "$PACKAGER" install -y android-sdk-platform-tools
                 ;;
             zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" install android-tools
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install android-tools
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S android-tools
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm android-tools
                 ;;
             yum)
-                "$ESCALATION_TOOL" "$PACKAGER" install android-tools
+                "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
             *)
                 printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
