@@ -198,13 +198,21 @@ impl AppState {
             .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
             .split(horizontal[1]);
 
+        let list_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(60), Constraint::Percentage(40)].as_ref())
+            .split(chunks[1]);
+
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
 
         let mut items: Vec<Line> = Vec::new();
+        let mut task_items: Vec<Line> = Vec::new();
+
         if !self.at_root() {
             items.push(
                 Line::from(format!("{}  ..", self.theme.dir_icon())).style(self.theme.dir_color()),
             );
+            task_items.push(Line::from(" ").style(self.theme.dir_color()));
         }
 
         items.extend(self.filter.item_list().iter().map(
@@ -238,6 +246,21 @@ impl AppState {
             },
         ));
 
+        task_items.extend(self.filter.item_list().iter().map(
+            |ListEntry {
+                 node, has_children, ..
+             }| {
+                if *has_children {
+                    Line::from(" ").style(self.theme.dir_color())
+                } else {
+                    Line::from(format!("{} ", node.task_list))
+                        .alignment(Alignment::Right)
+                        .style(self.theme.cmd_color())
+                        .bold()
+                }
+            },
+        ));
+
         let style = if let Focus::List = self.focus {
             Style::default().reversed()
         } else {
@@ -255,17 +278,27 @@ impl AppState {
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
+        let task_list_title = Line::from("Important Actions ").right_aligned();
+
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(style)
             .block(
                 Block::default()
-                    .borders(Borders::ALL)
+                    .borders(Borders::ALL & !Borders::RIGHT)
                     .title(title)
                     .title_bottom(bottom_title),
             )
             .scroll_padding(1);
-        frame.render_stateful_widget(list, chunks[1], &mut self.selection);
+        frame.render_stateful_widget(list, list_chunks[0], &mut self.selection);
+
+        let disclaimer_list = List::new(task_items).highlight_style(style).block(
+            Block::default()
+                .borders(Borders::ALL & !Borders::LEFT)
+                .title(task_list_title),
+        );
+
+        frame.render_stateful_widget(disclaimer_list, list_chunks[1], &mut self.selection);
 
         if let Focus::FloatingWindow(float) = &mut self.focus {
             float.draw(frame, chunks[1]);
