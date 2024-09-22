@@ -18,7 +18,7 @@ installVsCode() {
                 "$ESCALATION_TOOL" rpm --import https://packages.microsoft.com/keys/microsoft.asc
                 printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | "$ESCALATION_TOOL" tee /etc/zypp/repos.d/vscode.repo > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" refresh
-                "$ESCALATION_TOOL" "$PACKAGER" install -y code
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install code
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm code
