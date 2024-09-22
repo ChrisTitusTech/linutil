@@ -70,11 +70,6 @@ script = "compile-setup.sh"
 task_list = "installation"
 
 [[data]]
-name = "Docker"
-script = "docker-setup.sh"
-task_list = "installation, systemd actions"
-
-[[data]]
 name = "Full System Cleanup"
 script = "system-cleanup.sh"
 task_list = "package removal, privileged file modification"
@@ -102,8 +97,3 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
 task_list = "package removal"
-
-[[data]]
-name = "SSH-Samba"
-script = "samba-ssh-setup.sh"
-task_list = "installation, systemd actions, privileged file modification"
