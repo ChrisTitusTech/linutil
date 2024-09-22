@@ -16,7 +16,7 @@ installSublime() {
                     "$ESCALATION_TOOL" rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
                     "$ESCALATION_TOOL" "$PACKAGER" addrepo -g -f https://download.sublimetext.com/rpm/dev/x86_64/sublime-text.repo
                     "$ESCALATION_TOOL" "$PACKAGER" refresh
-                    "$ESCALATION_TOOL" "$PACKAGER" install -y sublime-text
+                    "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install sublime-text
                     ;;
                 pacman)
                     "$AUR_HELPER" -S --needed --noconfirm sublime-text-4
