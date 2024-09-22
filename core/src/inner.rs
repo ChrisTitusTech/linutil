@@ -223,7 +223,7 @@ fn get_shebang(script_path: &Path, validate: bool) -> Option<(String, Vec<String
         return default_executable();
     };
 
-    let is_valid = !validate || Path::new(executable).exists();
+    let is_valid = !validate || Path::new(executable).is_file();
 
     is_valid.then(|| {
         let mut args: Vec<String> = parts.map(ToString::to_string).collect();
