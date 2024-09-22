@@ -5,6 +5,7 @@ use serde::Deserialize;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
+    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
 };
 use tempdir::TempDir;
@@ -223,13 +224,19 @@ fn get_shebang(script_path: &Path, validate: bool) -> Option<(String, Vec<String
         return default_executable();
     };
 
-    let is_valid = !validate || Path::new(executable).is_file();
+    let is_valid = !validate || is_executable(Path::new(executable));
 
     is_valid.then(|| {
         let mut args: Vec<String> = parts.map(ToString::to_string).collect();
         args.push(script_path.to_string_lossy().to_string());
         (executable.to_string(), args)
     })
+}
+
+fn is_executable(path: &Path) -> bool {
+    path.metadata()
+        .map(|metadata| metadata.is_file() && metadata.permissions().mode() & 0o111 != 0)
+        .unwrap_or(false)
 }
 
 impl TabList {
