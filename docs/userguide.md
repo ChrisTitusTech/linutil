@@ -17,7 +17,11 @@
 
 ## Fedora Setup
 
-- **RPM Fusion Setup**: Adds RPM Fusion repositories.
+- **RPM Fusion Setup**: Adds RPM Fusion free and nonfree repositories.
+- **Multimedia Codecs**: Installs multimedia codecs and updates multimedia-related packages. Requires RPM Fusion repositories to be set up first.
+- **NVIDIA Proprietary Driver Setup**: Installs proprietary NVIDIA drivers for GPUs from 2014 or later.
+- **Virtualization Setup**: Installs virtualization tools.
+- **Configure DNF**: Optimizes DNF for better speeds.
 
 ## Applications Setup
 
