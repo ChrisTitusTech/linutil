@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installZoom() {
-    if ! command_exists signal; then
+    if ! command_exists zoom; then
         printf "%b\n" "${YELLOW}Installing Zoom...${RC}"
         case "$PACKAGER" in
             pacman)
