@@ -55,8 +55,27 @@ EOF
     printf "%b\n" "${GREEN}Kvantum configured successfully.${RC}"
 }
 
+applyTheme() {
+    printf "%b\n" "${YELLOW}Applying global theming...${RC}"
+    case "$XDG_CURRENT_DESKTOP" in
+        KDE)
+            lookandfeeltool -a org.kde.breezedark.desktop
+            ;;
+        GNOME)
+            gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+            gsettings set org.gnome.desktop.interface icon-theme "Adwaita"
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported desktop environment: ""$XDG_CURRENT_DESKTOP""${RC}"
+            exit 1
+            ;;
+    esac
+    printf "%b\n" "${GREEN}Global theming applied.${RC}"
+}
+
 checkEnv
 checkEscalationTool
 install_theme_tools
 configure_qt6ct
 configure_kvantum
+applyTheme
