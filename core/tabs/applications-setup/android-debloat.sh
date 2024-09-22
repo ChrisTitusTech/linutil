@@ -15,7 +15,7 @@ install_adb() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm android-tools
                 ;;
-            rpm)
+            dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
             *)
