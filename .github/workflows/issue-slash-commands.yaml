@@ -25,6 +25,20 @@ jobs:
             LABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/label" '/\/label/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
             echo "label_command=true" >> $GITHUB_ENV
             echo "label_name=${LABEL_NAME}" >> $GITHUB_ENV
+          else
+            echo "label_command=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Check for /unlabel command
+        id: check_unlabel_command
+        run: |
+          if [[ "${{ contains(github.event.comment.body, '/unlabel') }}" == "true" ]]; then
+            echo "command=true" >> $GITHUB_ENV
+            UNLABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/unlabel" '/\/unlabel/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
+            echo "unlabel_command=true" >> $GITHUB_ENV
+            echo "unlabel_name=${UNLABEL_NAME}" >> $GITHUB_ENV
+          else
+            echo "unlabel_command=false" >> $GITHUB_ENV
           fi
 
       - name: Check for /close command
@@ -53,7 +67,7 @@ jobs:
         id: check_user
         if: env.command == 'true'
         run: |
-          ALLOWED_USERS=("ChrisTitusTech" "afonsofrancof" "Marterich" "MyDrift-user" "Real-MullaC" "nnyyxxxx" "adamperkowski" "lj3954" "jeevithakannan2" ${{ github.event.issue.user.login }})
+          ALLOWED_USERS=("ChrisTitusTech" "afonsofrancof" "Marterich" "MyDrift-user" "Real-MullaC" "nnyyxxxx" "adamperkowski" "lj3954" "jeevithakannan2" "${{ github.event.issue.user.login }}")
           if [[ " ${ALLOWED_USERS[@]} " =~ " ${{ github.event.comment.user.login }} " ]]; then
             echo "user=true" >> $GITHUB_ENV
           else
@@ -90,3 +104,12 @@ jobs:
         run: |
           echo Labeling the issue...
           gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --add-label "${{ env.label_name }}"
+      
+      - name: Remove labels
+        if: env.unlabel_command == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          echo Labeling the issue...
+          gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --remove-label "${{ env.unlabel_name }}"
