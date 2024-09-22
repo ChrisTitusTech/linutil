@@ -4,7 +4,7 @@
 
 install_adb() {
     if ! command_exists adb ; then
-        printf "%b\n" "${YELLOW}Installing ADB..${RC}."
+        printf "%b\n" "${YELLOW}Installing ADB...${RC}."
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install android-sdk-platform-tools
