@@ -70,7 +70,7 @@ configure_kvantum() {
     mkdir -p "$HOME/.config/Kvantum"
     cat <<EOF > "$HOME/.config/Kvantum/kvantum.kvconfig"
 [General]
-theme=Breeze
+theme=KvArcDark
 EOF
     printf "%b\n" "${GREEN}Kvantum configured successfully.${RC}"
 }
