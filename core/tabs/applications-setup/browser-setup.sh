@@ -104,9 +104,6 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 			curl -fsSL https://rpm.librewolf.net/librewolf-repo.repo | pkexec tee /etc/yum.repos.d/librewolf.repo > /dev/null
 			"$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
 			;;
-		rpm-ostree)
-			rpm-ostree install -y librewolf
-			;;
 		zypper)
 			"$ESCALATION_TOOL" rpm --import https://rpm.librewolf.net/pubkey.gpg
 			"$ESCALATION_TOOL" zypper ar -ef https://rpm.librewolf.net librewolf
