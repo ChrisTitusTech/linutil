@@ -19,7 +19,7 @@ installTelegram() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram-desktop 
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Telegram manually.${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
