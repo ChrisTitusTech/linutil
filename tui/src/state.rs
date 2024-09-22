@@ -98,9 +98,9 @@ impl AppState {
             let centered_layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([
-                    Constraint::Percentage(40),
-                    Constraint::Min(1),
-                    Constraint::Percentage(10),
+                    Constraint::Fill(1),
+                    Constraint::Length(5),
+                    Constraint::Fill(1),
                 ])
                 .split(terminal_size);
 
