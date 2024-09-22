@@ -48,9 +48,9 @@ list_devices() {
 
 # Function to create a new snapshot
 create_snapshot() {
-    printf "%b\n" "${CYAN}Enter a comment for the snapshot (optional): ${RC}"
+    printf "%b" "${CYAN}Enter a comment for the snapshot (optional): ${RC}"
     read -r COMMENT
-    printf "%b\n" "${CYAN}Enter snapshot tag (O,B,H,D,W,M) (leave empty for no tag): ${RC}"
+    printf "%b" "${CYAN}Enter snapshot tag (O,B,H,D,W,M) (leave empty for no tag): ${RC}"
     read -r TAG
 
     if [ -z "$COMMENT" ] && [ -z "$TAG" ]; then
@@ -75,14 +75,14 @@ create_snapshot() {
 restore_snapshot() {
     list_snapshots
 
-    printf "%b\n" "${CYAN}Enter the snapshot name you want to restore: ${RC}"
+    printf "%b" "${CYAN}Enter the snapshot name you want to restore: ${RC}"
     read -r SNAPSHOT
-    printf "%b\n" "${CYAN}Enter the target device (e.g., /dev/sda1): ${RC}"
+    printf "%b" "${CYAN}Enter the target device (e.g., /dev/sda1): ${RC}"
     read -r TARGET_DEVICE
-    printf "%b\n" "${CYAN}Do you want to skip GRUB reinstall? (yes/no): ${RC}"
+    printf "%b" "${CYAN}Do you want to skip GRUB reinstall? (y/N): ${RC}"
     read -r SKIP_GRUB
 
-    if [ "$SKIP_GRUB" = "yes" ]; then
+    if [ "$SKIP_GRUB" = "y" ] || [ "$SKIP_GRUB" = "Y" ]; then
         "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --skip-grub --yes
     else
         printf "%b\n" "${CYAN}Enter GRUB device (e.g., /dev/sda): ${RC}"
@@ -101,7 +101,7 @@ restore_snapshot() {
 delete_snapshot() {
     list_snapshots
 
-    printf "%b\n" "${CYAN}Enter the snapshot name you want to delete: ${RC}"
+    printf "%b" "${CYAN}Enter the snapshot name you want to delete: ${RC}"
     read -r SNAPSHOT
 
     printf "%b\n" "${YELLOW}Deleting snapshot $SNAPSHOT...${RC}"
@@ -117,10 +117,10 @@ delete_snapshot() {
 # Function to delete all snapshots
 delete_all_snapshots() {
     printf "%b\n" "${RED}WARNING: This will delete all snapshots!${RC}"
-    printf "%b\n" "${CYAN}Are you sure? (yes/no): ${RC}"
+    printf "%b" "${CYAN}Are you sure? (y/N): ${RC}"
     read -r CONFIRMATION
 
-    if [ "$CONFIRMATION" = "yes" ]; then
+    if [ "$CONFIRMATION" = "y" ] || [ "$CONFIRMATION" = "Y" ]; then
         printf "%b\n" "${CYAN}Deleting all snapshots...${RC}"
         "$ESCALATION_TOOL" timeshift --delete-all --yes
         if [ $? -eq 0 ]; then

@@ -26,7 +26,7 @@ cleanup_system() {
             "$ESCALATION_TOOL" "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             return 1
             ;;
     esac

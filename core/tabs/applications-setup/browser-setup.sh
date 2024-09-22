@@ -24,7 +24,7 @@ install_chrome() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
                 ;;
             *)
-                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 ;;
         esac
     else
@@ -43,15 +43,14 @@ install_thorium() {
                 ;;
             zypper|dnf)
                 url=$(curl -s https://api.github.com/repos/Alex313031/Thorium/releases/latest | grep -oP '(?<=browser_download_url": ")[^"]*\.rpm')
-                    echo $url && curl -L $url -o thorium-latest.rpm
+                    echo "$url" && curl -L "$url" -o thorium-latest.rpm
                     "$ESCALATION_TOOL" rpm -i thorium-latest.rpm && rm thorium-latest.rpm
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Thorium manually.${RC}"
-            exit 1
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             ;;
         esac
     else
@@ -76,7 +75,8 @@ install_firefox() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
                 ;;
             *)
-                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
     else
@@ -117,7 +117,7 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
 			"$AUR_HELPER" -S --needed --noconfirm librewolf-bin
 			;;
 		*)
-			printf "%b\n" "${RED}Unsupported package manager. Please install Librewolf manually.${RC}"
+			printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 			exit 1
 			;;
 	esac
@@ -152,7 +152,8 @@ install_brave() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
                 ;;
             *)
-                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
     else
@@ -189,7 +190,8 @@ install_chromium() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
                 ;;
             *)
-                printf "%b\n" "${RED}The script does not support your Distro. Install manually..${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
     else
@@ -227,7 +229,7 @@ browserSetup() {
     printf "%b\n" "7. Thorium"
     printf "%b\n" "8. Lynx"
     printf "%b\n" "----------------------------"
-    printf "%b"  "Enter your choices (e.g., 1 3 5): "
+    printf "%b"  "Enter your choices (e.g. 1 3 5): "
     read -r choice
     for ch in $choice; do
         case $ch in

@@ -27,7 +27,7 @@ installLinutil() {
             ;;
         *)
             printf "%b\n" "${RED}There are no official packages for your distro.${RC}"
-            printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N) ${RC}"
+            printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
             read -r choice
             case $choice in
                 y|Y)
