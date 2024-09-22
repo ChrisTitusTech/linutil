@@ -28,13 +28,6 @@ setup_flatpak() {
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
-            xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" install -S flatpak
-                ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
         printf "%b\n" "Adding Flathub remote..."
         "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
