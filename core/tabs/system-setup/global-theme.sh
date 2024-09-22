@@ -24,6 +24,26 @@ install_theme_tools() {
     esac
 }
 
+applyTheming() {
+    printf "%b\n" "${YELLOW}Applying global theming...${RC}"
+    case "$XDG_CURRENT_DESKTOP" in
+        KDE)
+            lookandfeeltool -a org.kde.breezedark.desktop
+            successOutput
+            exit 0
+            ;;
+        GNOME)
+            gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+            gsettings set org.gnome.desktop.interface icon-theme "Adwaita"
+            successOutput
+            exit 0
+            ;;
+        *)
+            return
+            ;;
+    esac
+}
+
 configure_qt6ct() {
     printf "%b\n" "${YELLOW}Configuring qt6ct...${RC}"
     mkdir -p "$HOME/.config/qt6ct"
@@ -46,17 +66,23 @@ EOF
 }
 
 configure_kvantum() {
-    printf "%b\n" "${YELLOW}Configuring Kvantum...${RC}\n"
+    printf "%b\n" "${YELLOW}Configuring Kvantum...${RC}"
     mkdir -p "$HOME/.config/Kvantum"
     cat <<EOF > "$HOME/.config/Kvantum/kvantum.kvconfig"
 [General]
-theme=Breeze
+theme=KvArcDark
 EOF
     printf "%b\n" "${GREEN}Kvantum configured successfully.${RC}"
 }
 
+successOutput() {
+    printf "%b\n" "${GREEN}Global theming applied successfully.${RC}"
+}
+
 checkEnv
 checkEscalationTool
+applyTheming
 install_theme_tools
 configure_qt6ct
 configure_kvantum
+successOutput
