@@ -13,7 +13,7 @@ installTelegram() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install telegram-desktop
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm telegram-desktop 
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm telegram-desktop 
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram-desktop 

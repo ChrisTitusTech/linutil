@@ -13,7 +13,7 @@ installThunderBird() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install thunderbird
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm thunderbird
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm thunderbird
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 

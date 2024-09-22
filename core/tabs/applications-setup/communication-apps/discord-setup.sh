@@ -14,7 +14,7 @@ installDiscord() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install discord
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm discord 
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord 
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
