@@ -15,7 +15,7 @@ installJitsi() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install jitsi
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm jitsi-meet
+                "$AUR_HELPER" -S --needed --noconfirm jitsi-meet-bin
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
