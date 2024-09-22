@@ -6,14 +6,14 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip
+            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh # no need to include git here as it should be already installed via "Development Tools"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
@@ -90,10 +90,10 @@ install_nerd_font() {
 }
 
 picom_animations() {
-    # Clone the repository in the home/build directory
-    mkdir -p ~/build
-    if [ ! -d ~/build/picom ]; then
-        if ! git clone https://github.com/FT-Labs/picom.git ~/build/picom; then
+    # clone the repo into .local/share & use the -p flag to avoid overwriting that dir
+    mkdir -p "$HOME/.local/share/"
+    if [ ! -d "$HOME/.local/share/ftlabs-picom" ]; then
+        if ! git clone https://github.com/FT-Labs/picom.git "$HOME/.local/share/ftlabs-picom"; then
             printf "%b\n" "${RED}Failed to clone the repository${RC}"
             return 1
         fi
@@ -101,7 +101,7 @@ picom_animations() {
         printf "%b\n" "${GREEN}Repository already exists, skipping clone${RC}"
     fi
 
-    cd ~/build/picom || { printf "%b\n" "${RED}Failed to change directory to picom${RC}"; return 1; }
+    cd "$HOME/.local/share/ftlabs-picom" || { printf "%b\n" "${RED}Failed to change directory to picom${RC}"; return 1; }
 
     # Build the project
     if ! meson setup --buildtype=release build; then

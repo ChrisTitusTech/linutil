@@ -9,7 +9,7 @@ install_package() {
     if ! command_exists "$PACKAGE"; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"

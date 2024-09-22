@@ -38,7 +38,7 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-index-
 
       - name: Run cargo clippy
-        run: cargo clippy
+        run: cargo clippy -- -Dwarnings
 
       - name: Run cargo fmt
         run: cargo fmt --all --check

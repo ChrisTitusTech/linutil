@@ -39,7 +39,6 @@ install_thorium() {
             apt-get|nala)
                 "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
                 "$ESCALATION_TOOL" curl http://dl.thorium.rocks/debian/dists/stable/thorium.list -o /etc/apt/sources.list.d/thorium.list
-                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
                 ;;
             zypper|dnf)
@@ -99,7 +98,7 @@ Suites: $distro
 Components: main
 Architectures: amd64
 Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/librewolf.sources > /dev/null
-			"$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
+			"$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
 			;;
 		dnf)
 			curl -fsSL https://rpm.librewolf.net/librewolf-repo.repo | pkexec tee /etc/yum.repos.d/librewolf.repo > /dev/null
@@ -135,7 +134,6 @@ install_brave() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
                 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"| "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/brave-browser-release.list
-                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
                 ;;
             zypper)
