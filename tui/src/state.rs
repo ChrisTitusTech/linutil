@@ -200,7 +200,7 @@ impl AppState {
 
         let list_chunks = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(75), Constraint::Percentage(25)].as_ref())
+            .constraints([Constraint::Percentage(60), Constraint::Percentage(40)].as_ref())
             .split(chunks[1]);
 
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
