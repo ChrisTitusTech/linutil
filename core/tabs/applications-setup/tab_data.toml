@@ -46,6 +46,51 @@ script = "Developer-tools/ngrok-setup.sh"
 task_list = "installation"
 
 [[data]]
+name = "Communication Apps"
+
+[[data.entries]]
+name = "Discord"
+description = "Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features."
+script = "communication-apps/discord-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Jitsi"
+description = "Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads."
+script = "communication-apps/jitsi-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Signal"
+description = "Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication."
+script = "communication-apps/signal-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Slack"
+description = "Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools."
+script = "communication-apps/slack-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Telegram"
+description = "Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls."
+script = "communication-apps/telegram-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Zoom"
+description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
+script = "communication-apps/zoom-setup.sh"
+task_list = "installation"
+
+[[data.entries]]
+name = "Thunderbird"
+description = "Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality."
+script = "communication-apps/thunderbird-setup.sh"
+task_list = "installation"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
