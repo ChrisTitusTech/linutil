@@ -49,7 +49,7 @@ script = "communication-apps/discord-setup.sh"
 [[data.entries]]
 name = "Install Jitsi"
 description = "Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads."
-script = "communication-apps/jitsi-meet-setup.sh"
+script = "communication-apps/jitsi-setup.sh"
 
 [[data.entries]]
 name = "Install Signal"
