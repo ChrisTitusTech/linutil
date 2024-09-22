@@ -144,6 +144,7 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             }
             hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
             hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
+            hints.push(Shortcut::new(vec!["g"], "Important actions guide"));
             ShortcutList {
                 scope_name: "Command list",
                 hints,
