@@ -111,5 +111,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          echo Labeling the issue...
+          echo Unlabeling the issue...
           gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --remove-label "${{ env.unlabel_name }}"
