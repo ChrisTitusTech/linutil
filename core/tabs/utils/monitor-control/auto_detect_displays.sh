@@ -18,8 +18,8 @@ auto_detect_displays() {
             temp_common_resolutions=$(mktemp)
             temp_resolutions=$(mktemp)
 
-            printf "%s" "$common_resolutions" > "$temp_common_resolutions"
-            printf "%s" "$resolutions" > "$temp_resolutions"
+            printf "%b\n" "$common_resolutions" > "$temp_common_resolutions"
+            printf "%b\n" "$resolutions" > "$temp_resolutions"
 
             common_resolutions=$(comm -12 "$temp_common_resolutions" "$temp_resolutions")
 

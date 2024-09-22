@@ -41,7 +41,7 @@ setup_flatpak() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -S flatpak
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
@@ -50,7 +50,7 @@ setup_flatpak() {
     else
         if command -v flatpak >/dev/null 2>&1; then
             if ! flatpak remotes | grep -q "flathub"; then
-                printf "%b\n" "${YELLOW}Detected Flatpak package manager but Flathub remote is not added. Would you like to add it? (y/n)${RC}"
+                printf "%b" "${YELLOW}Detected Flatpak package manager but Flathub remote is not added. Would you like to add it? (y/N): ${RC}"
                 read -r add_remote
                 case "$add_remote" in
                     [Yy]*)
@@ -70,14 +70,14 @@ setup_flatpak() {
         # Only used for Ubuntu GNOME. Ubuntu GNOME doesnt allow flathub to be added as a remote to their store.
         # So in case the user wants to use a GUI siftware manager they can setup it here
         if [ "$DE" = "GNOME" ]; then
-            printf "%b\n" "${YELLOW}Detected GNOME desktop environment. Would you like to install GNOME Software plugin for Flatpak? (y/n)${RC}"
+            printf "%b" "${YELLOW}Detected GNOME desktop environment. Would you like to install GNOME Software plugin for Flatpak? (y/N): ${RC}"
             read -r install_gnome
             if [ "$install_gnome" = "y" ] || [ "$install_gnome" = "Y" ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y gnome-software-plugin-flatpak
             fi
         # Useful for Debian KDE spin as well
         elif [ "$DE" = "KDE" ]; then
-            printf "%b\n" "${YELLOW}Detected KDE desktop environment. Would you like to install KDE Plasma Discover backend for Flatpak? (y/n)${RC}"
+            printf "%b" "${YELLOW}Detected KDE desktop environment. Would you like to install KDE Plasma Discover backend for Flatpak? (y/N): ${RC}"
             read -r install_kde
             if [ "$install_kde" = "y" ] || [ "$install_kde" = "Y" ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y plasma-discover-backend-flatpak

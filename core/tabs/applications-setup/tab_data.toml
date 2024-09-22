@@ -1,7 +1,7 @@
 name = "Applications Setup"
 
 [[data]]
-name = "Developer TOols"
+name = "Developer Tools"
 
 [[data.entries]]
 name = "Install Github Desktop"
@@ -106,6 +106,16 @@ script = "office-suite-setup.sh"
 name = "Rofi"
 description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport.\nThis command installs and configures rofi with configuration from CTT's DWM repo.\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "rofi-setup.sh"
+
+[[data]]
+name = "Waydroid"
+description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
+script = "waydroid-setup.sh"
+
+[[data.preconditions]]
+matches = true
+data = { environment = "XDG_SESSION_TYPE" }
+values = [ "wayland", "Wayland" ]
 
 [[data]]
 name = "ZSH Prompt"

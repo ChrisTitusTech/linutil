@@ -4,6 +4,15 @@
 
 gitpath="$HOME/.local/share/neovim"
 
+checkNeovimVer() {
+    # lazy.nvim requires nvim >= 0.8.0
+    nvim_version=$(nvim --version | head -n 1 | awk '{print $2}')
+    if [ "$(printf "%s\n" "$nvim_version" "0.8.0" | sort -V | head -n 1)" != "0.8.0" ]; then
+        printf "%b\n" "${RED}Neovim version $nvim_version not supported.${RC}"
+        exit 1
+    fi
+}
+
 cloneNeovim() {
     # Check if the dir exists before attempting to clone into it.
     if [ -d "$gitpath" ]; then
@@ -30,7 +39,7 @@ installNeovim() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}" # The packages above were grabbed out of the original nvim-setup-script.
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
@@ -54,6 +63,7 @@ linkNeovimConfig() {
 checkEnv
 checkEscalationTool
 installNeovim
+checkNeovimVer
 cloneNeovim
 backupNeovimConfig
 linkNeovimConfig
