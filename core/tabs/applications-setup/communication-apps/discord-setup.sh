@@ -7,7 +7,7 @@ installDiscord() {
         printf "%b\n" "${YELLOW}Installing Discord...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                curl -L -o discord.deb "https://discord.com/api/download?platform=linux&format=deb"
+                curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
                 ;;
             zypper)
