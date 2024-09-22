@@ -12,6 +12,7 @@ script = "Developer-tools/githubdesktop-setup.sh"
 name = "Setup Neovim"
 description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
 script = "Developer-tools/neovim-setup.sh"
+task_list = "installation, moving files"
 
 [[data.entries]]
 name = "Install Sublime"
