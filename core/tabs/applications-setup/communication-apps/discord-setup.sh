@@ -21,7 +21,7 @@ installDiscord() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager. Please install Discord manually.${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac
