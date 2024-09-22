@@ -56,7 +56,10 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, state: &mut AppState) -> io::Result<()> {
+fn run(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    state: &mut AppState,
+) -> io::Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
