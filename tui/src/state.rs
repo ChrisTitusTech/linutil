@@ -495,12 +495,7 @@ impl AppState {
     }
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description_content: Vec<String> = vec![]
-                .into_iter()
-                .chain(command_description.lines().map(|line| line.to_string())) // New line when \n is given in toml
-                .collect();
-
-            let description = FloatingText::new(description_content, FloatingTextMode::Description);
+            let description = FloatingText::new(command_description, FloatingTextMode::Description);
             self.spawn_float(description, 80, 80);
         }
     }
