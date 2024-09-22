@@ -1,9 +1,18 @@
+use std::{
+    borrow::Cow,
+    collections::VecDeque,
+    io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
+};
+
 use crate::{
     float::FloatContent,
     hint::{Shortcut, ShortcutList},
 };
-use crossterm::event::{KeyCode, KeyEvent};
+
 use linutil_core::Command;
+
+use crossterm::event::{KeyCode, KeyEvent};
+
 use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
@@ -11,57 +20,193 @@ use ratatui::{
     widgets::{Block, Borders, Clear, List},
     Frame,
 };
+
+use ansi_to_tui::IntoText;
+
+use tree_sitter_bash as hl_bash;
+use tree_sitter_highlight::{self as hl, HighlightEvent};
+use zips::zip_result;
+
 pub enum FloatingTextMode {
     Preview,
     Description,
 }
+
 pub struct FloatingText {
-    text: Vec<String>,
+    pub src: Vec<String>,
+    max_line_width: usize,
+    v_scroll: usize,
+    h_scroll: usize,
     mode_title: &'static str,
-    scroll: usize,
+}
+
+macro_rules! style {
+    ($r:literal, $g:literal, $b:literal) => {{
+        use anstyle::{Color, RgbColor, Style};
+        Style::new().fg_color(Some(Color::Rgb(RgbColor($r, $g, $b))))
+    }};
+}
+
+const SYNTAX_HIGHLIGHT_STYLES: [(&str, anstyle::Style); 8] = [
+    ("function", style!(220, 220, 170)), // yellow
+    ("string", style!(206, 145, 120)),   // brown
+    ("property", style!(156, 220, 254)), // light blue
+    ("comment", style!(92, 131, 75)),    // green
+    ("embedded", style!(206, 145, 120)), // blue (string expansions)
+    ("constant", style!(79, 193, 255)),  // dark blue
+    ("keyword", style!(197, 134, 192)),  // magenta
+    ("number", style!(181, 206, 168)),   // light green
+];
+
+fn get_highlighted_string(s: &str) -> Option<String> {
+    let mut hl_conf = hl::HighlightConfiguration::new(
+        hl_bash::LANGUAGE.into(),
+        "bash",
+        hl_bash::HIGHLIGHT_QUERY,
+        "",
+        "",
+    )
+    .ok()?;
+
+    let matched_tokens = &SYNTAX_HIGHLIGHT_STYLES
+        .iter()
+        .map(|hl| hl.0)
+        .collect::<Vec<_>>();
+
+    hl_conf.configure(matched_tokens);
+
+    let mut hl = hl::Highlighter::new();
+
+    let mut style_stack = vec![anstyle::Style::new()];
+    let src = s.as_bytes();
+
+    let events = hl.highlight(&hl_conf, src, None, |_| None).ok()?;
+
+    let mut buf = Cursor::new(vec![]);
+
+    for event in events {
+        match event.unwrap() {
+            HighlightEvent::HighlightStart(h) => {
+                style_stack.push(SYNTAX_HIGHLIGHT_STYLES.get(h.0)?.1);
+            }
+
+            HighlightEvent::HighlightEnd => {
+                style_stack.pop();
+            }
+
+            HighlightEvent::Source { start, end } => {
+                let style = style_stack.last()?;
+                zip_result!(
+                    write!(&mut buf, "{}", style),
+                    buf.write_all(&src[start..end]),
+                    write!(&mut buf, "{style:#}"),
+                )?;
+            }
+        }
+    }
+
+    let mut output = String::new();
+
+    zip_result!(
+        buf.seek(SeekFrom::Start(0)),
+        buf.read_to_string(&mut output),
+    )?;
+
+    Some(output)
+}
+
+macro_rules! max_width {
+    ($($lines:tt)+) => {{
+        $($lines)+.iter().fold(0, |accum, val| accum.max(val.len()))
+    }}
+}
+
+#[inline]
+fn get_lines(s: &str) -> Vec<&str> {
+    s.lines().collect::<Vec<_>>()
+}
+
+#[inline]
+fn get_lines_owned(s: &str) -> Vec<String> {
+    get_lines(s).iter().map(|s| s.to_string()).collect()
 }
 
 impl FloatingText {
-    pub fn new(text: Vec<String>, mode: FloatingTextMode) -> Self {
-        let mode_title = match mode {
-            FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::Description => "Command Description",
-        };
+    pub fn new(text: String, mode: FloatingTextMode) -> Self {
+        let src = get_lines(&text)
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<_>>();
+
+        let max_line_width = max_width!(src);
         Self {
-            text,
-            scroll: 0,
-            mode_title,
+            src,
+            mode_title: Self::get_mode_title(mode),
+            max_line_width,
+            v_scroll: 0,
+            h_scroll: 0,
         }
     }
 
     pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
-        let lines = match command {
+        let (max_line_width, src) = match command {
             Command::Raw(cmd) => {
-                // Reconstruct the line breaks and file formatting after the
-                // 'include_str!()' call in the node
-                cmd.lines().map(|line| line.to_string()).collect()
+                // just apply highlights directly
+                (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
+
             Command::LocalFile(file_path) => {
-                let file_contents = std::fs::read_to_string(file_path)
+                // have to read from tmp dir to get cmd src
+                let raw = std::fs::read_to_string(file_path)
                     .map_err(|_| format!("File not found: {:?}", file_path))
                     .unwrap();
-                file_contents.lines().map(|line| line.to_string()).collect()
+
+                (max_width!(get_lines(&raw)), Some(raw))
             }
+
             // If command is a folder, we don't display a preview
-            Command::None => return None,
+            Command::None => (0usize, None),
         };
-        Some(Self::new(lines, mode))
+
+        let src = get_lines_owned(&get_highlighted_string(&src?)?);
+
+        Some(Self {
+            src,
+            mode_title: Self::get_mode_title(mode),
+            max_line_width,
+            h_scroll: 0,
+            v_scroll: 0,
+        })
+    }
+
+    fn get_mode_title(mode: FloatingTextMode) -> &'static str {
+        match mode {
+            FloatingTextMode::Preview => "Command Preview",
+            FloatingTextMode::Description => "Command Description",
+        }
     }
 
     fn scroll_down(&mut self) {
-        if self.scroll + 1 < self.text.len() {
-            self.scroll += 1;
+        if self.v_scroll + 1 < self.src.len() {
+            self.v_scroll += 1;
         }
     }
 
     fn scroll_up(&mut self) {
-        if self.scroll > 0 {
-            self.scroll -= 1;
+        if self.v_scroll > 0 {
+            self.v_scroll -= 1;
+        }
+    }
+
+    fn scroll_left(&mut self) {
+        if self.h_scroll > 0 {
+            self.h_scroll -= 1;
+        }
+    }
+
+    fn scroll_right(&mut self) {
+        if self.h_scroll + 1 < self.max_line_width {
+            self.h_scroll += 1;
         }
     }
 }
@@ -81,25 +226,43 @@ impl FloatContent for FloatingText {
 
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
-
-        // Create the list of lines to be displayed
-        let lines: Vec<Line> = self
-            .text
+        let Rect { height, .. } = inner_area;
+        let lines = self
+            .src
             .iter()
-            .skip(self.scroll)
-            .flat_map(|line| {
-                if line.is_empty() {
-                    return vec![String::new()];
+            .skip(self.v_scroll)
+            .take(height as usize)
+            .flat_map(|l| l.into_text().unwrap())
+            .map(|line| {
+                let mut skipped = 0;
+                let mut spans = line
+                    .into_iter()
+                    .skip_while(|span| {
+                        let skip = (skipped + span.content.len()) <= self.h_scroll;
+                        if skip {
+                            skipped += span.content.len();
+                            true
+                        } else {
+                            false
+                        }
+                    })
+                    .collect::<VecDeque<_>>();
+
+                if spans.is_empty() {
+                    Line::raw(Cow::Owned(String::new()))
+                } else {
+                    if skipped < self.h_scroll {
+                        let to_split = spans.pop_front().unwrap();
+                        let new_content = to_split.content.clone().into_owned()
+                            [self.h_scroll - skipped..]
+                            .to_owned();
+                        spans.push_front(to_split.content(Cow::Owned(new_content)));
+                    }
+
+                    Line::from(Vec::from(spans))
                 }
-                line.chars()
-                    .collect::<Vec<char>>()
-                    .chunks(inner_area.width as usize)
-                    .map(|chunk| chunk.iter().collect())
-                    .collect::<Vec<String>>()
             })
-            .take(inner_area.height as usize)
-            .map(Line::from)
-            .collect();
+            .collect::<Vec<_>>();
 
         // Create list widget
         let list = List::new(lines)
@@ -114,9 +277,12 @@ impl FloatContent for FloatingText {
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        use KeyCode::*;
         match key.code {
-            KeyCode::Down | KeyCode::Char('j') => self.scroll_down(),
-            KeyCode::Up | KeyCode::Char('k') => self.scroll_up(),
+            Down | Char('j') => self.scroll_down(),
+            Up | Char('k') => self.scroll_up(),
+            Left | Char('h') => self.scroll_left(),
+            Right | Char('l') => self.scroll_right(),
             _ => {}
         }
         false
@@ -132,7 +298,9 @@ impl FloatContent for FloatingText {
             hints: vec![
                 Shortcut::new(vec!["j", "Down"], "Scroll down"),
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
-                Shortcut::new(vec!["Enter", "q"], "Close window"),
+                Shortcut::new(vec!["h", "Left"], "Scroll left"),
+                Shortcut::new(vec!["l", "Right"], "Scroll right"),
+                Shortcut::new(vec!["Enter", "p", "d"], "Close window"),
             ],
         }
     }

@@ -13,14 +13,14 @@ disable_monitor() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Disable Monitor${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b\n" "Choose a monitor to disable:"
+    printf "%b" "Choose a monitor to disable: "
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"
         i=$((i + 1))
     done
 
-    printf "%b\n" "Enter the number of the monitor: "
+    printf "%b" "Enter the number of the monitor: "
     read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
@@ -45,7 +45,7 @@ disable_monitor() {
 confirm_action() {
     action="$1"
     printf "%b\n" "${YELLOW}$action${RC}"
-    printf "%b\n" "Are you sure? (y/n): "
+    printf "%b" "Are you sure? (y/N): "
     read -r confirm
     if echo "$confirm" | grep -qE '^[Yy]$'; then
         return 0

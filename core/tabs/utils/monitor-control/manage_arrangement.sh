@@ -13,14 +13,14 @@ manage_arrangement() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Manage Monitor Arrangement${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b\n" "${YELLOW}Choose the monitor to arrange:${RC}"
+    printf "%b" "${YELLOW}Choose the monitor to arrange: ${RC}"
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${YELLOW}$monitor${RC}"
         i=$((i + 1))
     done
 
-    printf "Enter the number of the monitor to arrange: "
+    printf "%b" "Enter the number of the monitor to arrange: "
     read -r monitor_choice
 
     if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
@@ -31,13 +31,13 @@ manage_arrangement() {
     monitor_name=$(echo "$monitor_array" | cut -d' ' -f"$monitor_choice")
 
     clear
-    printf "%b\n" "${YELLOW}Choose position relative to other monitors:${RC}"
+    printf "%b" "${YELLOW}Choose position relative to other monitors: ${RC}"
     printf "%b\n" "1. ${YELLOW}Left of${RC}"
     printf "%b\n" "2. ${YELLOW}Right of${RC}"
     printf "%b\n" "3. ${YELLOW}Above${RC}"
     printf "%b\n" "4. ${YELLOW}Below${RC}"
 
-    printf "Enter the number of the position: "
+    printf "%b" "Enter the number of the position: "
     read -r position_choice
 
     case $position_choice in
@@ -55,7 +55,7 @@ manage_arrangement() {
         fi
     done
 
-    printf "Enter the number of the reference monitor: "
+    printf "%b" "Enter the number of the reference monitor: "
     read -r ref_choice
 
     if ! echo "$ref_choice" | grep -qE '^[0-9]+$' || [ "$ref_choice" -lt 1 ] || [ "$ref_choice" -gt "$((i - 1))" ] || [ "$ref_choice" -eq "$monitor_choice" ]; then
