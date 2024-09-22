@@ -17,16 +17,20 @@ pub enum FloatingTextMode {
 }
 pub struct FloatingText {
     text: Vec<String>,
-    mode: FloatingTextMode,
+    mode_title: &'static str,
     scroll: usize,
 }
 
 impl FloatingText {
     pub fn new(text: Vec<String>, mode: FloatingTextMode) -> Self {
+        let mode_title = match mode {
+            FloatingTextMode::Preview => "Command Preview",
+            FloatingTextMode::Description => "Command Description",
+        };
         Self {
             text,
             scroll: 0,
-            mode,
+            mode_title,
         }
     }
 
@@ -65,14 +69,9 @@ impl FloatingText {
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         // Define the Block with a border and background color
-        let block_title = match self.mode {
-            FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::Description => "Command Description",
-        };
-
         let block = Block::default()
             .borders(Borders::ALL)
-            .title(block_title)
+            .title(self.mode_title)
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())
             .style(Style::default());
@@ -129,7 +128,7 @@ impl FloatContent for FloatingText {
 
     fn get_shortcut_list(&self) -> ShortcutList {
         ShortcutList {
-            scope_name: "Floating text",
+            scope_name: self.mode_title,
             hints: vec![
                 Shortcut::new(vec!["j", "Down"], "Scroll down"),
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
