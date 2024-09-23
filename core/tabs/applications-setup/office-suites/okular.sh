@@ -7,7 +7,7 @@ installOkular() {
         printf "%b\n" "${YELLOW}Installing Okular...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm okular
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm okular
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y okular

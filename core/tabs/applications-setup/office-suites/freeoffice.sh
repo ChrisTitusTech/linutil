@@ -16,7 +16,7 @@ installFreeOffice() {
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install softmaker-freeoffice-2024
             ;;
         pacman)
-            "$AUR_HELPER" -S --noconfirm freeoffice
+            "$AUR_HELPER" -S --needed --noconfirm freeoffice
             ;;
         dnf)
             "$ESCALATION_TOOL" curl -O -qO /etc/yum.repos.d/softmaker.repo https://shop.softmaker.com/repo/softmaker.repo
