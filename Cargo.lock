@@ -491,7 +491,7 @@ checksum = "d8adc4bb1803a324070e64a98ae98f38934d91957a99cfb3a43dcbc01bc56439"
 
 [[package]]
 name = "linutil_core"
-version = "24.9.22"
+version = "24.9.23"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -503,7 +503,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "24.9.22"
+version = "24.9.23"
 dependencies = [
  "ansi-to-tui",
  "anstyle",
