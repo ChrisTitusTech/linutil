@@ -19,16 +19,6 @@ name = "Auto Detect Displays"
 description = "This utility is designed to detect and apply recommended configuration for monitors connected with your system"
 script = "monitor-control/auto_detect_displays.sh"
 
-[[data]]
-name = "Audio Control"
-script = "audio-control.sh"
-task_list = "I SS"
-
-[[data]]
-name = "Auto Mount Drive"
-script = "auto-mount.sh"
-task_list = "PFM"
-
 [[data.entries]]
 name = "Change Orientation"
 description = "This utility is designed to change the orientation of monitors in your system"
@@ -102,6 +92,16 @@ script = "user-account-manager/delete_user.sh"
 [[data.entries]]
 name = "Remove User From Groups"
 script = "user-account-manager/remove_from_group.sh"
+
+[[data]]
+name = "Audio Control"
+script = "audio-control.sh"
+task_list = "I SS"
+
+[[data]]
+name = "Auto Mount Drive"
+script = "auto-mount.sh"
+task_list = "PFM"
 
 [[data]]
 name = "Auto Login"
