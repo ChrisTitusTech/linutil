@@ -11,7 +11,7 @@ use crate::state::{AppState, Focus};
 pub const SHORTCUT_LINES: usize = 2;
 
 pub struct ShortcutList {
-    pub scope_name: &'static str,
+    pub scope_name: String,
     pub hints: Vec<Shortcut>,
 }
 
@@ -114,7 +114,7 @@ fn get_list_item_shortcut(state: &AppState) -> Vec<Shortcut> {
 pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
     match state.focus {
         Focus::Search => ShortcutList {
-            scope_name: "Search bar",
+            scope_name: "Search bar".to_string(),
             hints: vec![Shortcut::new(vec!["Enter"], "Finish search")],
         },
 
@@ -146,13 +146,13 @@ pub fn draw_shortcuts(state: &AppState, frame: &mut Frame, area: Rect) {
             hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
             hints.push(Shortcut::new(vec!["g"], "Important actions guide"));
             ShortcutList {
-                scope_name: "Command list",
+                scope_name: "Command list".to_string(),
                 hints,
             }
         }
 
         Focus::TabList => ShortcutList {
-            scope_name: "Tab list",
+            scope_name: "Tab list".to_string(),
             hints: vec![
                 Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"),
                 Shortcut::new(vec!["l", "Right", "Enter"], "Focus action list"),

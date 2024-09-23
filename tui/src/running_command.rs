@@ -123,12 +123,12 @@ impl FloatContent for RunningCommand {
     fn get_shortcut_list(&self) -> ShortcutList {
         if self.is_finished() {
             ShortcutList {
-                scope_name: "Finished command",
+                scope_name: "Finished command".to_string(),
                 hints: vec![Shortcut::new(vec!["Enter", "q"], "Close window")],
             }
         } else {
             ShortcutList {
-                scope_name: "Running command",
+                scope_name: "Running command".to_string(),
                 hints: vec![Shortcut::new(vec!["CTRL-c"], "Kill the command")],
             }
         }

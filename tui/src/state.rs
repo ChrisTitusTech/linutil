@@ -1,7 +1,7 @@
 use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::{FloatingText, FloatingTextMode},
+    floating_text::FloatingText,
     hint::{draw_shortcuts, SHORTCUT_LINES},
     running_command::RunningCommand,
     theme::Theme,
@@ -415,11 +415,11 @@ impl AppState {
         }
     }
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_command() {
-            if self.selected_commands.contains(&command) {
-                self.selected_commands.retain(|c| c != &command);
+        if let Some(list_node) = self.get_selected_list_node() {
+            if self.selected_commands.contains(&list_node.command) {
+                self.selected_commands.retain(|c| c != &list_node.command);
             } else {
-                self.selected_commands.push(command);
+                self.selected_commands.push(list_node.command);
             }
         }
     }
@@ -470,12 +470,8 @@ impl AppState {
         }
         None
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
-        self.get_selected_node().map(|node| node.command.clone())
-    }
-    fn get_selected_description(&self) -> Option<String> {
-        self.get_selected_node()
-            .map(|node| node.description.clone())
+    pub fn get_selected_list_node(&self) -> Option<ListNode> {
+        self.get_selected_node().cloned()
     }
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
@@ -524,15 +520,17 @@ impl AppState {
         !self.at_root() && selected_index == 0
     }
     fn enable_preview(&mut self) {
-        if let Some(command) = self.get_selected_command() {
-            if let Some(preview) = FloatingText::from_command(&command, FloatingTextMode::Preview) {
+        if let Some(list_node) = self.get_selected_list_node() {
+            let mut preview_title = "[Preview] - ".to_string();
+            preview_title.push_str(list_node.name.as_str());
+            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
     fn enable_description(&mut self) {
-        if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, FloatingTextMode::Description);
+        if let Some(list_node) = self.get_selected_list_node() {
+            let description = FloatingText::new(list_node.description, "Command Description");
             self.spawn_float(description, 80, 80);
         }
     }
@@ -540,8 +538,8 @@ impl AppState {
     fn handle_enter(&mut self) {
         if self.selected_item_is_cmd() {
             if self.selected_commands.is_empty() {
-                if let Some(cmd) = self.get_selected_command() {
-                    self.selected_commands.push(cmd);
+                if let Some(list_node) = self.get_selected_list_node() {
+                    self.selected_commands.push(list_node.command);
                 }
             }
             let command = RunningCommand::new(self.selected_commands.clone());
@@ -576,7 +574,7 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
             80,
             80,
         );
