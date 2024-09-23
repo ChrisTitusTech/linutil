@@ -91,6 +91,21 @@ script = "communication-apps/thunderbird-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Linutil"
+
+[[data.entries]]
+name = "Linutil Installer"
+description = "Installs a distro-specific Linutil package locally."
+script = "linutil-installer.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Linutil Updater"
+description = "Updates your local Linutil crate installation."
+script = "linutil-updater.sh"
+task_list = "I"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -152,28 +167,6 @@ name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.\nkitty is written in a mix of C and Python programming languages.\n This command installs and configures kitty."
 script = "kitty-setup.sh"
 task_list = "I FM"
-
-[[data]]
-name = "Linutil Installer"
-description = "Installs a distro-specific Linutil package locally."
-script = "linutil-installer.sh"
-task_list = "I"
-
-[[data.preconditions]]
-matches = false
-data = "command_exists"
-values = [ "linutil" ]
-
-[[data]]
-name = "Linutil Updater"
-description = "Updates your local Linutil crate installation."
-script = "linutil-updater.sh"
-task_list = "I"
-
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = [ "linutil" ]
 
 [[data]]
 name = "Office Suite"
