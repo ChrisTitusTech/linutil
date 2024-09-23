@@ -117,8 +117,6 @@ task_list = "I"
 name = "PDF Suites"
 
 [[data.entries]]
-
-[[data.entries]]
 name = "Evince"
 script = "pdf-suites/evince.sh"
 task_list = "I"
