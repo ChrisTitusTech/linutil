@@ -20,6 +20,11 @@ description = "This utility is designed to detect and apply recommended configur
 script = "monitor-control/auto_detect_displays.sh"
 
 [[data]]
+name = "Audio Control"
+script = "audio-control.sh"
+task_list = "I SS"
+
+[[data]]
 name = "Auto Mount Drive"
 script = "auto-mount.sh"
 task_list = "PFM"
