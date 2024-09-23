@@ -15,7 +15,7 @@ default = ["tips"]
 tips = ["rand"]
 
 [dependencies]
-clap = { version = "4.5.16", features = ["derive"] }
+clap = { version = "4.5.18", features = ["derive"] }
 crossterm = "0.28.1"
 ego-tree = { workspace = true }
 oneshot = "0.1.8"
