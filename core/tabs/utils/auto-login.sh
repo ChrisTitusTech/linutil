@@ -43,9 +43,9 @@ configure_lightdm() {
     printf "%b" "Enter username for LightDM autologin: "
     read -r user
 
-    "$ESCALATION_TOOL" "printf '[Seat:*]' > /etc/lightdm/lightdm.conf.d/50-autologin.conf"
-    "$ESCALATION_TOOL" "printf 'autologin-user=$user' >> /etc/lightdm/lightdm.conf.d/50-autologin.conf"
-    "$ESCALATION_TOOL" "printf 'autologin-user-timeout=0' >> /etc/lightdm/lightdm.conf.d/50-autologin.conf"
+    printf "%b\n" '[Seat:*]' | "$ESCALATION_TOOL" tee /etc/lightdm/lightdm.conf.d/50-autologin.conf
+    printf "%s\n" "autologin-user=$user" | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf.d/50-autologin.conf
+    printf "%b\n" 'autologin-user-timeout=0' | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf.d/50-autologin.conf
 
     printf "%b\n" "LightDM has been configured for autologin."
 }
@@ -63,9 +63,9 @@ configure_gdm() {
     printf "%b" "Enter username for GDM autologin: "
     read -r user
 
-    "$ESCALATION_TOOL" "printf '[daemon]' > /etc/gdm/custom.conf"
-    "$ESCALATION_TOOL" "printf 'AutomaticLoginEnable = true' >> /etc/gdm/custom.conf"
-    "$ESCALATION_TOOL" "printf 'AutomaticLogin = $user' >> /etc/gdm/custom.conf"
+    printf "%b\n" '[daemon]' | "$ESCALATION_TOOL" tee /etc/gdm/custom.conf
+    printf "%b\n" 'AutomaticLoginEnable = true' | "$ESCALATION_TOOL" tee -a /etc/gdm/custom.conf
+    printf "%s\n" "AutomaticLogin = $user" | "$ESCALATION_TOOL" tee -a /etc/gdm/custom.conf
 
     printf "%b\n" "GDM has been configured for autologin."
 }
@@ -85,9 +85,9 @@ configure_sddm() {
     read -r user
     list_sessions  # Show session options
 
-    "$ESCALATION_TOOL" "printf '[Autologin]' > /etc/sddm.conf"
-    "$ESCALATION_TOOL" "printf 'User=$user' >> /etc/sddm.conf"
-    "$ESCALATION_TOOL" "printf 'Session=$session' >> /etc/sddm.conf"
+    printf "%b\n" '[Autologin]' | "$ESCALATION_TOOL" tee /etc/sddm.conf
+    printf "%s\n" "User=$user" | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
+    printf "%s\n" "Session=$session" | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
 
     printf "%b\n" "SDDM has been configured for autologin."
 }
