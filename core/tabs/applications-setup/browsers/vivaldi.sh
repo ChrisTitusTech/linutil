@@ -2,17 +2,22 @@
 
 . ../../common-script.sh
 
-if ! command_exists vivaldi; then
-    printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
-    curl -fsSL https://downloads.vivaldi.com/snapshot/install-vivaldi.sh | sh
-    if [ $? -eq 0 ]; then
-        printf "%b\n" "${GREEN}Vivaldi installed successfully!${RC}"
+installLynx() {
+    if ! command_exists lynx; then
+        printf "%b\n" "${YELLOW}Installing Lynx...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm lynx
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
+                ;;
+        esac
     else
-        printf "%b\n" "${RED}Vivaldi installation failed!${RC}"
+        printf "%b\n" "${GREEN}Lynx TUI Browser is already installed.${RC}"
     fi
-else
-    printf "%b\n" "${GREEN}Vivaldi Browser is already installed.${RC}"
-fi
+}
 
 checkEnv
 checkEscalationTool
+installLynx
