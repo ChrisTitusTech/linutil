@@ -96,13 +96,13 @@ name = "Linutil"
 [[data.entries]]
 name = "Linutil Installer"
 description = "Installs a distro-specific Linutil package locally."
-script = "linutil-installer.sh"
+script = "linutil/linutil-installer.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Linutil Updater"
 description = "Updates your local Linutil crate installation."
-script = "linutil-updater.sh"
+script = "linutil/linutil-updater.sh"
 task_list = "I"
 
 [[data]]
