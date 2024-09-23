@@ -81,7 +81,7 @@ setVolume() {
         clear
         printf "%b" "Enter the volume percentage (1-100): "
         read -r volume
-        if [ "$volume" -ge 1 ] && [ "$volume" -le 100 ]; then
+        if [ "$volume" -eq "$volume" ] 2>/dev/null && [ "$volume" -ge 1 ] && [ "$volume" -le 100 ]; then
             if pactl set-sink-volume @DEFAULT_SINK@ "$volume%"; then
                 printf "%b\n" "${GREEN}Volume set to $volume% successfully.${RC}"
             else
