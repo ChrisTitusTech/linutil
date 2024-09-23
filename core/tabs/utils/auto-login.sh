@@ -43,9 +43,9 @@ configure_lightdm() {
     printf "%b" "Enter username for LightDM autologin: "
     read -r user
 
-    printf "%b\n" '[Seat:*]' | "$ESCALATION_TOOL" tee /etc/lightdm/lightdm.conf.d/50-autologin.conf
-    printf "%s\n" "autologin-user=$user" | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf.d/50-autologin.conf
-    printf "%b\n" 'autologin-user-timeout=0' | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf.d/50-autologin.conf
+    printf "%b\n" '[Seat:*]' | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf
+    printf "%s\n" "autologin-user=$user" | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf
+    printf "%b\n" 'autologin-user-timeout=0' | "$ESCALATION_TOOL" tee -a /etc/lightdm/lightdm.conf
 
     printf "%b\n" "LightDM has been configured for autologin."
 }
@@ -53,7 +53,8 @@ configure_lightdm() {
 # Function to remove LightDM autologin
 remove_lightdm_autologin() {
     printf "%b\n" "Removing LightDM autologin configuration..."
-    "$ESCALATION_TOOL" rm -f /etc/lightdm/lightdm.conf.d/50-autologin.conf
+    "$ESCALATION_TOOL" sed -i '/^\[Seat:\*]/d' /etc/lightdm/lightdm.conf
+    "$ESCALATION_TOOL" sed -i '/^autologin-/d' /etc/lightdm/lightdm.conf
     printf "%b\n" "LightDM autologin configuration has been removed."
 }
 
@@ -63,7 +64,7 @@ configure_gdm() {
     printf "%b" "Enter username for GDM autologin: "
     read -r user
 
-    printf "%b\n" '[daemon]' | "$ESCALATION_TOOL" tee /etc/gdm/custom.conf
+    printf "%b\n" '[daemon]' | "$ESCALATION_TOOL" tee -a /etc/gdm/custom.conf
     printf "%b\n" 'AutomaticLoginEnable = true' | "$ESCALATION_TOOL" tee -a /etc/gdm/custom.conf
     printf "%s\n" "AutomaticLogin = $user" | "$ESCALATION_TOOL" tee -a /etc/gdm/custom.conf
 
@@ -85,7 +86,7 @@ configure_sddm() {
     read -r user
     list_sessions  # Show session options
 
-    printf "%b\n" '[Autologin]' | "$ESCALATION_TOOL" tee /etc/sddm.conf
+    printf "%b\n" '[Autologin]' | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
     printf "%s\n" "User=$user" | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
     printf "%s\n" "Session=$session" | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
 
