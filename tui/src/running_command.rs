@@ -112,12 +112,6 @@ impl FloatContent for RunningCommand {
             KeyCode::PageDown => {
                 self.scroll_offset = self.scroll_offset.saturating_sub(10);
             }
-            KeyCode::Up => {
-                self.scroll_offset = self.scroll_offset.saturating_add(1);
-            }
-            KeyCode::Down => {
-                self.scroll_offset = self.scroll_offset.saturating_sub(1);
-            }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
         }
@@ -137,12 +131,20 @@ impl FloatContent for RunningCommand {
         if self.is_finished() {
             ShortcutList {
                 scope_name: "Finished command",
-                hints: vec![Shortcut::new(vec!["Enter", "q"], "Close window")],
+                hints: vec![
+                    Shortcut::new(vec!["Enter", "q"], "Close window"),
+                    Shortcut::new(vec!["Page up"], "Scroll up"),
+                    Shortcut::new(vec!["Page down"], "Scroll down"),
+                ],
             }
         } else {
             ShortcutList {
                 scope_name: "Running command",
-                hints: vec![Shortcut::new(vec!["CTRL-c"], "Kill the command")],
+                hints: vec![
+                    Shortcut::new(vec!["CTRL-c"], "Kill the command"),
+                    Shortcut::new(vec!["Page up"], "Scroll up"),
+                    Shortcut::new(vec!["Page down"], "Scroll down"),
+                ],
             }
         }
     }
@@ -311,6 +313,8 @@ impl RunningCommand {
             KeyCode::Backspace => vec![0x7f],
             KeyCode::Left => vec![27, 91, 68],
             KeyCode::Right => vec![27, 91, 67],
+            KeyCode::Up => vec![27, 91, 65],
+            KeyCode::Down => vec![27, 91, 66],
             KeyCode::Tab => vec![9],
             KeyCode::Home => vec![27, 91, 72],
             KeyCode::End => vec![27, 91, 70],
