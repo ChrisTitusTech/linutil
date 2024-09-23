@@ -137,13 +137,13 @@ script = "fastfetch-setup.sh"
 task_list = "I FM"
 
 [[data]]
-name = "Flatpak / Flathub"
+name = "Flatpak"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 task_list = "I"
 
 [[data]]
-name = "Grub Theme"
+name = "Grub"
 script = "grub-theme.sh"
 task_list = "PFM"
 
@@ -198,7 +198,7 @@ data = { environment = "XDG_SESSION_TYPE" }
 values = [ "wayland", "Wayland" ]
 
 [[data]]
-name = "ZSH Prompt"
+name = "ZSH"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
 task_list = "I FM"
