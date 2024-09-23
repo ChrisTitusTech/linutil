@@ -91,6 +91,52 @@ script = "communication-apps/thunderbird-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Office Suites"
+
+[[data.entries]]
+name = "Evince"
+script = "office-suites/evince.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "FreeOffice"
+script = "office-suites/freeoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "LibreOffice"
+script = "office-suites/libreoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Okular"
+script = "office-suites/okular.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OnlyOffice"
+script = "office-suites/onlyoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "WPS Office"
+script = "office-suites/wpsoffice.sh"
+task_list = "I"
+
+[[data]]
+name = "PDF Suites"
+
+[[data.entries]]
+name = "PDF Studio"
+script = "pdf-suites/pdfstudio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "PDF Studio Viewer"
+script = "pdf-suites/pdfstudioviewer.sh"
+task_list = "I"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -174,12 +220,6 @@ task_list = "I"
 matches = true
 data = "command_exists"
 values = [ "linutil" ]
-
-[[data]]
-name = "Office Suite"
-description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
-script = "office-suite-setup.sh"
-task_list = "I"
 
 [[data]]
 name = "Rofi"
