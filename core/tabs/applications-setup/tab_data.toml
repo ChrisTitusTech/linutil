@@ -94,11 +94,6 @@ task_list = "I"
 name = "Office Suites"
 
 [[data.entries]]
-name = "FreeOffice"
-script = "office-suites/freeoffice.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "LibreOffice"
 script = "office-suites/libreoffice.sh"
 task_list = "I"
@@ -106,6 +101,11 @@ task_list = "I"
 [[data.entries]]
 name = "OnlyOffice"
 script = "office-suites/onlyoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "FreeOffice"
+script = "office-suites/freeoffice.sh"
 task_list = "I"
 
 [[data.entries]]
