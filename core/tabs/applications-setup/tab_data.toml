@@ -103,7 +103,7 @@ script = "android-debloat.sh"
 task_list = "I"
 
 [[data]]
-name = "Bash Prompt"
+name = "Bash"
 description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.\nIt is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.\nThis command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "mybash-setup.sh"
 task_list = "I FM"
