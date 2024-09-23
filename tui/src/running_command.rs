@@ -40,6 +40,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    scroll_offset: usize,
 }
 
 impl FloatContent for RunningCommand {
@@ -104,6 +105,18 @@ impl FloatContent for RunningCommand {
             // Close the window when Enter is pressed and the command is finished
             KeyCode::Enter if self.is_finished() => {
                 return true;
+            }
+            KeyCode::PageUp => {
+                self.scroll_offset = self.scroll_offset.saturating_add(10);
+            }
+            KeyCode::PageDown => {
+                self.scroll_offset = self.scroll_offset.saturating_sub(10);
+            }
+            KeyCode::Up => {
+                self.scroll_offset = self.scroll_offset.saturating_add(1);
+            }
+            KeyCode::Down => {
+                self.scroll_offset = self.scroll_offset.saturating_sub(1);
             }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
@@ -223,6 +236,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            scroll_offset: 0,
         }
     }
 
@@ -240,10 +254,12 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 0);
+        let mut parser = vt100::Parser::new(size.height, size.width, 200);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
+        // Adjust the screen content based on the scroll offset
+        parser.set_scrollback(self.scroll_offset);
         parser.screen().clone()
     }
 
