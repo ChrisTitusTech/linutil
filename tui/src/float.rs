@@ -60,6 +60,7 @@ impl Float {
             | KeyCode::Char('p')
             | KeyCode::Char('d')
             | KeyCode::Char('g')
+            | KeyCode::Char('q')
             | KeyCode::Esc
                 if self.content.is_finished() =>
             {

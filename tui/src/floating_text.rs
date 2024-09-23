@@ -301,7 +301,7 @@ impl FloatContent for FloatingText {
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
                 Shortcut::new(vec!["h", "Left"], "Scroll left"),
                 Shortcut::new(vec!["l", "Right"], "Scroll right"),
-                Shortcut::new(vec!["Enter", "p", "d", "g"], "Close window"),
+                Shortcut::new(vec!["Enter", "p", "q", "d", "g"], "Close window"),
             ],
         }
     }
