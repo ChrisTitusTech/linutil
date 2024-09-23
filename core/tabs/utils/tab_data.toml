@@ -19,11 +19,6 @@ name = "Auto Detect Displays"
 description = "This utility is designed to detect and apply recommended configuration for monitors connected with your system"
 script = "monitor-control/auto_detect_displays.sh"
 
-[[data]]
-name = "Auto Mount Drive"
-script = "auto-mount.sh"
-task_list = "PFM"
-
 [[data.entries]]
 name = "Change Orientation"
 description = "This utility is designed to change the orientation of monitors in your system"
@@ -59,11 +54,6 @@ name = "Reset Scaling"
 description = "This utility is designed to reset scaling of a monitor in your system"
 script = "monitor-control/reset_scaling.sh"
 matches = true
-
-[[data]]
-name = "SSH-Samba"
-script = "samba-ssh-setup.sh"
-task_list = "I SS PFM"
 
 [[data.entries]]
 name = "Scale Monitors"
@@ -102,6 +92,11 @@ script = "user-account-manager/delete_user.sh"
 [[data.entries]]
 name = "Remove User From Groups"
 script = "user-account-manager/remove_from_group.sh"
+
+[[data]]
+name = "Auto Mount Drive"
+script = "auto-mount.sh"
+task_list = "PFM"
 
 [[data]]
 name = "Auto Login"
@@ -151,6 +146,11 @@ task_list = "I PFM SS"
 name = "SSH Commands"
 script = "ssh.sh"
 task_list = "I FM SS"
+
+[[data]]
+name = "SSH Samba"
+script = "samba-ssh-setup.sh"
+task_list = "I SS PFM"
 
 [[data]]
 name = "Timeshift Backup"
