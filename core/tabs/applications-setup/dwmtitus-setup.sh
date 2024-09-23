@@ -207,8 +207,14 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        DM="sddm"
-        printf "%b\n" "${YELLOW}No display manager found, installing $DM${RC}"
+        printf "%b\n" "${YELLOW}--------------------------${RC}" 
+        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
+        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
+        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
+        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
+        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b" "${YELLOW}Please select one: ${RC}"
+        read -r DM
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
