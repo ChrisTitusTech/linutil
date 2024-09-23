@@ -94,11 +94,6 @@ task_list = "I"
 name = "Office Suites"
 
 [[data.entries]]
-name = "Evince"
-script = "office-suites/evince.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "FreeOffice"
 script = "office-suites/freeoffice.sh"
 task_list = "I"
@@ -106,11 +101,6 @@ task_list = "I"
 [[data.entries]]
 name = "LibreOffice"
 script = "office-suites/libreoffice.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Okular"
-script = "office-suites/okular.sh"
 task_list = "I"
 
 [[data.entries]]
@@ -125,6 +115,18 @@ task_list = "I"
 
 [[data]]
 name = "PDF Suites"
+
+[[data.entries]]
+
+[[data.entries]]
+name = "Evince"
+script = "pdf-suites/evince.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Okular"
+script = "pdf-suites/okular.sh"
+task_list = "I"
 
 [[data.entries]]
 name = "PDF Studio"
