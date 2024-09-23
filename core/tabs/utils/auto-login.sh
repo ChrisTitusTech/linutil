@@ -29,7 +29,7 @@ list_sessions() {
         8) session="openbox.desktop" ;;
         9) session="i3.desktop" ;;
         10) 
-            printf "%b" "Enter custom session name (e.g., mysession.desktop): "
+            printf "%b" "Enter custom session name (e.g., mysession): "
             read -r session ;;
         *) 
             printf "%b\n" "Invalid option selected."
