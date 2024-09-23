@@ -94,39 +94,9 @@ task_list = "I"
 name = "Web Browsers"
 
 [[data.entries]]
-name = "Google Chrome"
-description = "Google Chrome is a fast, secure, and free web browser, built for the modern web."
-script = "browsers/google-chrome.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Thorium"
-description = "Thorium is a Chromium-based browser focused on privacy and performance."
-script = "browsers/thorium.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Mozilla Firefox"
-description = "Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation."
-script = "browsers/firefox.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "LibreWolf"
-description = "LibreWolf is a fork of Firefox, focused on privacy, security, and freedom."
-script = "browsers/librewolf.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "Brave"
 description = "Brave is a free and open-source web browser developed by Brave Software, Inc. based on the Chromium web browser."
 script = "browsers/brave.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Vivaldi"
-description = "Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies."
-script = "browsers/vivaldi.sh"
 task_list = "I"
 
 [[data.entries]]
@@ -136,9 +106,39 @@ script = "browsers/chromium.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Google Chrome"
+description = "Google Chrome is a fast, secure, and free web browser, built for the modern web."
+script = "browsers/google-chrome.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "LibreWolf"
+description = "LibreWolf is a fork of Firefox, focused on privacy, security, and freedom."
+script = "browsers/librewolf.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Lynx"
 description = "Lynx is a highly configurable text-based web browser for use on cursor-addressable character cell terminals."
 script = "browsers/lynx.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Mozilla Firefox"
+description = "Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation."
+script = "browsers/firefox.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Thorium"
+description = "Thorium is a Chromium-based browser focused on privacy and performance."
+script = "browsers/thorium.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Vivaldi"
+description = "Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies."
+script = "browsers/vivaldi.sh"
 task_list = "I"
 
 [[data]]
