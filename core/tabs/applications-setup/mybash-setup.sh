@@ -61,8 +61,8 @@ installStarshipAndFzf() {
     if command_exists fzf; then
         printf "%b\n" "${GREEN}Fzf already installed${RC}"
     else
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        "$ESCALATION_TOOL" ~/.fzf/install
+        git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+        "$ESCALATION_TOOL" "$HOME/.fzf/install"
     fi
 }
 

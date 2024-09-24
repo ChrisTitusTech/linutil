@@ -3,15 +3,15 @@
 . ../common-script.sh
 
 # Check if ~/.ssh/config exists, if not, create it
-if [ ! -f ~/.ssh/config ]; then
-    touch ~/.ssh/config
-    chmod 600 ~/.ssh/config
+if [ ! -f "$HOME/.ssh/config" ]; then
+    touch "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
 fi
 
 # Function to show available hosts from ~/.ssh/config
 show_available_hosts() {
     printf "%b\n" "Available Systems:"
-    grep -E "^Host " ~/.ssh/config | awk '{print $2}'
+    grep -E "^Host " "$HOME/.ssh/config" | awk '{print $2}'
     printf "%b\n" "-------------------"
 }
 
@@ -27,18 +27,18 @@ ask_for_host_details() {
         printf "%b\n" "Host $host_alias"
         printf "%b\n" "    HostName $host"
         printf "%b\n" "    User $user"
-        printf "%b\n" "    IdentityFile ~/.ssh/id_rsa"
+        printf "%b\n" "    IdentityFile $HOME/.ssh/id_rsa"
         printf "%b\n" "    StrictHostKeyChecking no"
         printf "%b\n" "    UserKnownHostsFile=/dev/null"
-    } >> ~/.ssh/config
+    } >> "$HOME/.ssh/config"
     printf "%b\n" "Host $host_alias added successfully."
 }
 
 # Function to generate SSH key if not exists
 generate_ssh_key() {
-    if [ ! -f ~/.ssh/id_rsa ]; then
+    if [ ! -f "$HOME/.ssh/id_rsa" ]; then
         printf "%b\n" "SSH key not found, generating one..."
-        ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N "" -C "$(whoami)@$(hostname)"
+        ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa -N" "" -C "$(whoami)@$(hostname)"
     else
         printf "%b\n" "SSH key already exists."
     fi
@@ -150,7 +150,7 @@ move_directory_to_remote() {
 remove_system() {
     printf "%b\n" "Enter the alias of the host to remove: "
     read -r host_alias
-    sed -i "/^Host $host_alias/,+3d" ~/.ssh/config
+    sed -i "/^Host $host_alias/,+3d" "$HOME/.ssh/config"
     printf "%b\n" "Removed $host_alias from SSH configuration."
 }
 
@@ -159,9 +159,9 @@ view_ssh_config() {
     printf "%b\n" "Enter the alias of the host to view (or press Enter to view all): "
     read -r  host_alias
     if [ -z "$host_alias" ]; then
-        cat ~/.ssh/config
+        cat "$HOME/.ssh/config"
     else
-        grep -A 3 "^Host $host_alias" ~/.ssh/config
+        grep -A 3 "^Host $host_alias" "$HOME/.ssh/config"
     fi
 }
 

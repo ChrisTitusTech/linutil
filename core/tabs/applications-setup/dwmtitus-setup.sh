@@ -129,7 +129,7 @@ picom_animations() {
 
 clone_config_folders() {
     # Ensure the target directory exists
-    [ ! -d ~/.config ] && mkdir -p ~/.config
+    [ ! -d "$HOME/.config" ] && mkdir -p "$HOME/.config"
 
     # Iterate over all directories in config/*
     for dir in config/*/; do
@@ -138,7 +138,7 @@ clone_config_folders() {
 
         # Clone the directory to ~/.config/
         if [ -d "$dir" ]; then
-            cp -r "$dir" ~/.config/
+            cp -r "$dir" "$HOME/.config/"
             printf "%b\n" "${GREEN}Cloned $dir_name to ~/.config/${RC}"
         else
             printf "%b\n" "${RED}Directory $dir_name does not exist, skipping${RC}"
@@ -157,7 +157,7 @@ configure_backgrounds() {
     if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         printf "%b\n" "${RED}Pictures directory does not exist${RC}"
-        mkdir ~/Pictures
+        mkdir "$HOME/Pictures"
         printf "%b\n" "${GREEN}Directory was created in Home folder${RC}"
     fi
 
