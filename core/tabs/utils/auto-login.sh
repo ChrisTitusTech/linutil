@@ -53,8 +53,8 @@ configure_lightdm() {
 # Function to remove LightDM autologin
 remove_lightdm_autologin() {
     printf "%b\n" "Removing LightDM autologin configuration..."
-    "$ESCALATION_TOOL" sed -i '/^\[Seat:\*]/d' /etc/lightdm/lightdm.conf
-    "$ESCALATION_TOOL" sed -i '/^autologin-/d' /etc/lightdm/lightdm.conf
+    "$ESCALATION_TOOL" sed -i'' '/^\[Seat:\*]/d' /etc/lightdm/lightdm.conf
+    "$ESCALATION_TOOL" sed -i'' '/^autologin-/d' /etc/lightdm/lightdm.conf
     printf "%b\n" "LightDM autologin configuration has been removed."
 }
 
@@ -74,8 +74,8 @@ configure_gdm() {
 # Function to remove GDM autologin
 remove_gdm_autologin() {
     printf "%b\n" "Removing GDM autologin configuration..."
-    "$ESCALATION_TOOL" sed -i '/AutomaticLoginEnable/d' /etc/gdm/custom.conf
-    "$ESCALATION_TOOL" sed -i '/AutomaticLogin/d' /etc/gdm/custom.conf
+    "$ESCALATION_TOOL" sed -i'' '/AutomaticLoginEnable/d' /etc/gdm/custom.conf
+    "$ESCALATION_TOOL" sed -i'' '/AutomaticLogin/d' /etc/gdm/custom.conf
     printf "%b\n" "GDM autologin configuration has been removed."
 }
 
@@ -96,7 +96,7 @@ configure_sddm() {
 # Function to remove SDDM autologin
 remove_sddm_autologin() {
     printf "%b\n" "Removing SDDM autologin configuration..."
-    "$ESCALATION_TOOL" sed -i '/\[Autologin\]/,+2d' /etc/sddm.conf
+    "$ESCALATION_TOOL" sed -i'' '/\[Autologin\]/,+2d' /etc/sddm.conf
     printf "%b\n" "SDDM autologin configuration has been removed."
 }
 
@@ -107,8 +107,8 @@ configure_lxdm() {
     read -r user
     list_sessions  # Show session options
     
-    "$ESCALATION_TOOL" sed -i "s/^#.*autologin=.*$/autologin=${user}/" /etc/lxdm/lxdm.conf
-    "$ESCALATION_TOOL" sed -i "s|^#.*session=.*$|session=/usr/bin/${session}|; s|^session=.*$|session=/usr/bin/${session}|" /etc/lxdm/lxdm.conf
+    "$ESCALATION_TOOL" sed -i'' "s/^#.*autologin=.*$/autologin=${user}/" /etc/lxdm/lxdm.conf
+    "$ESCALATION_TOOL" sed -i'' "s|^#.*session=.*$|session=/usr/bin/${session}|; s|^session=.*$|session=/usr/bin/${session}|" /etc/lxdm/lxdm.conf
 
     printf "%b\n" "LXDM has been configured for autologin."
 }
@@ -116,8 +116,8 @@ configure_lxdm() {
 # Function to remove LXDM autologin
 remove_lxdm_autologin() {
     printf "%b\n" "Removing LXDM autologin configuration..."
-    "$ESCALATION_TOOL" sed -i "s/^autologin=.*$/#autologin=/" /etc/lxdm/lxdm.conf
-    "$ESCALATION_TOOL" sed -i "s/^session=.*$/#session=/" /etc/lxdm/lxdm.conf
+    "$ESCALATION_TOOL" sed -i'' "s/^autologin=.*$/#autologin=/" /etc/lxdm/lxdm.conf
+    "$ESCALATION_TOOL" sed -i'' "s/^session=.*$/#session=/" /etc/lxdm/lxdm.conf
     printf "%b\n" "LXDM autologin configuration has been removed."
 }
 
