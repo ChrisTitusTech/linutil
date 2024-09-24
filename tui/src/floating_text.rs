@@ -4,10 +4,7 @@ use std::{
     io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
 };
 
-use crate::{
-    float::FloatContent,
-    hint::{Shortcut, ShortcutList},
-};
+use crate::{float::FloatContent, hint::Shortcut};
 
 use linutil_core::Command;
 
@@ -293,16 +290,16 @@ impl FloatContent for FloatingText {
         true
     }
 
-    fn get_shortcut_list(&self) -> ShortcutList {
-        ShortcutList {
-            scope_name: self.mode_title,
-            hints: vec![
+    fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
+        (
+            self.mode_title,
+            Box::new([
                 Shortcut::new(vec!["j", "Down"], "Scroll down"),
                 Shortcut::new(vec!["k", "Up"], "Scroll up"),
                 Shortcut::new(vec!["h", "Left"], "Scroll left"),
                 Shortcut::new(vec!["l", "Right"], "Scroll right"),
                 Shortcut::new(vec!["Enter", "p", "d", "g"], "Close window"),
-            ],
-        }
+            ]),
+        )
     }
 }

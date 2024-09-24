@@ -2,7 +2,7 @@ use crate::{
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::{FloatingText, FloatingTextMode},
-    hint::{draw_shortcuts, SHORTCUT_LINES},
+    hint::{create_shortcut_list, Shortcut},
     running_command::RunningCommand,
     theme::Theme,
 };
@@ -12,9 +12,9 @@ use linutil_core::{Command, ListNode, Tab};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Flex, Layout},
     style::{Style, Stylize},
-    text::{Line, Span},
+    text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
@@ -93,6 +93,81 @@ impl AppState {
         state.update_items();
         state
     }
+
+    fn get_list_item_shortcut(&self) -> Vec<Shortcut> {
+        if self.selected_item_is_dir() {
+            vec![Shortcut::new(
+                vec!["l", "Right", "Enter"],
+                "Go to selected dir",
+            )]
+        } else {
+            vec![
+                Shortcut::new(vec!["l", "Right", "Enter"], "Run selected command"),
+                Shortcut::new(vec!["p"], "Enable preview"),
+                Shortcut::new(vec!["d"], "Command Description"),
+            ]
+        }
+    }
+
+    pub fn get_keybinds(&self) -> (&str, Box<[Shortcut]>) {
+        match self.focus {
+            Focus::Search => (
+                "Search bar",
+                Box::new([Shortcut::new(vec!["Enter"], "Finish search")]),
+            ),
+
+            Focus::List => {
+                let mut hints = Vec::new();
+                hints.push(Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"));
+
+                if self.at_root() {
+                    hints.push(Shortcut::new(vec!["h", "Left"], "Focus tab list"));
+                    hints.extend(self.get_list_item_shortcut());
+                } else if self.selected_item_is_up_dir() {
+                    hints.push(Shortcut::new(
+                        vec!["l", "Right", "Enter", "h", "Left"],
+                        "Go to parent directory",
+                    ));
+                } else {
+                    hints.push(Shortcut::new(vec!["h", "Left"], "Go to parent directory"));
+                    hints.extend(self.get_list_item_shortcut());
+                }
+
+                hints.push(Shortcut::new(vec!["k", "Up"], "Select item above"));
+                hints.push(Shortcut::new(vec!["j", "Down"], "Select item below"));
+                hints.push(Shortcut::new(vec!["t"], "Next theme"));
+                hints.push(Shortcut::new(vec!["T"], "Previous theme"));
+
+                if self.is_current_tab_multi_selectable() {
+                    hints.push(Shortcut::new(vec!["v"], "Toggle multi-selection mode"));
+                    hints.push(Shortcut::new(vec!["Space"], "Select multiple commands"));
+                }
+
+                hints.push(Shortcut::new(vec!["Tab"], "Next tab"));
+                hints.push(Shortcut::new(vec!["Shift-Tab"], "Previous tab"));
+                hints.push(Shortcut::new(vec!["g"], "Important actions guide"));
+
+                ("Command list", hints.into_boxed_slice())
+            }
+
+            Focus::TabList => (
+                "Tab list",
+                Box::new([
+                    Shortcut::new(vec!["q", "CTRL-c"], "Exit linutil"),
+                    Shortcut::new(vec!["l", "Right", "Enter"], "Focus action list"),
+                    Shortcut::new(vec!["k", "Up"], "Select item above"),
+                    Shortcut::new(vec!["j", "Down"], "Select item below"),
+                    Shortcut::new(vec!["t"], "Next theme"),
+                    Shortcut::new(vec!["T"], "Previous theme"),
+                    Shortcut::new(vec!["Tab"], "Next tab"),
+                    Shortcut::new(vec!["Shift-Tab"], "Previous tab"),
+                ]),
+            ),
+
+            Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
+        }
+    }
+
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
@@ -153,12 +228,26 @@ impl AppState {
             .unwrap_or(0)
             .max(str1.len() + str2.len());
 
+        let (keybind_scope, shortcuts) = self.get_keybinds();
+
+        let keybind_render_width = terminal_size.width - 2;
+
+        let keybinds_block = Block::default()
+            .title(format!(" {} ", keybind_scope))
+            .borders(Borders::all());
+
+        let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
+        let n_lines = keybinds.len() as u16;
+
+        let keybind_para = Paragraph::new(Text::from_iter(keybinds)).block(keybinds_block);
+
         let vertical = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Percentage(100),
-                Constraint::Min(2 + SHORTCUT_LINES as u16),
+                Constraint::Percentage(0),
+                Constraint::Max(n_lines as u16 + 2),
             ])
+            .flex(Flex::Legacy)
             .margin(0)
             .split(frame.area());
 
@@ -305,7 +394,7 @@ impl AppState {
             float.draw(frame, chunks[1]);
         }
 
-        draw_shortcuts(self, frame, vertical[1]);
+        frame.render_widget(keybind_para, vertical[1]);
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
