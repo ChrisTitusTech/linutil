@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 installPdfstudioviewer() {
-    if ! command_exists pdfstudioviewer2024/pdfstudioviewer2024; then
+    if ! command_exists pdfstudioviewer2024; then
         printf "%b\n" "${YELLOW}Installing PDF Studio Viewer...${RC}"
         curl -O https://download.qoppa.com/pdfstudioviewer/PDFStudioViewer_linux64.sh
         "$ESCALATION_TOOL" chmod +x PDFStudioViewer_linux64.sh
