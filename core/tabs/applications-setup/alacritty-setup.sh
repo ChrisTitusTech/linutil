@@ -20,8 +20,11 @@ installAlacritty() {
 
 setupAlacrittyConfig() {
     printf "%b\n" "${YELLOW}Copying alacritty config files...${RC}"
-    if [ -d "${HOME}/.config/alacritty" ] && [ ! -d "${HOME}/.config/alacritty-bak" ]; then
-        cp -r "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-bak"
+    if [ -d "${HOME}/.config/alacritty" ]; then
+        if [ -d "${HOME}/.config/alacritty-linutilbak" ]; then
+            rm -rf "${HOME}/.config/alacritty-linutilbak"
+        fi
+        mv "${HOME}/.config/alacritty" "${HOME}/.config/alacritty-linutilbak"
     fi
     mkdir -p "${HOME}/.config/alacritty/"
     curl -sSLo "${HOME}/.config/alacritty/alacritty.toml" "https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/alacritty/alacritty.toml"

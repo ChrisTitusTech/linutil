@@ -45,10 +45,12 @@ installNeovim() {
 
 backupNeovimConfig() {
     printf "%b\n" "${YELLOW}Backing up existing configuration files...${RC}"
-    if [ -d "$HOME/.config/nvim" ] && [ ! -d "$HOME/.config/nvim-backup" ]; then
-        cp -r "$HOME/.config/nvim" "$HOME/.config/nvim-backup"
+    if [ -d "$HOME/.config/nvim" ]; then
+        if [ -d "$HOME/.config/nvim-linutilbak" ]; then
+            rm -rf "$HOME/.config/nvim-linutilbak"
+        fi
+        mv "$HOME/.config/nvim" "$HOME/.config/nvim-linutilbak"
     fi
-    rm -rf "$HOME/.config/nvim"
 }
 
 linkNeovimConfig() {

@@ -20,8 +20,11 @@ installKitty() {
 
 setupKittyConfig() {
     printf "%b\n" "${YELLOW}Copying Kitty configuration files...${RC}"
-    if [ -d "${HOME}/.config/kitty" ] && [ ! -d "${HOME}/.config/kitty-bak" ]; then
-        cp -r "${HOME}/.config/kitty" "${HOME}/.config/kitty-bak"
+    if [ -d "${HOME}/.config/kitty" ]; then
+        if [ -d "${HOME}/.config/kitty-linutilbak" ]; then
+            rm -rf "${HOME}/.config/kitty-linutilbak"
+        fi
+        mv "${HOME}/.config/kitty" "${HOME}/.config/kitty-linutilbak"
     fi
     mkdir -p "${HOME}/.config/kitty/"
     curl -sSLo "${HOME}/.config/kitty/kitty.conf" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/kitty/kitty.conf

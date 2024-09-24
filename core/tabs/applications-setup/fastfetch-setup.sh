@@ -25,8 +25,11 @@ installFastfetch() {
 
 setupFastfetchConfig() {
     printf "%b\n" "${YELLOW}Copying Fastfetch config files...${RC}"
-    if [ -d "${HOME}/.config/fastfetch" ] && [ ! -d "${HOME}/.config/fastfetch-bak" ]; then
-        cp -r "${HOME}/.config/fastfetch" "${HOME}/.config/fastfetch-bak"
+    if [ -d "${HOME}/.config/fastfetch" ]; then
+        if [ -d "${HOME}/.config/fastfetch-linutilbak" ]; then
+            rm -rf  "${HOME}/.config/fastfetch-linutilbak"
+        fi
+        mv "${HOME}/.config/fastfetch" "${HOME}/.config/fastfetch-linutilbak"
     fi
     mkdir -p "${HOME}/.config/fastfetch/"
     curl -sSLo "${HOME}/.config/fastfetch/config.jsonc" https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/config.jsonc
