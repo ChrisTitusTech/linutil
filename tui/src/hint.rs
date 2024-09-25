@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use ratatui::{
     style::{Style, Stylize},
     text::{Line, Span},
@@ -31,16 +33,23 @@ pub fn create_shortcut_list(
 
     let mut lines: Vec<Line<'static>> = vec![];
 
-    for _ in 0.. {
+    loop {
         let split_idx = shortcut_spans
             .iter()
             .scan(0usize, |total_len, s| {
-                *total_len += span_vec_len(s);
-                if *total_len > render_width as usize {
-                    None
+                // take at least one so that we guarantee that we drain the list
+                // otherwise, this might lock up if there's a shortcut that exceeds the window width
+                if *total_len == 0 {
+                    *total_len += span_vec_len(s) + 4;
+                    Some(())
                 } else {
-                    *total_len += 4;
-                    Some(1)
+                    *total_len += span_vec_len(s);
+                    if *total_len > render_width as usize {
+                        None
+                    } else {
+                        *total_len += 4;
+                        Some(())
+                    }
                 }
             })
             .count();
@@ -59,11 +68,11 @@ pub fn create_shortcut_list(
 }
 
 impl Shortcut {
-    pub fn new(key_sequences: Vec<&'static str>, desc: &'static str) -> Self {
+    pub fn new<const N: usize>(desc: &'static str, key_sequences: [&'static str; N]) -> Self {
         Self {
             key_sequences: key_sequences
                 .iter()
-                .map(|s| Span::styled(*s, Style::default().bold()))
+                .map(|s| Span::styled(Cow::<'static, str>::Borrowed(s), Style::default().bold()))
                 .collect(),
             desc,
         }

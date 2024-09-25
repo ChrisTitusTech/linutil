@@ -121,12 +121,12 @@ impl FloatContent for RunningCommand {
         if self.is_finished() {
             (
                 "Finished command",
-                Box::new([Shortcut::new(vec!["Enter", "q"], "Close window")]),
+                Box::new([Shortcut::new("Close window", ["Enter", "q"])]),
             )
         } else {
             (
                 "Running command",
-                Box::new([Shortcut::new(vec!["CTRL-c"], "Kill the command")]),
+                Box::new([Shortcut::new("Kill the command", ["CTRL-c"])]),
             )
         }
     }

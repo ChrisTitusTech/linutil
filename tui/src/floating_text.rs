@@ -294,11 +294,11 @@ impl FloatContent for FloatingText {
         (
             self.mode_title,
             Box::new([
-                Shortcut::new(vec!["j", "Down"], "Scroll down"),
-                Shortcut::new(vec!["k", "Up"], "Scroll up"),
-                Shortcut::new(vec!["h", "Left"], "Scroll left"),
-                Shortcut::new(vec!["l", "Right"], "Scroll right"),
-                Shortcut::new(vec!["Enter", "p", "d", "g"], "Close window"),
+                Shortcut::new("Scroll down", ["j", "Down"]),
+                Shortcut::new("Scroll up", ["k", "Up"]),
+                Shortcut::new("Scroll left", ["h", "Left"]),
+                Shortcut::new("Scroll right", ["l", "Right"]),
+                Shortcut::new("Close window", ["Enter", "p", "d", "g"]),
             ]),
         )
     }
