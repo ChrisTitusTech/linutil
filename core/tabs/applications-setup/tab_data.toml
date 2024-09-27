@@ -128,6 +128,7 @@ task_list = "I PFM SS"
 
 [[data]]
 name = "Docker"
+description = "Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "docker-setup.sh"
 task_list = "I SS"
 
