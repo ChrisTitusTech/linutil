@@ -110,6 +110,7 @@ task_list = "I FM"
 
 [[data]]
 name = "Bottles"
+description = "Bottles allows Windows software, like applications and games, to run on Linux.\nBottles also provides tools to categorize, organize and optimize your applications."
 script = "bottles-setup.sh"
 task_list = "FI"
 
