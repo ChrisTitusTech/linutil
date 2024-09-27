@@ -146,6 +146,7 @@ task_list = "I"
 
 [[data]]
 name = "Grub Theme"
+description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB."
 script = "grub-theme.sh"
 task_list = "PFM"
 
