@@ -1,4 +1,7 @@
+use std::rc::Rc;
+
 use crate::{
+    confirmation::{ConfirmPrompt, ConfirmStatus},
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::{FloatingText, FloatingTextMode},
@@ -8,7 +11,7 @@ use crate::{
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
-use linutil_core::{Command, ListNode, Tab};
+use linutil_core::{ListNode, Tab};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -40,7 +43,7 @@ pub struct AppState {
     /// Selected theme
     theme: Theme,
     /// Currently focused area
-    pub focus: Focus,
+    pub focus: Focus<dyn FloatContent>,
     /// List of tabs
     tabs: Vec<Tab>,
     /// Current tab
@@ -53,21 +56,22 @@ pub struct AppState {
     selection: ListState,
     filter: Filter,
     multi_select: bool,
-    selected_commands: Vec<Command>,
+    selected_commands: Vec<Rc<ListNode>>,
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: &'static str,
 }
 
-pub enum Focus {
+pub enum Focus<Content: FloatContent + ?Sized> {
     Search,
     TabList,
     List,
-    FloatingWindow(Float),
+    FloatingWindow(Float<Content>),
+    ConfirmationPrompt(Float<ConfirmPrompt>),
 }
 
 pub struct ListEntry {
-    pub node: ListNode,
+    pub node: Rc<ListNode>,
     pub id: NodeId,
     pub has_children: bool,
 }
@@ -164,6 +168,7 @@ impl AppState {
             ),
 
             Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
+            Focus::ConfirmationPrompt(ref prompt) => prompt.get_shortcut_list(),
         }
     }
 
@@ -308,7 +313,7 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
-                let is_selected = self.selected_commands.contains(&node.command);
+                let is_selected = self.selected_commands.contains(node);
                 let (indicator, style) = if is_selected {
                     (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
@@ -389,8 +394,10 @@ impl AppState {
 
         frame.render_stateful_widget(disclaimer_list, list_chunks[1], &mut self.selection);
 
-        if let Focus::FloatingWindow(float) = &mut self.focus {
-            float.draw(frame, chunks[1]);
+        match &mut self.focus {
+            Focus::FloatingWindow(float) => float.draw(frame, chunks[1]),
+            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1]),
+            _ => {}
         }
 
         frame.render_widget(keybind_para, vertical[1]);
@@ -400,9 +407,11 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
-        if matches!(self.focus, Focus::TabList | Focus::List)
-            && (key.code == KeyCode::Char('q')
-                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        if matches!(
+            self.focus,
+            Focus::TabList | Focus::List | Focus::ConfirmationPrompt(_)
+        ) && (key.code == KeyCode::Char('q')
+            || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
         }
@@ -441,6 +450,22 @@ impl AppState {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
                     self.focus = Focus::List;
+                }
+            }
+
+            Focus::ConfirmationPrompt(confirm) => {
+                confirm.content.handle_key_event(key);
+                match confirm.content.status {
+                    ConfirmStatus::Abort => {
+                        self.focus = Focus::List;
+                        // selected command was pushed to selection list if multi-select was
+                        // enabled, need to clear it to prevent state corruption
+                        if !self.multi_select {
+                            self.selected_commands.clear()
+                        }
+                    }
+                    ConfirmStatus::Confirm => self.handle_confirm_command(),
+                    ConfirmStatus::None => {}
                 }
             }
 
@@ -503,7 +528,7 @@ impl AppState {
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_command() {
+        if let Some(command) = self.get_selected_node() {
             if self.selected_commands.contains(&command) {
                 self.selected_commands.retain(|c| c != &command);
             } else {
@@ -552,7 +577,7 @@ impl AppState {
         self.update_items();
     }
 
-    fn get_selected_node(&self) -> Option<&ListNode> {
+    fn get_selected_node(&self) -> Option<Rc<ListNode>> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
@@ -564,18 +589,17 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
             if !item.has_children {
-                return Some(&item.node);
+                return Some(item.node.clone());
             }
         }
         None
     }
-    pub fn get_selected_command(&self) -> Option<Command> {
-        self.get_selected_node().map(|node| node.command.clone())
-    }
+
     fn get_selected_description(&self) -> Option<String> {
         self.get_selected_node()
             .map(|node| node.description.clone())
     }
+
     pub fn go_to_selected_dir(&mut self) {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
@@ -596,6 +620,7 @@ impl AppState {
             }
         }
     }
+
     pub fn selected_item_is_dir(&self) -> bool {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
@@ -617,18 +642,23 @@ impl AppState {
         // Any item that is not a directory or up directory (..) must be a command
         !(self.selected_item_is_up_dir() || self.selected_item_is_dir())
     }
+
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
 
         !self.at_root() && selected_index == 0
     }
+
     fn enable_preview(&mut self) {
-        if let Some(command) = self.get_selected_command() {
-            if let Some(preview) = FloatingText::from_command(&command, FloatingTextMode::Preview) {
+        if let Some(node) = self.get_selected_node() {
+            if let Some(preview) =
+                FloatingText::from_command(&node.command, FloatingTextMode::Preview)
+            {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
+
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
             let description = FloatingText::new(command_description, FloatingTextMode::Description);
@@ -639,31 +669,53 @@ impl AppState {
     fn handle_enter(&mut self) {
         if self.selected_item_is_cmd() {
             if self.selected_commands.is_empty() {
-                if let Some(cmd) = self.get_selected_command() {
-                    self.selected_commands.push(cmd);
+                if let Some(node) = self.get_selected_node() {
+                    self.selected_commands.push(node);
                 }
             }
-            let command = RunningCommand::new(self.selected_commands.clone());
-            self.spawn_float(command, 80, 80);
-            self.selected_commands.clear();
+
+            let cmd_names = self
+                .selected_commands
+                .iter()
+                .map(|node| node.name.as_str())
+                .collect::<Vec<_>>();
+
+            let prompt = ConfirmPrompt::new(&cmd_names[..]);
+            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
         } else {
             self.go_to_selected_dir();
         }
     }
+
+    fn handle_confirm_command(&mut self) {
+        let commands = self
+            .selected_commands
+            .iter()
+            .map(|node| node.command.clone())
+            .collect();
+
+        let command = RunningCommand::new(commands);
+        self.spawn_float(command, 80, 80);
+        self.selected_commands.clear();
+    }
+
     fn spawn_float<T: FloatContent + 'static>(&mut self, float: T, width: u16, height: u16) {
         self.focus = Focus::FloatingWindow(Float::new(Box::new(float), width, height));
     }
+
     fn enter_search(&mut self) {
         self.focus = Focus::Search;
         self.filter.activate_search();
         self.selection.select(None);
     }
+
     fn exit_search(&mut self) {
         self.selection.select(Some(0));
         self.focus = Focus::List;
         self.filter.deactivate_search();
         self.update_items();
     }
+
     fn refresh_tab(&mut self) {
         self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
             .tree

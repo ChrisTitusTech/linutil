@@ -13,14 +13,14 @@ pub trait FloatContent {
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>);
 }
 
-pub struct Float {
-    content: Box<dyn FloatContent>,
+pub struct Float<Content: FloatContent + ?Sized> {
+    pub content: Box<Content>,
     width_percent: u16,
     height_percent: u16,
 }
 
-impl Float {
-    pub fn new(content: Box<dyn FloatContent>, width_percent: u16, height_percent: u16) -> Self {
+impl<Content: FloatContent + ?Sized> Float<Content> {
+    pub fn new(content: Box<Content>, width_percent: u16, height_percent: u16) -> Self {
         Self {
             content,
             width_percent,
