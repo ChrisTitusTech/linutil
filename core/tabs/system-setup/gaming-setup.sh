@@ -36,8 +36,15 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$DISTRO_DEPS"
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+            if [ "$(rpm -E %fedora)" -le 41 ]; then 
+                "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            else
+                echo "Skipping Fedora 41 Setup To Older setup"
+                "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264 -y
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            fi
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -n install "$DEPENDENCIES"
