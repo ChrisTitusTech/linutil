@@ -110,6 +110,7 @@ task_list = "I FM"
 
 [[data]]
 name = "Bottles"
+description = "Bottles allows Windows software, like applications and games, to run on Linux.\nBottles also provides tools to categorize, organize and optimize your applications."
 script = "bottles-setup.sh"
 task_list = "FI"
 
@@ -127,6 +128,7 @@ task_list = "I PFM SS"
 
 [[data]]
 name = "Docker"
+description = "Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "docker-setup.sh"
 task_list = "I SS"
 
@@ -144,6 +146,7 @@ task_list = "I"
 
 [[data]]
 name = "Grub Theme"
+description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB."
 script = "grub-theme.sh"
 task_list = "PFM"
 
