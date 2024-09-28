@@ -27,7 +27,7 @@ checkAURHelper() {
             done
 
             printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
             cd /opt && "$ESCALATION_TOOL" git clone https://aur.archlinux.org/yay-bin.git && "$ESCALATION_TOOL" chown -R "$USER":"$USER" ./yay-bin
             cd yay-bin && makepkg --noconfirm -si
 
@@ -125,11 +125,11 @@ checkDistro() {
 }
 
 checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
+    checkEscalationTool
+    checkCommandRequirements "curl groups $ESCALATION_TOOL"
     checkPackageManager 'nala apt-get dnf pacman zypper'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
-    checkEscalationTool
     checkAURHelper
 }
