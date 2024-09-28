@@ -3,13 +3,13 @@
 . ../../common-script.sh
 
 setUpRepos() {
-    if ! grep -q "^\s*$$jupiter-staging$$" /etc/pacman.conf; then
+    if ! grep -q "^\s*\[jupiter-staging\]" /etc/pacman.conf; then
         printf "%b\n" "${CYAN}Adding jupiter-staging to pacman repositories...${RC}"
         echo "[jupiter-staging]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
         echo "Server = https://steamdeck-packages.steamos.cloud/archlinux-mirror/\$repo/os/\$arch" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
         echo "SigLevel = Never" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
     fi
-    if ! grep -q "^\s*$$holo-staging$$" /etc/pacman.conf; then
+    if ! grep -q "^\s*\[holo-staging\]" /etc/pacman.conf; then
         printf "%b\n" "${CYAN}Adding holo-staging to pacman repositories...${RC}"
         echo "[holo-staging]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
         echo "Server = https://steamdeck-packages.steamos.cloud/archlinux-mirror/\$repo/os/\$arch" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
