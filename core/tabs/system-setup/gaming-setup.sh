@@ -9,7 +9,7 @@ installDepend() {
     case "$PACKAGER" in
         pacman)
             #Check for multilib
-            if ! grep -q "^\s*$$multilib$$" /etc/pacman.conf; then
+            if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                 echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                 echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                 "$ESCALATION_TOOL" "$PACKAGER" -Syu
