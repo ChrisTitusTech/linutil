@@ -43,7 +43,7 @@ pub struct AppState {
     /// Selected theme
     theme: Theme,
     /// Currently focused area
-    pub focus: Focus<dyn FloatContent>,
+    pub focus: Focus,
     /// List of tabs
     tabs: Vec<Tab>,
     /// Current tab
@@ -62,11 +62,11 @@ pub struct AppState {
     tip: &'static str,
 }
 
-pub enum Focus<Content: FloatContent + ?Sized> {
+pub enum Focus {
     Search,
     TabList,
     List,
-    FloatingWindow(Float<Content>),
+    FloatingWindow(Float<dyn FloatContent>),
     ConfirmationPrompt(Float<ConfirmPrompt>),
 }
 
