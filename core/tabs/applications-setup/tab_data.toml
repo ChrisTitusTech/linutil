@@ -190,7 +190,7 @@ script = "setup-flatpak.sh"
 task_list = "I"
 
 [[data]]
-name = "Grub Theme"
+name = "Grub"
 description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB."
 script = "grub-theme.sh"
 task_list = "PFM"
