@@ -135,6 +135,7 @@ task_list = "I"
 name = "PDF Studio Viewer"
 script = "pdf-suites/pdfstudioviewer.sh"
 
+[[data]]
 name = "Web Browsers"
 
 [[data.entries]]
