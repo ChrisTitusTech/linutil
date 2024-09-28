@@ -37,13 +37,17 @@ installLinutil() {
                             pacman)
                                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
                                 ;;
+                            dnf)
+                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                ;;
                             zypper)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
                                 . $HOME/.cargo/env
                                 ;;
                             *)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+                                . $HOME/.cargo/env
                                 ;;
                         esac
                     fi

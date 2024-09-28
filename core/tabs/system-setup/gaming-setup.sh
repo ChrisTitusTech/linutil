@@ -9,7 +9,7 @@ installDepend() {
     case "$PACKAGER" in
         pacman)
             #Check for multilib
-            if ! grep -q "^\s*$$multilib$$" /etc/pacman.conf; then
+            if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                 echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                 echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                 "$ESCALATION_TOOL" "$PACKAGER" -Syu
@@ -36,9 +36,15 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$DISTRO_DEPS"
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264 -y
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            if [ "$(rpm -E %fedora)" -le 41 ]; then 
+                "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            else
+                printf "%b\n" "${CYAN}Fedora < 41 detected. Installing rpmfusion repos.${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora)".noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora)".noarch.rpm -y
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264 -y
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            fi
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -n install "$DEPENDENCIES"
