@@ -23,10 +23,17 @@ pub struct ConfirmPrompt {
 
 impl ConfirmPrompt {
     pub fn new(names: &[&str]) -> Self {
+        let max_count_str = format!("{}", names.len());
         let names = names
             .iter()
             .zip(1..)
-            .map(|(name, n)| format!("{n}. {name}"))
+            .map(|(name, n)| {
+                let count_str = format!("{n}");
+                let space_str = (0..(max_count_str.len() - count_str.len()))
+                    .map(|_| ' ')
+                    .collect::<String>();
+                format!("{space_str}{n}. {name}")
+            })
             .collect();
 
         Self {
