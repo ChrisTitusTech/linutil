@@ -1,7 +1,4 @@
-use crate::{
-    float::FloatContent,
-    hint::{Shortcut, ShortcutList},
-};
+use crate::{float::FloatContent, hint::Shortcut};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
@@ -120,17 +117,17 @@ impl FloatContent for RunningCommand {
         }
     }
 
-    fn get_shortcut_list(&self) -> ShortcutList {
+    fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         if self.is_finished() {
-            ShortcutList {
-                scope_name: "Finished command",
-                hints: vec![Shortcut::new(vec!["Enter", "q"], "Close window")],
-            }
+            (
+                "Finished command",
+                Box::new([Shortcut::new("Close window", ["Enter", "q"])]),
+            )
         } else {
-            ShortcutList {
-                scope_name: "Running command",
-                hints: vec![Shortcut::new(vec!["CTRL-c"], "Kill the command")],
-            }
+            (
+                "Running command",
+                Box::new([Shortcut::new("Kill the command", ["CTRL-c"])]),
+            )
         }
     }
 }

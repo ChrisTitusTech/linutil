@@ -6,14 +6,14 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh
+            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh # no need to include git here as it should be already installed via "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -66,6 +66,10 @@ install_nerd_font() {
 
     # Unzip the font file if it hasn't been unzipped yet
     if [ ! -d "$FONT_DIR/Meslo" ]; then
+        mkdir -p "$FONT_DIR/Meslo" || {
+            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR/Meslo${RC}"
+            return 1
+        }
         unzip "$FONT_ZIP" -d "$FONT_DIR" || {
             printf "%b\n" "${RED}Failed to unzip $FONT_ZIP${RC}"
             return 1
@@ -203,8 +207,14 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        DM="sddm"
-        printf "%b\n" "${YELLOW}No display manager found, installing $DM${RC}"
+        printf "%b\n" "${YELLOW}--------------------------${RC}" 
+        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
+        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
+        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
+        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
+        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b" "${YELLOW}Please select one: ${RC}"
+        read -r DM
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
@@ -222,47 +232,7 @@ setupDisplayManager() {
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
         systemctl enable "$DM"
-
-        # Prompt user for auto-login
-        # Using printf instead of echo -n as It's more posix-compliant.
-        printf "Do you want to enable auto-login? (Y/n) "
-        read -r answer
-        case "$answer" in
-            [Yy]*)
-                printf "%b\n" "${YELLOW}Configuring SDDM for autologin${RC}"
-                SDDM_CONF="/etc/sddm.conf"
-                if [ ! -f "$SDDM_CONF" ]; then
-                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                else
-                    "$ESCALATION_TOOL" sed -i '/^\[Autologin\]/d' "$SDDM_CONF"
-                    "$ESCALATION_TOOL" sed -i '/^User=/d' "$SDDM_CONF"
-                    "$ESCALATION_TOOL" sed -i '/^Session=/d' "$SDDM_CONF"
-                    echo "[Autologin]" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                    echo "User=$USER" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                    echo "Session=dwm" | "$ESCALATION_TOOL" tee -a "$SDDM_CONF"
-                fi
-                printf "%b\n" "{YELLOW}Checking if autologin group exists${RC}"
-                if ! getent group autologin > /dev/null; then
-                    printf "%b\n" "${YELLOW}Creating autologin group${RC}"
-                    "$ESCALATION_TOOL" groupadd autologin
-                else
-                    printf "%b\n" "${GREEN}Autologin group already exists${RC}"
-                fi
-                printf "%b\n" "${YELLOW}Adding user with UID 1000 to autologin group${RC}"
-                USER_UID_1000=$(getent passwd 1000 | cut -d: -f1)
-                if [ -n "$USER_UID_1000" ]; then
-                    "$ESCALATION_TOOL" usermod -aG autologin "$USER_UID_1000"
-                    printf "%b\n" "${GREEN}User $USER_UID_1000 added to autologin group${RC}"
-                else
-                    printf "%b\n" "${RED}No user with UID 1000 found - Auto login not possible${RC}"
-                fi
-                ;;
-            *)
-                printf "%b\n" "${GREEN}Auto-login configuration skipped${RC}"
-                ;;
-        esac
+        
     fi
 }
 
@@ -291,5 +261,6 @@ setupDWM
 makeDWM
 install_slstatus
 install_nerd_font
+picom_animations
 clone_config_folders
 configure_backgrounds

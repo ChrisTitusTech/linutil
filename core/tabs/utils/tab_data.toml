@@ -95,6 +95,7 @@ script = "user-account-manager/remove_from_group.sh"
 
 [[data]]
 name = "Auto Mount Drive"
+description = "This utility is designed to help with automating the process of mounting a drive on to your system."
 script = "auto-mount.sh"
 task_list = "PFM"
 
