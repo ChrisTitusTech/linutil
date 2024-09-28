@@ -54,6 +54,7 @@ impl FloatContent for ConfirmPrompt {
         let block = Block::default()
             .borders(Borders::ALL)
             .title(" Confirm selections ")
+            .title_bottom(" [y] to continue, [n] to abort ")
             .title_alignment(Alignment::Center)
             .title_style(Style::default().bold())
             .style(Style::default());
