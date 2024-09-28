@@ -36,7 +36,7 @@ impl ConfirmPrompt {
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll < self.names.len() {
+        if self.scroll < self.names.len() - 1 {
             self.scroll += 1;
         }
     }
@@ -67,7 +67,8 @@ impl FloatContent for ConfirmPrompt {
             .iter()
             .skip(self.scroll)
             .map(|p| {
-                Line::from(Span::from(Cow::<'_, str>::Borrowed(p))).style(Style::default().bold())
+                let span = Span::from(Cow::<'_, str>::Borrowed(p));
+                Line::from(span).style(Style::default().bold())
             })
             .collect::<Text>();
 
@@ -80,6 +81,8 @@ impl FloatContent for ConfirmPrompt {
         self.status = match key.code {
             Char('y') | Char('Y') => ConfirmStatus::Confirm,
             Char('n') | Char('N') | Esc => ConfirmStatus::Abort,
+            Char('j') => { self.scroll_down(); ConfirmStatus::None },
+            Char('k') => { self.scroll_up(); ConfirmStatus::None },
             _ => ConfirmStatus::None,
         };
 
@@ -100,6 +103,9 @@ impl FloatContent for ConfirmPrompt {
             Box::new([
                 Shortcut::new("Continue", ["Y", "y"]),
                 Shortcut::new("Abort", ["N", "n"]),
+                Shortcut::new("Scroll up", ["j"]),
+                Shortcut::new("Scroll down", ["k"]),
+                Shortcut::new("Close linutil", ["CTRL-c", "q"])
             ]),
         )
     }
