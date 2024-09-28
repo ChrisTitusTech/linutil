@@ -4,6 +4,7 @@ use crate::{float::FloatContent, hint::Shortcut};
 
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    layout::Alignment,
     prelude::*,
     widgets::{Block, Borders, Clear, List},
 };
@@ -52,12 +53,11 @@ impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         let block = Block::default()
             .borders(Borders::ALL)
-            .title("Confirm selections")
-            .title_alignment(ratatui::layout::Alignment::Center)
-            .title_style(Style::default().reversed())
+            .title(" Confirm selections ")
+            .title_alignment(Alignment::Center)
+            .title_style(Style::default().bold())
             .style(Style::default());
 
-        // Draw the Block first
         frame.render_widget(block.clone(), area);
 
         let inner_area = block.inner(area);
@@ -68,7 +68,7 @@ impl FloatContent for ConfirmPrompt {
             .skip(self.scroll)
             .map(|p| {
                 let span = Span::from(Cow::<'_, str>::Borrowed(p));
-                Line::from(span).style(Style::default().bold())
+                Line::from(span).style(Style::default())
             })
             .collect::<Text>();
 
@@ -81,8 +81,14 @@ impl FloatContent for ConfirmPrompt {
         self.status = match key.code {
             Char('y') | Char('Y') => ConfirmStatus::Confirm,
             Char('n') | Char('N') | Esc => ConfirmStatus::Abort,
-            Char('j') => { self.scroll_down(); ConfirmStatus::None },
-            Char('k') => { self.scroll_up(); ConfirmStatus::None },
+            Char('j') => {
+                self.scroll_down();
+                ConfirmStatus::None
+            }
+            Char('k') => {
+                self.scroll_up();
+                ConfirmStatus::None
+            }
             _ => ConfirmStatus::None,
         };
 
@@ -105,7 +111,7 @@ impl FloatContent for ConfirmPrompt {
                 Shortcut::new("Abort", ["N", "n"]),
                 Shortcut::new("Scroll up", ["j"]),
                 Shortcut::new("Scroll down", ["k"]),
-                Shortcut::new("Close linutil", ["CTRL-c", "q"])
+                Shortcut::new("Close linutil", ["CTRL-c", "q"]),
             ]),
         )
     }
