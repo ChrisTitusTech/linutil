@@ -21,7 +21,7 @@ installKernel() {
     if ! "$PACKAGER" -Q | grep -q "\blinux-neptune"; then
         printf "%b\n" "${CYAN}Installing linux-neptune..."
         "$ESCALATION_TOOL" "$PACKAGER" -Syyu --noconfirm
-        "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm linux-neptune linux-neptune-headers
+        "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm linux-neptune linux-neptune-headers steamdeck-dsp jupiter-staging/alsa-ucm-conf
         "$ESCALATION_TOOL" mkinitcpio -P
     else
         printf "%b\n" "${GREEN}linux-neptune detected. Skipping installation.${RC}"
