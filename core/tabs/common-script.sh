@@ -125,11 +125,11 @@ checkDistro() {
 }
 
 checkEnv() {
-    checkCommandRequirements 'curl groups sudo'
+    checkEscalationTool
+    checkCommandRequirements "curl groups $ESCALATION_TOOL"
     checkPackageManager 'nala apt-get dnf pacman zypper'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
-    checkEscalationTool
     checkAURHelper
 }
