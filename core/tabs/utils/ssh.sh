@@ -2,13 +2,13 @@
 
 . ../common-script.sh
 
-# Check if ~/.ssh/config exists, if not, create it
+# Check if $HOME/.ssh/config exists, if not, create it
 if [ ! -f "$HOME/.ssh/config" ]; then
     touch "$HOME/.ssh/config"
     chmod 600 "$HOME/.ssh/config"
 fi
 
-# Function to show available hosts from ~/.ssh/config
+# Function to show available hosts from $HOME/.ssh/config
 show_available_hosts() {
     printf "%b\n" "Available Systems:"
     grep -E "^Host " "$HOME/.ssh/config" | awk '{print $2}'

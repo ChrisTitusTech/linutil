@@ -136,10 +136,10 @@ clone_config_folders() {
         # Extract the directory name
         dir_name=$(basename "$dir")
 
-        # Clone the directory to ~/.config/
+        # Clone the directory to $HOME/.config/
         if [ -d "$dir" ]; then
             cp -r "$dir" "$HOME/.config/"
-            printf "%b\n" "${GREEN}Cloned $dir_name to ~/.config/${RC}"
+            printf "%b\n" "${GREEN}Cloned $dir_name to $HOME/.config/${RC}"
         else
             printf "%b\n" "${RED}Directory $dir_name does not exist, skipping${RC}"
         fi
@@ -153,7 +153,7 @@ configure_backgrounds() {
     # Set the variable BG_DIR to the path where backgrounds will be stored
     BG_DIR="$PIC_DIR/backgrounds"
 
-    # Check if the ~/Pictures directory exists
+    # Check if the $HOME/Pictures directory exists
     if [ ! -d "$PIC_DIR" ]; then
         # If it doesn't exist, print an error message and return with a status of 1 (indicating failure)
         printf "%b\n" "${RED}Pictures directory does not exist${RC}"
