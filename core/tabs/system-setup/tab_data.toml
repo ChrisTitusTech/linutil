@@ -71,6 +71,7 @@ task_list = "I"
 
 [[data]]
 name = "Full System Cleanup"
+description = "This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash."
 script = "system-cleanup.sh"
 task_list = "RP PFM"
 
