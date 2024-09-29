@@ -30,7 +30,7 @@ SetTermiusFonts() {
                 if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
                     CURRENT_TTY=$(tty)
                     echo "Set Font to $CURRENT_TTY"
-                    setfont -c "$CURRENT_TTY" ter-v32b
+                    setfont -C "$CURRENT_TTY" ter-v32b
                 fi
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
                 ;;
@@ -45,7 +45,7 @@ SetTermiusFonts() {
                 if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
                     CURRENT_TTY=$(tty)
                     echo "Set Font to $CURRENT_TTY"
-                    exec setfont -c "$CURRENT_TTY" /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
+                    exec setfont -C "$CURRENT_TTY" /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
                 fi
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
@@ -56,7 +56,7 @@ SetTermiusFonts() {
                 if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
                     CURRENT_TTY=$(tty)
                     echo "Set Font to $CURRENT_TTY"
-                    setfont -c "$CURRENT_TTY" ter-v32b
+                    setfont -C "$CURRENT_TTY" ter-v32b
                 fi               
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
