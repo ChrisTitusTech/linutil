@@ -3,8 +3,10 @@
 . ../common-script.sh
 
 InstallTermiusFonts() {
-    if [ ! -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] && [ ! -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ]; then
-    printf "%b\n" "${YELLOW}Installing Terminus Fonts...${RC}"
+    if [ -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] || [ -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ]; then
+        printf "%b\n" "${GREEN}Terminus Fonts is already installed.${RC}"
+        else
+        printf "%b\n" "${YELLOW}Installing Terminus Fonts...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm terminus-font
@@ -16,8 +18,6 @@ InstallTermiusFonts() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-fonts-console
                 ;;
         esac
-    else
-        printf "%b\n" "${GREEN}Terminus Fonts is already installed.${RC}"
     fi
 }
 
