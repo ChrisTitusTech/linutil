@@ -66,6 +66,14 @@ fetch_debian_latest_iso() {
     printf "%b\n" "${GREEN} Selected Debian Linux (latest) ISO URL: ${RC} $DEBIAN_URL"
 }
 
+# Function to fetch the latest Fedora Workstation ISO
+fetch_fedora_latest_iso() {
+    FEDORA_BASE_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/40/Workstation/x86_64/iso/"
+    FEDORA_ISO=$(curl -s -L "$FEDORA_BASE_URL" | grep -oP 'Fedora-Workstation-Live-x86_64-[\d.-]+\.iso' | sort -V | tail -1)
+    FEDORA_URL="${FEDORA_BASE_URL}${FEDORA_ISO}"
+    printf "%b\n" "${GREEN} Selected Fedora Workstation (latest) ISO URL: ${RC} $FEDORA_URL"
+}
+
 # Function to ask whether to use local or online ISO
 choose_iso_source() {
     printf "%b\n" "${YELLOW} Do you want to use a local ISO or download online? ${RC}"
@@ -101,8 +109,9 @@ fetch_iso_urls() {
     printf "%b\n" "1) Arch Linux (latest)"
     printf "%b\n" "2) Arch Linux (older versions)"
     printf "%b\n" "3) Debian Linux (latest)"
+    printf "%b\n" "4) Fedora 40 Workstation (latest)"
     printf "\n"
-    printf "%b" "Select the ISO you want to download (1-3): "
+    printf "%b" "Select the ISO you want to download (1-4): "
     read -r ISO_OPTION
 
     case $ISO_OPTION in
@@ -117,6 +126,10 @@ fetch_iso_urls() {
         3)
             fetch_debian_latest_iso
             ISO_URL=$DEBIAN_URL
+            ;;
+        4)
+            fetch_fedora_latest_iso
+            ISO_URL=$FEDORA_URL
             ;;
         *)
             printf "%b\n" "${RED}Invalid option selected.${RC}"
