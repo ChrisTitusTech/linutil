@@ -11,9 +11,10 @@
 
 ### Arch Setup
 
+- **Server Setup**: Installs Arch Linux.
+- **Linux Neptune**: Installs [Linux Neptune](https://github.com/neptune-mirror/linux-neptune) (Valve's fork of the Linux Kernel) for the [Steam Deck](https://wiki.archlinux.org/title/Steam_Deck).
 - **Paru Setup**: Installs the Paru AUR helper.
 - **Yay Setup**: Installs the Yay AUR helper.
-- **Server Setup**: Installs Arch Linux.
 
 ### Fedora Setup
 
