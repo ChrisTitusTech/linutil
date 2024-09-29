@@ -55,6 +55,7 @@
 - **Wifi Control**: Controls WiFi settings.
 - **Numlock Control**: Sets up Numlock on boot.
 - **Bluetooth Control**: Controls Bluetooth settings.
+- **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
 ### Monitor control
 
