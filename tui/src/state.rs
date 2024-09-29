@@ -22,6 +22,7 @@ use ratatui::{
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
 const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const KEYS_NOT_TO_NORMALIZE: [char; 2] = ['t', 'T'];
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -397,12 +398,24 @@ impl AppState {
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
+        // Convert capital keys to lower
+        let normalized_key = if let KeyCode::Char(c) = key.code {
+            if KEYS_NOT_TO_NORMALIZE.contains(&c) {
+                key.code
+            } else {
+                KeyCode::Char(c.to_ascii_lowercase())
+            }
+        } else {
+            key.code
+        };
+
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
         if matches!(self.focus, Focus::TabList | Focus::List)
-            && (key.code == KeyCode::Char('q')
-                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+            && (normalized_key == KeyCode::Char('q')
+                || key.modifiers.contains(KeyModifiers::CONTROL)
+                    && normalized_key == KeyCode::Char('c'))
         {
             return false;
         }
@@ -416,7 +429,7 @@ impl AppState {
         // Prevents exiting the application even when a command is running
         // Add keys here which should work on both TabList and List
         if matches!(self.focus, Focus::TabList | Focus::List) {
-            match key.code {
+            match normalized_key {
                 KeyCode::Tab => {
                     if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
                         self.current_tab.select_first();
@@ -450,7 +463,7 @@ impl AppState {
                 SearchAction::None => {}
             },
 
-            Focus::TabList => match key.code {
+            Focus::TabList => match normalized_key {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
                 KeyCode::Char('j') | KeyCode::Down
@@ -468,22 +481,22 @@ impl AppState {
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
-                KeyCode::Char('g') => self.toggle_task_list_guide(),
+                KeyCode::Char('g') => self.enable_action_guide(),
                 _ => {}
             },
 
-            Focus::List if key.kind != KeyEventKind::Release => match key.code {
+            Focus::List if key.kind != KeyEventKind::Release => match normalized_key {
                 KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
                 KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
-                KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
-                KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
+                KeyCode::Char('p') => self.enable_preview(),
+                KeyCode::Char('d') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => self.go_back(),
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
                 KeyCode::Char('T') => self.theme.prev(),
-                KeyCode::Char('g') => self.toggle_task_list_guide(),
-                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+                KeyCode::Char('g') => self.enable_action_guide(),
+                KeyCode::Char('v') => self.toggle_multi_select(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
@@ -635,7 +648,13 @@ impl AppState {
             self.spawn_float(description, 80, 80);
         }
     }
-
+    fn enable_action_guide(&mut self) {
+        self.spawn_float(
+            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            80,
+            80,
+        );
+    }
     fn handle_enter(&mut self) {
         if self.selected_item_is_cmd() {
             if self.selected_commands.is_empty() {
@@ -671,14 +690,6 @@ impl AppState {
             .id()];
         self.selection.select(Some(0));
         self.update_items();
-    }
-
-    fn toggle_task_list_guide(&mut self) {
-        self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
-            80,
-            80,
-        );
     }
 }
 

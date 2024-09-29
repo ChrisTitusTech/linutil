@@ -55,7 +55,12 @@ impl Float {
 
     // Returns true if the floating window is finished.
     pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        match key.code {
+        let normalized_key = if let KeyCode::Char(c) = key.code {
+            KeyCode::Char(c.to_ascii_lowercase())
+        } else {
+            key.code
+        };
+        match normalized_key {
             KeyCode::Enter
             | KeyCode::Char('p')
             | KeyCode::Char('d')

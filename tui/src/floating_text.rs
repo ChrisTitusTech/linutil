@@ -275,12 +275,16 @@ impl FloatContent for FloatingText {
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        use KeyCode::*;
-        match key.code {
-            Down | Char('j') => self.scroll_down(),
-            Up | Char('k') => self.scroll_up(),
-            Left | Char('h') => self.scroll_left(),
-            Right | Char('l') => self.scroll_right(),
+        let normalized_key = if let KeyCode::Char(c) = key.code {
+            KeyCode::Char(c.to_ascii_lowercase())
+        } else {
+            key.code
+        };
+        match normalized_key {
+            KeyCode::Down | KeyCode::Char('j') => self.scroll_down(),
+            KeyCode::Up | KeyCode::Char('k') => self.scroll_up(),
+            KeyCode::Left | KeyCode::Char('h') => self.scroll_left(),
+            KeyCode::Right | KeyCode::Char('l') => self.scroll_right(),
             _ => {}
         }
         false
