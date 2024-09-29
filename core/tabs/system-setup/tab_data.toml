@@ -99,7 +99,7 @@ script = "remove-snaps.sh"
 task_list = "RP"
 
 [[data]]
-name = "Set TTY Fonts"
+name = "TTY Fonts"
 description = "This Script will set the default TYY font to Terminus size 32 Bold"
 script = "terminus-tty.sh"
 task_list = "RP"
