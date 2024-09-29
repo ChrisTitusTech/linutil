@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 InstallTermiusFonts() {
-    if [ -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] || [ -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ]; then
+    if [ -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] || [ -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ] || [ -f "/usr/lib/kbd/consolefonts/ter-c18b.psf.gz" ]; then
     printf "%b\n" "${YELLOW}Installing Terminus Fonts...${RC}"
         case "$PACKAGER" in
             pacman)
