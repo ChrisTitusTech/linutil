@@ -28,6 +28,7 @@ SetTermiusFonts() {
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
+                setfont "ter-v32b"
                 ;;
             debian)
                 printf "%b\n" "${YELLOW}Updating console-setup configuration...${RC}"
@@ -36,11 +37,14 @@ SetTermiusFonts() {
                 "$ESCALATION_TOOL" sed -i 's/^FONTSIZE=.*/FONTSIZE="16x32"/' /etc/default/console-setup
                 printf "%b\n" "${GREEN}Console-setup configuration updated for Terminus font.${RC}"
                 "$ESCALATION_TOOL" update-initramfs -u
+                setfont "/usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz"
+                printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
             fedora)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
-                printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
+                setfont "ter-v32b"
+                printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
         esac
 }
