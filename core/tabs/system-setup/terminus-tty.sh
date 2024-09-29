@@ -1,9 +1,10 @@
 #!/bin/sh -e
 
 . ../common-script.sh
-
 InstallTermiusFonts() {
-    if [ -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] || [ -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ] || [ -f "/usr/lib/kbd/consolefonts/ter-c18b.psf.gz" ]; then
+    if [ -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] || 
+       [ -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ] || 
+       [ -f "/usr/lib/kbd/consolefonts/ter-c18b.psf.gz" ]; then
     printf "%b\n" "${YELLOW}Installing Terminus Fonts...${RC}"
         case "$PACKAGER" in
             pacman)
@@ -36,7 +37,7 @@ SetTermiusFonts() {
                 printf "%b\n" "${GREEN}Console-setup configuration updated for Terminus font.${RC}"
                 "$ESCALATION_TOOL" update-initramfs -u
                 ;;
-            dnf)
+            fedora)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
