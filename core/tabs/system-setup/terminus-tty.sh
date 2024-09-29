@@ -27,8 +27,8 @@ SetTermiusFonts() {
             arch)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
-                if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
-                    setfont -C /dev/tty1 ter-v32b
+                if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+                   "$ESCALATION_TOOL" setfont -C /dev/tty1 ter-v32b
                 fi
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
                 ;;
@@ -40,9 +40,8 @@ SetTermiusFonts() {
                 printf "%b\n" "${GREEN}Console-setup configuration updated for Terminus font.${RC}"
                 "$ESCALATION_TOOL" update-initramfs -u
                 echo "$TERM"
-                if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
-                    
-                    setfont -C /dev/tty1 /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
+                if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then                    
+                   "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
                 fi
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
@@ -50,8 +49,8 @@ SetTermiusFonts() {
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 echo "$TERM"
-                if [[ -z "$DISPLAY" && -z "$WAYLAND_DISPLAY" ]]; then
-                    setfont -C /dev/tty1 ter-v32b
+               if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then 
+                  "$ESCALATION_TOOL" setfont -C /dev/tty1 ter-v32b
                 fi               
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
