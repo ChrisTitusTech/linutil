@@ -100,6 +100,6 @@ task_list = "RP"
 
 [[data]]
 name = "Set TTY Fonts"
-description = "This Script will set the default font for tty to Terminus Fonts size 32 Bold And Set tty1 to the Terminus Font"
+description = "This Script will set the default TYY font to Terminus size 32 Bold"
 script = "terminus-tty.sh"
 task_list = "RP"
