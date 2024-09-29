@@ -170,7 +170,8 @@ write_iso(){
     printf "%b" "${RED}WARNING: This will erase all data on ${USB_DEVICE}. Are you sure you want to continue? (y/N): ${RC}"
     read -r CONFIRMATION
 
-    if [ "$CONFIRMATION" != "yes" ]; then
+    # Convert the input to lowercase and compare
+    if [ "$(echo "$CONFIRMATION" | tr '[:upper:]' '[:lower:]')" != "yes" ] && [ "$(echo "$CONFIRMATION" | tr '[:upper:]' '[:lower:]')" != "y" ]; then
         printf "%b\n" "${YELLOW}Operation cancelled.${RC}"
         exit 1
     fi
