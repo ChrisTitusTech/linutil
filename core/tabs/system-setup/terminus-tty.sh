@@ -39,7 +39,6 @@ SetTermiusFonts() {
                 "$ESCALATION_TOOL" sed -i 's/^FONTSIZE=.*/FONTSIZE="16x32"/' /etc/default/console-setup
                 printf "%b\n" "${GREEN}Console-setup configuration updated for Terminus font.${RC}"
                 "$ESCALATION_TOOL" update-initramfs -u
-                echo "$TERM"
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then                    
                    "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
                 fi
@@ -48,7 +47,6 @@ SetTermiusFonts() {
             fedora)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
-                echo "$TERM"
                if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then 
                   "$ESCALATION_TOOL" setfont -C /dev/tty1 ter-v32b
                 fi               
