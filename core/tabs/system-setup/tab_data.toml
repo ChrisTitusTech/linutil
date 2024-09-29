@@ -97,3 +97,9 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
 task_list = "RP"
+
+[[data]]
+name = "Set TTY Fonts"
+description = "This Script will set the default font for tty to Terminus Fonts size 32 Bold"
+script = "terminus-tty.sh"
+task_list = "RP"
