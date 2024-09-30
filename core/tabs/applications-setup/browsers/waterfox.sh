@@ -5,7 +5,7 @@
 installWaterfox() {
     buildWaterfox=$(curl -L -o waterfox.tar.bz2 "https://cdn1.waterfox.net/waterfox/releases/latest/linux" && tar -xvjf waterfox.tar.bz2 -C ./ && rm waterfox.tar.bz2 ; sudo mkdir -p /opt/waterfox && sudo mv waterfox /opt/waterfox && cd /opt/waterfox/waterfox && sudo ln -s /opt/waterfox/waterfox/waterfox /usr/bin/waterfox)
 
-    if ! command_exists firefox; then
+    if ! command_exists waterfox; then
         printf "%b\n" "${YELLOW}Installing waterfox...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
