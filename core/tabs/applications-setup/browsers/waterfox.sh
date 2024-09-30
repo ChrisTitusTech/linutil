@@ -8,17 +8,8 @@ installWaterfox() {
     if ! command_exists waterfox; then
         printf "%b\n" "${YELLOW}Installing waterfox...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
-		"$ESCALATION_TOOL" "$PACKAGER" install -y curl && printf "$buildWaterfox"
-                ;;
-            zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install curl && printf "$buildWaterfox"
-                ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm curl && printf "$buildWaterfox"
-                ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y curl && printf "$buildWaterfox"
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -26,10 +17,11 @@ installWaterfox() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}Waterfox Browser is already installed.${RC}"
+        printf "%b\n" "${GREEN}Waterfox is already installed.${RC}"
     fi
 }
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 installWaterfox
