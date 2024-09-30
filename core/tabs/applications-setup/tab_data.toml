@@ -145,7 +145,7 @@ task_list = "I"
 name = "waterfox"
 description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
 script = "browsers/waterfox.sh"
-task_list = "I"
+task_list = "FI"
 
 [[data]]
 name = "Alacritty"
