@@ -16,6 +16,10 @@ InstallTermiusFonts() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-fonts-console
                 ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
         esac
     else
         printf "%b\n" "${GREEN}Terminus Fonts is already installed.${RC}"
