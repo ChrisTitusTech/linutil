@@ -34,3 +34,5 @@ esac
 	printf "%b\n" "${GREEN}waterfox is already installed.${RC}"
     fi
 }
+
+installWaterfox
