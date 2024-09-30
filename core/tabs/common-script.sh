@@ -12,6 +12,33 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+flatpak_app_exists() {
+    flatpak info "$1" >/dev/null 2>&1
+}
+
+checkFlatpak() {
+    if ! command_exists flatpak; then
+        printf "%b\n" "${YELLOW}Installing Flatpak...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
+                ;;
+        esac
+        printf "%b\n" "Adding Flathub remote..."
+        "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    else
+        if ! flatpak remotes | grep -q "flathub"; then
+            printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
+            "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        else
+            printf "%b\n" "${CYAN}Flatpak is installed${RC}"
+        fi
+    fi
+}
+
 checkAURHelper() {
     ## Check & Install AUR helper
     if [ "$PACKAGER" = "pacman" ]; then
