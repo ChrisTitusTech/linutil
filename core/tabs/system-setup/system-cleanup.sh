@@ -7,8 +7,7 @@ cleanup_system() {
     case "$PACKAGER" in
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" clean
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
-            "$ESCALATION_TOOL" "apt-get" autoclean
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y 
             "$ESCALATION_TOOL" du -h /var/cache/apt
             "$ESCALATION_TOOL" "$PACKAGER" clean
             ;;
