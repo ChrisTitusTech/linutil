@@ -10,7 +10,7 @@ installWaterfox() {
 		"$AUR_HELPER" -S --needed --noconfirm waterfox-bin
                 ;;
             *)
-		. ./setup-flatpak.sh
+		. ../setup-flatpak.sh
                 flatpak install -y flathub net.waterfox.waterfox
                 ;;
         esac
