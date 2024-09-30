@@ -8,6 +8,7 @@
 - **Gaming Setup**: Configures Steam, Lutris, etc.
 - **Global Theming**: Sets up and manages global themes.
 - **Remove Snaps**: Removes snap packages.
+- **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
 ### Arch Setup
 
