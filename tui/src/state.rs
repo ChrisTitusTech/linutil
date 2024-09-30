@@ -21,7 +21,7 @@ use ratatui::{
 
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
-const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const TITLE: &str = concat!(" Linux Toolbox - ", env!("BUILD_DATE"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -357,7 +357,7 @@ impl AppState {
         };
 
         let title = if self.multi_select {
-            &format!("{} [Multi-Select]", TITLE)
+            &format!("{}[Multi-Select] ", TITLE)
         } else {
             TITLE
         };
@@ -367,7 +367,7 @@ impl AppState {
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
-        let task_list_title = Line::from("Important Actions ").right_aligned();
+        let task_list_title = Line::from(" Important Actions ").right_aligned();
 
         // Create the list widget with items
         let list = List::new(items)
@@ -694,5 +694,5 @@ fn get_random_tip() -> &'static str {
 
     let mut rng = rand::thread_rng();
     let random_index = rng.gen_range(0..tips.len());
-    tips[random_index]
+    Box::leak(format!(" {} ", tips[random_index]).into_boxed_str())
 }

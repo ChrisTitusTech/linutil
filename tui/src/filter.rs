@@ -95,7 +95,7 @@ impl Filter {
 
         //Create the search bar widget
         let search_bar = Paragraph::new(display_text)
-            .block(Block::default().borders(Borders::ALL).title("Search"))
+            .block(Block::default().borders(Borders::ALL).title(" Search "))
             .style(Style::default().fg(search_color));
 
         //Render the search bar (First chunk of the screen)
