@@ -66,7 +66,6 @@ fetch_debian_latest_iso() {
     printf "%b\n" "${GREEN} Selected Debian Linux (latest) ISO URL: ${RC} $DEBIAN_URL"
 }
 
-# Function to fetch the latest Fedora Workstation ISO
 fetch_fedora_latest_iso() {
     FEDORA_BASE_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/40/Workstation/x86_64/iso/"
     FEDORA_ISO=$(curl -s -L "$FEDORA_BASE_URL" | grep -oP 'Fedora-Workstation-Live-x86_64-[\d.-]+\.iso' | sort -V | tail -1)
@@ -170,7 +169,6 @@ write_iso(){
     printf "%b" "${RED}WARNING: This will erase all data on ${USB_DEVICE}. Are you sure you want to continue? (y/N): ${RC}"
     read -r CONFIRMATION
 
-    # Convert the input to lowercase and compare
     if [ "$(echo "$CONFIRMATION" | tr '[:upper:]' '[:lower:]')" != "yes" ] && [ "$(echo "$CONFIRMATION" | tr '[:upper:]' '[:lower:]')" != "y" ]; then
         printf "%b\n" "${YELLOW}Operation cancelled.${RC}"
         exit 1
