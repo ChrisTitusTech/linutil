@@ -67,9 +67,7 @@ fetch_debian_latest_iso() {
 }
 
 fetch_fedora_latest_iso() {
-    FEDORA_BASE_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/40/Workstation/x86_64/iso/"
-    FEDORA_ISO=$(curl -s -L "$FEDORA_BASE_URL" | grep -oP 'Fedora-Workstation-Live-x86_64-[\d.-]+\.iso' | sort -V | tail -1)
-    FEDORA_URL="${FEDORA_BASE_URL}${FEDORA_ISO}"
+    FEDORA_URL=$(curl -s 'https://www.fedoraproject.org/releases.json' | jq -r '.[] | select(.version == "40" and .arch == "x86_64" and .variant == "Workstation") | select(.link | match(".*Live-x86_64*")) | .link')
     printf "%b\n" "${GREEN} Selected Fedora Workstation (latest) ISO URL: ${RC} $FEDORA_URL"
 }
 
