@@ -55,7 +55,7 @@
 - **Wifi Control**: Controls WiFi settings.
 - **Numlock Control**: Sets up Numlock on boot.
 - **Bluetooth Control**: Controls Bluetooth settings.
-- **Create Bootable USB**: Makes a USB Stick that can be used to install the selected Linux distribution.
+- **Bootable USB Creator**: Makes a USB Stick that can be used to install the selected Linux distribution.
 
 ### Monitor control
 
