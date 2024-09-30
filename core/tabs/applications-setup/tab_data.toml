@@ -37,7 +37,7 @@ task_list = "I"
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
 script = "Developer-tools/meld-setup.sh"
-task_list = "FI"
+task_list = "I FI"
 
 [[data.entries]]
 name = "Ngrok"
