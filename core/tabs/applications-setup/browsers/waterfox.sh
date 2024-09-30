@@ -35,4 +35,6 @@ esac
     fi
 }
 
+checkEnv
+checkEscalationTool
 installWaterfox
