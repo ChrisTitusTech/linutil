@@ -71,11 +71,10 @@ fetch_fedora_latest_iso() {
     grep -o '"link": "[^"]*' |
     sed -e 's/"link": "//' |
     awk -v version="40" -v arch="x86_64" -v variant="Workstation" ' BEGIN { FS="," }
-    {
-        if ($0 ~ version && $0 ~ arch && $0 ~ variant && $0 ~ "Live-x86_64") {
-            print $0
-        }
-    }' |
+        {
+            if ($0 ~ version && $0 ~ arch && $0 ~ variant && $0 ~ "Live-x86_64") 
+            { print $0 }
+        }' |
     head -n 1)
     printf "%b\n" "${GREEN} Selected Fedora Workstation (latest) ISO URL: ${RC} $FEDORA_URL"
 }
