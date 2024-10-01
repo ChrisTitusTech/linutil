@@ -33,6 +33,7 @@ jobs:
       - name: Check for bashisms
         if: steps.get_sh_files.outputs.changed == 1
         run: |
+          echo "Running for:\n$(cat changed_files)\n"
           for file in $(cat changed_files); do
             if [[ -f "$file" ]]; then
               checkbashisms "$file"
