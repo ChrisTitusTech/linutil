@@ -28,40 +28,31 @@ pub fn create_shortcut_list(
     render_width: u16,
 ) -> Box<[Line<'static>]> {
     let hints = shortcuts.into_iter().collect::<Box<[Shortcut]>>();
+    let shortcut_spans: Vec<Vec<Span<'static>>> = hints.iter().map(|h| h.to_spans()).collect();
 
-    let mut shortcut_spans: Vec<Vec<Span<'static>>> = hints.iter().map(|h| h.to_spans()).collect();
+    let max_shortcut_width = shortcut_spans
+        .iter()
+        .map(|s| span_vec_len(s))
+        .max()
+        .unwrap_or(0);
 
-    let mut lines: Vec<Line<'static>> = vec![];
+    let columns = (render_width as usize / (max_shortcut_width + 4)).max(1);
+    let rows = (shortcut_spans.len() + columns - 1) / columns;
 
-    loop {
-        let split_idx = shortcut_spans
-            .iter()
-            .scan(0usize, |total_len, s| {
-                // take at least one so that we guarantee that we drain the list
-                // otherwise, this might lock up if there's a shortcut that exceeds the window width
-                if *total_len == 0 {
-                    *total_len += span_vec_len(s) + 4;
-                    Some(())
-                } else {
-                    *total_len += span_vec_len(s);
-                    if *total_len > render_width as usize {
-                        None
-                    } else {
-                        *total_len += 4;
-                        Some(())
-                    }
-                }
-            })
-            .count();
+    let mut lines: Vec<Line<'static>> = Vec::new();
 
-        let rest = shortcut_spans.split_off(split_idx);
-        lines.push(add_spacing(shortcut_spans));
-
-        if rest.is_empty() {
-            break;
-        } else {
-            shortcut_spans = rest;
+    for row in 0..rows {
+        let mut row_spans = Vec::new();
+        for col in 0..columns {
+            let index = row * columns + col;
+            if index < shortcut_spans.len() {
+                let mut span = shortcut_spans[index].clone();
+                let padding = max_shortcut_width - span_vec_len(&span);
+                span.push(Span::raw(" ".repeat(padding)));
+                row_spans.push(span);
+            }
         }
+        lines.push(add_spacing(row_spans));
     }
 
     lines.into_boxed_slice()
