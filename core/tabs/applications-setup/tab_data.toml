@@ -28,12 +28,6 @@ script = "Developer-tools/vscode-setup.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "Lapce"
-description = "Lapce is an open source code editor written in Rust."
-script = "Developer-tools/lapce.sh"
-task_list = "FI"
-
-[[data.entries]]
 name = "VS Codium"
 description = "VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding."
 script = "Developer-tools/vscodium-setup.sh"
