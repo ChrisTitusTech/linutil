@@ -13,7 +13,7 @@ disable_monitor() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Disable Monitor${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b" "Choose a monitor to disable: "
+    printf "%b\n" "Choose a monitor to disable: "
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"
