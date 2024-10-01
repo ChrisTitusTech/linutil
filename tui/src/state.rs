@@ -56,7 +56,7 @@ pub struct AppState {
     selected_commands: Vec<Command>,
     drawable: bool,
     #[cfg(feature = "tips")]
-    tip: &'static str,
+    tip: String,
 }
 
 pub enum Focus {
@@ -363,7 +363,7 @@ impl AppState {
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
+        let bottom_title = Line::from(self.tip.clone().bold().blue()).right_aligned();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
@@ -686,13 +686,13 @@ impl AppState {
 const TIPS: &str = include_str!("../cool_tips.txt");
 
 #[cfg(feature = "tips")]
-fn get_random_tip() -> &'static str {
+fn get_random_tip() -> String {
     let tips: Vec<&str> = TIPS.lines().collect();
     if tips.is_empty() {
-        return "";
+        return "".to_string();
     }
 
     let mut rng = rand::thread_rng();
     let random_index = rng.gen_range(0..tips.len());
-    Box::leak(format!(" {} ", tips[random_index]).into_boxed_str())
+    format!(" {} ", tips[random_index])
 }
