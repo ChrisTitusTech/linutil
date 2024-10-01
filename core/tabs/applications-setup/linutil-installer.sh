@@ -15,9 +15,9 @@ installLinutil() {
             printf "%b" "Enter your choice: "
             read -r choice
             case $choice in
-                1) "$AUR_HELPER" -S --noconfirm linutil ;;
-                2) "$AUR_HELPER" -S --noconfirm linutil-bin ;;
-                3) "$AUR_HELPER" -S --noconfirm linutil-git ;;
+                1) "$AUR_HELPER" -S --needed --noconfirm linutil ;;
+                2) "$AUR_HELPER" -S --needed --noconfirm linutil-bin ;;
+                3) "$AUR_HELPER" -S --needed --noconfirm linutil-git ;;
                 *)
                     printf "%b\n" "${RED}Invalid choice:${RC} $choice"
                     exit 1

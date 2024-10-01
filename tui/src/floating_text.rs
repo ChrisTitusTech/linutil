@@ -302,7 +302,7 @@ impl FloatContent for FloatingText {
                 Shortcut::new("Scroll up", ["k", "Up"]),
                 Shortcut::new("Scroll left", ["h", "Left"]),
                 Shortcut::new("Scroll right", ["l", "Right"]),
-                Shortcut::new("Close window", ["Enter", "p", "d", "g"]),
+                Shortcut::new("Close window", ["Enter", "p", "q", "d", "g"]),
             ]),
         )
     }

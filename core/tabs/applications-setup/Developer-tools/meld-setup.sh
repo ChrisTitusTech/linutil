@@ -3,8 +3,23 @@
 . ../../common-script.sh
 
 installMeld() {
-    cd "$HOME" && git clone https://gitlab.gnome.org/GNOME/meld.git
-    echo "PATH=\$PATH:$HOME/meld/bin" | "$ESCALATION_TOOL" tee -a /etc/environment
+    if ! command_exists meld; then
+        printf "%b\n" "${YELLOW}Installing Meld...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm meld
+                ;;
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" -y install meld
+                ;;
+            *)
+                . ../setup-flatpak.sh
+                flatpak install -y flathub org.gnome.meld
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}Meld is already installed.${RC}"
+    fi
 }
 
 checkEnv
