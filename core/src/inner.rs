@@ -1,13 +1,15 @@
-use crate::{Command, ListNode, Tab};
-use ego_tree::{NodeMut, Tree};
-use include_dir::{include_dir, Dir};
-use serde::Deserialize;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
+    rc::Rc,
 };
+
+use crate::{Command, ListNode, Tab};
+use ego_tree::{NodeMut, Tree};
+use include_dir::{include_dir, Dir};
+use serde::Deserialize;
 use tempdir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
@@ -35,12 +37,12 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                 },
                 directory,
             )| {
-                let mut tree = Tree::new(ListNode {
+                let mut tree = Tree::new(Rc::new(ListNode {
                     name: "root".to_string(),
                     description: String::new(),
                     command: Command::None,
                     task_list: String::new(),
-                });
+                }));
                 let mut root = tree.root_mut();
                 create_directory(data, &mut root, &directory, validate);
                 Tab {
@@ -164,28 +166,28 @@ fn filter_entries(entries: &mut Vec<Entry>) {
 
 fn create_directory(
     data: Vec<Entry>,
-    node: &mut NodeMut<ListNode>,
+    node: &mut NodeMut<Rc<ListNode>>,
     command_dir: &Path,
     validate: bool,
 ) {
     for entry in data {
         match entry.entry_type {
             EntryType::Entries(entries) => {
-                let mut node = node.append(ListNode {
+                let mut node = node.append(Rc::new(ListNode {
                     name: entry.name,
                     description: entry.description,
                     command: Command::None,
                     task_list: String::new(),
-                });
+                }));
                 create_directory(entries, &mut node, command_dir, validate);
             }
             EntryType::Command(command) => {
-                node.append(ListNode {
+                node.append(Rc::new(ListNode {
                     name: entry.name,
                     description: entry.description,
                     command: Command::Raw(command),
                     task_list: String::new(),
-                });
+                }));
             }
             EntryType::Script(script) => {
                 let script = command_dir.join(script);
@@ -194,7 +196,7 @@ fn create_directory(
                 }
 
                 if let Some((executable, args)) = get_shebang(&script, validate) {
-                    node.append(ListNode {
+                    node.append(Rc::new(ListNode {
                         name: entry.name,
                         description: entry.description,
                         command: Command::LocalFile {
@@ -203,7 +205,7 @@ fn create_directory(
                             file: script,
                         },
                         task_list: entry.task_list,
-                    });
+                    }));
                 }
             }
         }
