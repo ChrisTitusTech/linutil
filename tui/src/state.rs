@@ -140,12 +140,10 @@ impl AppState {
                 hints.push(Shortcut::new("Select item below", ["j", "Down"]));
                 hints.push(Shortcut::new("Next theme", ["t"]));
                 hints.push(Shortcut::new("Previous theme", ["T"]));
-
-                if self.is_current_tab_multi_selectable() {
-                    hints.push(Shortcut::new("Toggle multi-selection mode", ["v"]));
+                hints.push(Shortcut::new("Multi-selection mode", ["v"]));
+                if self.multi_select {
                     hints.push(Shortcut::new("Select multiple commands", ["Space"]));
                 }
-
                 hints.push(Shortcut::new("Next tab", ["Tab"]));
                 hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
                 hints.push(Shortcut::new("Important actions guide", ["g"]));
@@ -462,6 +460,13 @@ impl AppState {
                         // enabled, need to clear it to prevent state corruption
                         if !self.multi_select {
                             self.selected_commands.clear()
+                        } else {
+                            // Prevents non multi_selectable cmd from being pushed into the selected list
+                            if let Some(node) = self.get_selected_node() {
+                                if !node.multi_select {
+                                    self.selected_commands.retain(|cmd| cmd.name != node.name);
+                                }
+                            }
                         }
                     }
                     ConfirmStatus::Confirm => self.handle_confirm_command(),
@@ -519,29 +524,22 @@ impl AppState {
     }
 
     fn toggle_multi_select(&mut self) {
-        if self.is_current_tab_multi_selectable() {
-            self.multi_select = !self.multi_select;
-            if !self.multi_select {
-                self.selected_commands.clear();
-            }
+        self.multi_select = !self.multi_select;
+        if !self.multi_select {
+            self.selected_commands.clear();
         }
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_node() {
-            if self.selected_commands.contains(&command) {
-                self.selected_commands.retain(|c| c != &command);
-            } else {
-                self.selected_commands.push(command);
+        if let Some(node) = self.get_selected_node() {
+            if node.multi_select {
+                if self.selected_commands.contains(&node) {
+                    self.selected_commands.retain(|c| c != &node);
+                } else {
+                    self.selected_commands.push(node);
+                }
             }
         }
-    }
-
-    pub fn is_current_tab_multi_selectable(&self) -> bool {
-        let index = self.current_tab.selected().unwrap_or(0);
-        self.tabs
-            .get(index)
-            .map_or(false, |tab| tab.multi_selectable)
     }
 
     fn update_items(&mut self) {
@@ -550,10 +548,6 @@ impl AppState {
             self.current_tab.selected().unwrap(),
             *self.visit_stack.last().unwrap(),
         );
-        if !self.is_current_tab_multi_selectable() {
-            self.multi_select = false;
-            self.selected_commands.clear();
-        }
     }
 
     /// Checks either the current tree node is the root node (can we go up the tree or no)
