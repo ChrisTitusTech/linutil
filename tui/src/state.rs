@@ -315,7 +315,12 @@ impl AppState {
                 let (indicator, style) = if is_selected {
                     (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    ("", Style::new())
+                    let ms_style = if self.multi_select && !node.multi_select {
+                        Style::default().fg(self.theme.multi_select_disabled_color())
+                    } else {
+                        Style::new()
+                    };
+                    ("", ms_style)
                 };
                 if *has_children {
                     Line::from(format!(
@@ -325,6 +330,7 @@ impl AppState {
                         indicator
                     ))
                     .style(self.theme.dir_color())
+                    .patch_style(style)
                 } else {
                     Line::from(format!(
                         "{}  {} {}",
@@ -342,13 +348,21 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
+                let ms_style = if self.multi_select && !node.multi_select {
+                    Style::default().fg(self.theme.multi_select_disabled_color())
+                } else {
+                    Style::new()
+                };
                 if *has_children {
-                    Line::from(" ").style(self.theme.dir_color())
+                    Line::from(" ")
+                        .style(self.theme.dir_color())
+                        .patch_style(ms_style)
                 } else {
                     Line::from(format!("{} ", node.task_list))
                         .alignment(Alignment::Right)
                         .style(self.theme.cmd_color())
                         .bold()
+                        .patch_style(ms_style)
                 }
             },
         ));
