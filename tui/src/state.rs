@@ -363,7 +363,7 @@ impl AppState {
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.clone().bold().blue()).right_aligned();
+        let bottom_title = Line::from(self.tip.as_str().bold().blue()).right_aligned();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
