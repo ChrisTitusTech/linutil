@@ -36,6 +36,7 @@ pub struct FloatingText {
     v_scroll: usize,
     h_scroll: usize,
     mode_title: &'static str,
+    frame_height: usize,
 }
 
 macro_rules! style {
@@ -143,6 +144,7 @@ impl FloatingText {
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
+            frame_height: 0,
         }
     }
 
@@ -173,6 +175,7 @@ impl FloatingText {
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
+            frame_height: 0,
         })
     }
 
@@ -185,7 +188,8 @@ impl FloatingText {
     }
 
     fn scroll_down(&mut self) {
-        if self.v_scroll + 1 < self.src.len() {
+        let visible_lines = self.get_visible_lines();
+        if self.v_scroll + visible_lines < self.src.len() {
             self.v_scroll += 1;
         }
     }
@@ -207,10 +211,16 @@ impl FloatingText {
             self.h_scroll += 1;
         }
     }
+
+    fn get_visible_lines(&self) -> usize {
+        self.frame_height.saturating_sub(2)
+    }
 }
 
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        self.frame_height = area.height as usize;
+
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
