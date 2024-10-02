@@ -52,16 +52,20 @@ impl FloatContent for RunningCommand {
         let (content, content_style) = if !self.is_finished() {
             (" Running command... ", Style::default().reversed())
         } else if self.wait_command().success() {
-            (" Success ", Style::default().green().reversed())
+            (" Success ", Style::default().bold().green().reversed())
         } else {
-            (" Failed ", Style::default().red().reversed())
+            (" Failed ", Style::default().bold().red().reversed())
         };
 
         Some(Line::from(content).style(content_style))
     }
 
     fn bottom_title(&self) -> Option<Line<'_>> {
-        Some(Line::from("Press Ctrl-C to KILL the command"))
+        Some(Line::from(if !self.is_finished() {
+            " Press [CTRL-c] to KILL the command "
+        } else {
+            " Press [Enter] to close this window "
+        }))
     }
 
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
