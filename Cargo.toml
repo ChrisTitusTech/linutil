@@ -9,6 +9,9 @@ ego-tree = "0.6.2"
 members = ["tui", "core"]
 resolver = "2"
 
+[patch.crates-io]
+vt100 = { path = "vt100" }
+
 [profile.release]
 opt-level = "z"
 debug = false
