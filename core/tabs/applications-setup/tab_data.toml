@@ -1,5 +1,30 @@
 name = "Applications Setup"
 
+
+[[data]]
+name = "Rahul Setups"
+
+[[data.entries]]
+name = "alacritty"
+description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
+script = "rahul-setups/alacritty-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "dwm-rahul"
+description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
+script = "rahul-setups/dwmrahul-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "mybash"
+description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.\nIt is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.\nThis command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
+script = "rahul-setups/mybash-setup.sh"
+task_list = "I"
+
+
+
+
 [[data]]
 name = "Developer Tools"
 
@@ -289,3 +314,11 @@ name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
 task_list = "I FM"
+
+
+
+
+
+
+
+
