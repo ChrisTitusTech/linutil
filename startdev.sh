@@ -21,11 +21,11 @@ get_latest_release() {
 redirect_to_latest_pre_release() {
   latest_release=$(get_latest_release)
   if [ -n "$latest_release" ]; then
-    url="https://github.com/ChrisTitusTech/linutil/releases/download/$latest_release/linutil"
+    url="https://github.com/aarjaycreation/linutil/releases/download/$latest_release/linutil"
   else
     printf "%b\n" 'Unable to determine latest pre-release version.' >&2
     printf "%b\n" "Using latest Full Release"
-    url="https://github.com/ChrisTitusTech/linutil/releases/latest/download/linutil"
+    url="https://github.com/aarjaycreation/linutil/releases/latest/download/linutil"
   fi
   addArch
   printf "%b\n" "Using URL: $url"
