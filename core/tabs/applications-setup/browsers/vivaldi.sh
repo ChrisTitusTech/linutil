@@ -5,7 +5,7 @@
 installVivaldi() {
     if ! command_exists vivaldi; then
         printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
-case "$PACKAGER" in
+        case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor | sudo dd of=/usr/share/keyrings/vivaldi-browser.gpg
@@ -17,6 +17,13 @@ case "$PACKAGER" in
                 "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://repo.vivaldi.com/stable/vivaldi-fedora.repo
                 "$ESCALATION_TOOL" "$PACKAGER" install -y vivaldi-stable
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" zypper ar https://repo.vivaldi.com/archive/vivaldi-suse.repo
+                "$ESCALATION_TOOL" zypper --non-interactive --gpg-auto-import-keys in vivaldi-stable
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xdg-utils vivaldi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
