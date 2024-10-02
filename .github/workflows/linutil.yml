@@ -104,7 +104,7 @@ jobs:
       - name: Upload the preview
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: New Preview
+          commit_message: Preview for ${{ env.version }}
           file_pattern: "docs/assets/preview.gif"
           add_options: "--force"
         if: success()
