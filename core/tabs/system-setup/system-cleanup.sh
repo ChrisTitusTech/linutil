@@ -23,7 +23,8 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm
+            # -Rns will return 1 if there are no packages provided
+            "$PACKAGER" -Qtdq | "$ESCALATION_TOOL" "$PACKAGER" -Rns --noconfirm -- &> /dev/null 2>&1 || true
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
