@@ -88,3 +88,23 @@ jobs:
         env:
           version: ${{ env.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install vhs
+        run: |
+          wget 'https://github.com/charmbracelet/vhs/releases/download/v0.8.0/vhs_0.8.0_amd64.deb'
+          sudo apt install -y ffmpeg
+          sudo snap install ttyd --classic
+          sudo dpkg -i 'vhs_0.8.0_amd64.deb'
+
+      - name: Build the preview
+        run: |
+          export PATH="$(pwd)/build:$PATH"
+          vhs docs/assets/preview.tape -o docs/assets/preview.gif
+
+      - name: Upload the preview
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: New Preview
+          file_pattern: "docs/assets/preview.gif"
+          add_options: "--force"
+        if: success()
