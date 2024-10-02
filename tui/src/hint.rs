@@ -27,8 +27,8 @@ pub fn create_shortcut_list(
     shortcuts: impl IntoIterator<Item = Shortcut>,
     render_width: u16,
 ) -> Box<[Line<'static>]> {
-    let hints = shortcuts.into_iter().collect::<Box<[Shortcut]>>();
-    let shortcut_spans: Vec<Vec<Span<'static>>> = hints.iter().map(|h| h.to_spans()).collect();
+    let shortcut_spans: Vec<Vec<Span<'static>>> =
+        shortcuts.into_iter().map(|h| h.to_spans()).collect();
 
     let max_shortcut_width = shortcut_spans
         .iter()
