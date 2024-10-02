@@ -188,7 +188,7 @@ impl FloatingText {
     }
 
     fn scroll_down(&mut self) {
-        let visible_lines = self.get_visible_lines();
+        let visible_lines = self.frame_height.saturating_sub(2);
         if self.v_scroll + visible_lines < self.src.len() {
             self.v_scroll += 1;
         }
@@ -210,10 +210,6 @@ impl FloatingText {
         if self.h_scroll + 1 < self.max_line_width {
             self.h_scroll += 1;
         }
-    }
-
-    fn get_visible_lines(&self) -> usize {
-        self.frame_height.saturating_sub(2)
     }
 }
 
