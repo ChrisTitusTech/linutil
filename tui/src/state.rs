@@ -613,7 +613,11 @@ impl AppState {
             return;
         }
 
-        let actual_index = if self.at_root() { selected_index } else { selected_index - 1 };
+        let actual_index = if self.at_root() {
+            selected_index
+        } else {
+            selected_index - 1
+        };
 
         if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
