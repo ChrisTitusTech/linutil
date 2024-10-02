@@ -9,7 +9,7 @@ themeinstall(){
         mv 'Top-5-Bootloader-Themes' 'Top-5-Bootloader-Themes.bak'
     fi
     git clone "https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes"
-    cd "$HOME/.local/share/Top-5-Bootloader-Themes"
+    cd "Top-5-Bootloader-Themes"
     "$ESCALATION_TOOL" ./install.sh
 }
 
