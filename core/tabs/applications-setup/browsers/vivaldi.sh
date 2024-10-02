@@ -23,7 +23,7 @@ installVivaldi() {
                 "$ESCALATION_TOOL" zypper --non-interactive --gpg-auto-import-keys in vivaldi-stable
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xdg-utils vivaldi
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm vivaldi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
