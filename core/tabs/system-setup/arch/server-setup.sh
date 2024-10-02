@@ -130,7 +130,7 @@ echo -ne "
 ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
 ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 ------------------------------------------------------------------------
-            Please select presetup settings for your system              
+            Please select presetup settings for your system
 ------------------------------------------------------------------------
 "
 }
@@ -146,7 +146,7 @@ filesystem () {
     case $? in
     0) export FS=btrfs;;
     1) export FS=ext4;;
-    2) 
+    2)
         set_password "LUKS_PASSWORD"
         export FS=luks
         ;;
@@ -155,14 +155,14 @@ filesystem () {
     esac
 }
 
-# @description Detects and sets timezone. 
+# @description Detects and sets timezone.
 timezone () {
     # Added this from arch wiki https://wiki.archlinux.org/title/System_time
     time_zone="$(curl --fail https://ipapi.co/timezone)"
     echo -ne "
     System detected your timezone to be '$time_zone' \n"
     echo -ne "Is this correct?
-    " 
+    "
     options=("Yes" "No")
     select_option "${options[@]}"
 
@@ -171,14 +171,14 @@ timezone () {
         echo "${time_zone} set as timezone"
         export TIMEZONE=$time_zone;;
         n|N|no|NO|No)
-        echo "Please enter your desired timezone e.g. Europe/London :" 
+        echo "Please enter your desired timezone e.g. Europe/London :"
         read -r new_timezone
         echo "${new_timezone} set as timezone"
         export TIMEZONE=$new_timezone;;
         *) echo "Wrong option. Try again";timezone;;
     esac
 }
-# @description Set user's keyboard mapping. 
+# @description Set user's keyboard mapping.
 keymap () {
     echo -ne "
     Please select key board layout from this list"
@@ -236,18 +236,18 @@ echo -ne "
     drivessd
 }
 
-# @description Gather username and password to be used for installation. 
+# @description Gather username and password to be used for installation.
 userinfo () {
     # Loop through user input until the user gives a valid username
     while true
-    do 
+    do
             read -r -p "Please enter username: " username
             if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-            then 
+            then
                     break
-            fi 
+            fi
             echo "Incorrect username."
-    done 
+    done
     export USERNAME=$username
 
     while true
@@ -264,22 +264,22 @@ userinfo () {
     done
     export PASSWORD=$PASSWORD1
 
-     # Loop through user input until the user gives a valid hostname, but allow the user to force save 
+     # Loop through user input until the user gives a valid hostname, but allow the user to force save
     while true
-    do 
+    do
             read -r -p "Please name your machine: " name_of_machine
             # hostname regex (!!couldn't find spec for computer name!!)
             if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-            then 
-                    break 
-            fi 
+            then
+                    break
+            fi
             # if validation fails allow the user to force saving of the hostname
-            read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
+            read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force
             if [[ "${force,,}" = "y" ]]
-            then 
-                    break 
-            fi 
-    done 
+            then
+                    break
+            fi
+    done
     export NAME_OF_MACHINE=$name_of_machine
 }
 
@@ -351,7 +351,7 @@ echo -ne "
                     Creating Filesystems
 -------------------------------------------------------------------------
 "
-# @description Creates the btrfs subvolumes. 
+# @description Creates the btrfs subvolumes.
 createsubvolumes () {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
@@ -362,11 +362,11 @@ mountallsubvol () {
     mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
 }
 
-# @description BTRFS subvolulme creation and mounting. 
+# @description BTRFS subvolulme creation and mounting.
 subvolumesetup () {
 # create nonroot subvolumes
-    createsubvolumes     
-# unmount root to remount with subvolume 
+    createsubvolumes
+# unmount root to remount with subvolume
     umount /mnt
 # mount @ subvolume
     mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
@@ -386,25 +386,28 @@ fi
 
 if [[ "${FS}" == "btrfs" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
-    mkfs.btrfs -L ROOT "${partition3}" -f
+    mkfs.btrfs -f "${partition3}"
     mount -t btrfs "${partition3}" /mnt
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
-    mkfs.ext4 -L ROOT "${partition3}"
+    mkfs.ext4 "${partition3}"
     mount -t ext4 "${partition3}" /mnt
 elif [[ "${FS}" == "luks" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.vfat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
     echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
-# open luks container and ROOT will be place holder 
+# open luks container and ROOT will be place holder
     echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
-    mkfs.btrfs -L ROOT "${partition3}"
+    mkfs.btrfs "${partition3}"
 # create subvolumes for btrfs
     mount -t btrfs "${partition3}" /mnt
     subvolumesetup
+    ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value "${partition3}")
 fi
+
+BOOT_UUID=$(blkid -s UUID -o value "${partition2}")
 
 sync
 if ! mountpoint -q /mnt; then
@@ -412,7 +415,7 @@ if ! mountpoint -q /mnt; then
     exit 1
 fi
 mkdir -p /mnt/boot/efi
-mount -t vfat -L EFIBOOT /mnt/boot/
+mount -t vfat -U "${BOOT_UUID}" /mnt/boot/
 
 if ! grep -qs '/mnt' /proc/mounts; then
     echo "Drive is not mounted can not continue"
@@ -435,8 +438,8 @@ fi
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
-genfstab -L /mnt >> /mnt/etc/fstab
-echo " 
+genfstab -U /mnt >> /mnt/etc/fstab
+echo "
   Generated /etc/fstab:
 "
 cat /mnt/etc/fstab
@@ -475,14 +478,14 @@ arch-chroot /mnt /bin/bash -c "KEYMAP='${KEYMAP}' /bin/bash" <<EOF
 
 echo -ne "
 -------------------------------------------------------------------------
-                    Network Setup 
+                    Network Setup
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed networkmanager dhclient
 systemctl enable --now NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
-                    Setting up mirrors for optimal download 
+                    Setting up mirrors for optimal download
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed pacman-contrib curl
@@ -504,7 +507,7 @@ sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg
 fi
 echo -ne "
 -------------------------------------------------------------------------
-                    Setup Language to US and set locale  
+                    Setup Language to US and set locale
 -------------------------------------------------------------------------
 "
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
@@ -572,7 +575,7 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 groupadd libvirt
-useradd -m -G wheel,libvirt -s /bin/bash $USERNAME 
+useradd -m -G wheel,libvirt -s /bin/bash $USERNAME
 echo "$USERNAME created, home directory created, added to wheel and libvirt group, default shell set to /bin/bash"
 echo "$USERNAME:$PASSWORD" | chpasswd
 echo "$USERNAME password set"
