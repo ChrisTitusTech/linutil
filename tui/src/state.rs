@@ -512,6 +512,9 @@ impl AppState {
 
     fn scroll_down(&mut self) {
         let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
         let current = self.selection.selected().unwrap_or(0);
         let max_index = if self.at_root() { len - 1 } else { len };
         let next = if current + 1 > max_index {
@@ -525,6 +528,9 @@ impl AppState {
 
     fn scroll_up(&mut self) {
         let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
         let current = self.selection.selected().unwrap_or(0);
         let max_index = if self.at_root() { len - 1 } else { len };
         let next = if current == 0 { max_index } else { current - 1 };
