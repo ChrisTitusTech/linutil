@@ -1,11 +1,16 @@
-# Chris Titus Tech's Linux Utility
+<h1 align="center">Chris Titus Tech's Linux Utility</h1>
 
-[![Version](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest)
-![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge)
-[![](https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp)](https://discord.gg/bujFYKAHSp)
+<p align="center">
+  <a href="https://github.com/ChrisTitusTech/linutil/releases/latest"><img src="https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest%20Release&style=for-the-badge" alt="Version"></a>
+  <img src="https://img.shields.io/github/downloads/ChrisTitusTech/linutil/linutil?label=Total%20Downloads&style=for-the-badge" alt="GitHub Downloads">
+  <a href="https://discord.gg/bujFYKAHSp"><img src="https://dcbadge.limes.pink/api/server/https://discord.gg/bujFYKAHSp" alt="Discord"></a>
+</p>
 
-<!-- TODO: crates.io package here + <br> -->
-[![Crates.io Version](https://img.shields.io/crates/v/linutil_tui?style=for-the-badge&color=%23af3a03)](https://crates.io/crates/linutil_tui) [![linutil AUR Version](https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff)](https://aur.archlinux.org/packages/linutil) [![linutil-bin AUR Version](https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff)](https://aur.archlinux.org/packages/linutil-bin)
+<p align="center">
+  <a href="https://crates.io/crates/linutil_tui"><img src="https://img.shields.io/crates/v/linutil_tui?style=for-the-badge&color=%23af3a03" alt="Crates.io Version"></a>
+  <a href="https://aur.archlinux.org/packages/linutil"><img src="https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff" alt="linutil AUR Version"></a>
+  <a href="https://aur.archlinux.org/packages/linutil-bin"><img src="https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff" alt="linutil-bin AUR Version"></a>
+</p>
 
 <p align="center">
   <img src="docs/assets/logo.jpg" alt="Image">
