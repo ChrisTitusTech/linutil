@@ -82,8 +82,7 @@ Type "/" Sleep 1s
 Type@200ms "System Cleanup" Sleep 1s  Enter
 
 Sleep 2s
-Enter Sleep 1s
-# Type "y" Sleep 18s    # CONFIRMATION PROMPT
-Sleep 18s            # REMOVE THIS IF PREVIOUS LINE GETS UNCOMMENTED
+Enter Sleep 3s
+Type "y" Sleep 15s    # CONFIRMATION PROMPT
 
 Escape
