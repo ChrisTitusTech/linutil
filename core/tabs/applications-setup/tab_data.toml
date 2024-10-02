@@ -23,6 +23,12 @@ script = "rahul-setups/mybash-setup.sh"
 task_list = "I"
 
 
+[[data.entries]]
+name = "rofi-setup"
+description = "demo rofi"
+script = "rahul-setups/rofi-setup.sh"
+task_list = "I"
+
 
 
 [[data]]
