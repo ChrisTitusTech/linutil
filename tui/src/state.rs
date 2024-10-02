@@ -772,9 +772,6 @@ impl AppState {
 
     fn scroll_tab_up(&mut self) {
         let len = self.tabs.len();
-        if len == 0 {
-            return;
-        }
         let current = self.current_tab.selected().unwrap_or(0);
         let next = if current == 0 { len - 1 } else { current - 1 };
         self.current_tab.select(Some(next));
