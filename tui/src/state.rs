@@ -77,6 +77,13 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+enum SelectedItem {
+    UpDir,
+    Directory,
+    Command,
+    None,
+}
+
 impl AppState {
     pub fn new(theme: Theme, override_validation: bool) -> Self {
         let tabs = linutil_core::get_tabs(!override_validation);
@@ -574,9 +581,8 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        if self.visit_stack.len() > 1 {
+        if let Some(previous_position) = self.position_stack.pop() {
             self.visit_stack.pop();
-            let previous_position = self.position_stack.pop().unwrap_or(0);
             self.selection.select(Some(previous_position));
             self.update_items();
         }
@@ -674,26 +680,39 @@ impl AppState {
         }
     }
 
-    fn handle_enter(&mut self) {
+    fn get_selected_item_type(&self) -> SelectedItem {
         if self.selected_item_is_up_dir() {
-            self.enter_parent_directory();
+            SelectedItem::UpDir
         } else if self.selected_item_is_dir() {
-            self.go_to_selected_dir();
+            SelectedItem::Directory
         } else if self.selected_item_is_cmd() {
-            if self.selected_commands.is_empty() {
-                if let Some(node) = self.get_selected_node() {
-                    self.selected_commands.push(node);
+            SelectedItem::Command
+        } else {
+            SelectedItem::None
+        }
+    }
+
+    fn handle_enter(&mut self) {
+        match self.get_selected_item_type() {
+            SelectedItem::UpDir => self.enter_parent_directory(),
+            SelectedItem::Directory => self.go_to_selected_dir(),
+            SelectedItem::Command => {
+                if self.selected_commands.is_empty() {
+                    if let Some(node) = self.get_selected_node() {
+                        self.selected_commands.push(node);
+                    }
                 }
+
+                let cmd_names = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect::<Vec<_>>();
+
+                let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
             }
-
-            let cmd_names = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect::<Vec<_>>();
-
-            let prompt = ConfirmPrompt::new(&cmd_names[..]);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+            SelectedItem::None => {}
         }
     }
 
