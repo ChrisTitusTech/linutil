@@ -14,7 +14,7 @@ use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, Clear, List},
+    widgets::{Block, List},
     Frame,
 };
 
@@ -196,21 +196,20 @@ impl FloatingText {
 }
 
 impl FloatContent for FloatingText {
+    fn top_title(&self) -> Option<Line<'_>> {
+        let title_text = format!(" {} ", self.mode_title);
+        let title_line = Line::from(title_text)
+            .centered()
+            .style(Style::default().reversed());
+        Some(title_line)
+    }
+
+    fn bottom_title(&self) -> Option<Line<'_>> {
+        None
+    }
+
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        // Define the Block with a border and background color
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .title(self.mode_title.clone())
-            .title_alignment(ratatui::layout::Alignment::Center)
-            .title_style(Style::default().reversed())
-            .style(Style::default());
-
-        // Draw the Block first
-        frame.render_widget(block.clone(), area);
-
-        // Calculate the inner area to ensure text is not drawn over the border
-        let inner_area = block.inner(area);
-        let Rect { height, .. } = inner_area;
+        let Rect { height, .. } = area;
         let lines = self
             .src
             .iter()
@@ -253,11 +252,8 @@ impl FloatContent for FloatingText {
             .block(Block::default())
             .highlight_style(Style::default().reversed());
 
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
-
         // Render the list inside the bordered area
-        frame.render_widget(list, inner_area);
+        frame.render_widget(list, area);
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {

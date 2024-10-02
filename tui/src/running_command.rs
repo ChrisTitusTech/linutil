@@ -1,32 +1,39 @@
-use crate::{float::FloatContent, hint::Shortcut};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use linutil_core::Command;
-use oneshot::{channel, Receiver};
-use portable_pty::{
-    ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
-};
-use ratatui::{
-    layout::{Rect, Size},
-    style::{Color, Style, Stylize},
-    text::{Line, Span},
-    widgets::{Block, Borders},
-    Frame,
-};
 use std::{
+    cell::{Cell, RefCell},
     io::Write,
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
+
+use crate::{float::FloatContent, hint::Shortcut};
+
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+
+use oneshot::{channel, Receiver};
+
+use portable_pty::{
+    ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
+};
+
+use ratatui::{
+    layout::Rect,
+    style::{Style, Stylize},
+    text::Line,
+    Frame,
+};
+
 use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
 
+use linutil_core::Command;
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
     /// A handle for the thread running the command
-    command_thread: Option<JoinHandle<ExitStatus>>,
+    command_thread: Cell<Option<JoinHandle<ExitStatus>>>,
     /// A handle to kill the running process; it's an option because it can only be used once
     child_killer: Option<Receiver<Box<dyn ChildKiller + Send + Sync>>>,
     /// A join handle for the thread that reads command output and sends it to the main thread
@@ -36,56 +43,31 @@ pub struct RunningCommand {
     /// Used for sending keys to the emulated terminal
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
-    status: Option<ExitStatus>,
+    status: RefCell<Option<ExitStatus>>,
     scroll_offset: usize,
 }
 
 impl FloatContent for RunningCommand {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        // Calculate the inner size of the terminal area, considering borders
-        let inner_size = Size {
-            width: area.width - 2, // Adjust for border width
-            height: area.height - 2,
-        };
-
-        // Define the block for the terminal display
-        let block = if !self.is_finished() {
-            // Display a block indicating the command is running
-            Block::default()
-                .borders(Borders::ALL)
-                .title_top(Line::from("Running the command....").centered())
-                .title_style(Style::default().reversed())
-                .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
+    fn top_title(&self) -> Option<Line<'_>> {
+        let (content, content_style) = if !self.is_finished() {
+            (" Running command... ", Style::default().reversed())
+        } else if self.wait_command().success() {
+            (" Success ", Style::default().green().reversed())
         } else {
-            // Display a block with the command's exit status
-            let mut title_line = if self.get_exit_status().success() {
-                Line::from(
-                    Span::default()
-                        .content("SUCCESS!")
-                        .style(Style::default().fg(Color::Green).reversed()),
-                )
-            } else {
-                Line::from(
-                    Span::default()
-                        .content("FAILED!")
-                        .style(Style::default().fg(Color::Red).reversed()),
-                )
-            };
-
-            title_line.push_span(
-                Span::default()
-                    .content(" press <ENTER> to close this window ")
-                    .style(Style::default()),
-            );
-
-            Block::default()
-                .borders(Borders::ALL)
-                .title_top(title_line.centered())
+            (" Failed ", Style::default().red().reversed())
         };
 
+        Some(Line::from(content).style(content_style))
+    }
+
+    fn bottom_title(&self) -> Option<Line<'_>> {
+        Some(Line::from("Press Ctrl-C to KILL the command"))
+    }
+
+    fn draw(&mut self, frame: &mut Frame, area: Rect) {
         // Process the buffer and create the pseudo-terminal widget
-        let screen = self.screen(inner_size);
-        let pseudo_term = PseudoTerminal::new(&screen).block(block);
+        let screen = self.screen(area);
+        let pseudo_term = PseudoTerminal::new(&screen);
 
         // Render the widget on the frame
         frame.render_widget(pseudo_term, area);
@@ -116,12 +98,7 @@ impl FloatContent for RunningCommand {
     }
 
     fn is_finished(&self) -> bool {
-        // Check if the command thread has finished
-        if let Some(command_thread) = &self.command_thread {
-            command_thread.is_finished()
-        } else {
-            true
-        }
+        self.status.borrow().is_some()
     }
 
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
@@ -229,17 +206,17 @@ impl RunningCommand {
         let writer = pair.master.take_writer().unwrap();
         Self {
             buffer: command_buffer,
-            command_thread: Some(command_handle),
-            child_killer: Some(rx),
+            command_thread: Some(command_handle).into(),
+            child_killer: rx.into(),
             _reader_thread: reader_handle,
             pty_master: pair.master,
             writer,
-            status: None,
+            status: None.into(),
             scroll_offset: 0,
         }
     }
 
-    fn screen(&mut self, size: Size) -> Screen {
+    fn screen(&mut self, size: Rect) -> Screen {
         // Resize the emulated pty
         self.pty_master
             .resize(PtySize {
@@ -263,14 +240,16 @@ impl RunningCommand {
     }
 
     /// This function will block if the command is not finished
-    fn get_exit_status(&mut self) -> ExitStatus {
-        if self.command_thread.is_some() {
-            let handle = self.command_thread.take().unwrap();
-            let exit_status = handle.join().unwrap();
-            self.status = Some(exit_status.clone());
-            exit_status
-        } else {
-            self.status.as_ref().unwrap().clone()
+    fn wait_command(&self) -> ExitStatus {
+        let status = { self.status.borrow().clone() };
+        match status {
+            Some(status) => status,
+            None => {
+                let handle = self.command_thread.take().unwrap();
+                let exit_status = handle.join().unwrap();
+                self.status.replace(Some(exit_status.clone()));
+                exit_status
+            }
         }
     }
 
@@ -279,6 +258,7 @@ impl RunningCommand {
         if !self.is_finished() {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
+            self.wait_command();
         }
     }
 
