@@ -22,8 +22,8 @@ use ratatui::{
     Frame,
 };
 
-const MIN_WIDTH: u16 = 77;
-const MIN_HEIGHT: u16 = 19;
+const MIN_WIDTH: u16 = 100;
+const MIN_HEIGHT: u16 = 30;
 const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
