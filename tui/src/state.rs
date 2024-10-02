@@ -60,6 +60,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: &'static str,
+    position_stack: Vec<usize>,
 }
 
 pub enum Focus {
@@ -94,6 +95,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            position_stack: vec![0],
         };
 
         state.update_items();
@@ -572,9 +574,12 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        self.visit_stack.pop();
-        self.selection.select(Some(0));
-        self.update_items();
+        if self.visit_stack.len() > 1 {
+            self.visit_stack.pop();
+            let previous_position = self.position_stack.pop().unwrap_or(0);
+            self.selection.select(Some(previous_position));
+            self.update_items();
+        }
     }
 
     fn get_selected_node(&self) -> Option<Rc<ListNode>> {
@@ -601,20 +606,19 @@ impl AppState {
     }
 
     pub fn go_to_selected_dir(&mut self) {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
+        let selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
             self.enter_parent_directory();
             return;
         }
 
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
+        let actual_index = if self.at_root() { selected_index } else { selected_index - 1 };
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
+        if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
                 self.visit_stack.push(item.id);
+                self.position_stack.push(selected_index);
                 self.selection.select(Some(0));
                 self.update_items();
             }
@@ -646,7 +650,6 @@ impl AppState {
 
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
-
         !self.at_root() && selected_index == 0
     }
 
@@ -668,7 +671,11 @@ impl AppState {
     }
 
     fn handle_enter(&mut self) {
-        if self.selected_item_is_cmd() {
+        if self.selected_item_is_up_dir() {
+            self.enter_parent_directory();
+        } else if self.selected_item_is_dir() {
+            self.go_to_selected_dir();
+        } else if self.selected_item_is_cmd() {
             if self.selected_commands.is_empty() {
                 if let Some(node) = self.get_selected_node() {
                     self.selected_commands.push(node);
@@ -683,8 +690,6 @@ impl AppState {
 
             let prompt = ConfirmPrompt::new(&cmd_names[..]);
             self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
-        } else {
-            self.go_to_selected_dir();
         }
     }
 
