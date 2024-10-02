@@ -219,7 +219,8 @@ impl FloatContent for FloatingText {
             .title_style(Style::default().reversed())
             .style(Style::default());
 
-        // Draw the Block first
+        frame.render_widget(Clear, area);
+
         frame.render_widget(block.clone(), area);
 
         // Calculate the inner area to ensure text is not drawn over the border
@@ -266,9 +267,6 @@ impl FloatContent for FloatingText {
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
-
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
