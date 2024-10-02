@@ -1,6 +1,9 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    style::{Style, Stylize},
+    text::Line,
+    widgets::{Block, Borders, Clear},
     Frame,
 };
 
@@ -8,6 +11,8 @@ use crate::hint::Shortcut;
 
 pub trait FloatContent {
     fn draw(&mut self, frame: &mut Frame, area: Rect);
+    fn top_title(&self) -> Option<Line<'_>>;
+    fn bottom_title(&self) -> Option<Line<'_>>;
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
     fn is_finished(&self) -> bool;
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>);
@@ -50,7 +55,22 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
 
     pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect) {
         let popup_area = self.floating_window(parent_area);
-        self.content.draw(frame, popup_area);
+        let mut block = Block::new()
+            .borders(Borders::ALL)
+            .title_alignment(Alignment::Center)
+            .style(Style::new().reset());
+
+        if let Some(top_title) = self.content.top_title() {
+            block = block.title_top(top_title);
+        }
+
+        if let Some(bottom_title) = self.content.bottom_title() {
+            block = block.title_bottom(bottom_title);
+        }
+
+        frame.render_widget(Clear, popup_area);
+        frame.render_widget(&block, popup_area);
+        self.content.draw(frame, block.inner(popup_area));
     }
 
     // Returns true if the floating window is finished.

@@ -3,11 +3,7 @@ use std::borrow::Cow;
 use crate::{float::FloatContent, hint::Shortcut};
 
 use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::{
-    layout::Alignment,
-    prelude::*,
-    widgets::{Block, Borders, Clear, List},
-};
+use ratatui::{prelude::*, widgets::List};
 
 pub enum ConfirmStatus {
     Confirm,
@@ -57,19 +53,15 @@ impl ConfirmPrompt {
 }
 
 impl FloatContent for ConfirmPrompt {
+    fn top_title(&self) -> Option<Line<'_>> {
+        Some(Line::from(" Confirm selections ").style(Style::default().bold()))
+    }
+
+    fn bottom_title(&self) -> Option<Line<'_>> {
+        Some(Line::from(" [y] to continue, [n] to abort ").italic())
+    }
+
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .title(" Confirm selections ")
-            .title_bottom(" [y] to continue, [n] to abort ")
-            .title_alignment(Alignment::Center)
-            .title_style(Style::default().bold())
-            .style(Style::default());
-
-        frame.render_widget(block.clone(), area);
-
-        let inner_area = block.inner(area);
-
         let paths_text = self
             .names
             .iter()
@@ -80,8 +72,7 @@ impl FloatContent for ConfirmPrompt {
             })
             .collect::<Text>();
 
-        frame.render_widget(Clear, inner_area);
-        frame.render_widget(List::new(paths_text), inner_area);
+        frame.render_widget(List::new(paths_text), area);
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
