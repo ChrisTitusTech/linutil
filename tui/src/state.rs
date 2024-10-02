@@ -519,6 +519,7 @@ impl AppState {
         } else {
             current + 1
         };
+
         self.selection.select(Some(next));
     }
 
@@ -527,6 +528,7 @@ impl AppState {
         let current = self.selection.selected().unwrap_or(0);
         let max_index = if self.at_root() { len - 1 } else { len };
         let next = if current == 0 { max_index } else { current - 1 };
+
         self.selection.select(Some(next));
     }
 
@@ -757,6 +759,7 @@ impl AppState {
         let len = self.tabs.len();
         let current = self.current_tab.selected().unwrap_or(0);
         let next = if current + 1 >= len { 0 } else { current + 1 };
+
         self.current_tab.select(Some(next));
         self.refresh_tab();
     }
@@ -765,6 +768,7 @@ impl AppState {
         let len = self.tabs.len();
         let current = self.current_tab.selected().unwrap_or(0);
         let next = if current == 0 { len - 1 } else { current - 1 };
+
         self.current_tab.select(Some(next));
         self.refresh_tab();
     }
