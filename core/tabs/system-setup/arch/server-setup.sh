@@ -466,7 +466,7 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     mkswap /mnt/opt/swap/swapfile
     swapon /mnt/opt/swap/swapfile
     # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
-    echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
+    echo "/opt/swap/swapfile    none    swap    sw    0    0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
 
 gpu_type=$(lspci | grep -E "VGA|3D|Display")
@@ -493,8 +493,8 @@ nc=$(grep -c ^processor /proc/cpuinfo)
 echo -ne "
 -------------------------------------------------------------------------
                     You have " $nc" cores. And
-			changing the makeflags for " $nc" cores. Aswell as
-				changing the compression settings.
+            changing the makeflags for " $nc" cores. Aswell as
+                changing the compression settings.
 -------------------------------------------------------------------------
 "
 TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
