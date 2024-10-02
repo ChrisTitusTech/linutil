@@ -42,16 +42,17 @@ pub fn create_shortcut_list(
     let mut lines: Vec<Line<'static>> = Vec::new();
 
     for row in 0..rows {
-        let mut row_spans = Vec::new();
-        for col in 0..columns {
-            let index = row * columns + col;
-            if index < shortcut_spans.len() {
-                let mut span = shortcut_spans[index].clone();
-                let padding = max_shortcut_width - span_vec_len(&span);
-                span.push(Span::raw(" ".repeat(padding)));
-                row_spans.push(span);
-            }
-        }
+        let row_spans: Vec<_> = (0..columns)
+            .filter_map(|col| {
+                let index = row * columns + col;
+                shortcut_spans.get(index).map(|span| {
+                    let padding = max_shortcut_width - span_vec_len(span);
+                    let mut span_clone = span.clone();
+                    span_clone.push(Span::raw(" ".repeat(padding)));
+                    span_clone
+                })
+            })
+            .collect();
         lines.push(add_spacing(row_spans));
     }
 
