@@ -43,11 +43,13 @@ task_list = "PFM"
 
 [[data.entries]]
 name = "Multimedia Codecs"
+description = "This script is designed to install multimedia codecs, and to ensure RPM Fusion repositories are installed."
 script = "fedora/multimedia-codecs.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Nvidia Proprietary Drivers"
+description = "This script is designed to download the proprietary NVIDIA drivers in Fedora."
 script = "fedora/nvidia-proprietary-driver-setup.sh"
 task_list = "I"
 
@@ -71,6 +73,7 @@ task_list = "I"
 
 [[data]]
 name = "Full System Cleanup"
+description = "This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash."
 script = "system-cleanup.sh"
 task_list = "RP PFM"
 
@@ -97,3 +100,9 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
 task_list = "RP"
+
+[[data]]
+name = "TTY Fonts"
+description = "This Script will set the default TTY font to Terminus size 32 Bold"
+script = "terminus-tty.sh"
+task_list = "I PFM"

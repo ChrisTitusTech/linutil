@@ -21,7 +21,7 @@ select_drive() {
 
 # Function to get UUID and FSTYPE of the selected drive
 get_uuid_fstype() {
-    UUID=$(blkid -s UUID -o value "${partition}")
+    UUID=$("$ESCALATION_TOOL" blkid -s UUID -o value "${partition}")
     FSTYPE=$(lsblk -no FSTYPE "${partition}")
     NAME=$(lsblk -no NAME "${partition}")
 

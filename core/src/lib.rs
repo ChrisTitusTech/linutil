@@ -1,5 +1,7 @@
 mod inner;
 
+use std::rc::Rc;
+
 use ego_tree::Tree;
 use std::path::PathBuf;
 
@@ -20,7 +22,7 @@ pub enum Command {
 #[derive(Clone, Hash, Eq, PartialEq)]
 pub struct Tab {
     pub name: String,
-    pub tree: Tree<ListNode>,
+    pub tree: Tree<Rc<ListNode>>,
     pub multi_selectable: bool,
 }
 

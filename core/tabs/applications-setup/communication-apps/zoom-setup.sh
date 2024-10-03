@@ -10,7 +10,7 @@ installZoom() {
                 "$AUR_HELPER" -S --needed --noconfirm zoom
                 ;;
             *)
-                . ./setup-flatpak.sh
+                . ../setup-flatpak.sh
                 flatpak install -y flathub us.zoom.Zoom
                 ;;
         esac
