@@ -65,6 +65,12 @@ description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "Btrfs Assistant(+snapper), grub-btrfs Setup"
+description = "Installs Btrfs-Assistan/Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots\nInstalls Grub-Btrfs.\nEnables snapper-timeline and snapper-cleanup services.\nNotice: After installation you may want to change (Hourly, daily, weekly, monthly, yearly) timeline settings via Btrfs Assistant GUI.\nNotice: To perform a system recovery via Grub-btrfs, after the snapshot is booted, perform the restore operation with the Btrfs Assistant GUI.\nNotice: The /boot partition is in EXT4 format by default in Fedora, so it will not be included in the snapshots."
+script = "fedora/fedora-btrfs-assistant.sh"
+task_list = "I"
+
 [[data]]
 name = "Build Prerequisites"
 description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"

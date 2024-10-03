@@ -23,6 +23,7 @@
 - **NVIDIA Proprietary Driver Setup**: Installs proprietary NVIDIA drivers for GPUs from 2014 or later.
 - **Virtualization Setup**: Installs virtualization tools.
 - **Configure DNF**: Optimizes DNF for better speeds.
+- **Btrfs Assistant(+snapper), grub-btrfs Setup**: Installs Btrfs-Assistan/Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Notice: After installation you may want to change (Hourly, daily, weekly, monthly, yearly) timeline settings via Btrfs Assistant GUI. Notice: To perform a system recovery via Grub-btrfs, after the snapshot is booted, perform the restore operation with the Btrfs Assistant GUI. Notice: The /boot partition is in EXT4 format by default in Fedora, so it will not be included in the snapshots.
 
 ## Applications Setup
 
