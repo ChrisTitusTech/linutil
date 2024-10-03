@@ -97,7 +97,6 @@ jobs:
         uses: charmbracelet/vhs-action@v2.1.0
         with:
           path: "docs/assets/preview.tape"
-          install-fonts: "true"
 
       - name: Move preview
         run: |
