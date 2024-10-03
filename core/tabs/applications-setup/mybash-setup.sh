@@ -4,17 +4,31 @@
 
 gitpath="$HOME/.local/share/mybash"
 
-installDepend() {
-    if ! command_exists bash bash-completion tar bat tree unzip fontconfig git; then
-    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
-    case "$PACKAGER" in
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
-            ;;
-        *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
-            ;;
-    esac
+installDeps() {
+    DEPS="bash bash-completion tar bat tree unzip fontconfig git"
+    depsNeeded=""
+
+    for dep in $DEPS; do
+        if ! command_exists "${dep}"; then
+            depsNeeded="${depsNeeded} ${dep}"
+        fi
+    done
+
+    if [ "$depsNeeded" != "" ]; then
+        printf "%b\n" "${RED}Some dependencies weren't installed\nInstalling${depsNeeded}"
+
+        case "$PACKAGER" in
+            pacman)
+                # disable globbing/word-splitting warning, need word splitting
+                # shellcheck disable=SC2086
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $depsNeeded 
+                ;;
+            *)
+                # disable globbing/word-splitting warning, need word splitting
+                # shellcheck disable=SC2086
+                "$ESCALATION_TOOL" "$PACKAGER" install -y $depsNeeded 
+                ;;
+        esac
     fi
 }
 
@@ -102,7 +116,7 @@ linkConfig() {
 
 checkEnv
 checkEscalationTool
-installDepend
+installDeps
 cloneMyBash
 installFont
 installStarshipAndFzf
