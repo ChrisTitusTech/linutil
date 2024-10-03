@@ -6,30 +6,31 @@ gitpath="$HOME/.local/share/mybash"
 
 installDeps() {
     DEPS="bash bash-completion tar bat tree unzip fontconfig git"
-    depsNeeded=""
 
-    for dep in $DEPS; do
+    # no way to reliably test for bash-completion for all I know
+    # fontconfig isn't an executable, so use fc-cache to test for installation
+    DEP_TESTS="bash tar bat tree unzip fc-cache git"
+
+    for dep in $DEP_TESTS; do
         if ! command_exists "${dep}"; then
-            depsNeeded="${depsNeeded} ${dep}"
+            printf "%b\n" "${RED}Some dependencies weren't installed\n${GREEN}Installing${RC} [$(echo "${DEPS}" | sed 's/ /, /g')]"
+
+            case "$PACKAGER" in
+                pacman)
+                    # disable globbing/word-splitting warning, need word splitting
+                    # shellcheck disable=SC2086
+                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DEPS
+                    ;;
+                *)
+                    # disable globbing/word-splitting warning, need word splitting
+                    # shellcheck disable=SC2086
+                    "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPS
+                    ;;
+            esac
+
+            break
         fi
     done
-
-    if [ "$depsNeeded" != "" ]; then
-        printf "%b\n" "${RED}Some dependencies weren't installed\nInstalling${depsNeeded}"
-
-        case "$PACKAGER" in
-            pacman)
-                # disable globbing/word-splitting warning, need word splitting
-                # shellcheck disable=SC2086
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $depsNeeded 
-                ;;
-            *)
-                # disable globbing/word-splitting warning, need word splitting
-                # shellcheck disable=SC2086
-                "$ESCALATION_TOOL" "$PACKAGER" install -y $depsNeeded 
-                ;;
-        esac
-    fi
 }
 
 cloneMyBash() {
