@@ -11,7 +11,7 @@ checkFs() {
       printf "%b\n" "${RED}This operation can only be performed on a Btrfs filesystem.${RC}"
       exit 1
     fi
-    printf "%b\n" "${GREEN}}Btrfs filesystem detected. Continuing with the operation...${RC}"
+    printf "%b\n" "${GREEN}Btrfs filesystem detected. Continuing with the operation...${RC}"
 }
 
 # Install Btrfs-Assistant/snapper and dependencies
@@ -20,7 +20,7 @@ installBtrfsStack() {
     printf "%b\n" "${YELLOW}Installing btrfs-assistant/snapper and dependencies...${RC}"
     case "$PACKAGER" in
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant make inotify-tools python3-dnf-plugin-snapper git
+            "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant inotify-tools python3-dnf-plugin-snapper make git
             ;;
             *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -35,9 +35,9 @@ installBtrfsStack() {
 
 # Create first snapper config for root and home and create new manual snapshots
 configureSnapper() {
-    printf "%b\n" "${YELLOW}Creating snapper root config and taking the first root snapshot...${RC}"
-    snapper -c root create-config / && snapper -c root create --description "Manual Snapshot"
-    snapper -c home create-config /home && snapper -c home create --description "Manual Snapshot"
+    printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
+    snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
+    snapper -c home create-config /home && snapper -c home create --description "First home Snapshot"
     # Modifyling default timeline root config
     "$ESCALATION_TOOL" sed -i 's/^TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="1"/' /etc/snapper/configs/root
     "$ESCALATION_TOOL" sed -i 's/^TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="2"/' /etc/snapper/configs/root
@@ -54,6 +54,7 @@ configureSnapper() {
 
 # Check if the grub-btrfs dir exists before attempting to clone into it.
 cloneGrubBtrfs() {
+    printf "%b\n" "${YELLOW}Downloading grub-btrfs...${RC}"
     if [ -d "$HOME/grub-btrfs" ]; then
         rm -rf "$HOME/grub-btrfs"
     fi
@@ -81,10 +82,15 @@ serviceStartEnable() {
     systemctl start snapper-cleanup.timer && systemctl enable snapper-cleanup.timer #enables scheduled snapshot cleanup
     printf "%b\n" "${YELLOW}Restarting grub-btrfsd service...${RC}"
     systemctl restart grub-btrfsd
-    printf "%b\n" "${YELLOW}Setup complete. Grub-btrfs and automatic snapshot configuration is now active.${RC}"
+    printf "%b\n" "${GREEN}Installation completed. Grub-btrfs and automatic snapshot configuration is now active.${RC}"
+}
+
+# Post install information
+someNotices() {
     printf "%b\n" "${YELLOW}Notice: You can manage snapshots from the GUI with Btrfs Assistant.${RC}"
     printf "%b\n" "${YELLOW}Notice: You may want to change (Hourly, daily, weekly, monthly, yearly) timeline settings via Btrfs Assistant GUI.${RC}"
     printf "%b\n" "${YELLOW}Notice: To perform a system recovery via Grub-btrfs, after booting into your snapshot, do the 'restore' operation with the Btrfs Assistant GUI.${RC}"
+    printf "%b\n" "${CYAN}Notice: The /boot partition is in EXT4 format by default in Fedora, so it can't be included in the snapshots. Backup it seperately."${RC}"
 }
 
 checkEnv
@@ -95,3 +101,4 @@ configureSnapper
 cloneGrubBtrfs
 installGrubBtrfs
 serviceStartEnable
+someNotices
