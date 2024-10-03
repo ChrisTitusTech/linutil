@@ -10,7 +10,7 @@ installSlack() {
                 "$AUR_HELPER" -S --needed --noconfirm slack-desktop
                 ;;
             *)  
-                . ./setup-flatpak.sh
+                . ../setup-flatpak.sh
                 flatpak install -y flathub com.slack.Slack
                 ;;
         esac

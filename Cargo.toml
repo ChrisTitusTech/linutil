@@ -1,6 +1,6 @@
 [workspace.package]
 license = "MIT"
-version = "24.9.22"
+version = "24.9.28"
 
 [workspace.dependencies]
 ego-tree = "0.6.2"
@@ -8,6 +8,9 @@ ego-tree = "0.6.2"
 [workspace]
 members = ["tui", "core"]
 resolver = "2"
+
+[patch.crates-io]
+vt100 = { git = "https://github.com/ChrisTitusTech/vt100-rust" }
 
 [profile.release]
 opt-level = "z"

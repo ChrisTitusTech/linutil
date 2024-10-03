@@ -15,9 +15,9 @@ installLinutil() {
             printf "%b" "Enter your choice: "
             read -r choice
             case $choice in
-                1) "$AUR_HELPER" -S --noconfirm linutil ;;
-                2) "$AUR_HELPER" -S --noconfirm linutil-bin ;;
-                3) "$AUR_HELPER" -S --noconfirm linutil-git ;;
+                1) "$AUR_HELPER" -S --needed --noconfirm linutil ;;
+                2) "$AUR_HELPER" -S --needed --noconfirm linutil-bin ;;
+                3) "$AUR_HELPER" -S --needed --noconfirm linutil-git ;;
                 *)
                     printf "%b\n" "${RED}Invalid choice:${RC} $choice"
                     exit 1
@@ -37,13 +37,17 @@ installLinutil() {
                             pacman)
                                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
                                 ;;
+                            dnf)
+                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                ;;
                             zypper)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
                                 . $HOME/.cargo/env
                                 ;;
                             *)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+                                . $HOME/.cargo/env
                                 ;;
                         esac
                     fi

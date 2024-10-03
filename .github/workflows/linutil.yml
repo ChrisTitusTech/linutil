@@ -1,8 +1,6 @@
 name: LinUtil Release
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -55,12 +53,6 @@ jobs:
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
           mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
 
-      - name: Pull latest changes
-        run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git pull origin main
-
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Commit Linutil
@@ -75,15 +67,6 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
         shell: bash
 
-      - name: Generate Release Notes
-        id: generate_notes
-        uses: release-drafter/release-drafter@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-name: release-drafter.yml
-          version: ${{ env.version }}
-
       - name: Create and Upload Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -91,12 +74,11 @@ jobs:
           tag_name: ${{ env.version }}
           name: Pre-Release ${{ env.version }}
           body: |
-            ${{ steps.generate_notes.outputs.body }}
-            
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil)
             ![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/ChrisTitusTech/linutil/${{ env.version }}/linutil-aarch64)
 
-          append_body: false
+          append_body: true
+          generate_release_notes: true
           files: |
             ./build/linutil
             ./build/linutil-aarch64
@@ -106,3 +88,23 @@ jobs:
         env:
           version: ${{ env.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install vhs
+        run: |
+          wget 'https://github.com/charmbracelet/vhs/releases/download/v0.8.0/vhs_0.8.0_amd64.deb'
+          sudo apt install -y ffmpeg
+          sudo snap install ttyd --classic
+          sudo dpkg -i 'vhs_0.8.0_amd64.deb'
+
+      - name: Build the preview
+        run: |
+          export PATH="$(pwd)/build:$PATH"
+          vhs docs/assets/preview.tape -o docs/assets/preview.gif
+
+      - name: Upload the preview
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Preview for ${{ env.version }}
+          file_pattern: "docs/assets/preview.gif"
+          add_options: "--force"
+        if: success()

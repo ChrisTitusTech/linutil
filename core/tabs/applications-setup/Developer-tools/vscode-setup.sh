@@ -21,7 +21,7 @@ installVsCode() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install code
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm code
+                "$AUR_HELPER" -S --needed --noconfirm visual-studio-code-bin
                 ;;
             dnf)
                 "$ESCALATION_TOOL" rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -40,4 +40,5 @@ installVsCode() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 installVsCode 
