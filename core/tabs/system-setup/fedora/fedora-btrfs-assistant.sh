@@ -71,6 +71,9 @@ installGrubBtrfs() {
     sed -i '/#GRUB_BTRFS_MKCONFIG=/a GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig' config
     sed -i '/#GRUB_BTRFS_SCRIPT_CHECK=/a GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check' config
     "$ESCALATION_TOOL" make install
+    # Update grub.cfg and enable grub-btrfsd service
+    printf "%b\n" "${YELLOW}Updating grub configuration and enabling grub-btrfsd service...${RC}"
+    "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg && systemctl enable --now grub-btrfsd.service
     printf "%b\n" "${YELLOW}Cleaning up installation files...${RC}"
     cd .. && rm -rf "$HOME/grub-btrfs" #deletes downloaded git folder
 }
