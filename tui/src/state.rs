@@ -21,6 +21,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
+use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
@@ -33,13 +34,15 @@ FM - file modification
 I  - installation (privileged)
 MP - package manager actions
 SI - full system installation
-SS - systemd actions (privileged) 
+SS - systemd actions (privileged)
 RP - package removal
 
 P* - privileged *
 ";
 
 pub struct AppState {
+    /// This must be passed to retain the temp dir until the end of the program
+    _temp_dir: TempDir,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
@@ -78,10 +81,11 @@ pub struct ListEntry {
 
 impl AppState {
     pub fn new(theme: Theme, override_validation: bool) -> Self {
-        let tabs = linutil_core::get_tabs(!override_validation);
+        let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
         let mut state = Self {
+            _temp_dir: temp_dir,
             theme,
             focus: Focus::List,
             tabs,
