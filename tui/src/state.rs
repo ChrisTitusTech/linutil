@@ -50,7 +50,7 @@ pub struct AppState {
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
-    visit_stack: Vec<NodeId>,
+    visit_stack: Vec<(NodeId, usize)>,
     /// This is the state asociated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
@@ -60,7 +60,6 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: &'static str,
-    position_stack: Vec<usize>,
 }
 
 pub enum Focus {
@@ -94,7 +93,7 @@ impl AppState {
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
-            visit_stack: vec![root_id],
+            visit_stack: vec![(root_id, 0usize)],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
             multi_select: false,
@@ -102,7 +101,6 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
-            position_stack: vec![0],
         };
 
         state.update_items();
@@ -557,7 +555,7 @@ impl AppState {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
-            *self.visit_stack.last().unwrap(),
+            self.visit_stack.last().unwrap().0,
         );
         if !self.is_current_tab_multi_selectable() {
             self.multi_select = false;
@@ -581,8 +579,7 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        if let Some(previous_position) = self.position_stack.pop() {
-            self.visit_stack.pop();
+        if let Some((_, previous_position)) = self.visit_stack.pop() {
             self.selection.select(Some(previous_position));
             self.update_items();
         }
@@ -627,8 +624,7 @@ impl AppState {
 
         if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
-                self.visit_stack.push(item.id);
-                self.position_stack.push(selected_index);
+                self.visit_stack.push((item.id, selected_index));
                 self.selection.select(Some(0));
                 self.update_items();
             }
@@ -746,10 +742,13 @@ impl AppState {
     }
 
     fn refresh_tab(&mut self) {
-        self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
-            .tree
-            .root()
-            .id()];
+        self.visit_stack = vec![(
+            self.tabs[self.current_tab.selected().unwrap()]
+                .tree
+                .root()
+                .id(),
+            0usize,
+        )];
         self.selection.select(Some(0));
         self.update_items();
     }
