@@ -640,11 +640,6 @@ impl AppState {
         None
     }
 
-    fn get_selected_description(&self) -> Option<String> {
-        self.get_selected_node()
-            .map(|node| node.description.clone())
-    }
-
     pub fn go_to_selected_dir(&mut self) {
         let selected_index = self.selection.selected().unwrap_or(0);
 
@@ -697,21 +692,20 @@ impl AppState {
     }
 
     fn enable_preview(&mut self) {
-        if let Some(list_node) = self.get_selected_node() {
-            let mut preview_title = "[Preview] - ".to_string();
-            preview_title.push_str(list_node.name.as_str());
-            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
+        if let Some(node) = self.get_selected_node() {
+            let preview_title = format!("Command Preview - {}", node.name.as_str());
+            if let Some(preview) = FloatingText::from_command(&node.command, preview_title) {
                 self.spawn_float(preview, 80, 80);
             }
         }
     }
 
     fn enable_description(&mut self) {
-        if let Some(command_description) = self.get_selected_description() {
-            if !command_description.is_empty() {
-                let description = FloatingText::new(command_description, "Command Description");
-                self.spawn_float(description, 80, 80);
-            }
+        if let Some(node) = self.get_selected_node() {
+            let desc_title = format!("Command Description - {}", &node.name);
+
+            let description = FloatingText::new(node.description.clone(), desc_title);
+            self.spawn_float(description, 80, 80);
         }
     }
 
@@ -795,7 +789,10 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
+            FloatingText::new(
+                ACTIONS_GUIDE.to_string(),
+                "Important Actions Guide".to_string(),
+            ),
             80,
             80,
         );

@@ -29,8 +29,8 @@ pub struct FloatingText {
     max_line_width: usize,
     v_scroll: usize,
     h_scroll: usize,
-    mode_title: String,
     frame_height: usize,
+    title: String,
 }
 
 macro_rules! style {
@@ -125,7 +125,7 @@ fn get_lines_owned(s: &str) -> Vec<String> {
 }
 
 impl FloatingText {
-    pub fn new(text: String, title: &str) -> Self {
+    pub fn new(text: String, title: String) -> Self {
         let src = get_lines(&text)
             .into_iter()
             .map(|s| s.to_string())
@@ -134,7 +134,7 @@ impl FloatingText {
         let max_line_width = max_width!(src);
         Self {
             src,
-            mode_title: title.to_string(),
+            title,
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
@@ -148,6 +148,7 @@ impl FloatingText {
                 // just apply highlights directly
                 (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
+
             Command::LocalFile { file, .. } => {
                 // have to read from tmp dir to get cmd src
                 let raw = std::fs::read_to_string(file)
@@ -165,7 +166,7 @@ impl FloatingText {
 
         Some(Self {
             src,
-            mode_title: title,
+            title,
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
@@ -201,10 +202,12 @@ impl FloatingText {
 
 impl FloatContent for FloatingText {
     fn top_title(&self) -> Option<Line<'_>> {
-        let title_text = format!(" {} ", self.mode_title);
+        let title_text = format!(" {} ", self.title);
+
         let title_line = Line::from(title_text)
             .centered()
             .style(Style::default().reversed());
+
         Some(title_line)
     }
 
@@ -279,7 +282,7 @@ impl FloatContent for FloatingText {
 
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         (
-            &self.mode_title,
+            &self.title,
             Box::new([
                 Shortcut::new("Scroll down", ["j", "Down"]),
                 Shortcut::new("Scroll up", ["k", "Up"]),
