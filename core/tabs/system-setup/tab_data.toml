@@ -24,7 +24,7 @@ task_list = "I PFM K"
 [[data.preconditions]]
 matches = true
 data = { file = "/sys/devices/virtual/dmi/id/board_vendor" }
-values = [ "Valve", "Jupiter" ]
+values = [ "Valve" ]
 
 [[data.entries]]
 name = "Paru AUR Helper"
