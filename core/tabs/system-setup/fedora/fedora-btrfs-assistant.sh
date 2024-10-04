@@ -91,9 +91,9 @@ serviceStartEnable() {
 # Post install information
 someNotices() {
     printf "%b\n" "${YELLOW}Notice: You can manage snapshots from the GUI with Btrfs Assistant.${RC}"
-    printf "%b\n" "${YELLOW}Notice: You may want to change (Hourly, daily, weekly, monthly, yearly) timeline settings via Btrfs Assistant GUI.${RC}"
-    printf "%b\n" "${YELLOW}Notice: To perform a system recovery via Grub-btrfs, after booting into your snapshot, do the 'restore' operation with the Btrfs Assistant GUI.${RC}"
-    printf "%b\n" "${CYAN}Notice: The /boot partition is in EXT4 format by default in Fedora, so it can't be included in the snapshots. Backup it seperately."${RC}"
+    printf "%b\n" "${YELLOW}Notice: You may change (Hourly, daily, weekly, monthly, yearly) timeline settings via Btrfs Assistant GUI.${RC}"
+    printf "%b\n" "${YELLOW}Notice: To perform a system recovery via Grub-btrfs, after booting into your snapshot, do the 'restore' operation via Btrfs Assistant GUI.${RC}"
+    printf "%b\n" "${CYAN}Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately...${RC}"
 }
 
 checkEnv
