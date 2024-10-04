@@ -503,7 +503,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "24.9.28"
+version = "24.9.23"
 dependencies = [
  "ansi-to-tui",
  "anstyle",
