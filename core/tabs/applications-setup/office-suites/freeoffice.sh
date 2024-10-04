@@ -22,10 +22,6 @@ installFreeOffice() {
             "$ESCALATION_TOOL" curl -O -qO /etc/yum.repos.d/softmaker.repo https://shop.softmaker.com/repo/softmaker.repo
             "$ESCALATION_TOOL" "$PACKAGER" install -y softmaker-freeoffice-2024
             ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            exit 1
-            ;;
         esac
     else
         printf "%b\n" "${GREEN}Free Office is already installed.${RC}"

@@ -23,10 +23,6 @@ installSignal() {
                 "$ESCALATION_TOOL" "$PACKAGER" copr enable luminoso/Signal-Desktop
                 "$ESCALATION_TOOL" "$PACKAGER" install -y signal-desktop 
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Signal is already installed.${RC}"

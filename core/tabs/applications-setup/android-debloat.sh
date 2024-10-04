@@ -15,10 +15,6 @@ install_adb() {
             dnf|zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}ADB is already installed.${RC}"

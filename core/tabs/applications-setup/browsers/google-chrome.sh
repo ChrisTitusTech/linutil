@@ -23,10 +23,6 @@ installChrome() {
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
                 "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Google Chrome Browser is already installed.${RC}"

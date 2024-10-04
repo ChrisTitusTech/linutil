@@ -16,10 +16,6 @@ installLibreOffice() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Libre Office is already installed.${RC}"

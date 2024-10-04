@@ -29,10 +29,6 @@ installBrave() {
                 "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Brave Browser is already installed.${RC}"

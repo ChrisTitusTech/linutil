@@ -20,9 +20,6 @@ installThrorium() {
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm thorium-browser-bin
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Thorium Browser is already installed.${RC}"

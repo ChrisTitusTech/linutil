@@ -34,9 +34,6 @@ installLinutil() {
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
-                            pacman)
-                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
-                                ;;
                             dnf)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
                                 ;;

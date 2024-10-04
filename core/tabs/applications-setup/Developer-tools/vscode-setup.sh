@@ -28,10 +28,6 @@ installVsCode() {
                 printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | "$ESCALATION_TOOL" tee /etc/yum.repos.d/vscode.repo > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" install -y code
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}VS Code is already installed.${RC}"

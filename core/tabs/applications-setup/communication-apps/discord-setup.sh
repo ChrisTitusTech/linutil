@@ -20,10 +20,6 @@ installDiscord() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Discord is already installed.${RC}"

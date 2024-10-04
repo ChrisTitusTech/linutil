@@ -17,10 +17,6 @@ installOnlyOffice() {
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm onlyoffice
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Only Office is already installed.${RC}"

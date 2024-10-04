@@ -32,10 +32,6 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}LibreWolf Browser is already installed.${RC}"

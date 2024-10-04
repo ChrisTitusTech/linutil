@@ -26,10 +26,6 @@ installSublime() {
                     "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
                     "$ESCALATION_TOOL" "$PACKAGER" install -y sublime-text
                     ;;
-                *)
-                    printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                    exit 1
-                    ;;
             esac
         else
             printf "%b\n" "${GREEN}Sublime is already installed.${RC}"

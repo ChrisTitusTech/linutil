@@ -21,10 +21,6 @@ installJitsi() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
         esac
     else
         printf "%b\n" "${GREEN}Jitsi meet is already installed.${RC}"

@@ -48,10 +48,6 @@ fastUpdate() {
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
             ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
-            exit 1
-            ;;
     esac
 }
 

@@ -49,9 +49,6 @@ installDepend() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -n install "$DEPENDENCIES"
             ;;
-        *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
-            ;;
     esac
 }
 
@@ -93,8 +90,6 @@ installAdditionalDepend() {
             # Flatpak
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
-            ;;
-        *)
             ;;
     esac
 }
