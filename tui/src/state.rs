@@ -666,8 +666,10 @@ impl AppState {
 
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, FloatingTextMode::Description);
-            self.spawn_float(description, 80, 80);
+            if !command_description.is_empty() {
+                let description = FloatingText::new(command_description, FloatingTextMode::Description);
+                self.spawn_float(description, 80, 80);
+            }
         }
     }
 
