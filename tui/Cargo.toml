@@ -22,7 +22,6 @@ oneshot = "0.1.8"
 portable-pty = "0.8.1"
 ratatui = "0.28.1"
 tui-term = "0.1.12"
-temp-dir = "0.1.14"
 unicode-width = "0.2.0"
 rand = { version = "0.8.5", optional = true }
 linutil_core = { path = "../core", version = "24.9.28" }
