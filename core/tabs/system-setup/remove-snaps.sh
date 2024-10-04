@@ -22,9 +22,9 @@ removeSnaps() {
                 exit 1
                 ;;
         esac
-        printf "%b\n" "${GREEN}Successfully removed snaps...${RC}"
+        printf "%b\n" "${GREEN}Successfully removed snaps.${RC}"
     else
-        printf "%b\n" "${GREEN}Snapd is not installed...${RC}"
+        printf "%b\n" "${GREEN}Snapd is not installed.${RC}"
     fi
 }
 
