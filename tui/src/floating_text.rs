@@ -148,11 +148,9 @@ impl FloatingText {
     pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
         let src = match command {
             Command::Raw(cmd) => Some(cmd.clone()),
-            Command::LocalFile { file, .. } => {
-                std::fs::read_to_string(file)
-                    .map_err(|_| format!("File not found: {:?}", file))
-                    .ok()
-            }
+            Command::LocalFile { file, .. } => std::fs::read_to_string(file)
+                .map_err(|_| format!("File not found: {:?}", file))
+                .ok(),
             Command::None => None,
         }?;
 
@@ -216,7 +214,9 @@ impl FloatingText {
                     .into_iter()
                     .map(|cow| cow.into_owned())
                     .collect(),
-                _ => get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone())),
+                _ => {
+                    get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
+                }
             };
         }
     }
@@ -238,7 +238,7 @@ impl FloatContent for FloatingText {
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
         let Rect { width, height, .. } = inner_area;
-        
+
         self.update_wrapping(width as usize);
 
         let lines = self
