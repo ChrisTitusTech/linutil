@@ -10,24 +10,29 @@ use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
 use include_dir::{include_dir, Dir};
 use serde::Deserialize;
-use tempdir::TempDir;
+use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
-pub fn get_tabs(validate: bool) -> Vec<Tab> {
-    let tab_files = TabList::get_tabs();
-    let tabs = tab_files.into_iter().map(|path| {
-        let directory = path.parent().unwrap().to_owned();
-        let data = std::fs::read_to_string(path).expect("Failed to read tab data");
-        let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
+pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
+    let (temp_dir, tab_files) = TabList::get_tabs();
 
-        if validate {
-            filter_entries(&mut tab_data.data);
-        }
-        (tab_data, directory)
-    });
+    let tabs: Vec<_> = tab_files
+        .into_iter()
+        .map(|path| {
+            let directory = path.parent().unwrap().to_owned();
+            let data = std::fs::read_to_string(path).expect("Failed to read tab data");
+            let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
+
+            if validate {
+                filter_entries(&mut tab_data.data);
+            }
+            (tab_data, directory)
+        })
+        .collect();
 
     let tabs: Vec<Tab> = tabs
+        .into_iter()
         .map(|(TabEntry { name, data }, directory)| {
             let mut tree = Tree::new(Rc::new(ListNode {
                 name: "root".to_string(),
@@ -45,7 +50,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
     if tabs.is_empty() {
         panic!("No tabs found");
     }
-    tabs
+    (temp_dir, tabs)
 }
 
 #[derive(Deserialize)]
@@ -242,19 +247,20 @@ fn is_executable(path: &Path) -> bool {
 }
 
 impl TabList {
-    fn get_tabs() -> Vec<PathBuf> {
-        let temp_dir = TempDir::new("linutil_scripts").unwrap().into_path();
+    fn get_tabs() -> (TempDir, Vec<PathBuf>) {
+        let temp_dir = TempDir::new().unwrap();
         TAB_DATA
             .extract(&temp_dir)
             .expect("Failed to extract the saved directory");
 
-        let tab_files =
-            std::fs::read_to_string(temp_dir.join("tabs.toml")).expect("Failed to read tabs.toml");
+        let tab_files = std::fs::read_to_string(temp_dir.path().join("tabs.toml"))
+            .expect("Failed to read tabs.toml");
         let data: Self = toml::from_str(&tab_files).expect("Failed to parse tabs.toml");
-
-        data.directories
+        let tab_paths = data
+            .directories
             .iter()
-            .map(|path| temp_dir.join(path).join("tab_data.toml"))
-            .collect()
+            .map(|path| temp_dir.path().join(path).join("tab_data.toml"))
+            .collect();
+        (temp_dir, tab_paths)
     }
 }
