@@ -1,5 +1,0 @@
-What to do when you have a Cargo.lock merge conflict?
-1. `git checkout origin/main -- Cargo.lock` to get the original Cargo.lock
-2. `cargo build` to update Cargo.lock
-3. `git add Cargo.lock`
-4. continue the merge as normal
