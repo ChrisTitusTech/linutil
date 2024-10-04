@@ -242,7 +242,7 @@ task_list = "PFM"
 
 [[data]]
 name = "Kitty"
-description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages.  This command installs and configures kitty."
+description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty."
 script = "kitty-setup.sh"
 task_list = "I FM"
 
