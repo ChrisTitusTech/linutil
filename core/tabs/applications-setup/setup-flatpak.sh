@@ -27,6 +27,8 @@ setup_flatpak() {
                 ;;
             nix-env)
                 "$PACKAGER" -iA nixpkgs.flatpak
+                "$ESCALATION_TOOL" sed -i '/^services\.flatpak\.enable/!b; s/^services\.flatpak\.enable.*/services.flatpak.enable = true;/' "$NIXOS_CONFIG" || echo 'services.flatpak.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
+                "$ESCALATION_TOOL" nixos-rebuild switch
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak

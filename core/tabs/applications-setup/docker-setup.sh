@@ -4,7 +4,6 @@
 
 # Function to prompt the user for installation choice
 choose_installation() {
-    clear
     printf "%b\n" "${YELLOW}Choose what to install:${RC}"
     printf "%b\n" "1. ${YELLOW}Docker${RC}"
     printf "%b\n" "2. ${YELLOW}Docker Compose${RC}"
@@ -36,6 +35,11 @@ install_docker() {
             "$ESCALATION_TOOL" systemctl enable docker
             "$ESCALATION_TOOL" systemctl start docker
             ;;
+        nix-env)
+            "$PACKAGER" -iA nixpkgs.docker
+            "$ESCALATION_TOOL" sed -i '/^virtualisation\.docker\.enable/!b; s/^virtualisation\.docker\.enable.*/virtualisation.docker.enable = true;/' "$NIXOS_CONFIG" || echo 'virtualisation.docker.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
+            "$ESCALATION_TOOL" nixos-rebuild switch
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -54,6 +58,9 @@ install_docker_compose() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm docker-compose
+            ;;
+        nix-env)
+            "$PACKAGER" -iA nixpkgs.docker-compose
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
