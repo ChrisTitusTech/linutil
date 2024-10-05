@@ -25,6 +25,9 @@ setup_flatpak() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
                 ;;
+            nix-env)
+                "$PACKAGER" -iA nixpkgs.flatpak
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
