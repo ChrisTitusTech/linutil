@@ -44,6 +44,7 @@ RPROMPT='%F{15}(%F{166}%D{%H:%M}%F{15})%f'
 EOL
 
   # Ensure /etc/zsh/zshenv sets ZDOTDIR to the user's config directory
+  [ ! -f /etc/zsh/zshenv ] && "$ESCALATION_TOOL" touch /etc/zsh/zshenv
   echo "export ZDOTDIR=\"$HOME/.config/zsh\"" | "$ESCALATION_TOOL" tee -a /etc/zsh/zshenv
 }
 
