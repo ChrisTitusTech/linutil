@@ -4,7 +4,7 @@ use ego_tree::NodeId;
 use linutil_core::Tab;
 use ratatui::{
     layout::{Position, Rect},
-    style::Style,
+    style::{Color, Style},
     text::Span,
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -98,8 +98,9 @@ impl Filter {
         let input = self.search_input.iter().collect::<String>().to_lowercase();
         self.completion_preview = self.items.iter()
             .find_map(|item| {
-                if item.node.name.to_lowercase().starts_with(&input) {
-                    Some(item.node.name[input.len()..].to_string())
+                let item_name_lower = item.node.name.to_lowercase();
+                if item_name_lower.starts_with(&input) {
+                    Some(item_name_lower[input.len()..].to_string())
                 } else {
                     None
                 }
@@ -115,11 +116,7 @@ impl Filter {
             let preview_text = self.completion_preview.as_deref().unwrap_or("");
             Span::styled(
                 format!("{}{}", input_text, preview_text),
-                Style::default().fg(if preview_text.is_empty() {
-                    theme.focused_color()
-                } else {
-                    theme.unfocused_color()
-                }),
+                Style::default().fg(theme.focused_color()),
             )
         };
 
@@ -146,6 +143,22 @@ impl Filter {
             let x = area.x + cursor_position as u16 + 1;
             let y = area.y + 1;
             frame.set_cursor_position(Position::new(x, y));
+
+            if let Some(preview) = &self.completion_preview {
+                let preview_span = Span::styled(
+                    preview,
+                    Style::default().fg(Color::DarkGray),
+                );
+                let preview_paragraph = Paragraph::new(preview_span)
+                    .style(Style::default());
+                let preview_area = Rect::new(
+                    x,
+                    y,
+                    (preview.len() as u16).min(area.width - cursor_position as u16 - 1),
+                    1,
+                );
+                frame.render_widget(preview_paragraph, preview_area);
+            }
         }
     }
     // Handles key events. Returns true if search must be exited
