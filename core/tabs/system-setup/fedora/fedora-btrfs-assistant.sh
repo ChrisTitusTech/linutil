@@ -34,20 +34,6 @@ installBtrfsStack() {
 
 # Create first snapper config for root and home and create new manual snapshots
 configureSnapper() {
-    if command_exists snapper; then
-        printf "%b\n" "${YELLOW}Snapper tool detected. Do you want to configure root and home configs and take first snapshots? (y/n): ${RC}"
-        read -r response
-        case "$response" in
-            [yY]*)
-                ;;
-            *)
-                printf "%b\n" "${GREEN}Snapper configurations will not be changed.${RC}"
-                return
-                ;;
-        esac
-    else
-        "$ESCALATION_TOOL" "$PACKAGER" install -y snapper
-    fi
     printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
     snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
     snapper -c home create-config /home && snapper -c home create --description "First home Snapshot"
@@ -69,7 +55,6 @@ configureSnapper() {
         s/^TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/
     ' /etc/snapper/configs/home
     printf "%b\n" "${GREEN}Snapper configs and first snapshots created.${RC}"
-    serviceStartEnable
 }
 
 # Starting services
@@ -83,7 +68,7 @@ serviceStartEnable() {
 # Ask user if they want to install grub-btrfs
 askInstallGrubBtrfs() {
     printf "%b\n" "${YELLOW}You can skip installing grub-btrfs and use only Btrfs Assistant GUI or snapper CLI.${RC}"
-    printf "%b\n" "${RED}Notice: grub-btrfs may cause problems with booting into snapshots and other os on encrypted systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
+    printf "%b\n" "${RED}Notice: grub-btrfs may cause problems with booting into snapshots and other os on systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
     printf "%b\n" "${YELLOW}Do you want to install grub-btrfs? (y/n): ${RC}"
     read -r response
     case "$response" in
@@ -157,5 +142,6 @@ checkEscalationTool
 checkFs
 installBtrfsStack
 configureSnapper
+serviceStartEnable
 askInstallGrubBtrfs
 someNotices
