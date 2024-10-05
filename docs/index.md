@@ -69,7 +69,7 @@ Note that crates installed using `cargo install` require manual updating with `c
 
 After you've ran the command, you should see a GUI on your screen; It will look something like this:
 
-![preview](assets/preview.png)
+![preview](assets/preview.gif)
 
 !!! info
 
