@@ -22,6 +22,7 @@ pub struct Filter {
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
+    completion_preview: Option<String>,
 }
 
 impl Filter {
@@ -31,17 +32,23 @@ impl Filter {
             in_search_mode: false,
             input_position: 0,
             items: vec![],
+            completion_preview: None,
         }
     }
+
     pub fn item_list(&self) -> &[ListEntry] {
         &self.items
     }
+
     pub fn activate_search(&mut self) {
         self.in_search_mode = true;
     }
+
     pub fn deactivate_search(&mut self) {
         self.in_search_mode = false;
+        self.completion_preview = None;
     }
+
     pub fn update_items(&mut self, tabs: &[Tab], current_tab: usize, node: NodeId) {
         if self.search_input.is_empty() {
             let curr = tabs[current_tab].tree.get(node).unwrap();
@@ -78,13 +85,42 @@ impl Filter {
             }
             self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
         }
+
+        self.update_completion_preview();
     }
+
+    fn update_completion_preview(&mut self) {
+        if self.search_input.is_empty() {
+            self.completion_preview = None;
+            return;
+        }
+
+        let input = self.search_input.iter().collect::<String>().to_lowercase();
+        self.completion_preview = self.items.iter()
+            .find_map(|item| {
+                if item.node.name.to_lowercase().starts_with(&input) {
+                    Some(item.node.name[input.len()..].to_string())
+                } else {
+                    None
+                }
+            });
+    }
+
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         //Set the search bar text (If empty use the placeholder)
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
             Span::raw("Press / to search")
         } else {
-            Span::raw(self.search_input.iter().collect::<String>())
+            let input_text = self.search_input.iter().collect::<String>();
+            let preview_text = self.completion_preview.as_deref().unwrap_or("");
+            Span::styled(
+                format!("{}{}", input_text, preview_text),
+                Style::default().fg(if preview_text.is_empty() {
+                    theme.focused_color()
+                } else {
+                    theme.unfocused_color()
+                }),
+            )
         };
 
         let search_color = if self.in_search_mode {
@@ -121,30 +157,37 @@ impl Filter {
             KeyCode::Delete => self.remove_next(),
             KeyCode::Left => return self.cursor_left(),
             KeyCode::Right => return self.cursor_right(),
+            KeyCode::Tab => return self.complete_search(),
             KeyCode::Esc => {
                 self.input_position = 0;
                 self.search_input.clear();
+                self.completion_preview = None;
                 return SearchAction::Exit;
             }
             KeyCode::Enter => return SearchAction::Exit,
             _ => return SearchAction::None,
         };
+        self.update_completion_preview();
         SearchAction::Update
     }
+
     fn cursor_left(&mut self) -> SearchAction {
         self.input_position = self.input_position.saturating_sub(1);
         SearchAction::None
     }
+
     fn cursor_right(&mut self) -> SearchAction {
         if self.input_position < self.search_input.len() {
             self.input_position += 1;
         }
         SearchAction::None
     }
+
     fn insert_char(&mut self, input: char) {
         self.search_input.insert(self.input_position, input);
         self.cursor_right();
     }
+
     fn remove_previous(&mut self) {
         let current = self.input_position;
         if current > 0 {
@@ -152,10 +195,22 @@ impl Filter {
             self.cursor_left();
         }
     }
+
     fn remove_next(&mut self) {
         let current = self.input_position;
         if current < self.search_input.len() {
             self.search_input.remove(current);
+        }
+    }
+
+    fn complete_search(&mut self) -> SearchAction {
+        if let Some(completion) = self.completion_preview.take() {
+            self.search_input.extend(completion.chars());
+            self.input_position = self.search_input.len();
+            self.update_completion_preview();
+            SearchAction::Update
+        } else {
+            SearchAction::None
         }
     }
 }
