@@ -96,15 +96,14 @@ impl Filter {
         }
 
         let input = self.search_input.iter().collect::<String>().to_lowercase();
-        self.completion_preview = self.items.iter()
-            .find_map(|item| {
-                let item_name_lower = item.node.name.to_lowercase();
-                if item_name_lower.starts_with(&input) {
-                    Some(item_name_lower[input.len()..].to_string())
-                } else {
-                    None
-                }
-            });
+        self.completion_preview = self.items.iter().find_map(|item| {
+            let item_name_lower = item.node.name.to_lowercase();
+            if item_name_lower.starts_with(&input) {
+                Some(item_name_lower[input.len()..].to_string())
+            } else {
+                None
+            }
+        });
     }
 
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
@@ -145,12 +144,8 @@ impl Filter {
             frame.set_cursor_position(Position::new(x, y));
 
             if let Some(preview) = &self.completion_preview {
-                let preview_span = Span::styled(
-                    preview,
-                    Style::default().fg(Color::DarkGray),
-                );
-                let preview_paragraph = Paragraph::new(preview_span)
-                    .style(Style::default());
+                let preview_span = Span::styled(preview, Style::default().fg(Color::DarkGray));
+                let preview_paragraph = Paragraph::new(preview_span).style(Style::default());
                 let preview_area = Rect::new(
                     x,
                     y,
