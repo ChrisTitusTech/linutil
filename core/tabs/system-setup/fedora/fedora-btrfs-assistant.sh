@@ -35,8 +35,8 @@ installBtrfsStack() {
 # Create first snapper config for root and home and create new manual snapshots
 configureSnapper() {
     printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
-    snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
     snapper -c home create-config /home && snapper -c home create --description "First home Snapshot"
+    snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
     printf "%b\n" "${YELLOW}Updating timeline settings...${RC}"
     # Modifyling default timeline root config
     "$ESCALATION_TOOL" sed -i '
