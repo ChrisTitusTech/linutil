@@ -88,7 +88,7 @@ impl FloatContent for ConfirmPrompt {
         use KeyCode::*;
         self.status = match key.code {
             Char('y') | Char('Y') => ConfirmStatus::Confirm,
-            Char('n') | Char('N') | Esc | Char('q') | Char('Q') => ConfirmStatus::Abort,
+            Char('n') | Char('N') | Esc | Char('q') => ConfirmStatus::Abort,
             Char('j') => {
                 self.scroll_down();
                 ConfirmStatus::None
@@ -116,7 +116,7 @@ impl FloatContent for ConfirmPrompt {
             "Confirmation prompt",
             Box::new([
                 Shortcut::new("Continue", ["Y", "y"]),
-                Shortcut::new("Abort", ["N", "n", "q", "Q", "Esc"]),
+                Shortcut::new("Abort", ["N", "n", "q", "Esc"]),
                 Shortcut::new("Scroll up", ["k"]),
                 Shortcut::new("Scroll down", ["j"]),
                 Shortcut::new("Close linutil", ["CTRL-c"]),
