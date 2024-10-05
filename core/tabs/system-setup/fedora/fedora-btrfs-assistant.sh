@@ -20,7 +20,7 @@ installBtrfsStack() {
     printf "%b\n" "${YELLOW}Installing Btrfs Assistant with snapper...${RC}"
     case "$PACKAGER" in
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant
+            "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
             ;;
             *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -46,7 +46,7 @@ configureSnapper() {
                 ;;
         esac
     else
-        "$ESCALATION_TOOL" "$PACKAGER" install -y snapper python3-dnf-plugin-snapper
+        "$ESCALATION_TOOL" "$PACKAGER" install -y snapper
     fi
     printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
     snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
@@ -83,7 +83,7 @@ serviceStartEnable() {
 # Ask user if they want to install grub-btrfs
 askInstallGrubBtrfs() {
     printf "%b\n" "${YELLOW}You can skip installing grub-btrfs and use only Btrfs Assistant GUI or snapper CLI.${RC}"
-    printf "%b\n" "${RED}grub-btrfs may cause problems on encrypted systems with secure boot/tpm. ${RC}"
+    printf "%b\n" "${RED}Notice: grub-btrfs may cause problems with booting into snapshots and other os on encrypted systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
     printf "%b\n" "${YELLOW}Do you want to install grub-btrfs? (y/n): ${RC}"
     read -r response
     case "$response" in
@@ -119,15 +119,37 @@ installGrubBtrfs() {
     printf "%b\n" "${YELLOW}Cleaning up installation files...${RC}"
     cd .. && rm -rf "$HOME/grub-btrfs" #deletes downloaded git folder
     printf "%b\n" "${GREEN}Grub-btrfs installed and service enabled.${RC}"
-    printf "%b\n" "${CYAN}Notice: To perform a system recovery via grub-btrfs, after booting into your snapshot, do the 'restore' operation via Btrfs Assistant GUI.${RC}"
+    printf "%b\n" "${CYAN}Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot.${RC}"
+    # Ask user if they want to apply mitigation for "tpm.c:150:unknown TPM error"
+    printf "%b\n" "${YELLOW}Do you want to apply mitigation for 'tpm.c:150:unknown TPM error' on systems with secure boot/tpm? (y/n): ${RC}"
+    read -r response
+    case "$response" in
+        [yY]*)
+            mitigateTpmError
+            ;;
+        *)
+            printf "%b\n" "${GREEN}Skipping mitigation for 'tpm.c:150:unknown TPM error'.${RC}"
+            ;;
+    esac
+}
+
+# Mitigation for "tpm.c:150:unknown TPM error"
+mitigateTpmError() {
+    printf "%b\n" "${YELLOW}Applying mitigation for 'tpm.c:150:unknown TPM error'...${RC}"
+    printf "%b\n" "${YELLOW}Creating /etc/grub.d/02_tpm file...${RC}"
+    echo '#!/bin/sh' | "$ESCALATION_TOOL" tee /etc/grub.d/02_tpm > /dev/null
+    echo 'echo "rmmod tpm"' | "$ESCALATION_TOOL" tee -a /etc/grub.d/02_tpm > /dev/null
+    "$ESCALATION_TOOL" chmod +x /etc/grub.d/02_tpm #makes the file executable
+    "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg #updates grub config
+    printf "%b\n" "${GREEN}Mitigation applied and grub config updated.${RC}"
 }
 
 # Post install information
 someNotices() {
-    printf "%b\n" "${GREEN}Notice: Setup process completed.${RC}"
     printf "%b\n" "${YELLOW}Notice: You can manage snapshots from GUI with Btrfs Assistant or CLI with snapper.${RC}"
     printf "%b\n" "${YELLOW}Notice: You may change (Hourly, daily, weekly, monthly, yearly) timeline settings with Btrfs Assistant GUI.${RC}"
-    printf "%b\n" "${CYAN}Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately...${RC}"
+    printf "%b\n" "${RED}Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately...${RC}"
+    printf "%b\n" "${GREEN}Setup process completed.${RC}"
 }
 
 checkEnv
