@@ -37,7 +37,7 @@ install_docker() {
             ;;
         nix-env)
             "$PACKAGER" -iA nixpkgs.docker
-            "$ESCALATION_TOOL" sed -i -E '/^[[:space:]]*virtualisation\.docker\.enable/!b; s/^([[:space:]]*)virtualisation\.docker\.enable.*/\1virtualisation.docker.enable = true;/' "$NIXOS_CONFIG" || echo 'virtualisation.docker.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
+            "$ESCALATION_TOOL" sed -i'' -E '/^[[:space:]]*virtualisation\.docker\.enable/!b; s/^([[:space:]]*)virtualisation\.docker\.enable.*/\1virtualisation.docker.enable = true;/' "$NIXOS_CONFIG" || echo 'virtualisation.docker.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
             "$ESCALATION_TOOL" nixos-rebuild switch
             ;;
         *)

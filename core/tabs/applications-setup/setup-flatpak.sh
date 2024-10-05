@@ -27,7 +27,7 @@ setup_flatpak() {
                 ;;
             nix-env)
                 "$PACKAGER" -iA nixpkgs.flatpak
-                "$ESCALATION_TOOL" sed -i -E '/^[[:space:]]*services\.flatpak\.enable/!b; s/^([[:space:]]*)services\.flatpak\.enable.*/\1services.flatpak.enable = true;/' "$NIXOS_CONFIG" || echo 'services.flatpak.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
+                "$ESCALATION_TOOL" sed -i'' -E '/^[[:space:]]*services\.flatpak\.enable/!b; s/^([[:space:]]*)services\.flatpak\.enable.*/\1services.flatpak.enable = true;/' "$NIXOS_CONFIG" || echo 'services.flatpak.enable = true;' | "$ESCALATION_TOOL" tee -a "$NIXOS_CONFIG"
                 "$ESCALATION_TOOL" nixos-rebuild switch
                 ;;
             *)
