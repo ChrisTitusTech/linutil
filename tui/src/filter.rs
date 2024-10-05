@@ -112,11 +112,7 @@ impl Filter {
             Span::raw("Press / to search")
         } else {
             let input_text = self.search_input.iter().collect::<String>();
-            let preview_text = self.completion_preview.as_deref().unwrap_or("");
-            Span::styled(
-                format!("{}{}", input_text, preview_text),
-                Style::default().fg(theme.focused_color()),
-            )
+            Span::styled(input_text, Style::default().fg(theme.focused_color()))
         };
 
         let search_color = if self.in_search_mode {
@@ -172,7 +168,9 @@ impl Filter {
                 self.completion_preview = None;
                 return SearchAction::Exit;
             }
-            KeyCode::Enter => return SearchAction::Exit,
+            KeyCode::Enter => {
+                return SearchAction::Exit;
+            }
             _ => return SearchAction::None,
         };
         self.update_completion_preview();
