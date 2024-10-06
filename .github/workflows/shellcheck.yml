@@ -39,7 +39,7 @@ jobs:
                   # fast fail on the action runner would fail immediately if there weren't any tabs found
                   # this check makes sure that we don't continue if there's something really weird going on
                   if [ "$?" = "2" ]; then
-                      echo "::error file=$file::There was a critical while grepping $file, aborting"
+                      echo "::error file=$file::There was a critical error while grepping $file, aborting"
                       exit 1
                   fi
 
