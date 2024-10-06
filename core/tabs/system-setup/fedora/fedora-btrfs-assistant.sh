@@ -5,16 +5,6 @@
 # This script automates the installation and root and homesnapshot configuration of Snapper and installs Grub-Btrfs on Fedora. 
 # Also installs python3-dnf-plugin-snapper package for automatic snapshots after dnf commands.
 
-# Check the root filesystem type
-checkFs() {
-    fs_type=$(findmnt -n -o FSTYPE /)
-    if [ "$fs_type" != "btrfs" ]; then
-      printf "%b\n" "${RED}This operation can only be performed on a Btrfs filesystem.${RC}"
-      exit 1
-    fi
-    printf "%b\n" "${GREEN}Btrfs filesystem detected. Continuing with the operation...${RC}"
-}
-
 # Install Btrfs-Assistant/snapper and dependencies
 installBtrfsStack() {
     if ! command_exists btrfs-assistant; then
