@@ -67,7 +67,7 @@ task_list = "I"
 
 [[data.entries]]
 name = "Btrfs Assistant, Snapper Config, grub-btrfs"
-description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots.\nEnables snapper-timeline and snapper-cleanup services.\nInstalls Grub-Btrfs.\nNotice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot.\nNotice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
+description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
 script = "fedora/fedora-btrfs-assistant.sh"
 task_list = "I PFM SS"
 
