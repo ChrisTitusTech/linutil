@@ -1,0 +1,24 @@
+name: Check for typos
+
+on:
+  [pull_request, merge_group, workflow_dispatch]
+
+jobs:
+  check-typos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch origin ${{ github.base_ref }}
+
+      - name: Get a list of changed files
+        id: get_files
+        run: |
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          existing_files=$(echo "$changed_files" | xargs -I {} bash -c 'if [ -f "{}" ]; then echo "./{}"; fi')
+          echo "files=$existing_files" >> GITHUB_OUTPUT
+
+      - name: Run spellcheck
+        uses: crate-ci/typos@v1.25.0
+        with:
+          files: ${{ steps.get_files.outputs.files }}
