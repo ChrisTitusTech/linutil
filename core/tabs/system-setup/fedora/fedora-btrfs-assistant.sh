@@ -67,8 +67,9 @@ serviceStartEnable() {
 
 # Ask user if they want to install grub-btrfs
 askInstallGrubBtrfs() {
+    printf "%b\n" "${YELLOW}grub-btrfs installation...${RC}"
     printf "%b\n" "${YELLOW}You can skip installing grub-btrfs and use only Btrfs Assistant GUI or snapper CLI.${RC}"
-    printf "%b\n" "${RED}Notice: grub-btrfs may cause problems with booting into snapshots and other os on systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
+    printf "%b\n" "${CYAN}Notice: grub-btrfs may cause problems with booting into snapshots and other OSes on systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
     printf "%b\n" "${YELLOW}Do you want to install grub-btrfs? (y/n): ${RC}"
     read -r response
     case "$response" in
@@ -106,7 +107,10 @@ installGrubBtrfs() {
     printf "%b\n" "${GREEN}Grub-btrfs installed and service enabled.${RC}"
     printf "%b\n" "${CYAN}Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot.${RC}"
     # Ask user if they want to apply mitigation for "tpm.c:150:unknown TPM error"
-    printf "%b\n" "${YELLOW}Do you want to apply mitigation for 'tpm.c:150:unknown TPM error' on systems with secure boot/tpm? (y/n): ${RC}"
+    printf "%b\n" "${YELLOW}Mitigation for 'tpm.c:150:unknown TPM error'...${RC}"
+    printf "%b\n" "${YELLOW}Some systems with secure boot/tpm may encounter 'tpm.c:150:unknown TPM error' when booting into snapshots.${RC}"
+    printf "%b\n" "${YELLOW}If you encounter this issue, you can come back later and apply this mitigation or you can apply it now.${RC}"
+    printf "%b\n" "${YELLOW}Do you want to apply mitigation for 'tpm.c:150:unknown TPM error'? (y/n): ${RC}"
     read -r response
     case "$response" in
         [yY]*)
