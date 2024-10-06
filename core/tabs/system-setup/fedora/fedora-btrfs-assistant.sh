@@ -18,18 +18,18 @@ checkFs() {
 # Install Btrfs-Assistant/snapper and dependencies
 installBtrfsStack() {
     if ! command_exists btrfs-assistant; then
-    printf "%b\n" "${YELLOW}==========================================${RC}"
-    printf "%b\n" "${YELLOW}Installing Btrfs Assistant with snapper...${RC}"
-    printf "%b\n" "${YELLOW}==========================================${RC}"
-    case "$PACKAGER" in
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
-            ;;
+        printf "%b\n" "${YELLOW}==========================================${RC}"
+        printf "%b\n" "${YELLOW}Installing Btrfs Assistant with snapper...${RC}"
+        printf "%b\n" "${YELLOW}==========================================${RC}"
+        case "$PACKAGER" in
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
+                ;;
             *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            exit 1
-            ;;
-    esac
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
     else
         printf "%b\n" "${GREEN}Btrfs Assistant is already installed.${RC}"
     fi
