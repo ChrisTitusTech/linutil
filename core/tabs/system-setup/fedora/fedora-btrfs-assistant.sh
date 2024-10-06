@@ -2,7 +2,8 @@
 
 . ../../common-script.sh
 
-# This script automates the installation and root snapshot configuration of Snapper and installs Grub-Btrfs on Fedora. Also installs python3-dnf-plugin-snapper package for automatic snapshots after dnf commands.
+# This script automates the installation and root and homesnapshot configuration of Snapper and installs Grub-Btrfs on Fedora. 
+# Also installs python3-dnf-plugin-snapper package for automatic snapshots after dnf commands.
 
 # Check the root filesystem type
 checkFs() {
@@ -17,7 +18,9 @@ checkFs() {
 # Install Btrfs-Assistant/snapper and dependencies
 installBtrfsStack() {
     if ! command_exists btrfs-assistant; then
+    printf "%b\n" "${YELLOW}==========================================${RC}"
     printf "%b\n" "${YELLOW}Installing Btrfs Assistant with snapper...${RC}"
+    printf "%b\n" "${YELLOW}==========================================${RC}"
     case "$PACKAGER" in
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
@@ -34,7 +37,9 @@ installBtrfsStack() {
 
 # Create first snapper config for root and home and create new manual snapshots
 configureSnapper() {
+    printf "%b\n" "${YELLOW}==========================================================================${RC}"
     printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
+    printf "%b\n" "${YELLOW}==========================================================================${RC}"
     snapper -c home create-config /home && snapper -c home create --description "First home Snapshot"
     snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
     printf "%b\n" "${YELLOW}Updating timeline settings...${RC}"
@@ -59,7 +64,9 @@ configureSnapper() {
 
 # Starting services
 serviceStartEnable() {
+    printf "%b\n" "${YELLOW}==================================================================================${RC}"
     printf "%b\n" "${YELLOW}Starting and enabling snapper-timeline.timer and snapper-cleanup.timer services...${RC}"
+    printf "%b\n" "${YELLOW}==================================================================================${RC}"
     systemctl start snapper-timeline.timer && systemctl enable snapper-timeline.timer #enables scheduled timeline snapshots
     systemctl start snapper-cleanup.timer && systemctl enable snapper-cleanup.timer #enables scheduled snapshot cleanup
     printf "%b\n" "${GREEN}Snapper services started and enabled.${RC}"
@@ -67,7 +74,9 @@ serviceStartEnable() {
 
 # Ask user if they want to install grub-btrfs
 askInstallGrubBtrfs() {
+    printf "%b\n" "${YELLOW}=====================================${RC}"
     printf "%b\n" "${YELLOW}(optional) grub-btrfs installation...${RC}"
+    printf "%b\n" "${YELLOW}=====================================${RC}"
     printf "%b\n" "${YELLOW}You can skip installing grub-btrfs and use only Btrfs Assistant GUI or snapper CLI.${RC}"
     printf "%b\n" "${CYAN}Notice: grub-btrfs may cause problems with booting into snapshots and other OSes on systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
 
@@ -88,7 +97,7 @@ askInstallGrubBtrfs() {
                 break
                 ;;
             *)
-                printf "%b\n" "${RED}Invalid input. Please enter 'y' for yes or 'n' for no.${RC}"
+                printf "%b\n" "${RED}Invalid input. Please enter 'y' for yes, 'n' for no, or (f) to apply tpm mitigation to already installed grub-btrfs.${RC}"
                 ;;
         esac
     done
@@ -124,7 +133,9 @@ installGrubBtrfs() {
 # Mitigation for "tpm.c:150:unknown TPM error"
 mitigateTpmError() {
     # Ask user if they want to apply mitigation for "tpm.c:150:unknown TPM error"
+    printf "%b\n" "${YELLOW}===============================================${RC}"
     printf "%b\n" "${YELLOW}Mitigation for 'tpm.c:150:unknown TPM error'...${RC}"
+    printf "%b\n" "${YELLOW}===============================================${RC}"
     printf "%b\n" "${YELLOW}Some systems with secure boot/tpm may encounter 'tpm.c:150:unknown TPM error' when booting into snapshots.${RC}"
     printf "%b\n" "${YELLOW}If you encounter this issue, you can come back later and apply this mitigation or you can apply it now.${RC}"
     while true; do
@@ -153,9 +164,11 @@ mitigateTpmError() {
 
 # Post install information
 someNotices() {
+    printf "%b\n" "${YELLOW}================================NOTICES================================${RC}"
     printf "%b\n" "${YELLOW}Notice: You can manage snapshots from GUI with Btrfs Assistant or CLI with snapper.${RC}"
     printf "%b\n" "${YELLOW}Notice: You may change (Hourly, daily, weekly, monthly, yearly) timeline settings with Btrfs Assistant GUI.${RC}"
     printf "%b\n" "${RED}Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately...${RC}"
+    printf "%b\n" "${YELLOW}================================NOTICES================================${RC}"
     printf "%b\n" "${GREEN}Setup process completed.${RC}"
 }
 
