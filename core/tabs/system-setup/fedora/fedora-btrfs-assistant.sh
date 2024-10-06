@@ -81,7 +81,7 @@ askInstallGrubBtrfs() {
     printf "%b\n" "${CYAN}Notice: grub-btrfs may cause problems with booting into snapshots and other OSes on systems with secure boot/tpm. You will be asked to apply mitigation for this issue in next step.${RC}"
 
     while true; do
-        printf "%b\n" "${YELLOW}Do you want to install grub-btrfs? Press (y) for yes, (n) for no, (f) to apply tpm mitigation to already installed grub-btrfs: ${RC}"
+        printf "%b" "${YELLOW}Do you want to install grub-btrfs? Press (y) for yes, (n) for no, (f) to apply tpm mitigation to already installed grub-btrfs: ${RC}"
         read -r response
         case "$response" in
             [yY]*)
