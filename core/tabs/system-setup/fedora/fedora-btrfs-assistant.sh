@@ -130,9 +130,7 @@ installGrubBtrfs() {
     mitigateTpmError
 }
 
-# Mitigation for "tpm.c:150:unknown TPM error"
 mitigateTpmError() {
-    # Ask user if they want to apply mitigation for "tpm.c:150:unknown TPM error"
     printf "%b\n" "${YELLOW}===============================================${RC}"
     printf "%b\n" "${YELLOW}Mitigation for 'tpm.c:150:unknown TPM error'...${RC}"
     printf "%b\n" "${YELLOW}===============================================${RC}"
