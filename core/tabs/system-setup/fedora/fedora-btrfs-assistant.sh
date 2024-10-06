@@ -124,7 +124,7 @@ installGrubBtrfs() {
     printf "%b\n" "${YELLOW}Updating grub configuration and enabling grub-btrfsd service...${RC}"
     "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg && systemctl enable --now grub-btrfsd.service
     printf "%b\n" "${YELLOW}Cleaning up installation files...${RC}"
-    cd .. && rm -rf "$HOME/grub-btrfs" #deletes downloaded git folder
+    cd .. && rm -rf "$HOME/grub-btrfs"
     printf "%b\n" "${GREEN}Grub-btrfs installed and service enabled.${RC}"
     printf "%b\n" "${CYAN}Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot.${RC}"
     mitigateTpmError
