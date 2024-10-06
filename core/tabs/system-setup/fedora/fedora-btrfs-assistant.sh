@@ -13,7 +13,7 @@ installBtrfsStack() {
         printf "%b\n" "${YELLOW}==========================================${RC}"
         case "$PACKAGER" in
             dnf)
-                "$ESCALATION_TOOL" dnf install -y btrfs-assistant python3-dnf-plugin-snapper
+                "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
