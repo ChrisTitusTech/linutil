@@ -71,6 +71,11 @@ description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes t
 script = "fedora/fedora-btrfs-assistant.sh"
 task_list = "I PFM SS"
 
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "btrfs" ]
+
 [[data]]
 name = "Build Prerequisites"
 description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"

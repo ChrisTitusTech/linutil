@@ -13,7 +13,7 @@ installBtrfsStack() {
         printf "%b\n" "${YELLOW}==========================================${RC}"
         case "$PACKAGER" in
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y btrfs-assistant python3-dnf-plugin-snapper
+                "$ESCALATION_TOOL" dnf install -y btrfs-assistant python3-dnf-plugin-snapper
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -27,11 +27,11 @@ installBtrfsStack() {
 
 # Create first snapper config for root and home and create new manual snapshots
 configureSnapper() {
-    printf "%b\n" "${YELLOW}==========================================================================${RC}"
-    printf "%b\n" "${YELLOW}Creating snapper root(/) and home config and taking the first snapshots...${RC}"
-    printf "%b\n" "${YELLOW}==========================================================================${RC}"
-    snapper -c home create-config /home && snapper -c home create --description "First home Snapshot"
-    snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
+    printf "%b\n" "${YELLOW}===========================================================================${RC}"
+    printf "%b\n" "${YELLOW}Creating snapper root(/) and /home config and taking the first snapshots...${RC}"
+    printf "%b\n" "${YELLOW}===========================================================================${RC}"
+    "$ESCALATION_TOOL" snapper -c home create-config /home && "$ESCALATION_TOOL" snapper -c home create --description "First home Snapshot"
+    "$ESCALATION_TOOL" snapper -c root create-config / && "$ESCALATION_TOOL" snapper -c root create --description "First root Snapshot"
     printf "%b\n" "${YELLOW}Updating timeline settings...${RC}"
     # Modifyling default timeline root config
     "$ESCALATION_TOOL" sed -i'' '
@@ -57,8 +57,8 @@ serviceStartEnable() {
     printf "%b\n" "${YELLOW}==================================================================================${RC}"
     printf "%b\n" "${YELLOW}Starting and enabling snapper-timeline.timer and snapper-cleanup.timer services...${RC}"
     printf "%b\n" "${YELLOW}==================================================================================${RC}"
-    systemctl start snapper-timeline.timer && systemctl enable snapper-timeline.timer #enables scheduled timeline snapshots
-    systemctl start snapper-cleanup.timer && systemctl enable snapper-cleanup.timer #enables scheduled snapshot cleanup
+    "$ESCALATION_TOOL" systemctl enable --now snapper-timeline.timer
+    "$ESCALATION_TOOL" systemctl enable --now snapper-cleanup.timer
     printf "%b\n" "${GREEN}Snapper services started and enabled.${RC}"
 }
 
@@ -111,7 +111,7 @@ installGrubBtrfs() {
     sed -i'' '/#GRUB_BTRFS_SCRIPT_CHECK=/a GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check' config
     "$ESCALATION_TOOL" make install
     printf "%b\n" "${YELLOW}Updating grub configuration and enabling grub-btrfsd service...${RC}"
-    "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg && systemctl enable --now grub-btrfsd.service
+    "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg && "$ESCALATION_TOOL" systemctl enable --now grub-btrfsd.service
     printf "%b\n" "${YELLOW}Cleaning up installation files...${RC}"
     cd .. && rm -rf "$HOME/grub-btrfs"
     printf "%b\n" "${GREEN}Grub-btrfs installed and service enabled.${RC}"
@@ -161,7 +161,6 @@ someNotices() {
 
 checkEnv
 checkEscalationTool
-checkFs
 installBtrfsStack
 configureSnapper
 serviceStartEnable
