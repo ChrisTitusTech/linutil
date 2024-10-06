@@ -44,7 +44,7 @@ configureSnapper() {
     snapper -c root create-config / && snapper -c root create --description "First root Snapshot"
     printf "%b\n" "${YELLOW}Updating timeline settings...${RC}"
     # Modifyling default timeline root config
-    "$ESCALATION_TOOL" sed -i '
+    "$ESCALATION_TOOL" sed -i'' '
         s/^TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="1"/;
         s/^TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="2"/;
         s/^TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="1"/;
