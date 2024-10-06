@@ -115,10 +115,10 @@ installGrubBtrfs() {
     printf "%b\n" "${YELLOW}Installing grub-btrfs...${RC}"
     cd "$HOME/grub-btrfs"
     printf "%b\n" "${YELLOW}Modifying grub-btrfs configuration for Fedora...${RC}"
-    sed -i '/#GRUB_BTRFS_SNAPSHOT_KERNEL/a GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="systemd.volatile=state"' config
-    sed -i '/#GRUB_BTRFS_GRUB_DIRNAME/a GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"' config
-    sed -i '/#GRUB_BTRFS_MKCONFIG=/a GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig' config
-    sed -i '/#GRUB_BTRFS_SCRIPT_CHECK=/a GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check' config
+    sed -i'' '/#GRUB_BTRFS_SNAPSHOT_KERNEL/a GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="systemd.volatile=state"' config
+    sed -i'' '/#GRUB_BTRFS_GRUB_DIRNAME/a GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"' config
+    sed -i'' '/#GRUB_BTRFS_MKCONFIG=/a GRUB_BTRFS_MKCONFIG=/sbin/grub2-mkconfig' config
+    sed -i'' '/#GRUB_BTRFS_SCRIPT_CHECK=/a GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check' config
     "$ESCALATION_TOOL" make install
     printf "%b\n" "${YELLOW}Updating grub configuration and enabling grub-btrfsd service...${RC}"
     "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg && systemctl enable --now grub-btrfsd.service
