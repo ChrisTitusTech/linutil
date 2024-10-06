@@ -52,7 +52,7 @@ configureSnapper() {
         s/^TIMELINE_LIMIT_YEARLY="[^"]*"/TIMELINE_LIMIT_YEARLY="0"/
     ' /etc/snapper/configs/root
     # Modifyling default timeline for home config
-    "$ESCALATION_TOOL" sed -i '
+    "$ESCALATION_TOOL" sed -i'' '
         s/^TIMELINE_LIMIT_HOURLY="[^"]*"/TIMELINE_LIMIT_HOURLY="2"/;
         s/^TIMELINE_LIMIT_DAILY="[^"]*"/TIMELINE_LIMIT_DAILY="1"/;
         s/^TIMELINE_LIMIT_WEEKLY="[^"]*"/TIMELINE_LIMIT_WEEKLY="0"/;
