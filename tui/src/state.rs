@@ -418,6 +418,12 @@ impl AppState {
             return false;
         }
 
+        if matches!(self.focus, Focus::ConfirmationPrompt(_))
+            && (key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        {
+            return false;
+        }
+
         // If UI is not drawable returning true will mark as the key handled
         if !self.drawable {
             return true;
