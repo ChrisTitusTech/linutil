@@ -30,7 +30,7 @@ configureUFW() {
     printf "%b\n" "${YELLOW}Allowing port 80/tcp (UFW)${RC}"
     "$ESCALATION_TOOL" ufw allow 80/tcp
 
-    printf "%b\n" "${YELLO}Allowing port 443/tcp (UFW)${RC}"
+    printf "%b\n" "${YELLOW}Allowing port 443/tcp (UFW)${RC}"
     "$ESCALATION_TOOL" ufw allow 443/tcp
 
     printf "%b\n" "${YELLOW}Denying Incoming Packets by Default(UFW)${RC}"
