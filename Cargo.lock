@@ -510,7 +510,6 @@ dependencies = [
  "portable-pty",
  "rand",
  "ratatui",
- "temp-dir",
  "tree-sitter-bash",
  "tree-sitter-highlight",
  "tui-term",
