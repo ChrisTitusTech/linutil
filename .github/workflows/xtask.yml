@@ -8,6 +8,7 @@ on:
       - "Cargo.lock"
       - ".cargo"
       - "core/tabs"
+      - "docs"
   push:
     paths:
       - "xtask"
@@ -15,6 +16,7 @@ on:
       - "Cargo.lock"
       - ".cargo"
       - "core/tabs"
+      - "docs"
 
 env:
   CARGO_TERM_COLOR: always
