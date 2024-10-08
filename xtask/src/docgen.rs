@@ -37,17 +37,16 @@ pub fn userguide() -> Result<String, DynError> {
                     ));
                 } */ // Commenting this for now, might be a good idea later
             } else {
-                #[cfg(debug_assertions)]
-                println!("    Entry: {}", entry.name);
-
                 if !entry.description.is_empty() {
+                    #[cfg(debug_assertions)]
+                    println!("    Entry: {}", entry.name);
                     #[cfg(debug_assertions)]
                     println!("      Description: {}", entry.description);
 
                     md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
-                } else {
-                    md.push_str(&format!("- **{}**\n", entry.name));
-                }
+                } /* else {
+                      md.push_str(&format!("- **{}**\n", entry.name));
+                  } */ // https://github.com/ChrisTitusTech/linutil/pull/753
             }
         }
     }
