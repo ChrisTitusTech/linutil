@@ -34,5 +34,5 @@ pub fn userguide() -> Result<String, DynError> {
 
 pub fn write(file: &str, data: &str) {
     let path = path::docs().join(file);
-    fs::write(path, data).expect(&format!("Could not write to {}", file));
+    fs::write(path, data).unwrap_or_else(|_| panic!("Could not write to {}", file));
 }
