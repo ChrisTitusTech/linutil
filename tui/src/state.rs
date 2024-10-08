@@ -726,6 +726,7 @@ impl AppState {
             .root()
             .id()];
         self.selection.select(Some(0));
+        self.filter.clear_search();
         self.update_items();
     }
 
