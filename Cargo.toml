@@ -8,6 +8,7 @@ ego-tree = "0.6.2"
 
 [workspace]
 members = ["tui", "core", "xtask"]
+default-members = ["tui", "core"]
 resolver = "2"
 
 [patch.crates-io]

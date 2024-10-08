@@ -3,8 +3,6 @@
 
 ## Applications Setup
 
-- **root**: 
-- **Developer Tools**: 
 - **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
 - **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
 It is not a rewrite but a continuation and extension of Vim.
@@ -15,7 +13,6 @@ https://github.com/ChrisTitusTech/neovim
 - **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
 - **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
 - **Ngrok**: Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development.
-- **Communication Apps**: 
 - **Discord**: Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features.
 - **Jitsi**: Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads.
 - **Signal**: Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication.
@@ -23,17 +20,14 @@ https://github.com/ChrisTitusTech/neovim
 - **Telegram**: Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls.
 - **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
 - **Thunderbird**: Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality.
-- **Office Suites**: 
 - **LibreOffice**: 
 - **OnlyOffice**: 
 - **FreeOffice**: 
 - **WPS Office**: 
-- **PDF Suites**: 
 - **Evince**: 
 - **Okular**: 
 - **PDF Studio**: 
 - **PDF Studio Viewer**: 
-- **Web Browsers**: 
 - **Brave**: Brave is a free and open-source web browser developed by Brave Software, Inc. based on the Chromium web browser.
 - **Chromium**: Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser.
 - **Google Chrome**: Google Chrome is a fast, secure, and free web browser, built for the modern web.
@@ -79,8 +73,6 @@ This command installs ZSH prompt and provides basic configuration.
 
 ## Gaming
 
-- **root**: 
-- **Diablo II Resurrected**: 
 - **Loot Filter**: This is a loot filter for Diablo II Resurrected.
 It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items.
 Works on battle.net and single player.
@@ -89,21 +81,17 @@ For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter
 
 ## Security
 
-- **root**: 
 - **Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall.
 This command installs UFW and configures UFW based on CTT's recommended rules.
 For more information visit: https://christitus.com/linux-security-mistakes
 
 ## System Setup
 
-- **root**: 
-- **Arch Linux**: 
 - **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction.
 To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go.
 To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
-- **Fedora**: 
 - **Configure DNF**: Optimizes DNF for parallel downloads
 - **Multimedia Codecs**: This script is designed to install multimedia codecs, and to ensure RPM Fusion repositories are installed.
 - **Nvidia Proprietary Drivers**: This script is designed to download the proprietary NVIDIA drivers in Fedora.
@@ -121,8 +109,6 @@ For more information visit: https://rpmfusion.org/
 
 ## Utilities
 
-- **root**: 
-- **Monitor Control**: 
 - **Auto Detect Displays**: This utility is designed to detect and apply recommended configuration for monitors connected with your system
 - **Change Orientation**: This utility is designed to change the orientation of monitors in your system
 - **Disable Monitor**: This utility is designed to disable a monitor in your system
@@ -134,7 +120,6 @@ For more information visit: https://rpmfusion.org/
 - **Scale Monitors**: This utility is designed to change the scaling of monitors in your system
 - **Set Brightness**: 
 - **Set Primary Monitor**: This utility is designed to set a Primary monitor in your system
-- **User Account Manager**: 
 - **Add User**: 
 - **Add User To Groups**: 
 - **Change Password**: 

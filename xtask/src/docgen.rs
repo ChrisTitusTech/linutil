@@ -1,5 +1,7 @@
 use std::fs;
 
+use linutil_core::Command;
+
 use crate::path;
 use crate::DynError;
 
@@ -18,12 +20,15 @@ pub fn userguide() -> Result<String, DynError> {
         md.push_str(&format!("\n## {}\n\n", tab.name));
 
         for entry in tab.tree {
-            #[cfg(debug_assertions)]
-            println!("  Entry: {}", entry.name);
-            #[cfg(debug_assertions)]
-            println!("    Description: {}", entry.description);
-
-            md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+            if entry.command == Command::None {
+                println!("  Directory: {}", entry.name);
+            } else {
+                #[cfg(debug_assertions)]
+                println!("    Entry: {}", entry.name);
+                #[cfg(debug_assertions)]
+                println!("      Description: {}", entry.description);
+                md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+            }
         }
     }
 
