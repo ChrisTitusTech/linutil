@@ -128,16 +128,18 @@ For more information visit: https://rpmfusion.org/
 
 ### Monitor Control
 
-- **Auto Detect Displays**: This utility is designed to detect and apply recommended configuration for monitors connected with your system
-- **Change Orientation**: This utility is designed to change the orientation of monitors in your system
-- **Disable Monitor**: This utility is designed to disable a monitor in your system
-- **Duplicate Displays**: This utility is designed to duplicate display among multi-monitor setup in your system
-- **Enable Monitor**: This utility is designed to enable a monitor in your system
-- **Extend Displays**: This utility is designed to extend display among multi-monitor setup in your system
-- **Manage Arrangement**: This utility is designed to arrange monitors in multi-monitor setup in your system
-- **Reset Scaling**: This utility is designed to reset scaling of a monitor in your system
-- **Scale Monitors**: This utility is designed to change the scaling of monitors in your system
-- **Set Primary Monitor**: This utility is designed to set a Primary monitor in your system
+- **Auto Detect Displays**: This script is designed to detect and apply recommended configuration for monitors connected with your system
+- **Change Orientation**: This script is designed to change the orientation of monitors in your system
+- **Disable Monitor**: This script is designed to disable a monitor in your system
+- **Duplicate Displays**: This script is designed to duplicate display among multi-monitor setup in your system
+- **Enable Monitor**: This script is designed to enable a monitor in your system
+- **Extend Displays**: This script is designed to extend display among multi-monitor setup in your system
+- **Manage Arrangement**: This script is designed to arrange monitors in multi-monitor setup in your system
+- **Reset Scaling**: This script is designed to reset scaling of a monitor in your system
+- **Scale Monitors**: This script is designed to change the scaling of monitors in your system
+- **Set Brightness**: This script is designed to change the Brightness of monitors connected to your system
+- **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
+- **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
 
 ### User Account Manager
 
