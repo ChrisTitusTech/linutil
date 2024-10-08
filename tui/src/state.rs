@@ -54,7 +54,7 @@ pub struct AppState {
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<NodeId>,
-    /// This is the state asociated with the list widget, used to display the selection in the
+    /// This is the state associated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
     filter: Filter,
