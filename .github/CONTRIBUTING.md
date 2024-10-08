@@ -1,5 +1,3 @@
-<!-- docs/contributing.md IS GENERATED AUTOMATICALLY. EDIT .github/CONTRIBUTING.md -->
-
 # Contributing Guidelines for Linutil
 
 Thank you for considering contributing to Linutil! We appreciate your effort in helping improve this project. To ensure that your contributions align with the goals and quality standards of Linutil, please follow these guidelines:

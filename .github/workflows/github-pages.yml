@@ -22,8 +22,7 @@ jobs:
 
       - name: Copy Contributing Guidelines
         run: |
-          rm 'docs/contributing.md' || true
-          cp '.github/CONTRIBUTING.md' 'docs/contributing.md'
+          echo "<!-- THIS FILE IS GENERATED AUTOMATICALLY. EDIT .github/CONTRIBUTING.md -->\n\n$(cat .github/CONTRIBUTING.md)" > 'docs/contributing.md'
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
