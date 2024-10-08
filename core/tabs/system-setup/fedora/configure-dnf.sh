@@ -10,7 +10,7 @@ configureDNF() {
             echo "fastestmirror=True" | "$ESCALATION_TOOL" tee -a /etc/dnf/dnf.conf > /dev/null
             echo "defaultyes=True" | "$ESCALATION_TOOL" tee -a /etc/dnf/dnf.conf > /dev/null            
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            printf "%b\n" "${GREEN}DNF Configured Succesfully...${RC}"
+            printf "%b\n" "${GREEN}DNF Configured Successfully.${RC}"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported distribution: $DTYPE${RC}"

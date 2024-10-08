@@ -14,8 +14,8 @@ check() {
         exit 1
     fi
 
-	unset exit_code
-	unset message
+    unset exit_code
+    unset message
 }
 
 findArch() {

@@ -15,30 +15,30 @@ installDepend() {
             else
                 printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
             fi
-            "$AUR_HELPER" -S --needed --noconfirm "$DEPENDENCIES"
+            "$AUR_HELPER" -S --needed --noconfirm $DEPENDENCIES
             ;;
         apt-get|nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$COMPILEDEPS"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled powertools
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" $COMPILEDEPS
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             "$ESCALATION_TOOL" "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             "$ESCALATION_TOOL" "$PACKAGER" refresh 
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$DEPENDENCIES" "$COMPILEDEPS"
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             ;;
     esac
 }

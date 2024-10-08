@@ -15,7 +15,7 @@ default = ["tips"]
 tips = ["rand"]
 
 [dependencies]
-clap = { version = "4.5.18", features = ["derive", "std"], default-features = false }
+clap = { version = "4.5.19", features = ["derive", "std"], default-features = false }
 crossterm = { version = "0.28.1", default-features = false }
 ego-tree = { workspace = true }
 oneshot = { version = "0.1.8", features = ["std"], default-features = false }
@@ -26,7 +26,7 @@ temp-dir = "0.1.14"
 unicode-width = { version = "0.2.0", default-features = false }
 rand = { version = "0.8.5", optional = true }
 linutil_core = { version = "24.9.28", path = "../core" }
-tree-sitter-highlight = "0.23.0"
+tree-sitter-highlight = "0.24.2"
 tree-sitter-bash = "0.23.1"
 anstyle = { version = "1.0.8", default-features = false }
 ansi-to-tui = { version = "6.0.0", default-features = false }

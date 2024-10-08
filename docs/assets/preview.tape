@@ -61,13 +61,14 @@ Require linutil
 Require sh
 
 Set Shell "bash"
-Set FontSize 32
-Set Width 3200
-Set Height 1800
+Set FontFamily "JetBrainsMono Nerd Font"
+Set FontSize 24
+Set Width 1920
+Set Height 1080
 
 Sleep 1s
 
-Type "linutil -t compatible" Sleep 1s  Enter
+Type "linutil" Sleep 1s  Enter
 
 Sleep 5s
 
