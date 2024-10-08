@@ -29,17 +29,17 @@ https://github.com/ChrisTitusTech/neovim
 
 ### Office Suites
 
-- **LibreOffice**: 
-- **OnlyOffice**: 
-- **FreeOffice**: 
-- **WPS Office**: 
+- **LibreOffice**
+- **OnlyOffice**
+- **FreeOffice**
+- **WPS Office**
 
 ### PDF Suites
 
-- **Evince**: 
-- **Okular**: 
-- **PDF Studio**: 
-- **PDF Studio Viewer**: 
+- **Evince**
+- **Okular**
+- **PDF Studio**
+- **PDF Studio Viewer**
 
 ### Web Browsers
 
@@ -145,26 +145,26 @@ For more information visit: https://rpmfusion.org/
 - **Manage Arrangement**: This utility is designed to arrange monitors in multi-monitor setup in your system
 - **Reset Scaling**: This utility is designed to reset scaling of a monitor in your system
 - **Scale Monitors**: This utility is designed to change the scaling of monitors in your system
-- **Set Brightness**: 
+- **Set Brightness**
 - **Set Primary Monitor**: This utility is designed to set a Primary monitor in your system
 
 ### User Account Manager
 
-- **Add User**: 
-- **Add User To Groups**: 
-- **Change Password**: 
-- **Delete User**: 
-- **Remove User From Groups**: 
+- **Add User**
+- **Add User To Groups**
+- **Change Password**
+- **Delete User**
+- **Remove User From Groups**
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
-- **Auto Login**: 
-- **Auto Power Profiling**: 
+- **Auto Login**
+- **Auto Power Profiling**
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Bootable USB Creator**: 
-- **Crypto tool**: 
+- **Bootable USB Creator**
+- **Crypto tool**
 - **Numlock on Startup**: This utility is designed to configure auto enabling of numlock on boot
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
-- **SSH Commands**: 
-- **SSH Samba**: 
-- **Timeshift Backup**: 
+- **SSH Commands**
+- **SSH Samba**
+- **Timeshift Backup**
 - **WiFi Manager**: This utility is designed to manage wifi in your system

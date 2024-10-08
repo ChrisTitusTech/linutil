@@ -39,10 +39,15 @@ pub fn userguide() -> Result<String, DynError> {
             } else {
                 #[cfg(debug_assertions)]
                 println!("    Entry: {}", entry.name);
-                #[cfg(debug_assertions)]
-                println!("      Description: {}", entry.description);
 
-                md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+                if !entry.description.is_empty() {
+                    #[cfg(debug_assertions)]
+                    println!("      Description: {}", entry.description);
+
+                    md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+                } else {
+                    md.push_str(&format!("- **{}**\n", entry.name));
+                }
             }
         }
     }
