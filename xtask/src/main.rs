@@ -1,14 +1,17 @@
 mod docgen;
+mod path;
 
 use std::{env, error::Error};
 
 type DynError = Box<dyn Error>;
 
 pub mod tasks {
-    use crate::{docgen::ttest, DynError};
+    use crate::docgen::USER_GUIDE;
+    use crate::docgen::{userguide, write};
+    use crate::DynError;
 
     pub fn docgen() -> Result<(), DynError> {
-        ttest();
+        write(USER_GUIDE, &userguide()?);
         Ok(())
     }
 
