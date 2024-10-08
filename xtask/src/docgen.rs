@@ -21,18 +21,31 @@ pub fn userguide() -> Result<String, DynError> {
 
         for entry in tab.tree {
             if entry.command == Command::None {
+                #[cfg(debug_assertions)]
                 println!("  Directory: {}", entry.name);
+
+                if entry.name != "root".to_string() {
+                    md.push_str(&format!("\n### {}\n\n", entry.name));
+                }
+
+                /* let current_dir = &entry.name;
+
+                if *current_dir != "root".to_string() {
+                    md.push_str(&format!(
+                        "\n<details><summary>{}</summary>\n\n",
+                        current_dir
+                    ));
+                } */ // Commenting this for now, might be a good idea later
             } else {
                 #[cfg(debug_assertions)]
                 println!("    Entry: {}", entry.name);
                 #[cfg(debug_assertions)]
                 println!("      Description: {}", entry.description);
+
                 md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
             }
         }
     }
-
-    println!("{}", md);
 
     Ok(md)
 }
