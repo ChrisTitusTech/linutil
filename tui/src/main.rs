@@ -1,3 +1,4 @@
+mod confirmation;
 mod filter;
 mod float;
 mod floating_text;

@@ -34,6 +34,7 @@ installAutoCpufreq() {
         cd auto-cpufreq
         printf "%b\n" "${YELLOW}Running auto-cpufreq installer...${RC}"
         "$ESCALATION_TOOL" ./auto-cpufreq-installer
+        "$ESCALATION_TOOL"  auto-cpufreq --install
 
         cd ..
     fi

@@ -1,31 +1,38 @@
-use crate::{Command, ListNode, Tab};
-use ego_tree::{NodeMut, Tree};
-use include_dir::{include_dir, Dir};
-use serde::Deserialize;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
+    rc::Rc,
 };
-use tempdir::TempDir;
+
+use crate::{Command, ListNode, Tab};
+use ego_tree::{NodeMut, Tree};
+use include_dir::{include_dir, Dir};
+use serde::Deserialize;
+use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
-pub fn get_tabs(validate: bool) -> Vec<Tab> {
-    let tab_files = TabList::get_tabs();
-    let tabs = tab_files.into_iter().map(|path| {
-        let directory = path.parent().unwrap().to_owned();
-        let data = std::fs::read_to_string(path).expect("Failed to read tab data");
-        let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
+pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
+    let (temp_dir, tab_files) = TabList::get_tabs();
 
-        if validate {
-            filter_entries(&mut tab_data.data);
-        }
-        (tab_data, directory)
-    });
+    let tabs: Vec<_> = tab_files
+        .into_iter()
+        .map(|path| {
+            let directory = path.parent().unwrap().to_owned();
+            let data = std::fs::read_to_string(path).expect("Failed to read tab data");
+            let mut tab_data: TabEntry = toml::from_str(&data).expect("Failed to parse tab data");
+
+            if validate {
+                filter_entries(&mut tab_data.data);
+            }
+            (tab_data, directory)
+        })
+        .collect();
 
     let tabs: Vec<Tab> = tabs
+        .into_iter()
         .map(
             |(
                 TabEntry {
@@ -35,12 +42,12 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
                 },
                 directory,
             )| {
-                let mut tree = Tree::new(ListNode {
+                let mut tree = Tree::new(Rc::new(ListNode {
                     name: "root".to_string(),
                     description: String::new(),
                     command: Command::None,
                     task_list: String::new(),
-                });
+                }));
                 let mut root = tree.root_mut();
                 create_directory(data, &mut root, &directory, validate);
                 Tab {
@@ -55,7 +62,7 @@ pub fn get_tabs(validate: bool) -> Vec<Tab> {
     if tabs.is_empty() {
         panic!("No tabs found");
     }
-    tabs
+    (temp_dir, tabs)
 }
 
 #[derive(Deserialize)]
@@ -164,28 +171,28 @@ fn filter_entries(entries: &mut Vec<Entry>) {
 
 fn create_directory(
     data: Vec<Entry>,
-    node: &mut NodeMut<ListNode>,
+    node: &mut NodeMut<Rc<ListNode>>,
     command_dir: &Path,
     validate: bool,
 ) {
     for entry in data {
         match entry.entry_type {
             EntryType::Entries(entries) => {
-                let mut node = node.append(ListNode {
+                let mut node = node.append(Rc::new(ListNode {
                     name: entry.name,
                     description: entry.description,
                     command: Command::None,
                     task_list: String::new(),
-                });
+                }));
                 create_directory(entries, &mut node, command_dir, validate);
             }
             EntryType::Command(command) => {
-                node.append(ListNode {
+                node.append(Rc::new(ListNode {
                     name: entry.name,
                     description: entry.description,
                     command: Command::Raw(command),
                     task_list: String::new(),
-                });
+                }));
             }
             EntryType::Script(script) => {
                 let script = command_dir.join(script);
@@ -194,7 +201,7 @@ fn create_directory(
                 }
 
                 if let Some((executable, args)) = get_shebang(&script, validate) {
-                    node.append(ListNode {
+                    node.append(Rc::new(ListNode {
                         name: entry.name,
                         description: entry.description,
                         command: Command::LocalFile {
@@ -203,7 +210,7 @@ fn create_directory(
                             file: script,
                         },
                         task_list: entry.task_list,
-                    });
+                    }));
                 }
             }
         }
@@ -246,19 +253,20 @@ fn is_executable(path: &Path) -> bool {
 }
 
 impl TabList {
-    fn get_tabs() -> Vec<PathBuf> {
-        let temp_dir = TempDir::new("linutil_scripts").unwrap().into_path();
+    fn get_tabs() -> (TempDir, Vec<PathBuf>) {
+        let temp_dir = TempDir::new().unwrap();
         TAB_DATA
             .extract(&temp_dir)
             .expect("Failed to extract the saved directory");
 
-        let tab_files =
-            std::fs::read_to_string(temp_dir.join("tabs.toml")).expect("Failed to read tabs.toml");
+        let tab_files = std::fs::read_to_string(temp_dir.path().join("tabs.toml"))
+            .expect("Failed to read tabs.toml");
         let data: Self = toml::from_str(&tab_files).expect("Failed to parse tabs.toml");
-
-        data.directories
+        let tab_paths = data
+            .directories
             .iter()
-            .map(|path| temp_dir.join(path).join("tab_data.toml"))
-            .collect()
+            .map(|path| temp_dir.path().join(path).join("tab_data.toml"))
+            .collect();
+        (temp_dir, tab_paths)
     }
 }

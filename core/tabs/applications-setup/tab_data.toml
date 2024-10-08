@@ -37,7 +37,7 @@ task_list = "I"
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
 script = "Developer-tools/meld-setup.sh"
-task_list = "I"
+task_list = "I FI"
 
 [[data.entries]]
 name = "Ngrok"
@@ -91,6 +91,102 @@ script = "communication-apps/thunderbird-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Office Suites"
+
+[[data.entries]]
+name = "LibreOffice"
+script = "office-suites/libreoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OnlyOffice"
+script = "office-suites/onlyoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "FreeOffice"
+script = "office-suites/freeoffice.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "WPS Office"
+script = "office-suites/wpsoffice.sh"
+task_list = "I"
+
+[[data]]
+name = "PDF Suites"
+
+[[data.entries]]
+name = "Evince"
+script = "pdf-suites/evince.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Okular"
+script = "pdf-suites/okular.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "PDF Studio"
+script = "pdf-suites/pdfstudio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "PDF Studio Viewer"
+script = "pdf-suites/pdfstudioviewer.sh"
+
+[[data]]
+name = "Web Browsers"
+
+[[data.entries]]
+name = "Brave"
+description = "Brave is a free and open-source web browser developed by Brave Software, Inc. based on the Chromium web browser."
+script = "browsers/brave.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Chromium"
+description = "Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser."
+script = "browsers/chromium.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Google Chrome"
+description = "Google Chrome is a fast, secure, and free web browser, built for the modern web."
+script = "browsers/google-chrome.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "LibreWolf"
+description = "LibreWolf is a fork of Firefox, focused on privacy, security, and freedom."
+script = "browsers/librewolf.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Lynx"
+description = "Lynx is a highly configurable text-based web browser for use on cursor-addressable character cell terminals."
+script = "browsers/lynx.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Mozilla Firefox"
+description = "Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation."
+script = "browsers/firefox.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Thorium"
+description = "Thorium is a Chromium-based browser focused on privacy and performance."
+script = "browsers/thorium.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Vivaldi"
+description = "Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies."
+script = "browsers/vivaldi.sh"
+task_list = "I"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
 script = "alacritty-setup.sh"
@@ -110,14 +206,9 @@ task_list = "I FM"
 
 [[data]]
 name = "Bottles"
+description = "Bottles allows Windows software, like applications and games, to run on Linux.\nBottles also provides tools to categorize, organize and optimize your applications."
 script = "bottles-setup.sh"
 task_list = "FI"
-
-[[data]]
-name = "Web Browsers"
-description = "An interactive script to install popular browsers."
-script = "browser-setup.sh"
-task_list = "I"
 
 [[data]]
 name = "DWM-Titus"
@@ -127,6 +218,7 @@ task_list = "I PFM SS"
 
 [[data]]
 name = "Docker"
+description = "Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "docker-setup.sh"
 task_list = "I SS"
 
@@ -144,6 +236,7 @@ task_list = "I"
 
 [[data]]
 name = "Grub Theme"
+description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB."
 script = "grub-theme.sh"
 task_list = "PFM"
 
@@ -174,12 +267,6 @@ task_list = "I"
 matches = true
 data = "command_exists"
 values = [ "linutil" ]
-
-[[data]]
-name = "Office Suite"
-description = "An office suite installer is a software package that installs productivity tools such as word processing, spreadsheets, presentations, and pdf viewers for business and personal use."
-script = "office-suite-setup.sh"
-task_list = "I"
 
 [[data]]
 name = "Rofi"
