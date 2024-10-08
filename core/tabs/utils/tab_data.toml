@@ -164,6 +164,11 @@ name = "Timeshift Backup"
 script = "timeshift.sh"
 task_list = "I"
 
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = [ "dnf" ]
+
 [[data]]
 name = "WiFi Manager"
 description = "This utility is designed to manage wifi in your system"
