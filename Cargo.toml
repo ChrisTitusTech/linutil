@@ -1,12 +1,13 @@
 [workspace.package]
 license = "MIT"
 version = "24.9.28"
+edition = "2021"
 
 [workspace.dependencies]
 ego-tree = "0.6.2"
 
 [workspace]
-members = ["tui", "core"]
+members = ["tui", "core", "xtask"]
 resolver = "2"
 
 [patch.crates-io]
