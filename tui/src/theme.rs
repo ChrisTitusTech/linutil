@@ -28,6 +28,13 @@ impl Theme {
         }
     }
 
+    pub fn multi_select_disabled_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::DarkGray,
+            Theme::Compatible => Color::DarkGray,
+        }
+    }
+
     pub fn tab_color(&self) -> Color {
         match self {
             Theme::Default => Color::Rgb(255, 255, 85),
