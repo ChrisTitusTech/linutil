@@ -2,7 +2,6 @@
 
 . ../common-script.sh
 
-# Function to prompt the user for installation choice
 choose_installation() { 
     clear
     printf "%b\n" "${YELLOW}Choose what to install:${RC}"
