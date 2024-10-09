@@ -79,7 +79,7 @@ jobs:
 
       - name: Setup Preview
         run: |
-          echo "$(pwd)/build/x86_64-unknown-linux-musl/release/" >> $GITHUB_PATH
+          echo "$(pwd)/build" >> $GITHUB_PATH
       
       - name: Generate preview 
         uses: charmbracelet/vhs-action@v2.1.0
