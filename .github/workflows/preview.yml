@@ -44,8 +44,7 @@ jobs:
           path: "docs/assets/preview.tape"
 
       - name: Move preview
-        run: |
-          mv preview.gif docs/assets/preview.gif
+        run: mv preview.gif docs/assets/preview.gif
 
       - name: Upload preview
         uses: stefanzweifel/git-auto-commit-action@v5
