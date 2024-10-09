@@ -1,0 +1,55 @@
+name: LinUtil Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+        run_id:
+          description: 'Run ID of LinUtil Release'
+          required: true
+  workflow_run:
+    workflows: ["LinUtil Release"]
+    types:
+      - completed
+
+jobs:
+  generate_preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Run ID
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_ENV
+          else
+            echo "run_id=${{ github.event.inputs.run_id }}" >> $GITHUB_ENV
+          fi
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linutil-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ env.run_id }}
+
+      - name: Set env
+        run: |
+          chmod +x linutil
+          echo "${{ github.workspace }}" >> $GITHUB_PATH
+
+      - name: Generate preview
+        uses: charmbracelet/vhs-action@v2.1.0
+        with:
+          path: "docs/assets/preview.tape"
+
+      - name: Move preview
+        run: mv preview.gif docs/assets/preview.gif
+
+      - name: Upload preview
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Preview for ${{ env.run_id }}
+          file_pattern: "docs/assets/preview.gif"
+          add_options: "--force"
+        if: success()
