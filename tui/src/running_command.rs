@@ -74,7 +74,7 @@ impl FloatContent for RunningCommand {
 
             title_line.push_span(
                 Span::default()
-                    .content(" press <ENTER> to close this window ")
+                    .content(" Press <ENTER> to close this window ")
                     .style(Style::default()),
             );
 
