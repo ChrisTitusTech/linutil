@@ -41,11 +41,58 @@ install_podman() {
     esac
 }
 
+check_python_pip() {
+    if ! command_exists python3; then
+        printf "%b\n" "${YELLOW}Pip not found. Installing pip...${RC}"
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y python3
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y python3
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install python3
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm python
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
+    fi
+
+    if ! command_exists pip3; then
+        printf "%b\n" "${YELLOW}Pip not found. Installing pip...${RC}"
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y python3-pip
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y python3-pip
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install python3-pip
+                ;;
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm python-pip
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
+    fi
+}
+
 install_podman_compose() {
     printf "%b\n" "${YELLOW}Installing Podman Compose...${RC}"
     case "$PACKAGER" in
         apt-get|nala|zypper|pacman)
-            "$ESCALATION_TOOL" pip3 install podman-compose
+            pip3 install --user podman-compose
+            export PATH="$HOME/.local/bin:$PATH"
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
@@ -69,6 +116,7 @@ install_components() {
     fi
 
     if [ "$INSTALL_COMPOSE" -eq 1 ]; then
+        check_python_pip
         if ! command_exists podman-compose; then
             install_podman_compose
         else
