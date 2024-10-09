@@ -53,13 +53,6 @@ jobs:
           mv build/x86_64-unknown-linux-musl/release/linutil build/linutil
           mv build/aarch64-unknown-linux-musl/release/linutil build/linutil-aarch64
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Commit Linutil
-          file_pattern: "build/linutil build/linutil-aarch64"
-          add_options: '--force'
-        if: success()
-
       - name: Extract Version
         id: extract_version
         run: |
