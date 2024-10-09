@@ -223,6 +223,12 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Podman"
+description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
+script = "podman-setup.sh"
+task_list = "I SS"
+
+[[data]]
 name = "Fastfetch"
 description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
