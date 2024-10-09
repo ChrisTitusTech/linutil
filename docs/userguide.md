@@ -59,6 +59,7 @@ This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.
 It is written mainly in C, with performance and customizability in mind.
 This command installs fastfetch and configures from CTT's mybash repository.
