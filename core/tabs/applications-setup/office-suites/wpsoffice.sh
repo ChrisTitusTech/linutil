@@ -2,26 +2,15 @@
 
 . ../common-script.sh
 
-checkWpsOfficeInstallation() {
-    case "$PACKAGER" in
-        pacman)
-            command_exists wps
-            ;;
-        *)
-            checkFlatpak
-            flatpak_app_exists com.wps.Office
-            ;;
-    esac
-}
-
 installWpsOffice() {
-    if ! checkWpsOfficeInstallation; then
+    if ! command_exists com.wps.Office && ! command_exists wps; then
         printf "%b\n" "${YELLOW}Installing WPS Office...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm wps-office
                 ;;
             *)
+                checkFlatpak
                 flatpak install flathub com.wps.Office
                 ;;
         esac

@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 installBottles() {
-    if ! flatpak_app_exists "com.usebottles.bottles"; then
+    if ! command_exists com.usebottles.bottles; then
         printf "%b\n" "${YELLOW}Installing Bottles...${RC}"
         flatpak install -y flathub com.usebottles.bottles
     else

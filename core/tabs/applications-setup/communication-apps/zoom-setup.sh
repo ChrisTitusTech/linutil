@@ -2,26 +2,15 @@
 
 . ../../common-script.sh
 
-checkZoomInstallation() {
-    case "$PACKAGER" in
-        pacman)
-            command_exists zoom
-            ;;
-        *)
-            checkFlatpak
-            flatpak_app_exists us.zoom.Zoom
-            ;;
-    esac
-}
-
 installZoom() {
-    if ! checkZoomInstallation; then
+    if ! command_exists us.zoom.Zoom && ! command_exists zoom; then
         printf "%b\n" "${YELLOW}Installing Zoom...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm zoom
                 ;;
             *)
+                checkFlatpak
                 flatpak install -y flathub us.zoom.Zoom
                 ;;
         esac

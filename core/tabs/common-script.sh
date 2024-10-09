@@ -9,11 +9,9 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
+    ## Export flatpak binary paths. Should not be exported to PATH https://github.com/flatpak/flatpak/issues/3573#issuecomment-1330754720
+    export XDG_DATA_DIRS=/home/jeeva/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:$XDG_DATA_DIRS
     command -v "$1" >/dev/null 2>&1
-}
-
-flatpak_app_exists() {
-    flatpak info "$1" >/dev/null 2>&1
 }
 
 checkFlatpak() {
