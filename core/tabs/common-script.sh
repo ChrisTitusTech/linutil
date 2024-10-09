@@ -9,8 +9,7 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-    ## Export flatpak binary paths. Should not be exported to PATH https://github.com/flatpak/flatpak/issues/3573#issuecomment-1330754720
-    export XDG_DATA_DIRS=/home/jeeva/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:$XDG_DATA_DIRS
+    export PATH=/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH
     command -v "$1" >/dev/null 2>&1
 }
 
@@ -25,8 +24,9 @@ checkFlatpak() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
         esac
-        printf "%b\n" "Adding Flathub remote..."
+        printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
         "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        printf "%b\n" "${YELLOW}Applications installed by Flatpak may not appear on your desktop until the user session is restarted...${RC}"
     else
         if ! flatpak remotes | grep -q "flathub"; then
             printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
