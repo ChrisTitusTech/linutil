@@ -50,7 +50,7 @@ jobs:
       - name: Upload preview
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Preview for ${{ github.sha }}
+          commit_message: Preview for ${{ env.run_id }}
           file_pattern: "docs/assets/preview.gif"
           add_options: "--force"
         if: success()
