@@ -229,6 +229,12 @@ script = "podman-setup.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Podman-compose"
+description = "Podman Compose is a tool for defining and running multi-container applications using Podman."
+script = "podman-compose-setup.sh"
+task_list = "I SS"
+
+[[data]]
 name = "Fastfetch"
 description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
