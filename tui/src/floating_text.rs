@@ -14,7 +14,7 @@ use ratatui::{
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, Clear, List},
+    widgets::{Block, List},
     Frame,
 };
 
@@ -29,7 +29,7 @@ pub struct FloatingText {
     max_line_width: usize,
     v_scroll: usize,
     h_scroll: usize,
-    mode_title: String,
+    title: String,
 }
 
 macro_rules! style {
@@ -124,7 +124,7 @@ fn get_lines_owned(s: &str) -> Vec<String> {
 }
 
 impl FloatingText {
-    pub fn new(text: String, title: &str) -> Self {
+    pub fn new(text: String, title: String) -> Self {
         let src = get_lines(&text)
             .into_iter()
             .map(|s| s.to_string())
@@ -133,7 +133,7 @@ impl FloatingText {
         let max_line_width = max_width!(src);
         Self {
             src,
-            mode_title: title.to_string(),
+            title,
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
@@ -146,6 +146,7 @@ impl FloatingText {
                 // just apply highlights directly
                 (max_width!(get_lines(cmd)), Some(cmd.clone()))
             }
+
             Command::LocalFile { file, .. } => {
                 // have to read from tmp dir to get cmd src
                 let raw = std::fs::read_to_string(file)
@@ -163,7 +164,7 @@ impl FloatingText {
 
         Some(Self {
             src,
-            mode_title: title,
+            title,
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
@@ -196,21 +197,22 @@ impl FloatingText {
 }
 
 impl FloatContent for FloatingText {
+    fn top_title(&self) -> Option<Line<'_>> {
+        let title_text = format!(" {} ", self.title);
+
+        let title_line = Line::from(title_text)
+            .centered()
+            .style(Style::default().reversed());
+
+        Some(title_line)
+    }
+
+    fn bottom_title(&self) -> Option<Line<'_>> {
+        None
+    }
+
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        // Define the Block with a border and background color
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .title(self.mode_title.clone())
-            .title_alignment(ratatui::layout::Alignment::Center)
-            .title_style(Style::default().reversed())
-            .style(Style::default());
-
-        // Draw the Block first
-        frame.render_widget(block.clone(), area);
-
-        // Calculate the inner area to ensure text is not drawn over the border
-        let inner_area = block.inner(area);
-        let Rect { height, .. } = inner_area;
+        let Rect { height, .. } = area;
         let lines = self
             .src
             .iter()
@@ -253,11 +255,8 @@ impl FloatContent for FloatingText {
             .block(Block::default())
             .highlight_style(Style::default().reversed());
 
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
-
         // Render the list inside the bordered area
-        frame.render_widget(list, inner_area);
+        frame.render_widget(list, area);
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
@@ -278,7 +277,7 @@ impl FloatContent for FloatingText {
 
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         (
-            &self.mode_title,
+            &self.title,
             Box::new([
                 Shortcut::new("Scroll down", ["j", "Down"]),
                 Shortcut::new("Scroll up", ["k", "Up"]),
