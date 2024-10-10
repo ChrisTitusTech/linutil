@@ -4,14 +4,15 @@
 
 # Check if ~/.ssh/config exists, if not, create it
 if [ ! -f ~/.ssh/config ]; then
-    touch ~/.ssh/config
-    chmod 600 ~/.ssh/config
+    mkdir -p "$HOME/.ssh"
+    touch "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
 fi
 
 # Function to show available hosts from ~/.ssh/config
 show_available_hosts() {
     printf "%b\n" "Available Systems:"
-    grep -E "^Host " ~/.ssh/config | awk '{print $2}'
+    grep -E "^Host " "$HOME/.ssh/config" | awk '{print $2}'
     printf "%b\n" "-------------------"
 }
 
