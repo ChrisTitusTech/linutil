@@ -51,7 +51,7 @@ install_podman_compose() {
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install podman-compose
             ;;
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm podman-compose
+            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed podman-compose
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
