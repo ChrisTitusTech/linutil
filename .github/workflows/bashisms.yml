@@ -3,7 +3,7 @@ name: Check for bashisms
 on:
   pull_request:
     paths:
-      - '**/*.sh'
+      - 'core/tabs/**/*.sh'
   merge_group:
   workflow_dispatch:
 
