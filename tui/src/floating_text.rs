@@ -50,14 +50,14 @@ macro_rules! style {
 }
 
 const SYNTAX_HIGHLIGHT_STYLES: [(&str, anstyle::Style); 8] = [
-    ("function", style!(220, 220, 170)),
-    ("string", style!(206, 145, 120)),
-    ("property", style!(156, 220, 254)),
-    ("comment", style!(92, 131, 75)),
-    ("embedded", style!(206, 145, 120)),
-    ("constant", style!(79, 193, 255)),
-    ("keyword", style!(197, 134, 192)),
-    ("number", style!(181, 206, 168)),
+    ("function", style!(220, 220, 170)), // yellow
+    ("string", style!(206, 145, 120)),   // brown
+    ("property", style!(156, 220, 254)), // light blue
+    ("comment", style!(92, 131, 75)),    // green
+    ("embedded", style!(206, 145, 120)), // blue (string expansions)
+    ("constant", style!(79, 193, 255)),  // dark blue
+    ("keyword", style!(197, 134, 192)),  // magenta
+    ("number", style!(181, 206, 168)),   // light green
 ];
 
 fn get_highlighted_string(s: &str) -> Option<String> {
@@ -224,6 +224,7 @@ impl FloatingText {
 
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
             .title(self.mode_title.clone())
@@ -231,8 +232,10 @@ impl FloatContent for FloatingText {
             .title_style(Style::default().reversed())
             .style(Style::default());
 
+        // Draw the Block first
         frame.render_widget(block.clone(), area);
 
+        // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
         let Rect { width, height, .. } = inner_area;
 
@@ -281,11 +284,15 @@ impl FloatContent for FloatingText {
             })
             .collect::<Vec<_>>();
 
+        // Create list widget
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
 
+        // Clear the text underneath the floats rendered area
         frame.render_widget(Clear, inner_area);
+
+        // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
     }
 
