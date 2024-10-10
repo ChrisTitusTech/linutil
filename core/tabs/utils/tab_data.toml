@@ -117,7 +117,7 @@ task_list = "I SS"
 
 [[data]]
 name = "Bootable USB Creator"
-description = "Makes a USB Stick that can be used to install the selected Linux distribution."
+description = "Makes a USB Stick that can be used to install the selected Linux distribution"
 script = "create-bootable-usb.sh"
 task_list = "D"
 
