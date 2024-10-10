@@ -3,7 +3,7 @@
 . ../../common-script.sh
 # This script allows user to download proprietary drivers for nvidia in fedora
 
-# It also disables noveau nvidia drivers
+# It also disables nouveau nvidia drivers
 
 # Installation guide link: https://rpmfusion.org/Howto/NVIDIA
 

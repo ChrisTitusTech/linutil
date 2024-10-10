@@ -20,6 +20,17 @@ jobs:
         with:
           fetch-depth: '0'  # Fetch all commit history for all branches as well as tags.
 
+      - name: Copy Contributing Guidelines
+        run: |
+          echo "<!-- THIS FILE IS GENERATED AUTOMATICALLY. EDIT .github/CONTRIBUTING.md -->\n\n$(cat .github/CONTRIBUTING.md)" > 'docs/contributing.md'
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Commit Contributing Guidelines
+          file_pattern: "docs/contributing.md"
+          add_options: '--force'
+        if: success()
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
