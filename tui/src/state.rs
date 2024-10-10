@@ -657,7 +657,9 @@ impl AppState {
         if let Some(list_node) = self.get_selected_node() {
             let mut preview_title = "[Preview] - ".to_string();
             preview_title.push_str(list_node.name.as_str());
-            if let Some(preview) = FloatingText::from_command(&list_node.command, FloatingTextMode::Preview) {
+            if let Some(preview) =
+                FloatingText::from_command(&list_node.command, FloatingTextMode::Preview)
+            {
                 self.spawn_float(preview, 80, 80);
             }
         }
