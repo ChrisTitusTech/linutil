@@ -16,6 +16,12 @@ script = "arch/server-setup.sh"
 task_list = "SI D"
 
 [[data.entries]]
+name = "Nvidia Drivers && Hardware Acceleration"
+description = "This script installs and configures nvidia drivers with Hardware Acceleration."
+script = "arch/nvidia-drivers.sh"
+task_list = "I FM SS"
+
+[[data.entries]]
 name = "Paru AUR Helper"
 description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
