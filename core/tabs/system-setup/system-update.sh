@@ -6,23 +6,23 @@ fastUpdate() {
     case "$PACKAGER" in
         pacman)
 
-            $AUR_HELPER -S --needed --noconfirm rate-mirrors-bin
+            $AUR_HELPER -S --needed --noconfirm reflector
 
-            printf "%b\n" "${YELLOW}Generating a new list of mirrors using rate-mirrors. This process may take a few seconds...${RC}"
+            printf "%b\n" "${YELLOW}Generating a new list of mirrors using reflector. This process may take a few seconds...${RC}"
 
             if [ -s /etc/pacman.d/mirrorlist ]; then
                 "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
             fi
 
-            # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
+            # If for some reason DTYPE is still unknown use always arch so the reflector does not fail
             dtype_local=${DTYPE}
             if [ "${DTYPE}" = "unknown" ]; then
                 dtype_local="arch"
             fi
 
-            "$ESCALATION_TOOL" rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
+            "$ESCALATION_TOOL" reflector --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
             if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
-                printf "%b\n" "${RED}Rate-mirrors failed, restoring backup.${RC}"
+                printf "%b\n" "${RED}Reflector failed, restoring backup.${RC}"
                 "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
             fi
             ;;
