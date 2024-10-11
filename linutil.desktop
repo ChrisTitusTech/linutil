@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Linutil
 Comment=Distro-agnostic toolbox designed to simplify everyday Linux tasks
-Exec=sh -c '/usr/bin/linutil || $HOME/.cargo/bin/linutil || linutil'
+Exec=sh -c '/usr/bin/linutil || \\$HOME/.cargo/bin/linutil || linutil'
 Icon=utilities-terminal
 Type=Application
 Terminal=true
