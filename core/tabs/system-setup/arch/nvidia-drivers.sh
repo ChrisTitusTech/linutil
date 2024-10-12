@@ -16,14 +16,19 @@ installDeps() {
     done
 }
 
-checkHardware() {
+checkNvidiaHardware() {
     # Refer https://nouveau.freedesktop.org/CodeNames.html for model code names
-    model=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep controller | cut -d ' ' -f 7 |  cut -c 1-2 )
+    model=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep NVIDIA | sed 's/.*Corporation //;s/ .*//' | cut -c 1-2)
     case "$model" in
         GM|GP|GV) return 1 ;;
         TU|GA|AD) return 0 ;;
         *) printf "%b\n" "${RED}Unsupported hardware." && exit 1 ;;
     esac
+}
+
+checkIntelHardware() {
+    model=$(grep "model name" /proc/cpuinfo | head -n 1 | cut -d ':' -f 2 | cut -c 2-3)
+    [ "$model" -ge 11 ]
 }
 
 promptUser() {
@@ -82,7 +87,7 @@ setupHardwareAcceleration() {
 
 installDriver() {
     # Refer https://wiki.archlinux.org/title/NVIDIA for open-dkms or dkms driver selection
-    if checkHardware && promptUser "install nvidia's open source drivers"; then
+    if checkNvidiaHardware && promptUser "install nvidia's open source drivers"; then
         printf "%b\n" "${YELLOW}Installing nvidia open source driver...${RC}"
         installDeps
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-open-dkms
@@ -90,6 +95,10 @@ installDriver() {
         printf "%b\n" "${YELLOW}Installing nvidia proprietary driver...${RC}"
         installDeps
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-dkms
+    fi
+
+    if checkIntelHardware; then
+        setKernelParam "ibt=off"
     fi
 
     # Refer https://wiki.archlinux.org/title/NVIDIA/Tips_and_tricks#Preserve_video_memory_after_suspend
