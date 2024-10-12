@@ -2,6 +2,7 @@ mod inner;
 
 use std::rc::Rc;
 
+pub use ego_tree;
 use ego_tree::Tree;
 use std::path::PathBuf;
 

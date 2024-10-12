@@ -17,7 +17,6 @@ tips = ["rand"]
 [dependencies]
 clap = { version = "4.5.19", features = ["derive"] }
 crossterm = "0.28.1"
-ego-tree = { workspace = true }
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
 ratatui = "0.28.1"

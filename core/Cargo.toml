@@ -5,11 +5,7 @@ repository = "https://github.com/ChrisTitusTech/linutil/tree/main/core"
 edition = "2021"
 version.workspace = true
 license.workspace = true
-include = [
-    "src/*.rs",
-    "Cargo.toml",
-    "tabs/**",
-]
+include = ["src/*.rs", "Cargo.toml", "tabs/**"]
 
 [dependencies]
 include_dir = "0.7.4"
@@ -17,4 +13,4 @@ temp-dir = "0.1.14"
 serde = { version = "1.0.205", features = ["derive"], default-features = false }
 toml = { version = "0.8.19", features = ["parse"], default-features = false }
 which = "6.0.3"
-ego-tree = { workspace = true }
+ego-tree = "0.9.0"

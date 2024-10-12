@@ -1,7 +1,6 @@
 use crate::{state::ListEntry, theme::Theme};
 use crossterm::event::{KeyCode, KeyEvent};
-use ego_tree::NodeId;
-use linutil_core::Tab;
+use linutil_core::{ego_tree::NodeId, Tab};
 use ratatui::{
     layout::{Position, Rect},
     style::Style,
