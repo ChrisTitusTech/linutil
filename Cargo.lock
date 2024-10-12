@@ -503,7 +503,6 @@ dependencies = [
  "anstyle",
  "chrono",
  "clap",
- "crossterm",
  "ego-tree",
  "linutil_core",
  "oneshot",
