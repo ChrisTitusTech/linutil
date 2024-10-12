@@ -59,9 +59,9 @@ pub fn create_shortcut_list(
 
         if rest.is_empty() {
             break;
-        } else {
-            shortcut_spans = rest;
         }
+
+        shortcut_spans = rest;
     }
 
     lines.into_boxed_slice()
@@ -79,8 +79,8 @@ impl Shortcut {
     }
 
     fn to_spans(&self) -> Vec<Span<'static>> {
-        let mut ret: Vec<_> = self
-            .key_sequences
+        let description = Span::styled(self.desc, Style::default().italic());
+        self.key_sequences
             .iter()
             .flat_map(|seq| {
                 [
@@ -89,8 +89,7 @@ impl Shortcut {
                     Span::default().content("] "),
                 ]
             })
-            .collect();
-        ret.push(Span::styled(self.desc, Style::default().italic()));
-        ret
+            .chain(std::iter::once(description))
+            .collect()
     }
 }
