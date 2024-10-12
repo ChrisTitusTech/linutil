@@ -20,7 +20,7 @@ fastUpdate() {
                 dtype_local="arch"
             fi
 
-            "$ESCALATION_TOOL" reflector --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
+            "$ESCALATION_TOOL" reflector -n 5 --save /etc/pacman.d/mirrorlist ${dtype_local}
             if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
                 printf "%b\n" "${RED}Reflector failed, restoring backup.${RC}"
                 "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
