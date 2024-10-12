@@ -8,8 +8,7 @@ use crate::{
     theme::Theme,
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use ego_tree::NodeId;
-use linutil_core::{ListNode, Tab};
+use linutil_core::{ego_tree::NodeId, ListNode, Tab};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
