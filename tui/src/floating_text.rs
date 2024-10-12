@@ -8,9 +8,8 @@ use crate::{float::FloatContent, hint::Shortcut};
 
 use linutil_core::Command;
 
-use crossterm::event::{KeyCode, KeyEvent};
-
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent},
     layout::Rect,
     style::{Style, Stylize},
     text::Line,

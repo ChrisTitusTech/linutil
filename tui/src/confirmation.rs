@@ -2,8 +2,8 @@ use std::borrow::Cow;
 
 use crate::{float::FloatContent, hint::Shortcut};
 
-use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent},
     layout::Alignment,
     prelude::*,
     widgets::{Block, Borders, Clear, List},
