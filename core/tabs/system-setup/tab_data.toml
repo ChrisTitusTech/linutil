@@ -22,6 +22,12 @@ script = "arch/paru-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Virtualization"
+description = "QEMU, Libvirt, Virt-Manager installation and configuration."
+script = "arch/virtualization.sh"
+task_list = "FM I SS RP"
+
+[[data.entries]]
 name = "Yay AUR Helper"
 description = "Yet Another Yogurt - An AUR Helper Written in Go.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/yay-setup.sh"
