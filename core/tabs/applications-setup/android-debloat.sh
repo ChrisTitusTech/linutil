@@ -15,6 +15,9 @@ install_adb() {
             dnf|zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add android-tools
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
                 exit 1

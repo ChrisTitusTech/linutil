@@ -127,7 +127,7 @@ checkDistro() {
 checkEnv() {
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
-    checkPackageManager 'nala apt-get dnf pacman zypper'
+    checkPackageManager 'nala apt-get dnf pacman zypper apk'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

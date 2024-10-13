@@ -12,6 +12,9 @@ installMeld() {
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install meld
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add meld
+                ;;
             *)
                 . ../setup-flatpak.sh
                 flatpak install -y flathub org.gnome.meld

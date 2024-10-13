@@ -32,6 +32,9 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add librewolf
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

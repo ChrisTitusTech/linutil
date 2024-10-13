@@ -13,6 +13,9 @@ setupNetworkManager() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y NetworkManager-1
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add networkmanager-wifi iwd
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
                 ;;

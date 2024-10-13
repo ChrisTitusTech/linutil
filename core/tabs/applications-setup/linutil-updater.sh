@@ -19,6 +19,13 @@ updateLinutil() {
                     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
                     . $HOME/.cargo/env
                     ;;
+                apk)
+                    "$ESCALATION_TOOL" "$PACKAGER" add build-base
+                    "$ESCALATION_TOOL" sed -i '/community/s/^#//' /etc/apk/repositories
+                    "$ESCALATION_TOOL" "$PACKAGER" update
+                    "$ESCALATION_TOOL" "$PACKAGER" add rustup
+                    rustup-init
+                    ;;
                 *)
                     "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
                     ;;

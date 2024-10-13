@@ -23,6 +23,9 @@ installSignal() {
                 "$ESCALATION_TOOL" "$PACKAGER" copr enable luminoso/Signal-Desktop
                 "$ESCALATION_TOOL" "$PACKAGER" install -y signal-desktop 
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add signal-desktop
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

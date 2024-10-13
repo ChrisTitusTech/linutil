@@ -48,6 +48,9 @@ fastUpdate() {
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" update
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
@@ -73,6 +76,10 @@ updateSystem() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" update
+            "$ESCALATION_TOOL" "$PACKAGER" upgrade
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"

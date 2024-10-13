@@ -36,6 +36,9 @@ install_docker() {
             "$ESCALATION_TOOL" systemctl enable docker
             "$ESCALATION_TOOL" systemctl start docker
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add docker
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -54,6 +57,9 @@ install_docker_compose() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm docker-compose
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add docker-cli-compose
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

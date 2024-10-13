@@ -25,6 +25,9 @@ cleanup_system() {
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
             "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" cache clean
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             return 1

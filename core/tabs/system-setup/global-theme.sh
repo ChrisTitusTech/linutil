@@ -17,6 +17,9 @@ install_theme_tools() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qt6ct kvantum
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add qt6ct kvantum
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
