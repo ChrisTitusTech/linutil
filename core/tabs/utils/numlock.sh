@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 # setleds can be used in all distros
 # This method works by calling a script using systemd service
@@ -40,6 +41,11 @@ EOF
 
 numlockSetup() {
   # Check if the script and service files exists
+  if [ "$PACKAGER" = "apk" ]; then
+    printf "%b\n" "${RED}Unsupported package manager.${RC}"
+    exit 1
+  fi
+
   if [ ! -f "/usr/local/bin/numlock" ]; then
     create_file
   fi
@@ -51,10 +57,10 @@ numlockSetup() {
   printf "%b" "Do you want to enable Numlock on boot? (y/N): "
   read -r confirm
   if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-    "$ESCALATION_TOOL" systemctl enable numlock.service --quiet
+    enableService numlock
     printf "%b\n" "Numlock will be enabled on boot"
   else
-    "$ESCALATION_TOOL" systemctl disable numlock.service --quiet
+    disableService numlock
     printf "%b\n" "Numlock will not be enabled on boot"
   fi
 }

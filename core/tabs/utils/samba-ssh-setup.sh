@@ -47,17 +47,13 @@ setup_ssh() {
         ;;
     esac
 
-    # Enable and start the appropriate SSH service
-    "$ESCALATION_TOOL" systemctl enable "$SSH_SERVICE"
-    "$ESCALATION_TOOL" systemctl start "$SSH_SERVICE"
+    startAndEnableService "$SSH_SERVICE"
 
-    # Get the local IP address
     LOCAL_IP=$(ip -4 addr show | awk '/inet / {print $2}' | tail -n 1)
 
     printf "%b\n" "${GREEN}Your local IP address is: $LOCAL_IP${RC}"
 
-    # Check if SSH is running
-    if systemctl is-active --quiet "$SSH_SERVICE"; then
+    if isServiceActive "$SSH_SERVICE"; then
         printf "%b\n" "${GREEN}SSH is up and running.${RC}"
     else
         printf "%b\n" "${RED}Failed to start SSH.${RC}"
@@ -137,12 +133,11 @@ setup_samba() {
 EOL
     fi
 
-    # Enable and start Samba services
-    "$ESCALATION_TOOL" systemctl enable smb nmb
-    "$ESCALATION_TOOL" systemctl start smb nmb
+    for service in smb nmb; do
+        startAndEnableService "$service"
+    done
 
-    # Check if Samba is running
-    if systemctl is-active --quiet smb && systemctl is-active --quiet nmb; then
+    if isServiceActive smb && isServiceActive nmb; then
         printf "%b\n" "${GREEN}Samba is up and running.${RC}"
         printf "%b\n" "${YELLOW}Samba share available at: $SHARED_DIR${RC}"
     else

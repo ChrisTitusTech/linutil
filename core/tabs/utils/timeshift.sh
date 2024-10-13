@@ -16,7 +16,8 @@ install_timeshift() {
                 "$ESCALATION_TOOL" "${PACKAGER}" install -y timeshift
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported pacakge manager.${RC}"
+                printf "%b\n" "${RED}Unsupported package manager.${RC}"
+                ;;
         esac
     else
         printf "%b\n" "${GREEN}Timeshift is already installed.${RC}"

@@ -1,10 +1,10 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 # Function to prompt the user for installation choice
 choose_installation() {
-    clear
     printf "%b\n" "${YELLOW}Choose what to install:${RC}"
     printf "%b\n" "1. ${YELLOW}Docker${RC}"
     printf "%b\n" "2. ${YELLOW}Docker Compose${RC}"
@@ -28,13 +28,9 @@ install_docker() {
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install docker
-            "$ESCALATION_TOOL" systemctl enable docker
-            "$ESCALATION_TOOL" systemctl start docker
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm docker
-            "$ESCALATION_TOOL" systemctl enable docker
-            "$ESCALATION_TOOL" systemctl start docker
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker
@@ -44,6 +40,8 @@ install_docker() {
             exit 1
             ;;
     esac
+
+    startAndEnableService docker
 }
 
 install_docker_compose() {
