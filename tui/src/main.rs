@@ -36,6 +36,12 @@ struct Args {
 }
 
 fn main() -> io::Result<()> {
+    if sudo::check() != sudo::RunningAs::User {
+        eprintln!("Error: This program is not intended to be run with elevated privileges.");
+        eprintln!("Please run this program as a regular user to ensure proper security and functionality.");
+        std::process::exit(1);
+    }
+
     let args = Args::parse();
 
     let mut state = AppState::new(args.theme, args.override_validation);
