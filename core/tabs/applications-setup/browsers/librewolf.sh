@@ -33,6 +33,11 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
                 ;;
             apk)
+                alpine_version=$(grep . /etc/alpine-release | cut -d . -f 2)
+                if [ "$alpine_version" -le 20 ]; then
+                    printf "%b\n" "${RED}Only available in edge release of alpine linux${RC}"
+                    exit 1
+                fi
                 "$ESCALATION_TOOL" "$PACKAGER" add librewolf
                 ;;
             *)

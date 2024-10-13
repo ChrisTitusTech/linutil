@@ -21,8 +21,6 @@ updateLinutil() {
                     ;;
                 apk)
                     "$ESCALATION_TOOL" "$PACKAGER" add build-base
-                    "$ESCALATION_TOOL" sed -i '/community/s/^#//' /etc/apk/repositories
-                    "$ESCALATION_TOOL" "$PACKAGER" update
                     "$ESCALATION_TOOL" "$PACKAGER" add rustup
                     rustup-init
                     ;;

@@ -21,9 +21,6 @@ installJitsi() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
                 ;;
-            apk)
-                "$ESCALATION_TOOL" "$PACKAGER" add jitsi-meet
-                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

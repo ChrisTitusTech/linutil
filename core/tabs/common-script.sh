@@ -82,6 +82,12 @@ checkPackageManager() {
         fi
     done
 
+    ## Enable apk community packages
+    if [ "$PACKAGER" = "apk" ] && grep -qE '^#.*community' /etc/apk/repositories; then
+        "$ESCALATION_TOOL" sed -i '/community/s/^#//' /etc/apk/repositories
+        "$ESCALATION_TOOL" "$PACKAGER" update
+    fi
+
     if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1

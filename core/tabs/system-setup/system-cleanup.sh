@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 cleanup_system() {
     printf "%b\n" "${YELLOW}Performing system cleanup...${RC}"
@@ -39,7 +40,9 @@ common_cleanup() {
     "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
     "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
     "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
-    "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    if [ "$INIT_MANAGER" = "systemctl" ]; then
+        "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    fi
 }
 
 clean_data() {
