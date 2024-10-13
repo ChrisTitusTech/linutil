@@ -13,7 +13,7 @@ installQEMUDesktop() {
 }
 
 installQEMUEmulators() {
-    if ! pacman -Q | grep -q "qemu-emulators-full "; then
+    if ! "$PACKAGER" -Q | grep -q "qemu-emulators-full "; then
         printf "%b\n" "${YELLOW}Installing QEMU-Emulators.${RC}"
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-emulators-full swtpm
     else
@@ -43,7 +43,7 @@ checkKVM() {
 
 setupLibvirt() {
     printf "%b\n" "${YELLOW}Configuring Libvirt.${RC}"
-    if pacman -Q | grep -q "iptables "; then
+    if "$PACKAGER" -Q | grep -q "iptables "; then
         "$ESCALATION_TOOL" "$PACKAGER" -Rdd --noconfirm iptables
     fi
 
