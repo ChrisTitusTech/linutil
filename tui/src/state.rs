@@ -1,10 +1,8 @@
-use std::rc::Rc;
-
 use crate::{
     confirmation::{ConfirmPrompt, ConfirmStatus},
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::{FloatingText, FloatingTextMode},
+    floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
     running_command::RunningCommand,
     theme::Theme,
@@ -21,6 +19,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
+use std::rc::Rc;
 use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 77;
@@ -655,10 +654,10 @@ impl AppState {
     }
 
     fn enable_preview(&mut self) {
-        if let Some(node) = self.get_selected_node() {
-            if let Some(preview) =
-                FloatingText::from_command(&node.command, FloatingTextMode::Preview)
-            {
+        if let Some(list_node) = self.get_selected_node() {
+            let mut preview_title = "[Preview] - ".to_string();
+            preview_title.push_str(list_node.name.as_str());
+            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
                 self.spawn_float(preview, 80, 80);
             }
         }
@@ -666,7 +665,7 @@ impl AppState {
 
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, FloatingTextMode::Description);
+            let description = FloatingText::new(command_description, "Command Description");
             self.spawn_float(description, 80, 80);
         }
     }
@@ -732,7 +731,7 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
             80,
             80,
         );
