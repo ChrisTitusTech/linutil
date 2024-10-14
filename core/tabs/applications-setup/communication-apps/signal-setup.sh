@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installSignal() {
-    if ! command_exists signal; then
+    if ! command_exists org.signal.Signal && ! command_exists signal; then
         printf "%b\n" "${YELLOW}Installing Signal...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -22,6 +22,10 @@ installSignal() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" copr enable luminoso/Signal-Desktop
                 "$ESCALATION_TOOL" "$PACKAGER" install -y signal-desktop 
+                ;;
+            apk)
+                checkFlatpak
+                flatpak install -y flathub org.signal.Signal
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
