@@ -51,9 +51,8 @@ checkAURHelper() {
 }
 
 checkEscalationTool() {
-    ## Check for escalation tools.
     if [ "$(id -u)" -eq 0 ]; then
-        printf "%b\n" "${CYAN}Running as root, no need for escalation tool.${RC}"
+        printf "%b\n" "${CYAN}Running as root. Skipping escalation tool check.${RC}"
         ESCALATION_TOOL_CHECKED=true
         return 0
     fi
