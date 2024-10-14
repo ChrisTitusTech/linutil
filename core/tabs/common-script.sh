@@ -20,6 +20,9 @@ checkFlatpak() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add flatpak
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
