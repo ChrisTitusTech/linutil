@@ -9,7 +9,35 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
+    export PATH=/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH
     command -v "$1" >/dev/null 2>&1
+}
+
+checkFlatpak() {
+    if ! command_exists flatpak; then
+        printf "%b\n" "${YELLOW}Installing Flatpak...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add flatpak
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
+                ;;
+        esac
+        printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
+        "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        printf "%b\n" "${YELLOW}Applications installed by Flatpak may not appear on your desktop until the user session is restarted...${RC}"
+    else
+        if ! flatpak remotes | grep -q "flathub"; then
+            printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
+            "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        else
+            printf "%b\n" "${CYAN}Flatpak is installed${RC}"
+        fi
+    fi
 }
 
 checkAURHelper() {
