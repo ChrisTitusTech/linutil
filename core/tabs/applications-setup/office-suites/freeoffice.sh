@@ -8,19 +8,19 @@ installFreeOffice() {
         case "$PACKAGER" in
         apt-get|nala)
             curl -O https://www.softmaker.net/down/softmaker-freeoffice-2024_1218-01_amd64.deb
-            "$ESCALATION_TOOL" "$PACKAGER" install -y ./softmaker-freeoffice-2024_1218-01_amd64.deb
+            elevated_execution "$PACKAGER" install -y ./softmaker-freeoffice-2024_1218-01_amd64.deb
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://shop.softmaker.com/repo/rpm SoftMaker
-            "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys refresh
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install softmaker-freeoffice-2024
+            elevated_execution "$PACKAGER" addrepo -f https://shop.softmaker.com/repo/rpm SoftMaker
+            elevated_execution "$PACKAGER" --gpg-auto-import-keys refresh
+            elevated_execution "$PACKAGER" --non-interactive install softmaker-freeoffice-2024
             ;;
         pacman)
             "$AUR_HELPER" -S --needed --noconfirm freeoffice
             ;;
         dnf)
-            "$ESCALATION_TOOL" curl -O -qO /etc/yum.repos.d/softmaker.repo https://shop.softmaker.com/repo/softmaker.repo
-            "$ESCALATION_TOOL" "$PACKAGER" install -y softmaker-freeoffice-2024
+            elevated_execution curl -O -qO /etc/yum.repos.d/softmaker.repo https://shop.softmaker.com/repo/softmaker.repo
+            elevated_execution "$PACKAGER" install -y softmaker-freeoffice-2024
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

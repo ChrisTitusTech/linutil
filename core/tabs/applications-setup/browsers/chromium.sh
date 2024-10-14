@@ -7,10 +7,10 @@ if ! command_exists chromium; then
     printf "%b\n" "${YELLOW}Installing Chromium...${RC}"
     case "$PACKAGER" in
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm chromium
+            elevated_execution "$PACKAGER" -S --needed --noconfirm chromium
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
+            elevated_execution "$PACKAGER" install -y chromium
             ;;
     esac
 else

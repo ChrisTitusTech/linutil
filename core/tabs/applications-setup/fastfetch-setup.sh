@@ -7,15 +7,15 @@ installFastfetch() {
         printf "%b\n" "${YELLOW}Installing Fastfetch...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm fastfetch
+                elevated_execution "$PACKAGER" -S --needed --noconfirm fastfetch
                 ;;
             apt-get|nala)
                 curl -sSLo /tmp/fastfetch.deb https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb
-                "$ESCALATION_TOOL" "$PACKAGER" install -y /tmp/fastfetch.deb
+                elevated_execution "$PACKAGER" install -y /tmp/fastfetch.deb
                 rm /tmp/fastfetch.deb
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y fastfetch
+                elevated_execution "$PACKAGER" install -y fastfetch
                 ;;
         esac
     else

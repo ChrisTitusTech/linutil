@@ -7,10 +7,10 @@ installAlacritty() {
     printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm alacritty
+                elevated_execution "$PACKAGER" -S --needed --noconfirm alacritty
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y alacritty
+                elevated_execution "$PACKAGER" install -y alacritty
                 ;;
         esac
     else

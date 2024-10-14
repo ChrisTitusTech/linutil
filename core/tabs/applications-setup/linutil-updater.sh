@@ -12,15 +12,15 @@ updateLinutil() {
         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
             case "$PACKAGER" in
                 pacman)
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
+                    elevated_execution "$PACKAGER" -S --needed --noconfirm rustup
                     ;;
                 zypper)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
+                    elevated_execution "$PACKAGER" install -n curl gcc make
                     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
                     . $HOME/.cargo/env
                     ;;
                 *)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                    elevated_execution "$PACKAGER" install -y rustup
                     ;;
             esac
     fi

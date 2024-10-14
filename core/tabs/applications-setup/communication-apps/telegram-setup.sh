@@ -7,10 +7,10 @@ installTelegram() {
         printf "%b\n" "${YELLOW}Installing Telegram...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm telegram-desktop 
+                elevated_execution "$PACKAGER" -S --needed --noconfirm telegram-desktop 
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y telegram-desktop 
+                elevated_execution "$PACKAGER" install -y telegram-desktop 
                 ;;
         esac
     else

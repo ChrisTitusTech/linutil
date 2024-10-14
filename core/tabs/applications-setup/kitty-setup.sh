@@ -7,10 +7,10 @@ installKitty() {
         printf "%b\n" "${YELLOW}Installing Kitty...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm kitty
+                elevated_execution "$PACKAGER" -S --needed --noconfirm kitty
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y kitty
+                elevated_execution "$PACKAGER" install -y kitty
                 ;;
         esac
     else

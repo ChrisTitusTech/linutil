@@ -18,10 +18,10 @@ checkRepo() {
     printf "%b\n" "${YELLOW}Nvidia non-free repository is not enabled. Enabling now...${RC}"
 
     # Enable the repository
-    "$ESCALATION_TOOL" dnf config-manager --set-enabled "$REPO_ID"
+    elevated_execution dnf config-manager --set-enabled "$REPO_ID"
 
     # Refreshing repository list
-    "$ESCALATION_TOOL" dnf makecache
+    elevated_execution dnf makecache
 
     # Verify if the repository is enabled
     if [ "$(dnf repolist enabled 2>/dev/null | grep -c "$REPO_ID")" -gt 0 ]; then
@@ -49,7 +49,7 @@ installDriver() {
   fi
 
   # NOTE:: Installing graphics driver.
-  "$ESCALATION_TOOL" dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
+  elevated_execution dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
   printf "%b\n" "${YELLOW}Building the drivers may take upto 5 minutes. Please don't kill the script!\n If the build failed try running the script again, select \"Remove Nvidia Drivers\" and reboot the system, then try installing drivers again.${RC}"
 
   for i in $(seq 1 5); do

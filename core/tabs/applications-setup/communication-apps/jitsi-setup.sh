@@ -7,19 +7,19 @@ installJitsi() {
         printf "%b\n" "${YELLOW}Installing Jitsi meet...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                curl https://download.jitsi.org/jitsi-key.gpg.key | "$ESCALATION_TOOL" gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg
-                printf "%b\n" 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/jitsi-stable.list > /dev/null
-                "$ESCALATION_TOOL" "$PACKAGER" update
-                "$ESCALATION_TOOL" "$PACKAGER" -y install jitsi-meet
+                curl https://download.jitsi.org/jitsi-key.gpg.key | elevated_execution gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg
+                printf "%b\n" 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | elevated_execution tee /etc/apt/sources.list.d/jitsi-stable.list > /dev/null
+                elevated_execution "$PACKAGER" update
+                elevated_execution "$PACKAGER" -y install jitsi-meet
                 ;;
             zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install jitsi
+                elevated_execution "$PACKAGER" --non-interactive install jitsi
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm jitsi-meet-bin
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
+                elevated_execution "$PACKAGER" install -y jitsi-meet
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

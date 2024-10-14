@@ -6,16 +6,16 @@ removeSnaps() {
     if command_exists snap; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -Rns snapd
+                elevated_execution "$PACKAGER" -Rns snapd
                 ;;
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" autoremove --purge snapd
+                elevated_execution "$PACKAGER" autoremove --purge snapd
                 if [ "$ID" = ubuntu ]; then
-                    "$ESCALATION_TOOL" apt-mark hold snapd
+                    elevated_execution apt-mark hold snapd
                 fi
                 ;;
             dnf|zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" remove snapd
+                elevated_execution "$PACKAGER" remove snapd
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

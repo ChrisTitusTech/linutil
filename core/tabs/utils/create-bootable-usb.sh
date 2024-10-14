@@ -13,7 +13,7 @@ usage() {
 list_devices() {
     printf "%b\n" "${YELLOW} Available devices and partitions: ${RC}"
     printf "\n"
-    "$ESCALATION_TOOL" lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL
+    elevated_execution lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL
     printf "\n"
 }
 
@@ -164,13 +164,13 @@ write_iso(){
 
     # Display progress and create the bootable USB drive
     printf "%b\n" "${YELLOW}Creating bootable USB drive...${RC}"
-    if ! "$ESCALATION_TOOL" dd if="$ISO_PATH" of="$USB_DEVICE" bs=4M status=progress oflag=sync; then
+    if ! elevated_execution dd if="$ISO_PATH" of="$USB_DEVICE" bs=4M status=progress oflag=sync; then
         printf "%b\n" "${RED}Failed to create bootable USB drive${RC}"
         exit 1
     fi
 
     # Sync to ensure all data is written
-    if ! "$ESCALATION_TOOL" sync; then
+    if ! elevated_execution sync; then
         printf "%b\n" "${RED}Failed to sync data${RC}"                              
         exit 1
     fi
@@ -179,10 +179,10 @@ write_iso(){
 
     # Eject the USB device
     printf "%b\n" "${YELLOW}Ejecting ${USB_DEVICE}...${RC}"
-    if ! "$ESCALATION_TOOL" umount "${USB_DEVICE}"* 2>/dev/null; then
+    if ! elevated_execution umount "${USB_DEVICE}"* 2>/dev/null; then
         printf "%b\n" "${RED}Failed to unmount ${USB_DEVICE}${RC}"
     fi
-    if ! "$ESCALATION_TOOL" eject "$USB_DEVICE"; then
+    if ! elevated_execution eject "$USB_DEVICE"; then
         printf "%b\n" "${RED}Failed to eject ${USB_DEVICE}${RC}"
     fi
 

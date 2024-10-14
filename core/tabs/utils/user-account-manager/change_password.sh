@@ -20,7 +20,7 @@ changePassword() {
         read -r confirm
         confirmAction || exit 1
 
-        echo "$username:$password" | "$ESCALATION_TOOL" chpasswd
+        echo "$username:$password" | elevated_execution chpasswd
         printf "%b\n" "${GREEN}Password changed successfully${RC}"
     else
         printf "%b\n" "${RED}User $username does not exist.${RC}"

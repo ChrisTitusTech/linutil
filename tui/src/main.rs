@@ -3,6 +3,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
 pub mod state;
 mod theme;
@@ -61,6 +62,10 @@ fn run(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     state: &mut AppState,
 ) -> io::Result<()> {
+    if !root::check_root(terminal)? {
+        return Ok(());
+    }
+
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event

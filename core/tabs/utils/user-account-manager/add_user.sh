@@ -26,8 +26,8 @@ createUser() {
         exit 1
     fi
 
-    "$ESCALATION_TOOL" useradd -m "$username" -g users -s /bin/bash
-    echo "$username:$password" | "$ESCALATION_TOOL" chpasswd
+    elevated_execution useradd -m "$username" -g users -s /bin/bash
+    echo "$username:$password" | elevated_execution chpasswd
 
     printf "%b\n" "${GREEN}User $username created successfully${RC}"
     printf "%b\n" "${GREEN}To add additional groups use Add User To Groups${RC}"

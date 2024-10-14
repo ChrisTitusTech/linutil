@@ -36,7 +36,7 @@ addToGroup() {
     read -r confirm
     confirmAction || exit 1
 
-    "$ESCALATION_TOOL" usermod -aG "$groups_to_add" "$username"
+    elevated_execution usermod -aG "$groups_to_add" "$username"
 
     printf "%b\n" "${GREEN}User successfully added to the $groups_to_add${RC}"
 }

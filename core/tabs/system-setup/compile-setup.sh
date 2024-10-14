@@ -9,9 +9,9 @@ installDepend() {
     case "$PACKAGER" in
         pacman)
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
-                echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                echo "[multilib]" | elevated_execution tee -a /etc/pacman.conf
+                echo "Include = /etc/pacman.d/mirrorlist" | elevated_execution tee -a /etc/pacman.conf
+                elevated_execution "$PACKAGER" -Syu
             else
                 printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
             fi
@@ -19,26 +19,26 @@ installDepend() {
             ;;
         apt-get|nala)
             COMPILEDEPS='build-essential'
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" dpkg --add-architecture i386
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            elevated_execution "$PACKAGER" update
+            elevated_execution dpkg --add-architecture i386
+            elevated_execution "$PACKAGER" update
+            elevated_execution "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             ;;
         dnf)
             COMPILEDEPS='@development-tools'
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled powertools
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
-            "$ESCALATION_TOOL" "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
+            elevated_execution "$PACKAGER" update
+            elevated_execution "$PACKAGER" config-manager --set-enabled powertools
+            elevated_execution "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            elevated_execution "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
-            "$ESCALATION_TOOL" "$PACKAGER" refresh 
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
+            elevated_execution "$PACKAGER" refresh 
+            elevated_execution "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
+            elevated_execution "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+            elevated_execution "$PACKAGER" install -y $DEPENDENCIES
             ;;
     esac
 }
