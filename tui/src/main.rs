@@ -3,6 +3,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
 pub mod state;
 mod theme;
@@ -15,18 +16,12 @@ use std::{
 use crate::theme::Theme;
 use clap::Parser;
 use crossterm::{
-    event::{self, DisableMouseCapture, Event, KeyCode, KeyEvent, KeyEventKind},
+    event::{self, DisableMouseCapture, Event, KeyEventKind},
     style::ResetColor,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use ratatui::{
-    backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Layout},
-    style::Stylize,
-    widgets::{Paragraph, Wrap},
-    Terminal,
-};
+use ratatui::{backend::CrosstermBackend, Terminal};
 use state::AppState;
 
 // Linux utility toolbox
@@ -42,12 +37,6 @@ struct Args {
 }
 
 fn main() -> io::Result<()> {
-    if sudo::check() != sudo::RunningAs::User && !Args::parse().allow_root {
-        eprintln!("Error: This program is not intended to be run with elevated privileges.");
-        eprintln!("To bypass this restriction, use the '--allow-root' flag.");
-        std::process::exit(1);
-    }
-
     let args = Args::parse();
 
     let mut state = AppState::new(args.theme, args.override_validation);
@@ -73,67 +62,8 @@ fn run(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     state: &mut AppState,
 ) -> io::Result<()> {
-    if sudo::check() == sudo::RunningAs::Root {
-        terminal.draw(|frame| {
-            let root_warn = Paragraph::new(
-                r#"
-!!!!!!!!!!!!!! YOU ARE ABOUT TO RUN LINUTIL AS ROOT !!!!!!!!!!!!!!
-
-This utility prioritizes compatibility with non-root environments.
-Some scripts may work without any issues, some may not.
-You have been warned!
-
-!!!!!!!!!!!!!!!!!!!!!! PROCEED WITH CAUTION !!!!!!!!!!!!!!!!!!!!!!
-
-Press [y] to continue, [n] to abort
-"#,
-            )
-            .on_black()
-            .white()
-            .alignment(Alignment::Center)
-            .wrap(Wrap { trim: true });
-
-            let rects = Layout::vertical([
-                Constraint::Fill(1),
-                Constraint::Length(10),
-                Constraint::Fill(1),
-            ])
-            .split(frame.area());
-
-            let centered = rects[1];
-
-            frame.render_widget(root_warn, centered);
-        })?;
-
-        loop {
-            match event::read()? {
-                Event::Key(
-                    KeyEvent {
-                        code: KeyCode::Char('y'),
-                        ..
-                    }
-                    | KeyEvent {
-                        code: KeyCode::Char('Y'),
-                        ..
-                    },
-                ) => {
-                    break;
-                }
-                Event::Key(
-                    KeyEvent {
-                        code: KeyCode::Char('n'),
-                        ..
-                    }
-                    | KeyEvent {
-                        code: KeyCode::Char('N'),
-                        ..
-                    },
-                ) => {
-                    return Ok(());
-                }
-                _ => {}
-            }
-        }
+    if !root::check_root(terminal)? {
+        return Ok(());
     }
 
     loop {
