@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installDiscord() {
-    if ! command_exists discord; then
+    if ! command_exists com.discordapp.Discord && ! command_exists discord; then
         printf "%b\n" "${YELLOW}Installing Discord...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -19,6 +19,10 @@ installDiscord() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+                ;;
+            apk)
+                checkFlatpak
+                flatpak install -y flathub com.discordapp.Discord
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

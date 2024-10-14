@@ -9,6 +9,9 @@ installPkg() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm ufw
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add ufw
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ufw
                 ;;

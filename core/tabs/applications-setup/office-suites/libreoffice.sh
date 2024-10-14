@@ -16,6 +16,9 @@ installLibreOffice() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add libreoffice
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

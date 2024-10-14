@@ -50,7 +50,8 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+            printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
+            exit 1
             ;;
     esac
 }
@@ -95,6 +96,8 @@ installAdditionalDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
             ;;
         *)
+            printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
+            exit 1
             ;;
     esac
 }

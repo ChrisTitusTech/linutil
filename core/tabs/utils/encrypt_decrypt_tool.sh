@@ -19,6 +19,9 @@ if ! command_exists openssl; then
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install openssl
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add openssl
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1

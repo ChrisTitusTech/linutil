@@ -9,6 +9,9 @@ installOkular() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm okular
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add okular
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y okular
                 ;;

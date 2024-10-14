@@ -9,6 +9,9 @@ installThunderBird() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm thunderbird
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add thunderbird
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 
                 ;;

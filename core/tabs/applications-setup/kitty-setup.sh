@@ -9,6 +9,9 @@ installKitty() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm kitty
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add kitty
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y kitty
                 ;;

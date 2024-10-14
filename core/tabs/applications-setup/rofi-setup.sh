@@ -9,6 +9,9 @@ installRofi() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rofi
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add rofi
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y rofi
                 ;;
