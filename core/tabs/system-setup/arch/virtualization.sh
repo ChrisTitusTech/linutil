@@ -31,10 +31,7 @@ installVirtManager() {
 }
 
 checkKVM() {
-    hardware_avail="$(grep -E 'vmx|svm|0xc0f' /proc/cpuinfo)"
-    kernel_avail="$(zgrep CONFIG_KVM= /proc/config.gz | cut -d '=' -f 2)"
-    modules_avail="$(lsmod | grep kvm)"
-    if [ -z "$hardware_avail" ] || [ -z "$modules_avail" ] || { [ "$kernel_avail" != "m" ] && [ "$kernel_avail" != "y" ]; }; then
+    if [ ! -e "/dev/kvm" ]; then
         printf "%b\n" "${RED}KVM is not available. Make sure you have CPU virtualization support enabled in your BIOS/UEFI settings. Please refer https://wiki.archlinux.org/title/KVM for more information.${RC}"
     else
         "$ESCALATION_TOOL" usermod "$USER" -aG kvm
