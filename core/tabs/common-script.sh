@@ -12,6 +12,14 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+elevated_execution() {
+    if [ -z "$ESCALATION_TOOL" ]; then
+        "$@"
+    else
+        "$ESCALATION_TOOL" "$@"
+    fi
+}
+
 checkAURHelper() {
     ## Check & Install AUR helper
     if [ "$PACKAGER" = "pacman" ]; then
@@ -44,6 +52,12 @@ checkAURHelper() {
 
 checkEscalationTool() {
     ## Check for escalation tools.
+    if [ "$(id -u)" -eq 0 ]; then
+        printf "%b\n" "${CYAN}Running as root, no need for escalation tool.${RC}"
+        ESCALATION_TOOL_CHECKED=true
+        return 0
+    fi
+
     if [ -z "$ESCALATION_TOOL_CHECKED" ]; then
         ESCALATION_TOOLS='sudo doas'
         for tool in ${ESCALATION_TOOLS}; do

@@ -7,10 +7,10 @@ installRofi() {
     printf "%b\n" "${YELLOW}Installing Rofi...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rofi
+                elevated_execution "$PACKAGER" -S --needed --noconfirm rofi
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y rofi
+                elevated_execution "$PACKAGER" install -y rofi
                 ;;
         esac
     else

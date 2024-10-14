@@ -10,7 +10,7 @@ themeinstall(){
     fi
     git clone "https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes"
     cd "Top-5-Bootloader-Themes"
-    "$ESCALATION_TOOL" ./install.sh
+    elevated_execution ./install.sh
 }
 
 checkEnv

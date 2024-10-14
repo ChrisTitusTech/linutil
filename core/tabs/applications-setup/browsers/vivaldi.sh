@@ -7,10 +7,10 @@ installLynx() {
         printf "%b\n" "${YELLOW}Installing Lynx...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lynx
+                elevated_execution "$PACKAGER" -S --needed --noconfirm lynx
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
+                elevated_execution "$PACKAGER" install -y lynx
                 ;;
         esac
     else

@@ -9,7 +9,7 @@
 
 create_file() {
   printf "%b\n" "Creating script..."
-  "$ESCALATION_TOOL" tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
+  elevated_execution tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
 #!/bin/bash
 
 for tty in /dev/tty{1..6}
@@ -18,13 +18,13 @@ do
 done
 EOF
 
-  "$ESCALATION_TOOL" chmod +x /usr/local/bin/numlock
+  elevated_execution chmod +x /usr/local/bin/numlock
 }
 
 # Create a systemd service to run the script on boot
 create_service() {
   printf "%b\n" "Creating service..."
-  "$ESCALATION_TOOL" tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
+  elevated_execution tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
 [Unit]
 Description=numlock
         
@@ -51,10 +51,10 @@ numlockSetup() {
   printf "%b" "Do you want to enable Numlock on boot? (y/N): "
   read -r confirm
   if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-    "$ESCALATION_TOOL" systemctl enable numlock.service --quiet
+    elevated_execution systemctl enable numlock.service --quiet
     printf "%b\n" "Numlock will be enabled on boot"
   else
-    "$ESCALATION_TOOL" systemctl disable numlock.service --quiet
+    elevated_execution systemctl disable numlock.service --quiet
     printf "%b\n" "Numlock will not be enabled on boot"
   fi
 }

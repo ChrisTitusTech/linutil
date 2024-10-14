@@ -8,25 +8,25 @@ installVsCode() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-                "$ESCALATION_TOOL" install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-                echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/vscode.list > /dev/null
+                elevated_execution install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+                echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | elevated_execution tee /etc/apt/sources.list.d/vscode.list > /dev/null
                 rm -f packages.microsoft.gpg
-                "$ESCALATION_TOOL" "$PACKAGER" update
-                "$ESCALATION_TOOL" "$PACKAGER" install -y apt-transport-https code
+                elevated_execution "$PACKAGER" update
+                elevated_execution "$PACKAGER" install -y apt-transport-https code
                 ;;
             zypper)
-                "$ESCALATION_TOOL" rpm --import https://packages.microsoft.com/keys/microsoft.asc
-                printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | "$ESCALATION_TOOL" tee /etc/zypp/repos.d/vscode.repo > /dev/null
-                "$ESCALATION_TOOL" "$PACKAGER" refresh
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install code
+                elevated_execution rpm --import https://packages.microsoft.com/keys/microsoft.asc
+                printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | elevated_execution tee /etc/zypp/repos.d/vscode.repo > /dev/null
+                elevated_execution "$PACKAGER" refresh
+                elevated_execution "$PACKAGER" --non-interactive install code
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm visual-studio-code-bin
                 ;;
             dnf)
-                "$ESCALATION_TOOL" rpm --import https://packages.microsoft.com/keys/microsoft.asc
-                printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | "$ESCALATION_TOOL" tee /etc/yum.repos.d/vscode.repo > /dev/null
-                "$ESCALATION_TOOL" "$PACKAGER" install -y code
+                elevated_execution rpm --import https://packages.microsoft.com/keys/microsoft.asc
+                printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | elevated_execution tee /etc/yum.repos.d/vscode.repo > /dev/null
+                elevated_execution "$PACKAGER" install -y code
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

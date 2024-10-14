@@ -9,10 +9,10 @@ install_package() {
     if ! command_exists "$PACKAGE"; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
+                elevated_execution "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
+                elevated_execution "$PACKAGER" install -y "$PACKAGE"
                 ;;
         esac
     else
@@ -41,8 +41,8 @@ setup_ssh() {
     esac
 
     # Enable and start the appropriate SSH service
-    "$ESCALATION_TOOL" systemctl enable "$SSH_SERVICE"
-    "$ESCALATION_TOOL" systemctl start "$SSH_SERVICE"
+    elevated_execution systemctl enable "$SSH_SERVICE"
+    elevated_execution systemctl start "$SSH_SERVICE"
 
     # Get the local IP address
     LOCAL_IP=$(ip -4 addr show | awk '/inet / {print $2}' | tail -n 1)
@@ -71,7 +71,7 @@ setup_samba() {
         printf "%b" "Do you want to modify the existing Samba configuration? (Y/n): "
         read -r MODIFY_SAMBA
         if [ "$MODIFY_SAMBA" = "Y" ] || [ "$MODIFY_SAMBA" = "y" ]; then
-            "$ESCALATION_TOOL" "$EDITOR" "$SAMBA_CONFIG"
+            elevated_execution "$EDITOR" "$SAMBA_CONFIG"
         fi
     else
         printf "%b\n" "${YELLOW}No existing Samba configuration found. Setting up a new one...${RC}"
@@ -82,8 +82,8 @@ setup_samba() {
         SHARED_DIR=${SHARED_DIR:-/srv/samba/share}
 
         # Create the shared directory if it doesn't exist
-        "$ESCALATION_TOOL" mkdir -p "$SHARED_DIR"
-        "$ESCALATION_TOOL" chmod -R 0777 "$SHARED_DIR"
+        elevated_execution mkdir -p "$SHARED_DIR"
+        elevated_execution chmod -R 0777 "$SHARED_DIR"
 
         # Add a new Samba user
         printf "%b" "Enter Samba username: "
@@ -109,10 +109,10 @@ setup_samba() {
         done
 
         # Add the user and set the password
-        "$ESCALATION_TOOL" smbpasswd -a "$SAMBA_USER"
+        elevated_execution smbpasswd -a "$SAMBA_USER"
 
         # Configure Samba settings
-        "$ESCALATION_TOOL" tee "$SAMBA_CONFIG" > /dev/null <<EOL
+        elevated_execution tee "$SAMBA_CONFIG" > /dev/null <<EOL
 [global]
    workgroup = WORKGROUP
    server string = Samba Server
@@ -131,8 +131,8 @@ EOL
     fi
 
     # Enable and start Samba services
-    "$ESCALATION_TOOL" systemctl enable smb nmb
-    "$ESCALATION_TOOL" systemctl start smb nmb
+    elevated_execution systemctl enable smb nmb
+    elevated_execution systemctl start smb nmb
 
     # Check if Samba is running
     if systemctl is-active --quiet smb && systemctl is-active --quiet nmb; then
@@ -148,9 +148,9 @@ configure_firewall() {
     printf "%b\n" "${BLUE}Configuring firewall...${RC}"
 
     if command_exists ufw; then
-        "$ESCALATION_TOOL" ufw allow OpenSSH
-        "$ESCALATION_TOOL" ufw allow Samba
-        "$ESCALATION_TOOL" ufw enable
+        elevated_execution ufw allow OpenSSH
+        elevated_execution ufw allow Samba
+        elevated_execution ufw enable
         printf "%b\n" "${GREEN}Firewall configured for SSH and Samba.${RC}"
     else
         printf "%b\n" "${YELLOW}UFW is not installed. Skipping firewall configuration.${RC}"

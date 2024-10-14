@@ -17,10 +17,10 @@ installAutoCpufreq() {
             printf "%b\n" "${YELLOW}git not found. Installing git...${RC}"
             case "$PACKAGER" in
                 pacman)
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm git
+                    elevated_execution "$PACKAGER" -S --needed --noconfirm git
                     ;;
                 *)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -y git
+                    elevated_execution "$PACKAGER" install -y git
                     ;;
             esac
         fi
@@ -33,8 +33,8 @@ installAutoCpufreq() {
 
         cd auto-cpufreq
         printf "%b\n" "${YELLOW}Running auto-cpufreq installer...${RC}"
-        "$ESCALATION_TOOL" ./auto-cpufreq-installer
-        "$ESCALATION_TOOL"  auto-cpufreq --install
+        elevated_execution ./auto-cpufreq-installer
+        elevated_execution  auto-cpufreq --install
 
         cd ..
     fi
@@ -47,10 +47,10 @@ configureAutoCpufreq() {
         # Check if the system has a battery to determine if it's a laptop
         if [ -d /sys/class/power_supply/BAT0 ]; then
             printf "%b\n" "${GREEN}System detected as laptop. Updating auto-cpufreq for laptop...${RC}"
-            "$ESCALATION_TOOL" auto-cpufreq --force powersave
+            elevated_execution auto-cpufreq --force powersave
         else
             printf "%b\n" "${GREEN}System detected as desktop. Updating auto-cpufreq for desktop...${RC}"
-            "$ESCALATION_TOOL" auto-cpufreq --force performance
+            elevated_execution auto-cpufreq --force performance
         fi
     else
         printf "%b\n" "${RED}auto-cpufreq is not installed, skipping configuration.${RC}"
@@ -62,7 +62,7 @@ removeAutoCpufreqTweak() {
 
     if command_exists auto-cpufreq; then
         printf "%b\n" "${YELLOW}Resetting auto-cpufreq configuration...${RC}"
-        "$ESCALATION_TOOL" auto-cpufreq --force reset
+        elevated_execution auto-cpufreq --force reset
     else
         printf "%b\n" "${RED}auto-cpufreq is not installed, skipping removal.${RC}"
     fi

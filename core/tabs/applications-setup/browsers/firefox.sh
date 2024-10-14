@@ -7,16 +7,16 @@ installFirefox() {
         printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
+                elevated_execution "$PACKAGER" install -y firefox-esr
                 ;;
             zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install MozillaFirefox
+                elevated_execution "$PACKAGER" --non-interactive install MozillaFirefox
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm firefox
+                elevated_execution "$PACKAGER" -S --needed --noconfirm firefox
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
+                elevated_execution "$PACKAGER" install -y firefox
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

@@ -8,20 +8,20 @@ installChrome() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-                "$ESCALATION_TOOL" "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
+                elevated_execution "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
                 ;;
             zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
-                "$ESCALATION_TOOL" "$PACKAGER" refresh
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install google-chrome-stable
+                elevated_execution "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
+                elevated_execution "$PACKAGER" refresh
+                elevated_execution "$PACKAGER" --non-interactive install google-chrome-stable
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm google-chrome
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y fedora-workstation-repositories
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
-                "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
+                elevated_execution "$PACKAGER" install -y fedora-workstation-repositories
+                elevated_execution "$PACKAGER" config-manager --set-enabled google-chrome
+                elevated_execution "$PACKAGER" install -y google-chrome-stable
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

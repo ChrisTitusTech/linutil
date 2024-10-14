@@ -6,24 +6,24 @@ cleanup_system() {
     printf "%b\n" "${YELLOW}Performing system cleanup...${RC}"
     case "$PACKAGER" in
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" clean
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
-            "$ESCALATION_TOOL" "$PACKAGER" autoclean
-            "$ESCALATION_TOOL" du -h /var/cache/apt
-            "$ESCALATION_TOOL" "$PACKAGER" clean
+            elevated_execution "$PACKAGER" clean
+            elevated_execution "$PACKAGER" autoremove -y
+            elevated_execution "$PACKAGER" autoclean
+            elevated_execution du -h /var/cache/apt
+            elevated_execution "$PACKAGER" clean
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" clean -a
-            "$ESCALATION_TOOL" "$PACKAGER" tidy
-            "$ESCALATION_TOOL" "$PACKAGER" cc -a
+            elevated_execution "$PACKAGER" clean -a
+            elevated_execution "$PACKAGER" tidy
+            elevated_execution "$PACKAGER" cc -a
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" clean all
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
+            elevated_execution "$PACKAGER" clean all
+            elevated_execution "$PACKAGER" autoremove -y
             ;;
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
+            elevated_execution "$PACKAGER" -Sc --noconfirm
+            elevated_execution "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -33,10 +33,10 @@ cleanup_system() {
 }
 
 common_cleanup() {
-    "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
-    "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    elevated_execution find /var/tmp -type f -atime +5 -delete
+    elevated_execution find /tmp -type f -atime +5 -delete
+    elevated_execution find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    elevated_execution journalctl --vacuum-time=3d
 }
 
 clean_data() {

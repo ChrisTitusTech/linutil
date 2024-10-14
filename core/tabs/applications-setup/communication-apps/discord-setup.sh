@@ -8,17 +8,17 @@ installDiscord() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
+                elevated_execution "$PACKAGER" install -y discord.deb
                 ;;
             zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install discord
+                elevated_execution "$PACKAGER" --non-interactive install discord
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord 
+                elevated_execution "$PACKAGER" -S --needed --noconfirm discord 
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+                elevated_execution "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+                elevated_execution "$PACKAGER" install -y discord
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

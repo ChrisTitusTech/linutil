@@ -7,10 +7,10 @@ installEvince() {
         printf "%b\n" "${YELLOW}Installing Evince...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm evince
+                elevated_execution "$PACKAGER" -S --needed --noconfirm evince
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y evince
+                elevated_execution "$PACKAGER" install -y evince
                 ;;
         esac
     else

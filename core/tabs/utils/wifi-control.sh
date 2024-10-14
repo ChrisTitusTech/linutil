@@ -8,13 +8,13 @@ setupNetworkManager() {
     if ! command_exists nmcli; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm networkmanager
+                elevated_execution "$PACKAGER" -S --noconfirm networkmanager
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y NetworkManager-1
+                elevated_execution "$PACKAGER" install -y NetworkManager-1
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
+                elevated_execution "$PACKAGER" install -y network-manager
                 ;;
         esac
     else
@@ -24,7 +24,7 @@ setupNetworkManager() {
     # Check if NetworkManager service is running
     if ! systemctl is-active --quiet NetworkManager; then
         printf "%b\n" "${YELLOW}NetworkManager service is not running. Starting it now...${RC}"
-        "$ESCALATION_TOOL" systemctl start NetworkManager
+        elevated_execution systemctl start NetworkManager
         
         if systemctl is-active --quiet NetworkManager; then
             printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"

@@ -11,7 +11,7 @@ fastUpdate() {
             printf "%b\n" "${YELLOW}Generating a new list of mirrors using rate-mirrors. This process may take a few seconds...${RC}"
 
             if [ -s /etc/pacman.d/mirrorlist ]; then
-                "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+                elevated_execution cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
             fi
 
             # If for some reason DTYPE is still unknown use always arch so the rate-mirrors does not fail
@@ -20,33 +20,33 @@ fastUpdate() {
                 dtype_local="arch"
             fi
 
-            "$ESCALATION_TOOL" rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
+            elevated_execution rate-mirrors --top-mirrors-number-to-retest=5 --disable-comments --save /etc/pacman.d/mirrorlist --allow-root ${dtype_local}
             if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
                 printf "%b\n" "${RED}Rate-mirrors failed, restoring backup.${RC}"
-                "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+                elevated_execution cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
             fi
             ;;
 
         apt-get|nala)
-            "$ESCALATION_TOOL" apt-get update
+            elevated_execution apt-get update
             if ! command_exists nala; then
-                "$ESCALATION_TOOL" apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
+                elevated_execution apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
             fi
 
             if [ "$PACKAGER" = "nala" ]; then
-                "$ESCALATION_TOOL" cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                "$ESCALATION_TOOL" nala update
+                elevated_execution cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                elevated_execution nala update
                 PACKAGER="nala"
             fi
 
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+            elevated_execution "$PACKAGER" upgrade -y
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
+            elevated_execution "$PACKAGER" update -y
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" ref
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
+            elevated_execution "$PACKAGER" ref
+            elevated_execution "$PACKAGER" --non-interactive dup
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
@@ -59,20 +59,20 @@ updateSystem() {
     printf "%b\n" "${GREEN}Updating system${RC}"
     case "$PACKAGER" in
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+            elevated_execution "$PACKAGER" update
+            elevated_execution "$PACKAGER" upgrade -y
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+            elevated_execution "$PACKAGER" update -y
+            elevated_execution "$PACKAGER" upgrade -y
             ;;
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm --needed archlinux-keyring
-            "$ESCALATION_TOOL" "$PACKAGER" -Su --noconfirm
+            elevated_execution "$PACKAGER" -Sy --noconfirm --needed archlinux-keyring
+            elevated_execution "$PACKAGER" -Su --noconfirm
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" ref
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
+            elevated_execution "$PACKAGER" ref
+            elevated_execution "$PACKAGER" --non-interactive dup
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"

@@ -6,14 +6,14 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit
+            elevated_execution "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
+            elevated_execution "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
+            elevated_execution "$PACKAGER" groupinstall -y "Development Tools"
+            elevated_execution "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -26,7 +26,7 @@ makeDWM() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
     # This path can be changed (e.g. to linux-toolbox directory)
     cd dwm-titus/ # Hardcoded path, maybe not the best.
-    "$ESCALATION_TOOL" make clean install # Run make clean install
+    elevated_execution make clean install # Run make clean install
 }
 
 install_nerd_font() {
@@ -119,7 +119,7 @@ picom_animations() {
     fi
 
     # Install the built binary
-    if ! "$ESCALATION_TOOL" ninja -C build install; then
+    if ! elevated_execution ninja -C build install; then
         printf "%b\n" "${RED}Failed to install the built binary${RC}"
         return 1
     fi
@@ -183,13 +183,13 @@ setupDisplayManager() {
     printf "%b\n" "${YELLOW}Setting up Xorg${RC}"
     case "$PACKAGER" in
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
+            elevated_execution "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg xinit
+            elevated_execution "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
+            elevated_execution "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
@@ -217,13 +217,13 @@ setupDisplayManager() {
         read -r DM
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
+                elevated_execution "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
+                elevated_execution "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
+                elevated_execution "$PACKAGER" install -y "$DM"
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
@@ -242,7 +242,7 @@ install_slstatus() {
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
         cd "$HOME/dwm-titus/slstatus" || { printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"; return 1; }
-        if "$ESCALATION_TOOL" make clean install; then
+        if elevated_execution make clean install; then
             printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else
             printf "%b\n" "${RED}Failed to install slstatus${RC}"

@@ -7,10 +7,10 @@ installThunderBird() {
         printf "%b\n" "${YELLOW}Installing Thunderbird...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm thunderbird
+                elevated_execution "$PACKAGER" -S --needed --noconfirm thunderbird
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 
+                elevated_execution "$PACKAGER" install -y thunderbird 
                 ;;
         esac
     else

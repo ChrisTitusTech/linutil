@@ -7,10 +7,10 @@ installPkg() {
      printf "%b\n" "${YELLOW}Installing UFW...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm ufw
+                elevated_execution "$PACKAGER" -S --needed --noconfirm ufw
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y ufw
+                elevated_execution "$PACKAGER" install -y ufw
                 ;;
         esac
     else
@@ -22,24 +22,24 @@ configureUFW() {
     printf "%b\n" "${YELLOW}Using Chris Titus Recommended Firewall Rules${RC}"
 
     printf "%b\n" "${YELLOW}Disabling UFW${RC}"
-    "$ESCALATION_TOOL" ufw disable
+    elevated_execution ufw disable
 
     printf "%b\n" "${YELLOW}Limiting port 22/tcp (UFW)${RC}"
-    "$ESCALATION_TOOL" ufw limit 22/tcp
+    elevated_execution ufw limit 22/tcp
 
     printf "%b\n" "${YELLOW}Allowing port 80/tcp (UFW)${RC}"
-    "$ESCALATION_TOOL" ufw allow 80/tcp
+    elevated_execution ufw allow 80/tcp
 
     printf "%b\n" "${YELLOW}Allowing port 443/tcp (UFW)${RC}"
-    "$ESCALATION_TOOL" ufw allow 443/tcp
+    elevated_execution ufw allow 443/tcp
 
     printf "%b\n" "${YELLOW}Denying Incoming Packets by Default(UFW)${RC}"
-    "$ESCALATION_TOOL" ufw default deny incoming
+    elevated_execution ufw default deny incoming
 
     printf "%b\n" "${YELLOW}Allowing Outcoming Packets by Default(UFW)${RC}"
-    "$ESCALATION_TOOL" ufw default allow outgoing
+    elevated_execution ufw default allow outgoing
 
-    "$ESCALATION_TOOL" ufw enable
+    elevated_execution ufw enable
     printf "%b\n" "${GREEN}Enabled Firewall with Baselines!${RC}"
 }
 

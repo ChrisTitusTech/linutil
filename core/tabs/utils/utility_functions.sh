@@ -8,13 +8,13 @@ setup_xrandr() {
     if ! command_exists xrandr; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm xorg-xrandr
+                elevated_execution "$PACKAGER" -S --noconfirm xorg-xrandr
                 ;;
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y x11-xserver-utils
+                elevated_execution "$PACKAGER" install -y x11-xserver-utils
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-server-utils
+                elevated_execution "$PACKAGER" install -y xorg-x11-server-utils
                 ;;
         esac
     else

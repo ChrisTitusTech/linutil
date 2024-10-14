@@ -7,10 +7,10 @@ installMeld() {
         printf "%b\n" "${YELLOW}Installing Meld...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm meld
+                elevated_execution "$PACKAGER" -S --needed --noconfirm meld
                 ;;
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" -y install meld
+                elevated_execution "$PACKAGER" -y install meld
                 ;;
             *)
                 . ../setup-flatpak.sh

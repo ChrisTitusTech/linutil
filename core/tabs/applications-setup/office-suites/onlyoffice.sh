@@ -8,7 +8,7 @@ installOnlyOffice() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -O https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
-                "$ESCALATION_TOOL" "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
+                elevated_execution "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
                 ;;
             zypper|dnf)
                 . ./setup-flatpak.sh

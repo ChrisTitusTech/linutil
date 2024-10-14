@@ -9,10 +9,10 @@ installDepend() {
     printf "%b\n" "${YELLOW}Installing Bash...${RC}"
     case "$PACKAGER" in
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+            elevated_execution "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+            elevated_execution "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
             ;;
     esac
     fi
@@ -62,7 +62,7 @@ installStarshipAndFzf() {
         printf "%b\n" "${GREEN}Fzf already installed${RC}"
     else
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        "$ESCALATION_TOOL" ~/.fzf/install
+        elevated_execution ~/.fzf/install
     fi
 }
 
