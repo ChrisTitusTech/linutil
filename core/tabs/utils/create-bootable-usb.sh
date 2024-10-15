@@ -134,7 +134,8 @@ get_online_iso() {
     # Download available operating systems, filter to to those that match requirements
     # Remove entries with more than 1 ISO or any other medium, they could cause issues
     OS_JSON="$(curl -L -s "$CONFIGURATION_URL" | jq -c "[.[] | \
-        .releases |= map(select(.arch // \"x86_64\" == "\"${ARCH}\"" \
+        .releases |= map(select( \
+        (.arch // \"x86_64\") == "\"${ARCH}\"" \
         and (.iso | length == 1) and (.iso[0] | has(\"web\")) \
         and .img == null and .fixed_iso == null and .floppy == null and .disk_images == null)) \
         | select(.releases | length > 0)]")"
@@ -149,7 +150,7 @@ get_online_iso() {
     printf "\n%b" "Select an operating system: "
     read -r OS
 
-    OS_JSON="$(echo "${OS_JSON}" | jq -c '.[] | select(.name == '"\"${OS}\""')')"
+    OS_JSON="$(echo "${OS_JSON}" | jq --arg os "${OS}" -c '.[] | select(.name == $os)')"
     if [ -z "${OS_JSON}" ]; then
         printf "%b\n" "${RED}Invalid operating system selected.${RC}"
         exit 1
@@ -162,7 +163,7 @@ get_online_iso() {
     read -r RELEASE
     printf "\n"
 
-    OS_JSON="$(echo "${OS_JSON}" | jq -c '.releases[] |= select(.release == '"\"${RELEASE}\""')')"
+    OS_JSON="$(echo "${OS_JSON}" | jq --arg release "${RELEASE}" -c '.releases |= map(select(.release == $release))')"
     if echo "${OS_JSON}" | jq -e '.releases | length == 0' >/dev/null; then
         printf "%b\n" "${RED}Invalid release selected.${RC}"
         exit 1
@@ -173,7 +174,7 @@ get_online_iso() {
         echo "${OS_JSON}" | jq -r '.releases[].edition' | sort -Vur | tr '\n' ' '
         printf "\n%b" "Select an edition: "
         read -r EDITION
-        ENTRY="$(echo "${OS_JSON}" | jq -c '.releases[] | select(.edition == '"\"${EDITION}\""')')"
+        ENTRY="$(echo "${OS_JSON}" | jq --arg edition "${EDITION}" -c '.releases[] | select(.edition == $edition)')"
     else
         ENTRY="$(echo "${OS_JSON}" | jq -c '.releases[0]')"
     fi
