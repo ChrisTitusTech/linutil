@@ -82,6 +82,7 @@ name = "Printers"
 [[data.entries]]
 name = "Install EPSON printer drivers"
 script = "printers/install-epson-printer-drivers.sh"
+task_list = "I"
 
 [[data]]
 name = "User Account Manager"
