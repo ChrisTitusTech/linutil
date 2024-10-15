@@ -21,7 +21,7 @@ ego-tree = { workspace = true }
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
 ratatui = "0.28.1"
-tui-term = "0.1.12"
+tui-term = "0.1.13"
 temp-dir = "0.1.14"
 unicode-width = "0.2.0"
 rand = { version = "0.8.5", optional = true }
@@ -33,7 +33,7 @@ ansi-to-tui = "6.0.0"
 zips = "0.1.7"
 
 [build-dependencies]
-chrono = "0.4.33"
+chrono = "0.4.38"
 
 [[bin]]
 name = "linutil"
