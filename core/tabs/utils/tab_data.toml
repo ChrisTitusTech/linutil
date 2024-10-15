@@ -77,6 +77,13 @@ description = "This script is designed to change the resolution of monitors conn
 script = "monitor-control/set_resolutions.sh"
 
 [[data]]
+name = "Printers"
+
+[[data.entries]]
+name = "Install EPSON printer drivers"
+script = "printers/install-epson-printer-drivers.sh"
+
+[[data]]
 name = "User Account Manager"
 
 [[data.entries]]
