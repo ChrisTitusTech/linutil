@@ -2,12 +2,7 @@
 
 . ../common-script.sh  
 
-# Function to display usage instructions
-usage() {
-    printf "%b\n" "${RED} Usage: $0 ${RC}"
-    printf "%b\n" "No arguments needed. The script will prompt for ISO path and USB device."
-    exit 1
-}
+CONFIGURATION_URL="https://github.com/quickemu-project/quickget_configs/releases/download/daily/quickget_data.json"
 
 # Function to display all available block devices
 list_devices() {
@@ -17,53 +12,23 @@ list_devices() {
     printf "\n"
 }
 
-# Function to fetch the latest Arch Linux ISO
-fetch_arch_latest_iso() {
-    ARCH_BASE_URL="https://archive.archlinux.org/iso/"
-    ARCH_LATEST=$(curl -s "$ARCH_BASE_URL" | grep -oP '(?<=href=")[0-9]{4}\.[0-9]{2}\.[0-9]{2}(?=/)' | sort -V | tail -1)
-    ARCH_URL="${ARCH_BASE_URL}${ARCH_LATEST}/archlinux-${ARCH_LATEST}-x86_64.iso"
-    printf "%b\n" "${GREEN} Selected Arch Linux (latest) ISO URL: ${RC} $ARCH_URL"
-}
-
-# Function to fetch older Arch Linux ISOs and display in a table format
-fetch_arch_older_isos() {
-    ARCH_BASE_URL="https://archive.archlinux.org/iso/"
-    ARCH_VERSIONS=$(curl -s "$ARCH_BASE_URL" | grep -oP '(?<=href=")[0-9]{4}\.[0-9]{2}\.[0-9]{2}(?=/)' | sort -V)
-
-    # Filter versions to include only those from 2017-04-01 and later
-    MIN_DATE="2017.04.01"
-    ARCH_VERSIONS=$(echo "$ARCH_VERSIONS" | awk -v min_date="$MIN_DATE" '$0 >= min_date')
-
-    if [ -z "$ARCH_VERSIONS" ]; then
-        printf "%b\n" "${RED}No Arch Linux versions found from ${MIN_DATE} onwards.${RC}"
-        exit 1
+installDependencies() {
+    DEPENDENCIES="xz gzip bzip2 jq"
+    if ! command_exists ${DEPENDENCIES}; then
+        printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
+        case "${PACKAGER}" in
+            apt-get|nala)
+                "${ESCALATION_TOOL}" "${PACKAGER}" install -y xz-utils gzip bzip2 jq;;
+            dnf|zypper)
+                "${ESCALATION_TOOL}" "${PACKAGER}" install -y ${DEPENDENCIES};;
+            pacman)
+                "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES};;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager.${RC}"
+                exit 1
+                ;;
+        esac
     fi
-
-    printf "%b\n" "${YELLOW}Available Arch Linux versions from ${MIN_DATE} onwards:${RC}"
-    
-    COUNTER=1
-    ROW_ITEMS=6  # Number of versions to show per row
-    for VERSION in $ARCH_VERSIONS; do
-        printf "%-5s${YELLOW}%-15s ${RC}" "$COUNTER)" "$VERSION"
-        
-        if [ $(( COUNTER % ROW_ITEMS )) -eq 0 ]; then
-            printf "\n"  # New line after every 6 versions
-        fi
-        
-        COUNTER=$((COUNTER + 1))
-    done
-    printf "\n"  # New line after the last row
-    printf "%b" "Select an Arch Linux version (1-$((COUNTER - 1))): "
-    read -r ARCH_OPTION
-    ARCH_DIR=$(echo "$ARCH_VERSIONS" | sed -n "${ARCH_OPTION}p")
-    ARCH_URL="${ARCH_BASE_URL}${ARCH_DIR}/archlinux-${ARCH_DIR}-x86_64.iso"
-    printf "%b\n" "${GREEN}Selected Arch Linux (older) ISO URL: $ARCH_URL${RC}"
-}
-
-# Function to fetch the latest Debian Linux ISO
-fetch_debian_latest_iso() {
-    DEBIAN_URL=$(curl -s https://www.debian.org/distrib/netinst | grep -oP '(?<=href=")[^"]+debian-[0-9.]+-amd64-netinst.iso(?=")' | head -1)
-    printf "%b\n" "${GREEN} Selected Debian Linux (latest) ISO URL: ${RC} $DEBIAN_URL"
 }
 
 # Function to ask whether to use local or online ISO
@@ -77,7 +42,7 @@ choose_iso_source() {
 
     case $ISO_SOURCE_OPTION in
         1)
-            fetch_iso_urls  # Call the function to fetch online ISO URLs
+            get_online_iso
             ;;
         2)
             printf "Enter the path to the already downloaded ISO file: "
@@ -94,42 +59,149 @@ choose_iso_source() {
     esac
 }
 
-# Function to fetch ISO URLs
-fetch_iso_urls() {
-    clear
-    printf "%b\n" "${YELLOW}Available ISOs for download:${RC}"
-    printf "%b\n" "1) Arch Linux (latest)"
-    printf "%b\n" "2) Arch Linux (older versions)"
-    printf "%b\n" "3) Debian Linux (latest)"
-    printf "\n"
-    printf "%b" "Select the ISO you want to download (1-3): "
-    read -r ISO_OPTION
-
-    case $ISO_OPTION in
-        1)
-            fetch_arch_latest_iso
-            ISO_URL=$ARCH_URL
-            ;;
-        2)
-            fetch_arch_older_isos
-            ISO_URL=$ARCH_URL
-            ;;
-        3)
-            fetch_debian_latest_iso
-            ISO_URL=$DEBIAN_URL
-            ;;
-        *)
-            printf "%b\n" "${RED}Invalid option selected.${RC}"
+decompress_iso() {
+    printf "%b\n" "${YELLOW}Decompressing ISO file...${RC}"
+    case "${ISO_ARCHIVE_FORMAT}" in
+        xz)
+            xz -d "${ISO_PATH}"
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.xz//')";;
+        gz)
+            gzip -d "${ISO_PATH}"
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.gz//')";;
+        bz2)
+            bzip2 -d "${ISO_PATH}"
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.bz2//')";;
+        *) 
+            printf "%b\n" "${RED}Unsupported archive format. Try manually decompressing the ISO and choosing it as a local file instead.${RC}"
             exit 1
             ;;
     esac
 
-    ISO_PATH=$(basename "$ISO_URL")
-    printf "%b\n" "${YELLOW}Downloading ISO...${RC}"
-    curl -L -o "$ISO_PATH" "$ISO_URL"
-    if [ $? -ne 0 ]; then
+    printf "%b\n" "${GREEN}ISO file decompressed successfully.${RC}"
+}
+
+check_hash() {
+    case "${#ISO_CHECKSUM}" in
+        32) HASH_ALGO="md5sum";;
+        40) HASH_ALGO="sha1sum";;
+        64) HASH_ALGO="sha256sum";;
+        128) HASH_ALGO="sha512sum";;
+        *) printf "%b\n" "${RED}Invalid checksum length. Skipping checksum verification.${RC}"
+            return;;
+    esac
+    printf "%b\n" "Checking ISO integrity using ${HASH_ALGO}..."
+    if ! echo "${ISO_CHECKSUM} ${ISO_PATH}" | "${HASH_ALGO}" --check --status; then
+        printf "%b\n" "${RED}Checksum verification failed.${RC}"
+        exit 1
+    else
+        printf "%b\n" "${GREEN}Checksum verification successful.${RC}"
+    fi
+}
+
+download_iso() {
+    printf "\n%b\n" "${YELLOW}Found URL: ${ISO_URL}${RC}"
+    printf "%b\n" "${YELLOW}Downloading ISO to ${ISO_PATH}...${RC}"
+    if ! curl -L -o "$ISO_PATH" "$ISO_URL"; then
         printf "%b\n" "${RED}Failed to download the ISO file.${RC}"
         exit 1
+    fi
+}
+
+get_architecture() {
+    printf "%b\n" "${YELLOW}Select the architecture of the ISO to flash${RC}"
+    printf "%b\n" "1) x86_64"
+    printf "%b\n" "2) AArch64"
+    printf "%b\n" "3) riscv64"
+    printf "%b" "Select an option (1-3): "
+    read -r ARCH
+    case "${ARCH}" in
+        1) ARCH="x86_64";;
+        2) ARCH="aarch64";;
+        3) ARCH="riscv64";;
+        *)
+            printf "%b\n" "${RED}Invalid architecture selected. ${RC}"
+            exit 1
+            ;;
+    esac
+}
+
+# Function to fetch ISO URLs
+get_online_iso() {
+    get_architecture
+    printf "%b\n" "${YELLOW}Fetching available operating systems...${RC}"
+    clear
+
+    # Download available operating systems, filter to to those that match requirements
+    # Remove entries with more than 1 ISO or any other medium, they could cause issues
+    OS_JSON="$(curl -L -s "$CONFIGURATION_URL" | jq -c "[.[] | \
+        .releases |= map(select((.arch // \"x86_64\") == "\"${ARCH}\"" \
+        and (.iso | length == 1) and (.iso[0] | has(\"web\")) \
+        and .img == null and .fixed_iso == null and .floppy == null and .disk_images == null)) \
+        | select(.releases | length > 0)]")"
+
+    if echo "${OS_JSON}" | jq -e 'length == 0' >/dev/null; then
+        printf "%b\n" "${RED}No operating systems found.${RC}"
+        exit 1
+    fi
+
+    printf "%b\n" "${YELLOW}Available Operating Systems:${RC}"
+    echo "${OS_JSON}" | jq -r '.[].name' | tr '\n' ' '
+    printf "\n%b" "Select an operating system: "
+    read -r OS
+
+    OS_JSON="$(echo "${OS_JSON}" | jq -c '.[] | select(.name == '"\"${OS}\""')')"
+    if [ -z "${OS_JSON}" ]; then
+        printf "%b\n" "${RED}Invalid operating system selected.${RC}"
+        exit 1
+    fi
+    PRETTY_NAME="$(echo "${OS_JSON}" | jq -r '.pretty_name')"
+
+    printf "\n%b\n" "${YELLOW}Available releases for ${PRETTY_NAME}:${RC}"
+    echo "${OS_JSON}" | jq -r '.releases[].release' | sort -Vur | tr '\n' ' '
+    printf "\n%b" "Select a release: "
+    read -r RELEASE
+    printf "\n"
+
+    OS_JSON="$(echo "${OS_JSON}" | jq -c '.releases[] |= select(.release == '"\"${RELEASE}\""')')"
+    if echo "${OS_JSON}" | jq -e '.releases | length == 0' >/dev/null; then
+        printf "%b\n" "${RED}Invalid release selected.${RC}"
+        exit 1
+    fi
+
+    if echo "${OS_JSON}" | jq -e '.releases[] | select(.edition != null) | any' >/dev/null; then
+        printf "%b\n" "${YELLOW}Available editions for ${PRETTY_NAME}:${RC}"
+        echo "${OS_JSON}" | jq -r '.releases[].edition' | sort -Vur | tr '\n' ' '
+        printf "\n%b" "Select an edition: "
+        read -r EDITION
+        ENTRY="$(echo "${OS_JSON}" | jq -c '.releases[] | select(.edition == '"\"${EDITION}\""')')"
+    else
+        ENTRY="$(echo "${OS_JSON}" | jq -c '.releases[0]')"
+    fi
+
+    if [ -z "${ENTRY}" ]; then
+        printf "%b\n" "${RED}Invalid edition selected.${RC}"
+        exit 1
+    fi
+
+    WEB_DATA="$(echo "${ENTRY}" | jq -c '.iso[0].web')"
+
+    ISO_URL="$(echo "${WEB_DATA}" | jq -r '.url')"
+    ISO_CHECKSUM="$(echo "${WEB_DATA}" | jq -r '.checksum')"
+    ISO_ARCHIVE_FORMAT="$(echo "${WEB_DATA}" | jq -r '.archive_format')"
+
+    ISO_FILENAME="$(echo "${WEB_DATA}" | jq -r '.file_name')"
+    if [ "${ISO_FILENAME}" = "null" ]; then
+        ISO_FILENAME="$(basename "${ISO_URL}")"
+    fi
+
+    ISO_PATH="${HOME}/Downloads/${ISO_FILENAME}"
+    download_iso
+
+    if [ "${ISO_CHECKSUM}" != "null" ]; then
+        check_hash
+    fi
+    if [ "${ISO_ARCHIVE_FORMAT}" != "null" ]; then
+        decompress_iso
     fi
 }
 
@@ -191,4 +263,5 @@ write_iso(){
 
 checkEnv
 checkEscalationTool
+installDependencies
 write_iso
