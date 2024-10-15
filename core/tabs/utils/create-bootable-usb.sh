@@ -125,7 +125,6 @@ get_architecture() {
     esac
 }
 
-# Function to fetch ISO URLs
 get_online_iso() {
     get_architecture
     printf "%b\n" "${YELLOW}Fetching available operating systems...${RC}"
