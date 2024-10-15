@@ -9,6 +9,7 @@ mod theme;
 
 use std::{
     io::{self, stdout},
+    path::PathBuf,
     time::Duration,
 };
 
@@ -26,6 +27,8 @@ use state::AppState;
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
+    #[arg(short, long, help = "Path to the configuration file")]
+    config: Option<PathBuf>,
     #[arg(short, long, value_enum)]
     #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
@@ -38,7 +41,7 @@ struct Args {
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(args.theme, args.override_validation);
+    let mut state = AppState::new(args.theme, args.override_validation, args.config);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
