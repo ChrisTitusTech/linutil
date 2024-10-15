@@ -30,6 +30,12 @@ struct Args {
     #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
     theme: Theme,
+    #[arg(
+        short = 'y',
+        long,
+        help = "Skip confirmation prompt before executing commands"
+    )]
+    skip_confirmation: bool,
     #[arg(long, default_value_t = false)]
     #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
     override_validation: bool,
@@ -38,7 +44,7 @@ struct Args {
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(args.theme, args.override_validation);
+    let mut state = AppState::new(args.theme, args.override_validation, args.skip_confirmation);
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

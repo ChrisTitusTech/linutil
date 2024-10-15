@@ -62,6 +62,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: &'static str,
+    skip_confirmation: bool,
 }
 
 pub enum Focus {
@@ -79,7 +80,7 @@ pub struct ListEntry {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
+    pub fn new(theme: Theme, override_validation: bool, skip_confirmation: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -97,6 +98,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            skip_confirmation,
         };
 
         state.update_items();
@@ -678,14 +680,18 @@ impl AppState {
                 }
             }
 
-            let cmd_names = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect::<Vec<_>>();
+            if self.skip_confirmation {
+                self.handle_confirm_command();
+            } else {
+                let cmd_names = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect::<Vec<_>>();
 
-            let prompt = ConfirmPrompt::new(&cmd_names[..]);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+            }
         } else {
             self.go_to_selected_dir();
         }
