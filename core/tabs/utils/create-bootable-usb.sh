@@ -169,7 +169,7 @@ get_online_iso() {
     fi
 
     if echo "${OS_JSON}" | jq -e '.releases[] | select(.edition != null) | any' >/dev/null; then
-        printf "%b\n" "${YELLOW}Available editions for ${PRETTY_NAME}:${RC}"
+        printf "%b\n" "${YELLOW}Available editions for ${PRETTY_NAME} ${RELEASE}:${RC}"
         echo "${OS_JSON}" | jq -r '.releases[].edition' | sort -Vur | tr '\n' ' '
         printf "\n%b" "Select an edition: "
         read -r EDITION
