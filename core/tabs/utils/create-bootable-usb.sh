@@ -134,7 +134,7 @@ get_online_iso() {
     # Download available operating systems, filter to to those that match requirements
     # Remove entries with more than 1 ISO or any other medium, they could cause issues
     OS_JSON="$(curl -L -s "$CONFIGURATION_URL" | jq -c "[.[] | \
-        .releases |= map(select((.arch // \"x86_64\") == "\"${ARCH}\"" \
+        .releases |= map(select(.arch // \"x86_64\" == "\"${ARCH}\"" \
         and (.iso | length == 1) and (.iso[0] | has(\"web\")) \
         and .img == null and .fixed_iso == null and .floppy == null and .disk_images == null)) \
         | select(.releases | length > 0)]")"
