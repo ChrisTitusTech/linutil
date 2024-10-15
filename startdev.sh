@@ -69,7 +69,7 @@ check $? "Downloading linutil"
 chmod +x "$TMPFILE"
 check $? "Making linutil executable"
 
-"$TMPFILE"
+"$TMPFILE" "$@"
 check $? "Executing linutil"
 
 rm -f "$TMPFILE"

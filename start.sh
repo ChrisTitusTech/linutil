@@ -43,7 +43,7 @@ check $? "Downloading linutil"
 chmod +x "$temp_file"
 check $? "Making linutil executable"
 
-"$temp_file"
+"$temp_file" "$@"
 check $? "Executing linutil"
 
 rm -f "$temp_file"
