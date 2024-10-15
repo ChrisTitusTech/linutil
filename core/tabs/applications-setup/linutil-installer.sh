@@ -25,6 +25,26 @@ installLinutil() {
             esac
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
+            zypper)
+            printf "%b\n" "Detecting flavor..."
+            flavor = [[zypper lr | grep -i "Tumbleweed"]] && echo "Tumbleweed" || echo "Slowroll"
+            printf "%b\n" " flavor detected is ${GREEN} ${flavor} ${RC}"
+            printf "%b\n" "setting up repos..."
+            if [$flavor == "Tumbleweed"]
+            then 
+                  zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
+            fi
+
+            if [$flavor == "Slowroll"]
+            then
+            zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
+            fi
+            
+            printf "%b\n" "refreshing and installing"
+            zypper refresh
+            zypper install linutil
+            printf "%b\n" "${GREEN}Installed successfully.${RC}"
+            ;;
         *)
             printf "%b\n" "${RED}There are no official packages for your distro.${RC}"
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
