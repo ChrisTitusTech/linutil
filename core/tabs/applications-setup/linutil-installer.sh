@@ -37,7 +37,7 @@ installLinutil() {
 
             if [ $flavor == "Slowroll" ]
             then
-            "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys  addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
+                   "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys  addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
             fi
             
             printf "%b\n" "refreshing and installing"
