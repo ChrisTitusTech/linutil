@@ -32,17 +32,17 @@ installLinutil() {
             printf "%b\n" "setting up repos..."
             if [$flavor == "Tumbleweed"]
             then 
-                  zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
+                  "$ESCALATION_TOOL" "$PACKAGER" addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
             fi
 
             if [$flavor == "Slowroll"]
             then
-            zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
+            "$ESCALATION_TOOL" "$PACKAGER" addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
             fi
             
             printf "%b\n" "refreshing and installing"
-            zypper refresh
-            zypper install linutil
+            "$ESCALATION_TOOL" "$PACKAGER" refresh
+            "$ESCALATION_TOOL" "$PACKAGER" install linutil
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
         *)
