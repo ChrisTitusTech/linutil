@@ -27,10 +27,10 @@ installLinutil() {
             ;;
             zypper)
             printf '%s\n' 'detecting flavor'
-            [ zypper lr | grep -i "Tumbleweed" ] && flavor="Tumbleweed" || flavor="Slowroll"
+            [ zypper lr | grep -q "Tumbleweed" ] && flavor="Tumbleweed" || flavor="Slowroll"
             printf '%b%s%b\n' "flavor detected is ${GREEN}" "$flavor" "$RC"
-            printf "\n" "setting up repos..."
-            if [ $flavor == "Tumbleweed" ]
+            printf "\n" "setting up repos"
+            if [[ $flavor == Tumbleweed ]]
             then 
                   "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys  addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
             fi
