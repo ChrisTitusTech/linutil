@@ -79,6 +79,12 @@ script = "communication-apps/telegram-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "WhatsApp"
+description = "WhatsApp is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls."
+script = "communication-apps/whatsapp-setup.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Zoom"
 description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
 script = "communication-apps/zoom-setup.sh"
@@ -255,7 +261,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Linutil Updater"
@@ -266,7 +272,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Rofi"
@@ -282,7 +288,7 @@ task_list = "I SS"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
-values = [ "wayland", "Wayland" ]
+values = ["wayland", "Wayland"]
 
 [[data]]
 name = "ZSH Prompt"
