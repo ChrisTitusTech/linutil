@@ -68,7 +68,7 @@ updateSystem() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm --needed archlinux-keyring
-            "$ESCALATION_TOOL" "$PACKAGER" -Su --noconfirm
+            "$AUR_HELPER" -Su --noconfirm
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" ref
