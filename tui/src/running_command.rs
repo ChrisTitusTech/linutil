@@ -37,6 +37,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    log_saved_path: Option<String>,
     scroll_offset: usize,
 }
 
@@ -78,9 +79,19 @@ impl FloatContent for RunningCommand {
                     .style(Style::default()),
             );
 
-            Block::default()
+            let mut block = Block::default()
                 .borders(Borders::ALL)
-                .title_top(title_line.centered())
+                .title_top(title_line.centered());
+
+            if let Some(log_path) = &self.log_saved_path {
+                block =
+                    block.title_bottom(Line::from(format!(" Log saved: {} ", log_path)).centered());
+            } else {
+                block =
+                    block.title_bottom(Line::from(" Press 'l' to save command log ").centered());
+            }
+
+            block
         };
 
         // Process the buffer and create the pseudo-terminal widget
@@ -108,6 +119,11 @@ impl FloatContent for RunningCommand {
             }
             KeyCode::PageDown => {
                 self.scroll_offset = self.scroll_offset.saturating_sub(10);
+            }
+            KeyCode::Char('l') => {
+                if let Ok(log_path) = self.save_log() {
+                    self.log_saved_path = Some(log_path);
+                }
             }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
@@ -235,6 +251,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            log_saved_path: None,
             scroll_offset: 0,
         }
     }
@@ -280,6 +297,20 @@ impl RunningCommand {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
         }
+    }
+
+    fn save_log(&self) -> std::io::Result<String> {
+        let mut log_path = std::env::temp_dir();
+        log_path.push(format!(
+            "linutil_log_{}.log",
+            chrono::Local::now().format("%Y%m%d_%H%M%S")
+        ));
+
+        let mut file = std::fs::File::create(&log_path)?;
+        let buffer = self.buffer.lock().unwrap();
+        file.write_all(&buffer)?;
+
+        Ok(log_path.to_string_lossy().into_owned())
     }
 
     /// Convert the KeyEvent to pty key codes, and send them to the virtual terminal
