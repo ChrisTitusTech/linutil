@@ -76,7 +76,7 @@ fetch_fedora_latest_iso() {
             { print $0 }
         }' |
     head -n 1)
-    printf "%b\n" "${GREEN} Selected Fedora Workstation (latest) ISO URL: ${RC} $FEDORA_URL"
+    printf "%b\n" "${GREEN} Selected Fedora Workstation (latest) ISO URL:${RC} $FEDORA_URL"
 }
 
 # Function to ask whether to use local or online ISO
