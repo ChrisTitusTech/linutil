@@ -13,7 +13,7 @@ cleanup_system() {
             fi
             "$ESCALATION_TOOL" du -h /var/cache/apt
             "$ESCALATION_TOOL" "$PACKAGER" clean
-            ;;          
+            ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" clean -a
             "$ESCALATION_TOOL" "$PACKAGER" tidy
