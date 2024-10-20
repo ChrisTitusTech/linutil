@@ -26,25 +26,6 @@ installLinutil() {
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
             zypper)
-            printf '%s\n' 'detecting flavor'
-            if zypper lr | grep -Fq Tumbleweed
-            then flavor=Tumbleweed
-            else flavor=Slowroll
-            fi
-
-            printf '%b%s%b\n' "flavor detected is ${GREEN}" "$flavor" "$RC"
-            printf "\n" "setting up repos"
-            case "$flavor" in
-                Tumbleweed)
-                    "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys  addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
-                    ;;
-                Slowroll)
-                    "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys  addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
-                     ;;
-            esac
-            
-            printf '%s\n' 'refreshing and installing'
-            "$ESCALATION_TOOL" "$PACKAGER" refresh
             "$ESCALATION_TOOL" "$PACKAGER" install linutil
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
