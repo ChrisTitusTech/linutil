@@ -26,7 +26,7 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get|nala)
-            DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
+            DISTRO_DEPS="libasound2 libsdl2-2.0-0 wine64 wine32"
 
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
@@ -71,7 +71,7 @@ installAdditionalDepend() {
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
             
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" install ./lutris_"${version_no_v}"_all.deb
+            "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris_"${version_no_v}"_all.deb
 
             rm lutris_"${version_no_v}"_all.deb
 
