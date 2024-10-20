@@ -30,8 +30,7 @@ install_docker() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
             "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
             "$ESCALATION_TOOL" "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
-            "$ESCALATION_TOOL" systemctl enable docker
-            "$ESCALATION_TOOL" systemctl start docker
+            "$ESCALATION_TOOL" systemctl enable --now docker
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install docker
