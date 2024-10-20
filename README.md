@@ -29,7 +29,7 @@ curl -fsSL https://christitus.com/linuxdev | sh
 Linutil is also available as a package in various repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/linutil.svg)](https://repology.org/project/linutil/versions)
-[![build result](https://build.opensuse.org/projects/utilities/packages/linutil/badge.svg?type=percent)](https://build.opensuse.org/package/show/utilities/linutil)
+[![build result](https://build.opensuse.org/projects/openSUSE:Factory/packages/linutil/badge.svg?type=percent)](https://build.opensuse.org/package/show/openSUSE:Factory/linutil)
 
 <details>
   <summary>Arch Linux</summary>
@@ -62,23 +62,10 @@ Replace `paru` with your preferred helper and `linutil` with your preferred pack
 <details>
   <summary>OpenSUSE</summary>
   
-  While waiting for the Package to be shipped to the Factory, you can install the application for openSuse by running:
-  
-  ### TumbleWeed
-  
+  ###just run:
   ```bash
-  zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Tumbleweed/home:solomoncyj.repo
-  zypper refresh
-  zypper install linutil
-  ```
-
-  ### Slowroll
-    
-  ```bash
-  zypper addrepo https://download.opensuse.org/repositories/home:solomoncyj/openSUSE_Slowroll/home:solomoncyj.repo
-  zypper refresh
-  zypper install linutil
-  ```
+  sudo zypper install linutil
+```
 </details>
 <details>
   <summary>Cargo</summary>
