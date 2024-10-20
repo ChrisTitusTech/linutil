@@ -125,6 +125,10 @@ get_architecture() {
     esac
 }
 
+comma_delimited_list() {
+    echo "${1}" | tr '\n' ',' | sed 's/,/, /g; s/, $//'
+}
+
 get_online_iso() {
     get_architecture
     printf "%b\n" "${YELLOW}Fetching available operating systems...${RC}"
@@ -145,7 +149,7 @@ get_online_iso() {
     fi
 
     printf "%b\n" "${YELLOW}Available Operating Systems:${RC}"
-    echo "${OS_JSON}" | jq -r '.[].name' | tr '\n' ' '
+    comma_delimited_list "$(echo "${OS_JSON}" | jq -r '.[].name')"
     printf "\n%b" "Select an operating system: "
     read -r OS
 
@@ -157,7 +161,7 @@ get_online_iso() {
     PRETTY_NAME="$(echo "${OS_JSON}" | jq -r '.pretty_name')"
 
     printf "\n%b\n" "${YELLOW}Available releases for ${PRETTY_NAME}:${RC}"
-    echo "${OS_JSON}" | jq -r '.releases[].release' | sort -Vur | tr '\n' ' '
+    comma_delimited_list "$(echo "${OS_JSON}" | jq -r '.releases[].release' | sort -Vur)"
     printf "\n%b" "Select a release: "
     read -r RELEASE
     printf "\n"
@@ -170,7 +174,7 @@ get_online_iso() {
 
     if echo "${OS_JSON}" | jq -e '.releases[] | select(.edition != null) | any' >/dev/null; then
         printf "%b\n" "${YELLOW}Available editions for ${PRETTY_NAME} ${RELEASE}:${RC}"
-        echo "${OS_JSON}" | jq -r '.releases[].edition' | sort -Vur | tr '\n' ' '
+        comma_delimited_list "$(echo "${OS_JSON}" | jq -r '.releases[].edition' | sort -Vur)"
         printf "\n%b" "Select an edition: "
         read -r EDITION
         ENTRY="$(echo "${OS_JSON}" | jq --arg edition "${EDITION}" -c '.releases[] | select(.edition == $edition)')"
