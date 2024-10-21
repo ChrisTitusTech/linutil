@@ -5,9 +5,13 @@
 fastUpdate() {
     case "$PACKAGER" in
         pacman)
-            printf "%b\n" "${YELLOW}Do you want to update the mirror list? (yes/no)${RC}"
+            printf "%b\n" "${YELLOW}Do you want to update the mirror list? (y/n)${RC}"
             read -r answer
-            if [[ "$answer" == "yes" ]]; then
+            while [ "$answer" != "y" ] && [ "$answer" != "n" ]; do
+                printf "%b\n" "${YELLOW}Invalid input. Please enter y or n.${RC}"
+                read -r answer
+            done
+            if [ "$answer" = "y" ]; then
                 printf "%b\n" "${YELLOW}Generating a new list of mirrors using reflector. This process may take a few seconds...${RC}"
 
                 if [ -s /etc/pacman.d/mirrorlist ]; then
@@ -28,32 +32,55 @@ fastUpdate() {
             fi
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" apt-get update
-            if ! command_exists nala; then
-                "$ESCALATION_TOOL" apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
-            fi
+            printf "%b\n" "${YELLOW}Do you want to update all packages? (y/n)${RC}"
+            read -r answer
+            while [ "$answer" != "y" ] && [ "$answer" != "n" ]; do
+                printf "%b\n" "${YELLOW}Invalid input. Please enter y or n.${RC}"
+                read -r answer
+            done
+            if [ "$answer" = "y" ]; then
+                "$ESCALATION_TOOL" apt-get update
+                if ! command_exists nala; then
+                    "$ESCALATION_TOOL" apt-get install -y nala || { printf "%b\n" "${YELLOW}Falling back to apt-get${RC}"; PACKAGER="apt-get"; }
+                fi
 
-            if [ "$PACKAGER" = "nala" ]; then
-                "$ESCALATION_TOOL" cp /etc/apt/sources.list /etc/apt/sources.list.bak
-                "$ESCALATION_TOOL" nala update
-                PACKAGER="nala"
-            fi
+                if [ "$PACKAGER" = "nala" ]; then
+                    "$ESCALATION_TOOL" cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                    "$ESCALATION_TOOL" nala update
+                    PACKAGER="nala"
+                fi
 
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+                "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+            fi
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
+            printf "%b\n" "${YELLOW}Do you want to update all packages? (y/n)${RC}"
+            read -r answer
+            while [ "$answer" != "y" ] && [ "$answer" != "n" ]; do
+                printf "%b\n" "${YELLOW}Invalid input. Please enter y or n.${RC}"
+                read -r answer
+            done
+            if [ "$answer" = "y" ]; then
+                "$ESCALATION_TOOL" "$PACKAGER" update -y
+            fi
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" ref
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
+            printf "%b\n" "${YELLOW}Do you want to update all packages? (y/n)${RC}"
+            read -r answer
+            while [ "$answer" != "y" ] && [ "$answer" != "n" ]; do
+                printf "%b\n" "${YELLOW}Invalid input. Please enter y or n.${RC}"
+                read -r answer
+            done
+            if [ "$answer" = "y" ]; then
+                "$ESCALATION_TOOL" "$PACKAGER" ref
+                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
+            fi
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
             exit 1
             ;;
     esac
-}
 
 updateSystem() {
     printf "%b\n" "${GREEN}Updating system${RC}"
