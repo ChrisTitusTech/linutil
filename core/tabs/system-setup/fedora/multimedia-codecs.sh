@@ -8,8 +8,6 @@ multimedia() {
             if [ -e /etc/yum.repos.d/rpmfusion-free.repo ] && [ -e /etc/yum.repos.d/rpmfusion-nonfree.repo ]; then
                 printf "%b\n" "${YELLOW}Installing Multimedia Codecs...${RC}"
                 "$ESCALATION_TOOL" "$PACKAGER" swap ffmpeg-free ffmpeg --allowerasing -y
-                "$ESCALATION_TOOL" "$PACKAGER" update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin -y
-                "$ESCALATION_TOOL" "$PACKAGER" update @sound-and-video -y
                 printf "%b\n" "${GREEN}Multimedia Codecs Installed...${RC}"
             else
                 printf "%b\n" "${RED}RPM Fusion repositories not found. Please set up RPM Fusion first!${RC}"
