@@ -26,7 +26,7 @@ installLinutil() {
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" install linutil
+            "$ESCALATION_TOOL" "$PACKAGER" install linutil -y
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
         *)
