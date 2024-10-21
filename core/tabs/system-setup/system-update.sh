@@ -5,28 +5,28 @@
 fastUpdate() {
     case "$PACKAGER" in
         pacman)
+            printf "%b\n" "${YELLOW}Do you want to update the mirror list? (yes/no)${RC}"
+            read -r answer
+            if [[ "$answer" == "yes" ]]; then
+                printf "%b\n" "${YELLOW}Generating a new list of mirrors using reflector. This process may take a few seconds...${RC}"
 
-            $AUR_HELPER -S --needed --noconfirm reflector
+                if [ -s /etc/pacman.d/mirrorlist ]; then
+                    "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+                fi
 
-            printf "%b\n" "${YELLOW}Generating a new list of mirrors using reflector. This process may take a few seconds...${RC}"
+                # If for some reason DTYPE is still unknown use always arch so the reflector does not fail
+                dtype_local=${DTYPE}
+                if [ "${DTYPE}" = "unknown" ]; then
+                    dtype_local="arch"
+                fi
 
-            if [ -s /etc/pacman.d/mirrorlist ]; then
-                "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-            fi
-
-            # If for some reason DTYPE is still unknown use always arch so the reflector does not fail
-            dtype_local=${DTYPE}
-            if [ "${DTYPE}" = "unknown" ]; then
-                dtype_local="arch"
-            fi
-
-            "$ESCALATION_TOOL" reflector -n 5 --save /etc/pacman.d/mirrorlist ${dtype_local}
-            if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
-                printf "%b\n" "${RED}Reflector failed, restoring backup.${RC}"
-                "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+                "$ESCALATION_TOOL" reflector -n 5 --save /etc/pacman.d/mirrorlist ${dtype_local}
+                if [ $? -ne 0 ] || [ ! -s /etc/pacman.d/mirrorlist ]; then
+                    printf "%b\n" "${RED}Reflector failed, restoring backup.${RC}"
+                    "$ESCALATION_TOOL" cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+                fi
             fi
             ;;
-
         apt-get|nala)
             "$ESCALATION_TOOL" apt-get update
             if ! command_exists nala; then
