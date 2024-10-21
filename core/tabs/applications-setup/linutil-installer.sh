@@ -25,7 +25,7 @@ installLinutil() {
             esac
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
-            zypper)
+        zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install linutil
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
