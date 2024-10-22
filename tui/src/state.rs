@@ -7,7 +7,7 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind};
 use ego_tree::NodeId;
 use linutil_core::{ListNode, Tab};
 #[cfg(feature = "tips")]
@@ -404,6 +404,39 @@ impl AppState {
         }
 
         frame.render_widget(keybind_para, vertical[1]);
+    }
+
+    pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
+        if !self.drawable {
+            return true;
+        }
+
+        match &mut self.focus {
+            Focus::TabList => match event.kind {
+                MouseEventKind::ScrollDown => {
+                    self.current_tab.select_next();
+                    self.refresh_tab();
+                }
+                MouseEventKind::ScrollUp => {
+                    self.current_tab.select_next();
+                    self.refresh_tab();
+                }
+                _ => {}
+            },
+            Focus::List => match event.kind {
+                MouseEventKind::ScrollDown => self.selection.select_next(),
+                MouseEventKind::ScrollUp => self.selection.select_previous(),
+                _ => {}
+            },
+            Focus::FloatingWindow(float) => {
+                float.content.handle_mouse_event(event);
+            }
+            Focus::ConfirmationPrompt(confirm) => {
+                confirm.content.handle_mouse_event(event);
+            }
+            _ => {}
+        }
+        true
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {

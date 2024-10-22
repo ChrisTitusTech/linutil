@@ -32,7 +32,7 @@ setupBluetooth() {
 # Function to display the main menu
 main_menu() {
     while true; do
-        clear
+         
         printf "%b\n" "${YELLOW}Bluetooth Manager${RC}"
         printf "%b\n" "${YELLOW}=================${RC}"
         printf "%b\n" "1. Scan for devices"
@@ -58,7 +58,7 @@ main_menu() {
 
 # Function to scan for devices
 scan_devices() {
-    clear
+     
     printf "%b\n" "${YELLOW}Scanning for devices...${RC}"
     bluetoothctl --timeout 10 scan on
     devices=$(bluetoothctl devices)
@@ -81,7 +81,7 @@ prompt_for_mac() {
     failure_msg=$5
 
     while true; do
-        clear
+         
         devices=$(bluetoothctl devices)
         if [ -z "$devices" ]; then
             printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"

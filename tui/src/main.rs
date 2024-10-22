@@ -15,7 +15,7 @@ use std::{
 use crate::theme::Theme;
 use clap::Parser;
 use crossterm::{
-    event::{self, DisableMouseCapture, Event, KeyEventKind},
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyEventKind},
     style::ResetColor,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
@@ -41,6 +41,8 @@ fn main() -> io::Result<()> {
     let mut state = AppState::new(args.theme, args.override_validation);
 
     stdout().execute(EnterAlternateScreen)?;
+    stdout().execute(EnableMouseCapture)?;
+
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
@@ -70,15 +72,23 @@ fn run(
 
         // It's guaranteed that the `read()` won't block when the `poll()`
         // function returns `true`
-        if let Event::Key(key) = event::read()? {
-            // We are only interested in Press and Repeat events
-            if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
+        match event::read()? {
+            Event::Key(key) => {
+                if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
+                    continue;
+                }
+
+                if !state.handle_key(&key) {
+                    return Ok(());
+                }
+            }
+            Event::Mouse(mouse_event) => {
+                if !state.handle_mouse(&mouse_event) {
+                    return Ok(());
+                }
                 continue;
             }
-
-            if !state.handle_key(&key) {
-                return Ok(());
-            }
+            _ => {}
         }
     }
 }

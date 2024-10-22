@@ -8,7 +8,7 @@ use crate::{float::FloatContent, hint::Shortcut};
 
 use linutil_core::Command;
 
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind};
 
 use ratatui::{
     layout::Rect,
@@ -258,6 +258,15 @@ impl FloatContent for FloatingText {
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
+    }
+
+    fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
+        match event.kind {
+            MouseEventKind::ScrollDown => self.scroll_down(),
+            MouseEventKind::ScrollUp => self.scroll_up(),
+            _ => {}
+        }
+        false
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
