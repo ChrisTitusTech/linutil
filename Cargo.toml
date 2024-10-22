@@ -4,7 +4,7 @@ version = "24.9.28"
 edition = "2021"
 
 [workspace.dependencies]
-ego-tree = "0.6.2"
+ego-tree = ">=0.6.2, <0.10"
 
 [workspace]
 members = ["tui", "core", "xtask"]
