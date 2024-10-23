@@ -29,7 +29,6 @@ curl -fsSL https://christitus.com/linuxdev | sh
 Linutil is also available as a package in various repositories:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/linutil.svg)](https://repology.org/project/linutil/versions)
-[![build result](https://build.opensuse.org/projects/openSUSE:Factory/packages/linutil/badge.svg?type=percent)](https://build.opensuse.org/package/show/openSUSE:Factory/linutil)
 
 <details>
   <summary>Arch Linux</summary>
