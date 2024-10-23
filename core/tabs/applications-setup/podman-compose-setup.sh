@@ -19,7 +19,7 @@ installPodmanCompose() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
                 exit 1
                 ;;
         esac
