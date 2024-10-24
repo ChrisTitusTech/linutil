@@ -9,6 +9,9 @@ installAlacritty() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm alacritty
                 ;;
+            nix-env)
+                "$PACKAGER" -iA nixpkgs.alacritty
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y alacritty
                 ;;
