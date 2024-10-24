@@ -5,7 +5,7 @@ on:
     branches: ["main"]
     paths:
       - '**/*.rs'
-      - 'Cargo.toml'
+      - '**/Cargo.toml'
       - 'Cargo.lock'
 
 env:
