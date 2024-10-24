@@ -120,7 +120,10 @@ impl AppState {
         match self.focus {
             Focus::Search => (
                 "Search bar",
-                Box::new([Shortcut::new("Finish search", ["Enter"])]),
+                Box::new([
+                    Shortcut::new("Abort search", ["Esc", "CTRL-c"]),
+                    Shortcut::new("Search", ["Enter"]),
+                ]),
             ),
 
             Focus::List => {

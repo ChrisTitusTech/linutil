@@ -13,10 +13,10 @@ manage_arrangement() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Manage Monitor Arrangement${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b" "${YELLOW}Choose the monitor to arrange: ${RC}"
+    printf "%b\n" "${YELLOW}Choose the monitor to arrange: ${RC}"
     i=1
     for monitor in $monitor_array; do
-        printf "%b\n" "$i. ${YELLOW}$monitor${RC}"
+        printf "%b\n" "$i. ${GREEN}$monitor${RC}"
         i=$((i + 1))
     done
 
