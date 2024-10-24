@@ -80,8 +80,9 @@ script = "monitor-control/set_resolutions.sh"
 name = "Printers"
 
 [[data.entries]]
-name = "Install EPSON printer drivers"
+name = "Install Epson printer drivers"
 script = "printers/install-epson-printer-drivers.sh"
+descrption = "This script will install the Epson printer drivers."
 task_list = "I"
 
 [[data]]
