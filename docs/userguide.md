@@ -141,6 +141,10 @@ For more information visit: https://rpmfusion.org/
 - **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
 - **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
 
+### Printers
+
+- **Install Epson printer drivers**: This script will install the Epson printer drivers.
+
 ### User Account Manager
 
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
