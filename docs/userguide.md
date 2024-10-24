@@ -101,6 +101,7 @@ For more information visit: https://christitus.com/linux-security-mistakes
 ### Arch Linux
 
 - **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
+- **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction.
 To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go.
