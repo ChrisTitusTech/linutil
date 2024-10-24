@@ -242,7 +242,7 @@ userinfo () {
     while true
     do 
             read -r -p "Please enter username: " username
-            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
+            if echo "$username" | grep -qE '^[a-z_][a-z0-9_-]{0,31}(\$)?$'
             then 
                     break
             fi 
@@ -267,20 +267,23 @@ userinfo () {
      # Loop through user input until the user gives a valid hostname, but allow the user to force save 
     while true
     do 
-            read -r -p "Please name your machine: " name_of_machine
-            # hostname regex (!!couldn't find spec for computer name!!)
-            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
+            printf "%b" "Please name your machine: "
+            read -r machine_name
+            
+            lower_machine_name=$(echo "$machine_name" | tr '[:upper:]' '[:lower:]')
+            if echo "$lower_machine_name" | grep -q '^[a-z][a-z0-9_.-]\{0,62\}[a-z0-9]$'
             then 
                     break 
             fi 
             # if validation fails allow the user to force saving of the hostname
-            read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force 
-            if [[ "${force,,}" = "y" ]]
+            printf "%b" "Hostname doesn't seem correct. Do you still want to save it? (y/N) "
+            read -r force
+            if [[ "$force" == "y" || "$force" == "Y" ]]
             then 
                     break 
             fi 
     done 
-    export NAME_OF_MACHINE=$name_of_machine
+    export NAME_OF_MACHINE=$lower_machine_name
 }
 
 # Starting functions
@@ -376,7 +379,7 @@ subvolumesetup () {
     mountallsubvol
 }
 
-if [[ "${DISK}" =~ "nvme" ]]; then
+if echo "$DISK" | grep -q "nvme"; then
     partition2=${DISK}p2
     partition3=${DISK}p3
 else
