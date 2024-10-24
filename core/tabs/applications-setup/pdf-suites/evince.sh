@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installEvince() {
     if ! command_exists evince; then

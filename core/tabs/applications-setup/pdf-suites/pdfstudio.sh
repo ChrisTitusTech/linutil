@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installPdfstudio() {
     if ! command_exists pdfstudio2024; then

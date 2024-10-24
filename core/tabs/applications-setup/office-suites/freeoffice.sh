@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installFreeOffice() {  
     if ! command_exists softmaker-freeoffice-2024 freeoffice softmaker; then
