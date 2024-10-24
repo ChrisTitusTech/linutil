@@ -143,6 +143,7 @@ For more information visit: https://rpmfusion.org/
 
 ### Printers
 
+- **Install Epson printer drivers**: This script will install the Epson printer drivers.
 
 ### User Account Manager
 
