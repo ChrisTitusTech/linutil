@@ -24,7 +24,7 @@ use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 77;
 const MIN_HEIGHT: u16 = 19;
-const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const TITLE: &str = concat!("Linux Toolbox - ", env!("CARGO_PKG_VERSION"));
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
