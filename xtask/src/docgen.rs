@@ -24,7 +24,7 @@ pub fn userguide() -> Result<String, DynError> {
                 #[cfg(debug_assertions)]
                 println!("  Directory: {}", entry.name);
 
-                if entry.name != "root".to_string() {
+                if entry.name != "root" {
                     md.push_str(&format!("\n### {}\n\n", entry.name));
                 }
 
@@ -36,18 +36,16 @@ pub fn userguide() -> Result<String, DynError> {
                         current_dir
                     ));
                 } */ // Commenting this for now, might be a good idea later
-            } else {
-                if !entry.description.is_empty() {
-                    #[cfg(debug_assertions)]
-                    println!("    Entry: {}", entry.name);
-                    #[cfg(debug_assertions)]
-                    println!("      Description: {}", entry.description);
+            } else if !entry.description.is_empty() {
+                #[cfg(debug_assertions)]
+                println!("    Entry: {}", entry.name);
+                #[cfg(debug_assertions)]
+                println!("      Description: {}", entry.description);
 
-                    md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
-                } /* else {
-                      md.push_str(&format!("- **{}**\n", entry.name));
-                  } */ // https://github.com/ChrisTitusTech/linutil/pull/753
-            }
+                md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+            } /* else {
+                  md.push_str(&format!("- **{}**\n", entry.name));
+              } */ // https://github.com/ChrisTitusTech/linutil/pull/753
         }
     }
 
