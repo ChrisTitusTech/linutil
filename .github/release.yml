@@ -1,20 +1,23 @@
 changelog:
   categories:
     - title: '🚀 Features'
-      labels:
-        - 'feature'
-        - 'enhancement'
+      label: 'enhancement'
     - title: '🐛 Bug Fixes'
-      labels:
-        - 'fix'
-        - 'bugfix'
-        - 'bug'
+      label: 'bug'
+    - title: '⚙️ Refactoring'
+      label: 'refactor'
+    - title: '🧩 UI/UX'
+      label: 'UI/UX'
     - title: '📚 Documentation'
       label: 'documentation'
     - title: '🔒 Security'
       label: 'security'
     - title: '🧰 GitHub Actions'
-      label: 'github actions'
+      label: 'github_actions'
+    - title: '🦀 Rust'
+      label: 'rust'
+    - title: '📃 Scripting'
+      label: 'script'
   exclude:
     labels:
       - 'skip-changelog'
