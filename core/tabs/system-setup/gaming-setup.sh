@@ -3,8 +3,7 @@
 . ../common-script.sh
 
 installDepend() {
-    # Check for dependencies
-    DEPENDENCIES='wine dbus'
+    DEPENDENCIES='wine dbus git'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
@@ -26,12 +25,15 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get|nala)
-            DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
+            DISTRO_DEPS="libasound2 libsdl2-2.0-0 wine64 wine32"
 
-            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
-            "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
-            "$ESCALATION_TOOL" apt-add-repository contrib -y
+
+            if [ "$DTYPE" != "pop" ]; then
+                "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
+                "$ESCALATION_TOOL" apt-add-repository contrib -y
+            fi
+
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
@@ -50,7 +52,8 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+            printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
+            exit 1
             ;;
     esac
 }
@@ -71,7 +74,7 @@ installAdditionalDepend() {
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
             
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" install ./lutris_"${version_no_v}"_all.deb
+            "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris_"${version_no_v}"_all.deb
 
             rm lutris_"${version_no_v}"_all.deb
 
@@ -90,11 +93,12 @@ installAdditionalDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         zypper)
-            # Flatpak
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
             ;;
         *)
+            printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
+            exit 1
             ;;
     esac
 }
