@@ -32,6 +32,14 @@ impl DerefMut for TabList {
         &mut self.0
     }
 }
+impl IntoIterator for TabList {
+    type Item = Tab;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
 
 pub fn get_tabs(validate: bool) -> TabList {
     let (temp_dir, tab_files) = TabDirectories::get_tabs();
