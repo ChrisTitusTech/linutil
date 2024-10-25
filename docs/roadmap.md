@@ -5,19 +5,23 @@
 
 ## Goals
 - [ ] Focus on tasks that take time in Linux and automate them. (Example: Removing a user, adding a user, etc. - but mostly BASH scripts with POSIX compliance.)
-- [ ] Remove Binary linutil from being tracked in git and make it a github action.
+- [x] Remove Binary linutil from being tracked in git and make it a github action.
 - [ ] Document every function and feature of linutil. (Preview panel description addition)
 - [x] Create a discord server for linutil and invite the community.
-- [ ] Power Optimizations for Laptops
+- [x] Power Optimizations for Laptops
 
 ## Milestones
-### Q3 2024
-- [ ] Finish the foundation of the project in CLI mode.
-- [ ] DENY ALL GUI Pull Requests while CLI and foundation is being established.
-
 ### Q4 2024
+- [x] Finish the foundation of the project in CLI mode
+- [ ] Implementation of CLI arguments and config file for automation
+- [ ] Logging of script executions for easier debugging
+
+### Q1 2025
 - [ ] GUI Brainstorming and Planning
-- [ ] GUI Implementation towards the end of Q4
+- [ ] GUI Basic Implementation
+
+### Q2 2025
+- [ ] GUI Full Implementation
 
 ## Community Feedback
 - Encourage community input and suggestions for future development.
