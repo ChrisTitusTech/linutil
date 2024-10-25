@@ -13,7 +13,7 @@ change_orientation() {
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}  Change Monitor Orientation${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
-    printf "%b" "${YELLOW}Choose a monitor to configure: ${RC}"
+    printf "%b\n" "${YELLOW}Choose a monitor to configure: ${RC}"
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"
