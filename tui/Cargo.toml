@@ -29,7 +29,7 @@ linutil_core = { path = "../core", version = "24.9.28" }
 tree-sitter-highlight = "0.24.2"
 tree-sitter-bash = "0.23.1"
 anstyle = "1.0.8"
-ansi-to-tui = "6.0.0"
+ansi-to-tui = "7.0.0"
 zips = "0.1.7"
 
 [build-dependencies]
