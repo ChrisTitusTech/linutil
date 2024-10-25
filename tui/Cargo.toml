@@ -20,7 +20,7 @@ crossterm = "0.28.1"
 ego-tree = { workspace = true }
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
-ratatui = "0.28.1"
+ratatui = "0.29.0"
 tui-term = "0.1.12"
 temp-dir = "0.1.14"
 unicode-width = "0.2.0"
