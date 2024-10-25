@@ -80,6 +80,12 @@ script = "monitor-control/set_resolutions.sh"
 name = "Printers"
 
 [[data.entries]]
+name = "Install CUPS"
+script = "printers/install-cups.sh"
+description = "This script will install the CUPS system, required for most printer drivers on Linux."
+task_list = "I"
+
+[[data.entries]]
 name = "Install Epson printer drivers"
 script = "printers/install-epson-printer-drivers.sh"
 description = "This script will install the Epson printer drivers."
