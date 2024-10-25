@@ -79,9 +79,9 @@ script = "communication-apps/telegram-setup.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "WhatsApp"
-description = "WhatsApp is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls."
-script = "communication-apps/whatsapp-setup.sh"
+name = "ZapZap (Whatsapp Client)"
+description = "ZapZap is a whatsapp desktop client for linux users, It is an open source project developed by rafatosta."
+script = "communication-apps/zapzap-setup.sh"
 task_list = "I"
 
 [[data.entries]]
