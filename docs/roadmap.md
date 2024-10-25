@@ -21,7 +21,7 @@
 - [ ] Basic GUI Implementation
 
 ### Q2 2025
-- [ ] GUI Full Implementation
+- [ ] Full GUI Implementation
 
 ## Community Feedback
 - Encourage community input and suggestions for future development.
