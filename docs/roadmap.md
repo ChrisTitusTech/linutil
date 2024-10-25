@@ -18,7 +18,7 @@
 
 ### Q1 2025
 - [ ] GUI Brainstorming and Planning
-- [ ] GUI Basic Implementation
+- [ ] Basic GUI Implementation
 
 ### Q2 2025
 - [ ] GUI Full Implementation
