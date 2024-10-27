@@ -55,11 +55,6 @@ askToClone() {
     printf "%b\n" "${GREEN}Do you also want to install the TitusDotfiles for neovim? (Y/n): ${RC}"
     read -r _titusDots
     case "$_titusDots" in
-    Y | y)
-        cloneNeovim
-        backupNeovimConfig
-        linkNeovimConfig
-        ;;
     N | n)
         printf "%b\n" "${YELLOW}Installation complete.."
         ;;
