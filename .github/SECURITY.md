@@ -10,6 +10,12 @@ Version tags lower than the [latest stable release](https://github.com/ChrisTitu
 | Stable  | :white_check_mark: YES |
 | Dev     | :x:                 NO |
 
+| Version                                                                                                                    | Supported              |
+| -------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| ![Latest](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest&style=for-the-badge) | :white_check_mark: YES |
+| Below LATEST                                                                                                               | :x:                 NO |
+| Above LATEST                                                                                                               | :x:                 NO |
+
 ## Reporting a Vulnerability
 
 If you have any reason to believe there are security vulnerabilities in Linutil, fill out the [report form](https://github.com/christitustech/linutil/security/advisories/new) or e-mail [contact@christitus.com](mailto:contact@christitus.com).
