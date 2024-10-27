@@ -23,7 +23,11 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
+            if pacman -Qtdq > /dev/null 2>&1; then
+                printf "%b\n" "${YELLOW}Detected Unused Packages. Removing.${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
+            fi
+            printf "%b\n" "${RED}No unused packages found. Skipping.${RC}"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
