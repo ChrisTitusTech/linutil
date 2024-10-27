@@ -51,8 +51,8 @@ linkNeovimConfig() {
     ln -s "$gitpath/titus-kickstart/"* "$HOME/.config/nvim/" # Wild card is used here to link all contents of titus-kickstart.
 }
 
-askToClone() {
-    printf "%b\n" "${GREEN}Do you also want to install the TitusDotfiles for neovim? (Y/n): ${RC}"
+dotsPrompt() {
+    printf "%b\n" "${GREEN}Do you want to install Titus' Neovim? (Y/n): ${RC}"
     read -r _titusDots
     case "$_titusDots" in
     N | n)
