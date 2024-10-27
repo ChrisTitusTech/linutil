@@ -10,11 +10,11 @@ Version tags lower than the [latest stable release](https://github.com/ChrisTitu
 | Stable  | :white_check_mark: YES |
 | Dev     | :x:                 NO |
 
-| Version                                                                                                                    | Supported              |
-| -------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| ![Latest](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest&style=for-the-badge) | :white_check_mark: YES |
-| Below LATEST                                                                                                               | :x:                 NO |
-| Above LATEST                                                                                                               | :x:                 NO |
+| Version                                            | Supported              |
+| -------------------------------------------------- | ---------------------- |
+| [![LATEST](https://img.shields.io/github/v/release/ChrisTitusTech/linutil?color=%230567ff&label=Latest&style=for-the-badge)](https://github.com/ChrisTitusTech/linutil/releases/latest) | :white_check_mark: YES |
+| Below LATEST                                       | :x:                 NO |
+| Above LATEST                                       | :x:                 NO |
 
 ## Reporting a Vulnerability
 
