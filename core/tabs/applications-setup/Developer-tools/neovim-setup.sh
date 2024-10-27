@@ -69,4 +69,4 @@ dotsPrompt() {
 checkEnv
 checkEscalationTool
 installNeovim
-askToClone
+dotsPrompt
