@@ -2,8 +2,8 @@
 
 ## Supported Versions
 
-It is recommended that you run the stable branch as this is more tested and used by most. The dev branch is bleeding-edge commits that are not well tested and aren't meant to be used in production environments.<br>
-Tags lower than the [latest stable](https://github.com/ChrisTitusTech/linutil/releases/latest) are **not** supported.
+It is recommended that you use the stable branch as it's tested and used by most. The dev branch may contain bleeding-edge commits that are not well tested and are not meant to be used in production environments.<br>
+Version tags lower than the [latest stable release](https://github.com/ChrisTitusTech/linutil/releases/latest) are **not** supported.
 
 | Branch  | Supported              |
 | ------- | ---------------------- |
