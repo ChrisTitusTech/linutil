@@ -2,13 +2,14 @@
 
 ## Supported Versions
 
-It is recommended that you run the stable version as this is more tested and used by most. The dev branch is bleed-edge commits that are not well tested and aren't meant to be used in production environments
+It is recommended that you run the stable branch as this is more tested and used by most. The dev branch is bleeding-edge commits that are not well tested and aren't meant to be used in production environments.<br>
+Tags lower than the [latest stable](https://github.com/ChrisTitusTech/linutil/releases/latest) are **not** supported.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | :white_check_mark: |
-| dev     | :x:                |
+| Branch  | Supported              |
+| ------- | ---------------------- |
+| Stable  | :white_check_mark: YES |
+| Dev     | :x:                 NO |
 
 ## Reporting a Vulnerability
 
-I'd recommend making an Issue for reporting a bug. If you would like privately submit the bug you can email me at contact@christitus.com
+If you have any reason to believe there are security vulnerabilities in Linutil, fill out the [report form](https://github.com/christitustech/linutil/security/advisories/new) or e-mail [contact@christitus.com](mailto:contact@christitus.com).
