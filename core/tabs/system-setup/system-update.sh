@@ -41,9 +41,6 @@ fastUpdate() {
 
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
-            ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" ref
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
@@ -63,8 +60,7 @@ updateSystem() {
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
+            "$ESCALATION_TOOL" "$PACKAGER" upgrade --refresh -y
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm --needed archlinux-keyring
