@@ -60,6 +60,12 @@ script = "fedora/rpm-fusion-setup.sh"
 task_list = "MP"
 
 [[data.entries]]
+name = "Upgrade to a New Fedora Release"
+description = "Upgrades the System to next fedora release"
+script = "fedora/fedora-upgrade.sh"
+task_list = "MP"
+
+[[data.entries]]
 name = "Virtualization"
 description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
