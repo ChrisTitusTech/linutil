@@ -16,7 +16,7 @@ update() {
     printf "%b\n" "${YELLOW}Do you want to update to Fedora version $next_version? (y/n): ${RC}"  
     read -r response
     
-    if [[ "$response" =~ ^[Yy]$ ]]; then
+    if [ "$response" =~ ^[Yy]$ ]; then
         printf "%b\n" "${CYAN}Preparing to update to Fedora version $next_version...${RC}"
         
         # Install the system upgrade plugin
@@ -35,7 +35,7 @@ update() {
         printf "%b\n" "${YELLOW}Do you want to reboot now to apply the upgrade? (y/n): ${RC}"
         read -r reboot_response
 
-        if [[ "$reboot_response" =~ ^[Yy]$ ]]; then
+        if [ "$reboot_response" =~ ^[Yy]$ ]; then
             printf "%b\n" "${GREEN}Rebooting to apply the upgrade...${RC}"
             "$ESCALATION_TOOL" "$PACKAGER" system-upgrade reboot
         else
