@@ -61,7 +61,7 @@ task_list = "MP"
 
 [[data.entries]]
 name = "Upgrade to a New Fedora Release"
-description = "Upgrades the System to the next fedora release"
+description = "Upgrades system to the next Fedora release"
 script = "fedora/fedora-upgrade.sh"
 task_list = "MP"
 
