@@ -70,7 +70,7 @@ fetch_fedora_latest_iso() {
     FEDORA_URL=$(curl -s 'https://www.fedoraproject.org/releases.json' |
     grep -o '"link": "[^"]*' |
     sed -e 's/"link": "//' |
-    awk -v version="40" -v arch="x86_64" -v variant="Workstation" ' BEGIN { FS="," }
+    awk -v version="41" -v arch="x86_64" -v variant="Workstation" ' BEGIN { FS="," }
         {
             if ($0 ~ version && $0 ~ arch && $0 ~ variant && $0 ~ "Live-x86_64") 
             { print $0 }
@@ -114,7 +114,7 @@ fetch_iso_urls() {
     printf "%b\n" "1) Arch Linux (latest)"
     printf "%b\n" "2) Arch Linux (older versions)"
     printf "%b\n" "3) Debian Linux (latest)"
-    printf "%b\n" "4) Fedora 40 Workstation (latest)"
+    printf "%b\n" "4) Fedora 41 Workstation (latest)"
     printf "\n"
     printf "%b" "Select the ISO you want to download (1-4): "
     read -r ISO_OPTION
