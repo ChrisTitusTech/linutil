@@ -2,7 +2,6 @@
 
 . ../../common-script.sh
 
-# Global version variables
 current_version=$(rpm -E '%{fedora}')
 next_version=$((current_version + 1))
 previous_version=$((current_version - 1))
