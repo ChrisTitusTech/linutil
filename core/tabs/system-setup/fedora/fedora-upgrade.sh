@@ -7,7 +7,7 @@ next_version=$((current_version + 1))
 previous_version=$((current_version - 1))
 
 update() {
-    printf "%b\n" "${RED}Make sure your system is fully updated; if not, update first and reboot once.${RC}"
+    printf "%b\n" "${RED}Make sure your system is fully updated; if not, update it first and reboot once.${RC}"
     printf "%b\n" "${CYAN}Your current Fedora version is $current_version.${RC}"
     printf "%b\n" "${CYAN}The next available version is $next_version.${RC}"
     
