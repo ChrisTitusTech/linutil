@@ -44,7 +44,6 @@ update() {
     fi
 }
 
-# Function to run post-upgrade tasks
 post_upgrade() {
     printf "%b\n" "${YELLOW}Running post-upgrade tasks...${RC}"
     
