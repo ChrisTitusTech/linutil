@@ -25,7 +25,7 @@ curl -fsSL https://christitus.com/linux | sh
 curl -fsSL https://christitus.com/linuxdev | sh
 ```
 <details>
-  <summary>Usage of Arguments</summary>
+  <summary>CLI arguments</summary>
 
 Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
 
