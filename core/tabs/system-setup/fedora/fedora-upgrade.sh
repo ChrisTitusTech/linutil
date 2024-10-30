@@ -11,7 +11,7 @@ update() {
     printf "%b\n" "${CYAN}Your current Fedora version is $current_version.${RC}"
     printf "%b\n" "${CYAN}The next available version is $next_version.${RC}"
     
-    printf "%b\n" "${YELLOW}Do you want to update to Fedora version $next_version? (y/n): ${RC}"  
+    printf "%b\n" "${YELLOW}Do you want to update to $next_version? (y/n): ${RC}"  
     read -r response
     
     if [ "$response" =~ ^[Yy]$ ]; then
