@@ -22,7 +22,7 @@ update() {
                 exit 1
             fi
         
-            if ! "$ESCALATION_TOOL" "$PACKAGER" system-upgrade download --releasever="$next_version"; then
+            if ! "$ESCALATION_TOOL" "$PACKAGER" system-upgrade download --releasever="$next_version" -y ; then
                 printf "%b\n" "${RED}Failed to download the upgrade packages.${RC}"
                 exit 1
             fi
