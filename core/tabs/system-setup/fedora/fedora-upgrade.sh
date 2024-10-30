@@ -14,34 +14,38 @@ update() {
     printf "%b\n" "${YELLOW}Do you want to update to $next_version? (y/n): ${RC}"  
     read -r response
     
-    if [ "$response" =~ ^[Yy]$ ]; then
-        printf "%b\n" "${CYAN}Preparing to update to Fedora version $next_version...${RC}"
+    case "$response" in
+        y|Y)
+            printf "%b\n" "${CYAN}Preparing to update to $next_version...${RC}"
         
-        # Install the system upgrade plugin
-        if ! "$ESCALATION_TOOL" "$PACKAGER" install dnf-plugin-system-upgrade -y; then
-            printf "%b\n" "${RED}Failed to install dnf-plugin-system-upgrade.${RC}"
-            exit 1
-        fi
+            if ! "$ESCALATION_TOOL" "$PACKAGER" install dnf-plugin-system-upgrade -y; then
+                printf "%b\n" "${RED}Failed to install dnf-plugin-system-upgrade.${RC}"
+                exit 1
+            fi
         
-        # Download the upgrade packages
-        if ! "$ESCALATION_TOOL" "$PACKAGER" system-upgrade download --releasever="$next_version"; then
-            printf "%b\n" "${RED}Failed to download the upgrade packages.${RC}"
-            exit 1
-        fi
+            if ! "$ESCALATION_TOOL" "$PACKAGER" system-upgrade download --releasever="$next_version"; then
+                printf "%b\n" "${RED}Failed to download the upgrade packages.${RC}"
+                exit 1
+            fi
 
-        #Asking for rebooting
-        printf "%b\n" "${YELLOW}Do you want to reboot now to apply the upgrade? (y/n): ${RC}"
-        read -r reboot_response
+            printf "%b\n" "${YELLOW}Do you want to reboot now to apply the upgrade? (y/n): ${RC}"
+            read -r reboot_response
 
-        if [ "$reboot_response" =~ ^[Yy]$ ]; then
-            printf "%b\n" "${GREEN}Rebooting to apply the upgrade...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" system-upgrade reboot
-        else
-            printf "%b\n" "${YELLOW}You can reboot later to apply the upgrade.${RC}"
-        fi
-    else
-        printf "%b\n" "${RED}No upgrade performed.${RC}"
-    fi
+            case "$reboot_response" in
+                y|Y)
+                    printf "%b\n" "${GREEN}Rebooting to apply the upgrade...${RC}"
+                    "$ESCALATION_TOOL" "$PACKAGER" system-upgrade reboot
+                    ;;
+                *)
+                    printf "%b\n" "${YELLOW}You can reboot later to apply the upgrade.${RC}"
+                    ;;
+            esac
+            ;;
+        *)
+            printf "%b\n" "${RED}No upgrade performed.${RC}"
+            ;;
+    esac
+}
 }
 
 post_upgrade() {
