@@ -6,7 +6,6 @@ current_version=$(rpm -E '%{fedora}')
 next_version=$((current_version + 1))
 previous_version=$((current_version - 1))
 
-# Function to update Fedora
 update() {
     printf "%b\n" "${RED}Make sure your system is fully updated; if not, update first and reboot once.${RC}"
     printf "%b\n" "${CYAN}Your current Fedora version is $current_version.${RC}"
