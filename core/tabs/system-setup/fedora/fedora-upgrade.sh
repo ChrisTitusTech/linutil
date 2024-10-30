@@ -59,7 +59,6 @@ post_upgrade() {
     esac
 }
 
-# Main menu
 checkEnv
 checkEscalationTool
 
