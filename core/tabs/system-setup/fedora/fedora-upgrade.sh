@@ -45,7 +45,6 @@ update() {
             ;;
     esac
 }
-}
 
 post_upgrade() {
     printf "%b\n" "${YELLOW}Running post-upgrade tasks...${RC}"
