@@ -1,0 +1,65 @@
+.\" manpage for Linutil
+.TH "linutil" "1" "October 2024" "" "Linutil Manual"
+
+.SH NAME
+linutil \- Chris Titus Tech's Linux Toolbox
+
+.SH SYNOPSIS
+\fBlinutil [OPTIONS]\fR
+
+.SH DESCRIPTION
+Linutil is a distro-agnostic toolbox designed to simplify everyday Linux tasks.
+.br
+It helps you set up applications and optimize your system for specific use cases. The utility is actively developed in Rust, providing performance and reliability.
+
+.SH LIVE VERSION
+To get started with the live version, pick which branch you would like to use, then run the command in your terminal:
+.TP
+\fBStable Branch\fR
+curl -fsSL https://christitus.com/linux | sh
+.TP
+\fBDevelopement branch\fR
+curl -fsSL https://christitus.com/linuxdev | sh
+
+.SH OPTIONS
+.TP
+\fB\-t\fR, \fB\-\-theme\fR \fI<theme>\fR
+Set the theme to use in the TUI.
+.br
+Possible values:
+\fIdefault\fR,
+\fIcompatible\fR.
+.br
+Defaults to \fIdefault\fR.
+
+.TP
+\fB\-\-override\-validation\fR
+Show all available entries, disregarding compatibility checks. (\fBUNSAFE\fR)
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help.
+
+.SH SUPPORT
+If you find Linutil helpful, please consider giving it a star on GitHub to show your support!
+https://github.com/ChrisTitusTech/linutil
+
+.SH DOCUMENTATION
+For comprehensive information on how to use Linutil, visit the Official Linutil Documentation.
+https://christitustech.github.io/linutil
+
+.SH AUTHOR
+Written by Adam Perkowski.
+<adas1per@protonmail.com>
+
+.SH REPORTING BUGS
+Since the project is still in active development, you may encounter some issues.
+.br
+Please consider submitting feedback if you do.
+https://github.com/ChrisTitusTech/linutil/issues
+
+.SH COPYRIGHT
+Copyright (c) 2024 Chris Titus.
+.br
+MIT License.
+https://opensource.org/license/MIT

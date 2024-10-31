@@ -9,8 +9,11 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
+for cmd in "$@"; do
     export PATH=/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH
-    command -v "$1" >/dev/null 2>&1
+    command -v "$cmd" >/dev/null 2>&1 || return 1
+done
+return 0
 }
 
 checkFlatpak() {

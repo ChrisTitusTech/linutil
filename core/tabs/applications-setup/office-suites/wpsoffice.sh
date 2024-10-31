@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installWpsOffice() {
     if ! command_exists com.wps.Office && ! command_exists wps; then
