@@ -6,8 +6,6 @@
 adjust_monitor_brightness() {
     while true; do
         monitor_list=$(detect_connected_monitors)
-        monitor_array=$(echo "$monitor_list" | tr '\n' ' ')
-        set -- "$monitor_array"
         count=1
 
         clear
@@ -15,7 +13,7 @@ adjust_monitor_brightness() {
         printf "%b\n" "${YELLOW}  Adjust Monitor Brightness${RC}"
         printf "%b\n" "${YELLOW}=========================================${RC}"
         printf "%b\n" "${YELLOW}Choose a monitor to adjust brightness:${RC}"
-        for monitor in "$@"; do
+        echo "$monitor_list" | while IFS= read -r monitor; do
             echo "$count. $monitor"
             count=$((count + 1))
         done
@@ -35,18 +33,18 @@ adjust_monitor_brightness() {
             continue
         fi
 
-        if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$#" ]; then
+        monitor_count=$(echo "$monitor_list" | wc -l)
+        if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$monitor_count" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "Press [Enter] to continue..."
             read -r dummy
             continue
         fi
 
-        monitor_name=$(eval echo "\${$monitor_choice}")
+        monitor_name=$(echo "$monitor_list" | sed -n "${monitor_choice}p")
         current_brightness=$(get_current_brightness "$monitor_name")
 
-        # Correctly calculate the brightness percentage
-        current_brightness_percentage=$(awk "BEGIN {printf \"%.0f\", $current_brightness * 100}")
+        current_brightness_percentage=$(awk -v brightness="$current_brightness" 'BEGIN {printf "%.0f", brightness * 100}')
         printf "%b\n" "${YELLOW}Current brightness for $monitor_name${RC}: ${GREEN}$current_brightness_percentage%${RC}"
 
         while true; do

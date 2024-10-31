@@ -9,7 +9,10 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+    for cmd in "$@"; do
+        command -v "$cmd" >/dev/null 2>&1 || return 1
+    done
+    return 0
 }
 
 checkAURHelper() {

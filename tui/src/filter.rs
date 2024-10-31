@@ -164,4 +164,8 @@ impl Filter {
             self.search_input.remove(current);
         }
     }
+    pub fn clear_search(&mut self) {
+        self.search_input.clear();
+        self.input_position = 0;
+    }
 }
