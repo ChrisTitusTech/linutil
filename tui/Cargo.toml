@@ -19,8 +19,8 @@ crossterm = "0.28.1"
 ego-tree = { workspace = true }
 oneshot = "0.1.8"
 portable-pty = "0.8.1"
-ratatui = "0.28.1"
-tui-term = "0.1.12"
+ratatui = "0.29.0"
+tui-term = "0.2.0"
 temp-dir = "0.1.14"
 unicode-width = "0.2.0"
 rand = { version = "0.8.5", optional = true }
@@ -28,7 +28,7 @@ linutil_core = { path = "../core", version = "24.9.28" }
 tree-sitter-highlight = "0.24.2"
 tree-sitter-bash = "0.23.1"
 anstyle = "1.0.8"
-ansi-to-tui = "6.0.0"
+ansi-to-tui = "7.0.0"
 zips = "0.1.7"
 
 [[bin]]
