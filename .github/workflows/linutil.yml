@@ -46,7 +46,9 @@ jobs:
         run: cargo build --target-dir=build --release --verbose --target=x86_64-unknown-linux-musl --all-features
 
       - name: Build aarch64 binary
-        run: cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl --all-features
+        run: |
+          cross build --target-dir=build --release --verbose --target=aarch64-unknown-linux-musl --all-features
+          mv ./build/aarch64-unknown-linux-musl/release/linutil ./build/aarch64-unknown-linux-musl/release/linutil-aarch64
 
       - name: Extract Version
         id: extract_version
