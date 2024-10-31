@@ -229,6 +229,7 @@ impl Filter {
         } else {
             SearchAction::None
         }
+    }
 
     pub fn clear_search(&mut self) {
         self.search_input.clear();
