@@ -186,6 +186,12 @@ description = "Vivaldi is a freeware, cross-platform web browser developed by Vi
 script = "browsers/vivaldi.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "waterfox"
+description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
+script = "browsers/waterfox.sh"
+task_list = "FI"
+
 [[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
