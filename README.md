@@ -86,7 +86,7 @@ We welcome contributions from the community! Before you start, please review our
 
 [Official LinUtil Roadmap](https://christitustech.github.io/linutil/roadmap)
 
-Docs is now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
+Docs are now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
 
 ## 🏅 Thanks to All Contributors
 
