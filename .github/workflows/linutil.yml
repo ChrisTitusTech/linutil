@@ -96,16 +96,16 @@ jobs:
       - name: Generate preview 
         uses: charmbracelet/vhs-action@v2.1.0
         with:
-          path: "docs/assets/preview.tape"
+          path: ".github/preview.tape"
 
       - name: Move preview
         run: |
-          mv preview.gif docs/assets/preview.gif
+          mv preview.gif .github/preview.gif
 
       - name: Upload preview
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Preview for ${{ env.version }}
-          file_pattern: "docs/assets/preview.gif"
+          file_pattern: ".github/preview.gif"
           add_options: "--force"
         if: success()
