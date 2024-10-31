@@ -52,7 +52,7 @@ pub struct AppState {
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
-    visit_stack: Vec<NodeId>,
+    visit_stack: Vec<(NodeId, usize)>,
     /// This is the state associated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
@@ -78,6 +78,13 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+enum SelectedItem {
+    UpDir,
+    Directory,
+    Command,
+    None,
+}
+
 impl AppState {
     pub fn new(theme: Theme, override_validation: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
@@ -89,7 +96,7 @@ impl AppState {
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
-            visit_stack: vec![root_id],
+            visit_stack: vec![(root_id, 0usize)],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
             multi_select: false,
@@ -554,7 +561,7 @@ impl AppState {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
-            *self.visit_stack.last().unwrap(),
+            self.visit_stack.last().unwrap().0,
         );
         if !self.is_current_tab_multi_selectable() {
             self.multi_select = false;
@@ -578,9 +585,10 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        self.visit_stack.pop();
-        self.selection.select(Some(0));
-        self.update_items();
+        if let Some((_, previous_position)) = self.visit_stack.pop() {
+            self.selection.select(Some(previous_position));
+            self.update_items();
+        }
     }
 
     fn get_selected_node(&self) -> Option<Rc<ListNode>> {
@@ -607,20 +615,22 @@ impl AppState {
     }
 
     pub fn go_to_selected_dir(&mut self) {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
+        let selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
             self.enter_parent_directory();
             return;
         }
 
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
+        let actual_index = if self.at_root() {
+            selected_index
+        } else {
+            selected_index - 1
+        };
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
+        if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
-                self.visit_stack.push(item.id);
+                self.visit_stack.push((item.id, selected_index));
                 self.selection.select(Some(0));
                 self.update_items();
             }
@@ -652,7 +662,6 @@ impl AppState {
 
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
-
         !self.at_root() && selected_index == 0
     }
 
@@ -673,24 +682,39 @@ impl AppState {
         }
     }
 
-    fn handle_enter(&mut self) {
-        if self.selected_item_is_cmd() {
-            if self.selected_commands.is_empty() {
-                if let Some(node) = self.get_selected_node() {
-                    self.selected_commands.push(node);
-                }
-            }
-
-            let cmd_names = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect::<Vec<_>>();
-
-            let prompt = ConfirmPrompt::new(&cmd_names[..]);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+    fn get_selected_item_type(&self) -> SelectedItem {
+        if self.selected_item_is_up_dir() {
+            SelectedItem::UpDir
+        } else if self.selected_item_is_dir() {
+            SelectedItem::Directory
+        } else if self.selected_item_is_cmd() {
+            SelectedItem::Command
         } else {
-            self.go_to_selected_dir();
+            SelectedItem::None
+        }
+    }
+
+    fn handle_enter(&mut self) {
+        match self.get_selected_item_type() {
+            SelectedItem::UpDir => self.enter_parent_directory(),
+            SelectedItem::Directory => self.go_to_selected_dir(),
+            SelectedItem::Command => {
+                if self.selected_commands.is_empty() {
+                    if let Some(node) = self.get_selected_node() {
+                        self.selected_commands.push(node);
+                    }
+                }
+
+                let cmd_names = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect::<Vec<_>>();
+
+                let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+            }
+            SelectedItem::None => {}
         }
     }
 
@@ -724,10 +748,13 @@ impl AppState {
     }
 
     fn refresh_tab(&mut self) {
-        self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
-            .tree
-            .root()
-            .id()];
+        self.visit_stack = vec![(
+            self.tabs[self.current_tab.selected().unwrap()]
+                .tree
+                .root()
+                .id(),
+            0usize,
+        )];
         self.selection.select(Some(0));
         self.update_items();
     }
