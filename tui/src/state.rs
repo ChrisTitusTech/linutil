@@ -491,17 +491,9 @@ impl AppState {
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
-                KeyCode::Char('j') | KeyCode::Down
-                    if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
-                {
-                    self.current_tab.select_next();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_tab_down(),
 
-                KeyCode::Char('k') | KeyCode::Up => {
-                    self.current_tab.select_previous();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_tab_up(),
 
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
@@ -511,8 +503,8 @@ impl AppState {
             },
 
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
-                KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
-                KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_down(),
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_up(),
                 KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
                 KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
@@ -529,6 +521,34 @@ impl AppState {
             _ => (),
         };
         true
+    }
+
+    fn scroll_down(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current + 1 > max_index {
+            0
+        } else {
+            current + 1
+        };
+
+        self.selection.select(Some(next));
+    }
+
+    fn scroll_up(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current == 0 { max_index } else { current - 1 };
+
+        self.selection.select(Some(next));
     }
 
     fn toggle_multi_select(&mut self) {
@@ -566,6 +586,13 @@ impl AppState {
         if !self.is_current_tab_multi_selectable() {
             self.multi_select = false;
             self.selected_commands.clear();
+        }
+        let len = self.filter.item_list().len();
+        if len > 0 {
+            let current = self.selection.selected().unwrap_or(0);
+            self.selection.select(Some(current.min(len - 1)));
+        } else {
+            self.selection.select(None);
         }
     }
 
@@ -765,6 +792,24 @@ impl AppState {
             80,
             80,
         );
+    }
+
+    fn scroll_tab_down(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current + 1 >= len { 0 } else { current + 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
+    }
+
+    fn scroll_tab_up(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current == 0 { len - 1 } else { current - 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
     }
 }
 
