@@ -783,6 +783,7 @@ impl AppState {
             0usize,
         )];
         self.selection.select(Some(0));
+        self.filter.clear_search();
         self.update_items();
     }
 
