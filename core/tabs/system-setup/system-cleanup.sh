@@ -30,16 +30,21 @@ cleanup_system() {
             "$ESCALATION_TOOL" "$PACKAGER" cache clean
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            return 1
+            printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
             ;;
     esac
 }
 
 common_cleanup() {
-    "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    if [ -d /var/tmp ]; then
+        "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
+    fi
+    if [ -d /tmp ]; then
+        "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
+    fi
+    if [ -d /var/log ]; then
+        "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    fi
     if [ "$INIT_MANAGER" = "systemctl" ]; then
         "$ESCALATION_TOOL" journalctl --vacuum-time=3d
     fi
@@ -51,8 +56,12 @@ clean_data() {
     case $clean_response in
         y|Y)
             printf "%b\n" "${YELLOW}Cleaning up old cache files and emptying trash...${RC}"
-            find "$HOME/.cache/" -type f -atime +5 -delete
-            find "$HOME/.local/share/Trash" -mindepth 1 -delete
+            if [ -d "$HOME/.cache" ]; then
+                find "$HOME/.cache/" -type f -atime +5 -delete
+            fi
+            if [ -d "$HOME/.local/share/Trash" ]; then
+                find "$HOME/.local/share/Trash" -mindepth 1 -delete
+            fi
             printf "%b\n" "${GREEN}Cache and trash cleanup completed.${RC}"
             ;;
         *)
