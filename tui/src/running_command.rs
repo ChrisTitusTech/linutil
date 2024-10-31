@@ -258,7 +258,7 @@ impl RunningCommand {
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
         // Adjust the screen content based on the scroll offset
-        parser.set_scrollback(self.scroll_offset);
+        parser.screen_mut().set_scrollback(self.scroll_offset);
         parser.screen().clone()
     }
 
