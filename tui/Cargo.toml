@@ -7,8 +7,7 @@ edition = "2021"
 license.workspace = true
 repository = "https://github.com/ChrisTitusTech/linutil/tree/main/tui"
 version.workspace = true
-include = ["src/*.rs", "Cargo.toml", "build.rs", "cool_tips.txt", "../man/linutil.1"]
-build = "build.rs"
+include = ["src/*.rs", "Cargo.toml", "cool_tips.txt", "../man/linutil.1"]
 
 [features]
 default = ["tips"]
@@ -32,9 +31,6 @@ textwrap = "0.16.1"
 anstyle = "1.0.8"
 ansi-to-tui = "6.0.0"
 zips = "0.1.7"
-
-[build-dependencies]
-chrono = "0.4.33"
 
 [[bin]]
 name = "linutil"
