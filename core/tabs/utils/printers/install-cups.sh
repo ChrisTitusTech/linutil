@@ -2,7 +2,6 @@
 
 . ../../common-script.sh
 
-# Function to install CUPS for printers
 installCUPS() {
     clear
 
