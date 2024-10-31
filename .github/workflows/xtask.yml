@@ -1,19 +1,29 @@
-name: Rust Checks
+name: XTasks
 
 on:
   pull_request:
-    branches: ["main"]
     paths:
-      - '**/*.rs'
-      - '**/Cargo.toml'
-      - 'Cargo.lock'
+      - "xtask"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo"
+      - "core/tabs"
+      - "docs"
+  push:
+    paths:
+      - "xtask"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo"
+      - "core/tabs"
+      - "docs"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lints:
-    name: Lints
+  docgen:
+    name: DocGen
     runs-on: ubuntu-latest
 
     steps:
@@ -37,8 +47,12 @@ jobs:
           key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-index-
 
-      - name: Run cargo clippy
-        run: cargo clippy -- -Dwarnings
+      - name: Run cargo xtask docgen
+        run: cargo xtask docgen
 
-      - name: Run cargo fmt
-        run: cargo fmt --all --check
+      - name: Check uncommitted documentation changes
+        run: |
+          git diff
+          git diff-files --quiet \
+            || (echo "Run 'cargo xtask docgen' and push the changes" \
+            && exit 1)

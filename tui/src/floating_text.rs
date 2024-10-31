@@ -24,18 +24,13 @@ use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
 use zips::zip_result;
 
-pub enum FloatingTextMode {
-    Preview,
-    Description,
-    ActionsGuide,
-}
-
 pub struct FloatingText {
     pub src: Vec<String>,
     max_line_width: usize,
     v_scroll: usize,
     h_scroll: usize,
-    mode_title: &'static str,
+    mode_title: String,
+    frame_height: usize,
 }
 
 macro_rules! style {
@@ -130,7 +125,7 @@ fn get_lines_owned(s: &str) -> Vec<String> {
 }
 
 impl FloatingText {
-    pub fn new(text: String, mode: FloatingTextMode) -> Self {
+    pub fn new(text: String, title: &str) -> Self {
         let src = get_lines(&text)
             .into_iter()
             .map(|s| s.to_string())
@@ -139,14 +134,15 @@ impl FloatingText {
         let max_line_width = max_width!(src);
         Self {
             src,
-            mode_title: Self::get_mode_title(mode),
+            mode_title: title.to_string(),
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
+            frame_height: 0,
         }
     }
 
-    pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
+    pub fn from_command(command: &Command, title: String) -> Option<Self> {
         let (max_line_width, src) = match command {
             Command::Raw(cmd) => {
                 // just apply highlights directly
@@ -169,23 +165,17 @@ impl FloatingText {
 
         Some(Self {
             src,
-            mode_title: Self::get_mode_title(mode),
+            mode_title: title,
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
+            frame_height: 0,
         })
     }
 
-    fn get_mode_title(mode: FloatingTextMode) -> &'static str {
-        match mode {
-            FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::Description => "Command Description",
-            FloatingTextMode::ActionsGuide => "Important Actions Guide",
-        }
-    }
-
     fn scroll_down(&mut self) {
-        if self.v_scroll + 1 < self.src.len() {
+        let visible_lines = self.frame_height.saturating_sub(2);
+        if self.v_scroll + visible_lines < self.src.len() {
             self.v_scroll += 1;
         }
     }
@@ -211,15 +201,18 @@ impl FloatingText {
 
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        self.frame_height = area.height as usize;
+
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
-            .title(self.mode_title)
+            .title(self.mode_title.clone())
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())
             .style(Style::default());
 
-        // Draw the Block first
+        frame.render_widget(Clear, area);
+
         frame.render_widget(block.clone(), area);
 
         // Calculate the inner area to ensure text is not drawn over the border
@@ -267,9 +260,6 @@ impl FloatContent for FloatingText {
             .block(Block::default())
             .highlight_style(Style::default().reversed());
 
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
-
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
     }
@@ -292,7 +282,7 @@ impl FloatContent for FloatingText {
 
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         (
-            self.mode_title,
+            &self.mode_title,
             Box::new([
                 Shortcut::new("Scroll down", ["j", "Down"]),
                 Shortcut::new("Scroll up", ["k", "Up"]),

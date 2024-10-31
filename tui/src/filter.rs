@@ -1,5 +1,5 @@
 use crate::{state::ListEntry, theme::Theme};
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::Tab;
 use ratatui::{
@@ -156,6 +156,9 @@ impl Filter {
     pub fn handle_key(&mut self, event: &KeyEvent) -> SearchAction {
         //Insert user input into the search bar
         match event.code {
+            KeyCode::Char('c') if event.modifiers.contains(KeyModifiers::CONTROL) => {
+                return self.exit_search()
+            }
             KeyCode::Char(c) => self.insert_char(c),
             KeyCode::Backspace => self.remove_previous(),
             KeyCode::Delete => self.remove_next(),
@@ -171,10 +174,18 @@ impl Filter {
             KeyCode::Enter => {
                 return SearchAction::Exit;
             }
+            KeyCode::Enter => return SearchAction::Exit,
+            KeyCode::Esc => return self.exit_search(),
             _ => return SearchAction::None,
         };
         self.update_completion_preview();
         SearchAction::Update
+    }
+
+    fn exit_search(&mut self) -> SearchAction {
+        self.input_position = 0;
+        self.search_input.clear();
+        SearchAction::Exit
     }
 
     fn cursor_left(&mut self) -> SearchAction {
@@ -218,5 +229,9 @@ impl Filter {
         } else {
             SearchAction::None
         }
+
+    pub fn clear_search(&mut self) {
+        self.search_input.clear();
+        self.input_position = 0;
     }
 }
