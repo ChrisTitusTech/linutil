@@ -3,7 +3,6 @@
 . ../../common-script.sh
 . ./install-cups.sh
 
-# Function to install drivers for Epson printers
 installEpsonPrinterDriver() {
     clear
 
