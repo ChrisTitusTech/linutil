@@ -1,4 +1,4 @@
-name: ShellCheck
+name: Script Checks
 
 on:
   pull_request:
@@ -53,3 +53,13 @@ jobs:
           done
 
           exit $error
+  shfmt:
+    name: Script Fomatting
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@4
+
+      - name: Run shfmt
+        uses: reviewdog/action-shfmt@v1
