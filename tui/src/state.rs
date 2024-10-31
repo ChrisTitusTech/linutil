@@ -1,10 +1,8 @@
-use std::rc::Rc;
-
 use crate::{
     confirmation::{ConfirmPrompt, ConfirmStatus},
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::{FloatingText, FloatingTextMode},
+    floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
     running_command::RunningCommand,
     theme::Theme,
@@ -21,11 +19,12 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
+use std::rc::Rc;
 use temp_dir::TempDir;
 
-const MIN_WIDTH: u16 = 77;
-const MIN_HEIGHT: u16 = 19;
-const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const MIN_WIDTH: u16 = 100;
+const MIN_HEIGHT: u16 = 25;
+const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -53,8 +52,8 @@ pub struct AppState {
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
-    visit_stack: Vec<NodeId>,
-    /// This is the state asociated with the list widget, used to display the selection in the
+    visit_stack: Vec<(NodeId, usize)>,
+    /// This is the state associated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
     filter: Filter,
@@ -62,7 +61,7 @@ pub struct AppState {
     selected_commands: Vec<Rc<ListNode>>,
     drawable: bool,
     #[cfg(feature = "tips")]
-    tip: &'static str,
+    tip: String,
 }
 
 pub enum Focus {
@@ -79,6 +78,13 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+enum SelectedItem {
+    UpDir,
+    Directory,
+    Command,
+    None,
+}
+
 impl AppState {
     pub fn new(theme: Theme, override_validation: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
@@ -90,7 +96,7 @@ impl AppState {
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
-            visit_stack: vec![root_id],
+            visit_stack: vec![(root_id, 0usize)],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
             multi_select: false,
@@ -120,7 +126,10 @@ impl AppState {
         match self.focus {
             Focus::Search => (
                 "Search bar",
-                Box::new([Shortcut::new("Finish search", ["Enter"])]),
+                Box::new([
+                    Shortcut::new("Abort search", ["Esc", "CTRL-c"]),
+                    Shortcut::new("Search", ["Enter"]),
+                ]),
             ),
 
             Focus::List => {
@@ -378,17 +387,17 @@ impl AppState {
         };
 
         let title = if self.multi_select {
-            &format!("{} [Multi-Select]", TITLE)
+            &format!("{}[Multi-Select] ", TITLE)
         } else {
             TITLE
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
+        let bottom_title = Line::from(self.tip.as_str().bold().blue()).right_aligned();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
-        let task_list_title = Line::from("Important Actions ").right_aligned();
+        let task_list_title = Line::from(" Important Actions ").right_aligned();
 
         // Create the list widget with items
         let list = List::new(items)
@@ -423,11 +432,15 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
-        if matches!(
-            self.focus,
-            Focus::TabList | Focus::List | Focus::ConfirmationPrompt(_)
-        ) && (key.code == KeyCode::Char('q')
-            || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && (key.code == KeyCode::Char('q')
+                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        {
+            return false;
+        }
+
+        if matches!(self.focus, Focus::ConfirmationPrompt(_))
+            && (key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
         }
@@ -501,17 +514,9 @@ impl AppState {
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
-                KeyCode::Char('j') | KeyCode::Down
-                    if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
-                {
-                    self.current_tab.select_next();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_tab_down(),
 
-                KeyCode::Char('k') | KeyCode::Up => {
-                    self.current_tab.select_previous();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_tab_up(),
 
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
@@ -521,8 +526,8 @@ impl AppState {
             },
 
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
-                KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
-                KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_down(),
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_up(),
                 KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
                 KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
@@ -539,6 +544,34 @@ impl AppState {
             _ => (),
         };
         true
+    }
+
+    fn scroll_down(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current + 1 > max_index {
+            0
+        } else {
+            current + 1
+        };
+
+        self.selection.select(Some(next));
+    }
+
+    fn scroll_up(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current == 0 { max_index } else { current - 1 };
+
+        self.selection.select(Some(next));
     }
 
     fn toggle_multi_select(&mut self) {
@@ -564,8 +597,20 @@ impl AppState {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
-            *self.visit_stack.last().unwrap(),
+            self.visit_stack.last().unwrap().0,
         );
+
+        if !self.is_current_tab_multi_selectable() {
+            self.multi_select = false;
+            self.selected_commands.clear();
+        }
+        let len = self.filter.item_list().len();
+        if len > 0 {
+            let current = self.selection.selected().unwrap_or(0);
+            self.selection.select(Some(current.min(len - 1)));
+        } else {
+            self.selection.select(None);
+        }
     }
 
     /// Checks either the current tree node is the root node (can we go up the tree or no)
@@ -584,9 +629,10 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        self.visit_stack.pop();
-        self.selection.select(Some(0));
-        self.update_items();
+        if let Some((_, previous_position)) = self.visit_stack.pop() {
+            self.selection.select(Some(previous_position));
+            self.update_items();
+        }
     }
 
     fn get_selected_node(&self) -> Option<Rc<ListNode>> {
@@ -613,20 +659,22 @@ impl AppState {
     }
 
     pub fn go_to_selected_dir(&mut self) {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
+        let selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
             self.enter_parent_directory();
             return;
         }
 
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
+        let actual_index = if self.at_root() {
+            selected_index
+        } else {
+            selected_index - 1
+        };
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
+        if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
-                self.visit_stack.push(item.id);
+                self.visit_stack.push((item.id, selected_index));
                 self.selection.select(Some(0));
                 self.update_items();
             }
@@ -658,15 +706,14 @@ impl AppState {
 
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
-
         !self.at_root() && selected_index == 0
     }
 
     fn enable_preview(&mut self) {
-        if let Some(node) = self.get_selected_node() {
-            if let Some(preview) =
-                FloatingText::from_command(&node.command, FloatingTextMode::Preview)
-            {
+        if let Some(list_node) = self.get_selected_node() {
+            let mut preview_title = "[Preview] - ".to_string();
+            preview_title.push_str(list_node.name.as_str());
+            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
                 self.spawn_float(preview, 80, 80);
             }
         }
@@ -674,29 +721,46 @@ impl AppState {
 
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, FloatingTextMode::Description);
-            self.spawn_float(description, 80, 80);
+            if !command_description.is_empty() {
+                let description = FloatingText::new(command_description, "Command Description");
+                self.spawn_float(description, 80, 80);
+            }
+        }
+    }
+
+    fn get_selected_item_type(&self) -> SelectedItem {
+        if self.selected_item_is_up_dir() {
+            SelectedItem::UpDir
+        } else if self.selected_item_is_dir() {
+            SelectedItem::Directory
+        } else if self.selected_item_is_cmd() {
+            SelectedItem::Command
+        } else {
+            SelectedItem::None
         }
     }
 
     fn handle_enter(&mut self) {
-        if self.selected_item_is_cmd() {
-            if self.selected_commands.is_empty() {
-                if let Some(node) = self.get_selected_node() {
-                    self.selected_commands.push(node);
+        match self.get_selected_item_type() {
+            SelectedItem::UpDir => self.enter_parent_directory(),
+            SelectedItem::Directory => self.go_to_selected_dir(),
+            SelectedItem::Command => {
+                if self.selected_commands.is_empty() {
+                    if let Some(node) = self.get_selected_node() {
+                        self.selected_commands.push(node);
+                    }
                 }
+
+                let cmd_names = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect::<Vec<_>>();
+
+                let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
             }
-
-            let cmd_names = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect::<Vec<_>>();
-
-            let prompt = ConfirmPrompt::new(&cmd_names[..]);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
-        } else {
-            self.go_to_selected_dir();
+            SelectedItem::None => {}
         }
     }
 
@@ -730,20 +794,42 @@ impl AppState {
     }
 
     fn refresh_tab(&mut self) {
-        self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
-            .tree
-            .root()
-            .id()];
+        self.visit_stack = vec![(
+            self.tabs[self.current_tab.selected().unwrap()]
+                .tree
+                .root()
+                .id(),
+            0usize,
+        )];
         self.selection.select(Some(0));
+        self.filter.clear_search();
         self.update_items();
     }
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
             80,
             80,
         );
+    }
+
+    fn scroll_tab_down(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current + 1 >= len { 0 } else { current + 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
+    }
+
+    fn scroll_tab_up(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current == 0 { len - 1 } else { current - 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
     }
 }
 
@@ -751,13 +837,13 @@ impl AppState {
 const TIPS: &str = include_str!("../cool_tips.txt");
 
 #[cfg(feature = "tips")]
-fn get_random_tip() -> &'static str {
+fn get_random_tip() -> String {
     let tips: Vec<&str> = TIPS.lines().collect();
     if tips.is_empty() {
-        return "";
+        return "".to_string();
     }
 
     let mut rng = rand::thread_rng();
     let random_index = rng.gen_range(0..tips.len());
-    tips[random_index]
+    format!(" {} ", tips[random_index])
 }
