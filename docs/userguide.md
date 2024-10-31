@@ -143,8 +143,8 @@ For more information visit: https://rpmfusion.org/
 
 ### Printers
 
-- **Install CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
-- **Install Epson printer drivers**: This script will install the Epson printer drivers.
+- **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
+- **Epson printer drivers**: This script will install the Epson printer drivers.
 
 ### User Account Manager
 
