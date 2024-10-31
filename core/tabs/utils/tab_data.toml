@@ -80,7 +80,7 @@ script = "monitor-control/set_resolutions.sh"
 name = "Printers"
 
 [[data.entries]]
-name = "Install CUPS"
+name = "CUPS"
 script = "printers/install-cups.sh"
 description = "This script will install the CUPS system, required for most printer drivers on Linux."
 task_list = "I"
