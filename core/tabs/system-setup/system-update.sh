@@ -59,7 +59,7 @@ updateSystem() {
     printf "%b\n" "${GREEN}Updating system${RC}"
     case "$PACKAGER" in
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
+            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
         dnf)

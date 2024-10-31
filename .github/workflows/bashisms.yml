@@ -19,17 +19,27 @@ jobs:
         id: get_sh_files
         run: |
           sh_files=$(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs | grep '\.sh$' || true)
-          echo "::set-output name=sh_files::$sh_files"
+          if [ -n "$sh_files" ]; then
+            echo "$sh_files" > changed_files
+            echo "changed=1" >> $GITHUB_OUTPUT
+          else
+            echo "changed=0" >> $GITHUB_OUTPUT
+          fi
       
       - name: Install devscripts
-        if: steps.get_sh_files.outputs.sh_files != ''
+        if: steps.get_sh_files.outputs.changed == 1
         run: sudo apt-get update && sudo apt-get install devscripts
 
       - name: Check for bashisms
-        if: steps.get_sh_files.outputs.sh_files != ''
+        if: steps.get_sh_files.outputs.changed == 1
         run: |
-          for file in ${{ steps.get_sh_files.outputs.sh_files }}; do
-              if [[ -f "$file" ]]; then
-                  checkbashisms "$file"
-              fi
+          echo "Running for:\n$(cat changed_files)\n"
+          for file in $(cat changed_files); do
+            if [[ -f "$file" ]]; then
+              checkbashisms "$file"
+            fi
           done
+
+      - name: Remove the created file
+        if: steps.get_sh_files.outputs.changed == 1
+        run: rm changed_files

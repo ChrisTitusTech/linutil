@@ -88,3 +88,24 @@ jobs:
         env:
           version: ${{ env.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Preview
+        run: |
+          echo "$(pwd)/build" >> $GITHUB_PATH
+      
+      - name: Generate preview 
+        uses: charmbracelet/vhs-action@v2.1.0
+        with:
+          path: "docs/assets/preview.tape"
+
+      - name: Move preview
+        run: |
+          mv preview.gif docs/assets/preview.gif
+
+      - name: Upload preview
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Preview for ${{ env.version }}
+          file_pattern: "docs/assets/preview.gif"
+          add_options: "--force"
+        if: success()

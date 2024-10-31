@@ -13,7 +13,7 @@ include = [
 
 [dependencies]
 include_dir = "0.7.4"
-tempdir = "0.3.7"
+temp-dir = "0.1.14"
 serde = { version = "1.0.205", features = ["derive"], default-features = false }
 toml = { version = "0.8.19", features = ["parse"], default-features = false }
 which = "6.0.3"
