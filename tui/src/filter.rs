@@ -154,7 +154,6 @@ impl Filter {
     }
     // Handles key events. Returns true if search must be exited
     pub fn handle_key(&mut self, event: &KeyEvent) -> SearchAction {
-        //Insert user input into the search bar
         match event.code {
             KeyCode::Char('c') if event.modifiers.contains(KeyModifiers::CONTROL) => {
                 return self.exit_search()
@@ -171,11 +170,7 @@ impl Filter {
                 self.completion_preview = None;
                 return SearchAction::Exit;
             }
-            KeyCode::Enter => {
-                return SearchAction::Exit;
-            }
             KeyCode::Enter => return SearchAction::Exit,
-            KeyCode::Esc => return self.exit_search(),
             _ => return SearchAction::None,
         };
         self.update_completion_preview();
