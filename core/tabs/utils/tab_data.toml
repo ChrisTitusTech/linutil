@@ -86,7 +86,7 @@ description = "This script will install the CUPS system, required for most print
 task_list = "I"
 
 [[data.entries]]
-name = "Install Epson printer drivers"
+name = "Epson printer drivers"
 script = "printers/install-epson-printer-drivers.sh"
 description = "This script will install the Epson printer drivers."
 task_list = "I"
