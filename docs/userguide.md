@@ -4,19 +4,6 @@
 ## Applications Setup
 
 
-### Developer Tools
-
-- **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
-- **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
-It is not a rewrite but a continuation and extension of Vim.
-This command configures neovim from CTT's neovim configuration.
-https://github.com/ChrisTitusTech/neovim
-- **Sublime Text**: Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages.
-- **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
-- **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
-- **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
-- **Ngrok**: Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development.
-
 ### Communication Apps
 
 - **Discord**: Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features.
@@ -24,8 +11,21 @@ https://github.com/ChrisTitusTech/neovim
 - **Signal**: Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication.
 - **Slack**: Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools.
 - **Telegram**: Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls.
-- **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
 - **Thunderbird**: Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality.
+- **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
+
+### Developer Tools
+
+- **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
+- **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
+- **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
+It is not a rewrite but a continuation and extension of Vim.
+This command configures neovim from CTT's neovim configuration.
+https://github.com/ChrisTitusTech/neovim
+- **Ngrok**: Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development.
+- **Sublime Text**: Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages.
+- **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
+- **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
 
 ### Office Suites
 
@@ -43,6 +43,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
 - **Thorium**: Thorium is a Chromium-based browser focused on privacy and performance.
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
+- **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.
 This command installs and condifures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
@@ -52,13 +53,13 @@ This command configures the key sections and functionalities defined in the .bas
 https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux.
 Bottles also provides tools to categorize, organize and optimize your applications.
+- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
 It manages windows in tiled, monocle and floating layouts.
 All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
 This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
-- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.
 It is written mainly in C, with performance and customizability in mind.
 This command installs fastfetch and configures from CTT's mybash repository.
