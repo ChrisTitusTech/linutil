@@ -530,8 +530,7 @@ sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: A
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 #Set colors and enable the easter egg
-sed -i 's/^#Color/Color/' /etc/pacman.conf
-echo "ILoveCandy" | tee -a /etc/pacman.conf
+sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
 
 #Enable multilib
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
