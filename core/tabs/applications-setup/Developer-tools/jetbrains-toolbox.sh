@@ -1,4 +1,4 @@
-#!/bin/dash -e
+#!/bin/sh -e
 
 . ../../common-script.sh
 
@@ -6,8 +6,8 @@ manualInstall() {
     JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
 
     case "$ARCH" in
-        x86_64) ARCHIVE_URL=$(curl -s "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" | jq -r ".TBA[0].downloads.linux.link");;
-        aarch64) ARCHIVE_URL=$(curl -s "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" | jq -r ".TBA[0].downloads.linuxARM64.link");;
+        x86_64) ARCHIVE_URL=$(curl -s "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" | jq -r ".TBA[0].downloads.linux.link") ;;
+        aarch64) ARCHIVE_URL=$(curl -s "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release" | jq -r ".TBA[0].downloads.linuxARM64.link") ;;
     esac
 
     curl -fSL "$ARCHIVE_URL" -o "jetbrains-toolbox.tar.gz"
