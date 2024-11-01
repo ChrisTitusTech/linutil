@@ -50,7 +50,9 @@ jobs:
       - name: Set env
         run: |
           chmod +x linutil
-          echo "${{ github.workspace }}" >> $GITHUB_PATH
+          mkdir -p build
+          mv linutil build/linutil
+          echo "${{ github.workspace }}/build" >> $GITHUB_PATH
 
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
@@ -60,8 +62,8 @@ jobs:
       - name: Move preview
         run: mv preview.gif docs/assets/preview.gif
 
-      - name: Upload preview
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7.0.5
         with:
           commit_message: Preview for ${{ env.tag_name }}
           file_pattern: "docs/assets/preview.gif"
