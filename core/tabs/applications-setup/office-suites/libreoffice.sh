@@ -3,14 +3,14 @@
 . ../../common-script.sh
 
 installLibreOffice() {
-    if ! command_exists libreoffice; then
+    if ! command_exists org.libreoffice.LibreOffice && ! command_exists libreoffice; then
         printf "%b\n" "${YELLOW}Installing Libre Office...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
                 ;;
             zypper|dnf)
-                . ./setup-flatpak.sh
+                checkFlatpak
                 flatpak install -y flathub org.libreoffice.LibreOffice
                 ;;
             pacman)
