@@ -600,10 +600,6 @@ impl AppState {
             self.visit_stack.last().unwrap().0,
         );
 
-        if !self.is_current_tab_multi_selectable() {
-            self.multi_select = false;
-            self.selected_commands.clear();
-        }
         let len = self.filter.item_list().len();
         if len > 0 {
             let current = self.selection.selected().unwrap_or(0);
