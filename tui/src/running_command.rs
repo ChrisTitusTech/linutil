@@ -148,6 +148,7 @@ impl FloatContent for RunningCommand {
                     Shortcut::new("Close window", ["Enter", "q"]),
                     Shortcut::new("Scroll up", ["Page up"]),
                     Shortcut::new("Scroll down", ["Page down"]),
+                    Shortcut::new("Save log", ["l"]),
                 ]),
             )
         } else {
