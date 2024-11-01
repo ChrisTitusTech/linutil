@@ -14,6 +14,7 @@ on:
 jobs:
   generate_preview:
     runs-on: ubuntu-latest
+    environment: linutil_env
     permissions:
       contents: write
       pull-requests: write
@@ -66,7 +67,12 @@ jobs:
       - name: Create PR
         uses: peter-evans/create-pull-request@v7.0.5
         with:
-          commit_message: Preview for ${{ env.tag_name }}
-          file_pattern: "docs/assets/preview.gif"
-          add_options: "--force"
+          commit-message: Preview for ${{ env.tag_name }}
+          file-pattern: "docs/assets/preview.gif"
+          add-options: "--force"
+          token: ${{ secrets.PAT_TOKEN }}
+          branch: feature/preview-${{ env.tag_name }}
+          title: "Update preview for ${{ env.tag_name }}"
+          body: |
+            Automated PR to update preview gif for version ${{ env.tag_name }}
         if: success()
