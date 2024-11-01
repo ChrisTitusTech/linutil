@@ -17,6 +17,7 @@
 ### Developer Tools
 
 - **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
+- **JetBrains Toolbox**: JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products.
 - **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
 - **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
 It is not a rewrite but a continuation and extension of Vim.

@@ -55,6 +55,12 @@ script = "Developer-tools/githubdesktop-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "JetBrains Toolbox"
+description = "JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products."
+script = "Developer-tools/jetbrains-toolbox.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
 script = "Developer-tools/meld-setup.sh"

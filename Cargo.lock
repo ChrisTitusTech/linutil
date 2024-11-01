@@ -31,9 +31,9 @@ checksum = "5c6cb57a04249c6480766f7f7cef5467412af1490f8d1e243141daddada3264f"
 
 [[package]]
 name = "ansi-to-tui"
-version = "6.0.0"
+version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "00c4af0bef1b514c9b6a32a773caf604c1390fa7913f4eaa23bfe76f251d6a42"
+checksum = "67555e1f1ece39d737e28c8a017721287753af3f93225e4a445b29ccb0f5912c"
 dependencies = [
  "nom",
  "ratatui",
@@ -159,9 +159,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "4.5.19"
+version = "4.5.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7be5744db7978a28d9df86a214130d106a89ce49644cbc4e3f0c22c3fba30615"
+checksum = "b97f376d85a664d5837dbae44bf546e6477a679ff6610010f17276f686d867e8"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -169,9 +169,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.19"
+version = "4.5.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5fbc17d3ef8278f55b282b2a2e75ae6f6c7d4bb70ed3d0382375104bfafdb4b"
+checksum = "19bc80abd44e4bed93ca373a0704ccbd1b710dc5749406201bb018272808dc54"
 dependencies = [
  "anstream",
  "anstyle",
@@ -357,6 +357,12 @@ dependencies = [
  "equivalent",
  "hashbrown",
 ]
+
+[[package]]
+name = "indoc"
+version = "2.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b248f5224d1d606005e02c97f5aa4e88eeb230488bcc03bc9ca4d7991399f2b5"
 
 [[package]]
 name = "instability"
@@ -661,23 +667,23 @@ dependencies = [
 
 [[package]]
 name = "ratatui"
-version = "0.28.1"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdef7f9be5c0122f890d58bdf4d964349ba6a6161f705907526d891efabba57d"
+checksum = "eabd94c2f37801c20583fc49dd5cd6b0ba68c716787c2dd6ed18571e1e63117b"
 dependencies = [
  "bitflags 2.6.0",
  "cassowary",
  "compact_str",
  "crossterm",
+ "indoc",
  "instability",
  "itertools",
  "lru",
  "paste",
  "strum",
- "strum_macros",
  "unicode-segmentation",
  "unicode-truncate",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.0",
 ]
 
 [[package]]
@@ -1023,9 +1029,9 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter"
-version = "0.24.2"
+version = "0.24.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23b84f60031bf8245b563a80c92c1034e557a914f7958f474bc0afa2eed78b98"
+checksum = "f9871f16d6cf5c4757dcf30d5d2172a2df6987c510c017bbb7abfb7f9aa24d06"
 dependencies = [
  "cc",
  "regex",
@@ -1046,9 +1052,9 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-highlight"
-version = "0.24.2"
+version = "0.24.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c727fb31f816c09fc54dc0e971d101318926866f7261b2acb820e84a61bf52d"
+checksum = "48859aa39513716018d81904220960f415dbb72e071234a721304d20bf245e4c"
 dependencies = [
  "lazy_static",
  "regex",
@@ -1065,9 +1071,9 @@ checksum = "2545046bd1473dac6c626659cc2567c6c0ff302fc8b84a56c4243378276f7f57"
 
 [[package]]
 name = "tui-term"
-version = "0.1.13"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d07f0233f0d4795d2dc6663cfc3ce56b87bebcee66d6bcc088aa6aff5c072361"
+checksum = "72af159125ce32b02ceaced6cffae6394b0e6b6dfd4dc164a6c59a2db9b3c0b0"
 dependencies = [
  "ratatui",
  "vt100",
