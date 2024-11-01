@@ -17,6 +17,7 @@
 ### Developer Tools
 
 - **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
+- **JetBrains Toolbox**: JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products.
 - **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
 - **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
 It is not a rewrite but a continuation and extension of Vim.
@@ -115,6 +116,7 @@ To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpe
 - **RPM Fusion**: RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.
 That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.
 For more information visit: https://rpmfusion.org/
+- **Upgrade to a New Fedora Release**: Upgrades system to the next Fedora release
 - **Virtualization**: Enables Virtualization through dnf
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
