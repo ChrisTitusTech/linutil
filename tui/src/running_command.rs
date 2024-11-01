@@ -37,7 +37,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
-    log_saved_path: Option<String>,
+    log_path: Option<String>,
     scroll_offset: usize,
 }
 
@@ -83,7 +83,7 @@ impl FloatContent for RunningCommand {
                 .borders(Borders::ALL)
                 .title_top(title_line.centered());
 
-            if let Some(log_path) = &self.log_saved_path {
+            if let Some(log_path) = &self.log_path {
                 block =
                     block.title_bottom(Line::from(format!(" Log saved: {} ", log_path)).centered());
             } else {
@@ -120,9 +120,9 @@ impl FloatContent for RunningCommand {
             KeyCode::PageDown => {
                 self.scroll_offset = self.scroll_offset.saturating_sub(10);
             }
-            KeyCode::Char('l') => {
+            KeyCode::Char('l') if self.is_finished() => {
                 if let Ok(log_path) = self.save_log() {
-                    self.log_saved_path = Some(log_path);
+                    self.log_path = Some(log_path);
                 }
             }
             // Pass other key events to the terminal
@@ -251,7 +251,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
-            log_saved_path: None,
+            log_path: None,
             scroll_offset: 0,
         }
     }
@@ -301,12 +301,12 @@ impl RunningCommand {
 
     fn save_log(&self) -> std::io::Result<String> {
         let mut log_path = std::env::temp_dir();
-        let format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
+        let date_format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
         log_path.push(format!(
             "linutil_log_{}.log",
             OffsetDateTime::now_local()
-                .unwrap()
-                .format(&format)
+                .unwrap_or(OffsetDateTime::now_utc())
+                .format(&date_format)
                 .unwrap()
         ));
 
