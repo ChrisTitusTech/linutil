@@ -17,6 +17,7 @@ jobs:
       - name: Run ShellCheck
         uses: reviewdog/action-shellcheck@v1
         with:
+          shellcheck_flags: '--source-path=${{ github.workspace }}/.shellcheckrc'
           reviewdog_flags: '-fail-level=any'
 
   shfmt:
