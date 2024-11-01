@@ -15,10 +15,17 @@ installWaydroid() {
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm waydroid
-                if command_exists dkms; then
-                    "$AUR_HELPER" -S --needed --noconfirm binder_linux-dkms
-                    elevated_execution modprobe binder-linux device=binder,hwbinder,vndbinder
+                if ! command_exists dkms; then
+                    installed_kernels=$("$PACKAGER" -Q | grep -E '^linux(| |-rt|-rt-lts|-hardened|-zen|-lts)[^-headers]' | cut -d ' ' -f 1)
+                    for kernel in $installed_kernels; do
+                        header="${kernel}-headers"
+                        printf "%b\n" "${CYAN}Installing headers for $kernel...${RC}"
+                        elevated_execution "$PACKAGER" -S --needed --noconfirm "$header"
+                    done
+                    elevated_execution "$PACKAGER" -S --needed --noconfirm dkms
                 fi
+                "$AUR_HELPER" -S --needed --noconfirm binder_linux-dkms
+                elevated_execution modprobe binder-linux device=binder,hwbinder,vndbinder
                 ;;
             apt-get|nala)
                 curl https://repo.waydro.id | elevated_execution sh

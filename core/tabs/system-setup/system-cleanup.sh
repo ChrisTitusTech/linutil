@@ -7,10 +7,8 @@ cleanup_system() {
     case "$PACKAGER" in
         apt-get|nala)
             elevated_execution "$PACKAGER" clean
-            elevated_execution "$PACKAGER" autoremove -y
-            elevated_execution "$PACKAGER" autoclean
+            elevated_execution "$PACKAGER" autoremove -y 
             elevated_execution du -h /var/cache/apt
-            elevated_execution "$PACKAGER" clean
             ;;
         zypper)
             elevated_execution "$PACKAGER" clean -a

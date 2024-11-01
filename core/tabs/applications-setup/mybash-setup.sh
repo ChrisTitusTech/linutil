@@ -5,16 +5,16 @@
 gitpath="$HOME/.local/share/mybash"
 
 installDepend() {
-    if ! command_exists bash bash-completion tar bat tree unzip fontconfig git; then
-    printf "%b\n" "${YELLOW}Installing Bash...${RC}"
-    case "$PACKAGER" in
-        pacman)
-            elevated_execution "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
-            ;;
-        *)
-            elevated_execution "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
-            ;;
-    esac
+    if [ ! -f "/usr/share/bash-completion/bash_completion" ] || ! command_exists bash tar bat tree unzip fc-list git; then
+        printf "%b\n" "${YELLOW}Installing Bash...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                elevated_execution "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+                ;;
+            *)
+                elevated_execution "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
+                ;;
+        esac
     fi
 }
 

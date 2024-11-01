@@ -26,6 +26,12 @@ install_docker() {
         apt-get|nala)
             curl -fsSL https://get.docker.com | sh 
             ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
+            "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            "$ESCALATION_TOOL" "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+            "$ESCALATION_TOOL" systemctl enable --now docker
+            ;;
         zypper)
             elevated_execution "$PACKAGER" --non-interactive install docker
             elevated_execution systemctl enable docker
@@ -48,6 +54,11 @@ install_docker_compose() {
     case "$PACKAGER" in
         apt-get|nala)
             elevated_execution "$PACKAGER" install -y docker-compose-plugin
+            ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
+            "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
             ;;
         zypper)
             elevated_execution "$PACKAGER" --non-interactive install docker-compose

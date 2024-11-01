@@ -8,7 +8,7 @@ printf "%b\n" "${YELLOW}Ensuring OpenSSL is installed...${RC}"
 if ! command_exists openssl; then
     case "$PACKAGER" in
         pacman)
-            elevated_execution "$PACKAGER" -Syu --noconfirm openssl
+            elevated_execution "$PACKAGER" -S --noconfirm --needed openssl
             ;;
         apt-get|nala)
             elevated_execution "$PACKAGER" install -y openssl
