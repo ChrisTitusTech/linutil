@@ -46,10 +46,16 @@ jobs:
       - name: Move preview
         run: mv preview.gif docs/assets/preview.gif
 
-      - name: Upload preview
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
         with:
-          commit_message: Preview for ${{ env.run_id }}
-          file_pattern: "docs/assets/preview.gif"
-          add_options: "--force"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Preview for ${{ env.run_id }}
+          title: 'Update preview GIF'
+          body: 'Automatically generated preview GIF from workflow run ${{ env.run_id }}'
+          branch: update-preview-gif
+          base: main
+          delete-branch: true
+          add-paths: |
+            docs/assets/preview.gif
         if: success()
