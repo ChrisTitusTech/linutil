@@ -17,11 +17,11 @@ use std::{
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
+use time::{macros::format_description, OffsetDateTime};
 use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
-
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -301,9 +301,13 @@ impl RunningCommand {
 
     fn save_log(&self) -> std::io::Result<String> {
         let mut log_path = std::env::temp_dir();
+        let format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
         log_path.push(format!(
             "linutil_log_{}.log",
-            chrono::Local::now().format("%Y%m%d_%H%M%S")
+            OffsetDateTime::now_local()
+                .unwrap()
+                .format(&format)
+                .unwrap()
         ));
 
         let mut file = std::fs::File::create(&log_path)?;
