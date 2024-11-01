@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout source
@@ -50,7 +51,9 @@ jobs:
       - name: Set env
         run: |
           chmod +x linutil
-          echo "${{ github.workspace }}" >> $GITHUB_PATH
+          mkdir -p build
+          mv linutil build/linutil
+          echo "${{ github.workspace }}/build" >> $GITHUB_PATH
 
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
@@ -60,10 +63,15 @@ jobs:
       - name: Move preview
         run: mv preview.gif docs/assets/preview.gif
 
-      - name: Upload preview
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7.0.5
         with:
-          commit_message: Preview for ${{ env.tag_name }}
-          file_pattern: "docs/assets/preview.gif"
-          add_options: "--force"
-        if: success()
+          title: "release: Preview for ${{ env.tag_name }}"
+          commit-message: "release: Preview for ${{ env.tag_name }}"
+          branch: "preview-${{ env.tag_name }}"
+          delete-branch: true
+          labels: "documentation"
+          body: |
+            ## Preview for ${{ env.tag_name }}
+            - Tag: [${{ env.tag_name }}](https://github.com/${{ github.repository }}/tree/${{ env.tag_name }})
+            - Preview: ![Preview](https://raw.githubusercontent.com/${{ github.repository }}/preview-${{ env.tag_name }}/docs/assets/preview.gif)
