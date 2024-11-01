@@ -24,7 +24,7 @@ use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
-const TITLE: &str = concat!("Linux Toolbox - ", env!("CARGO_PKG_VERSION"));
+const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -61,7 +61,7 @@ pub struct AppState {
     selected_commands: Vec<Rc<ListNode>>,
     drawable: bool,
     #[cfg(feature = "tips")]
-    tip: &'static str,
+    tip: String,
 }
 
 pub enum Focus {
@@ -375,17 +375,17 @@ impl AppState {
         };
 
         let title = if self.multi_select {
-            &format!("{} [Multi-Select]", TITLE)
+            &format!("{}[Multi-Select] ", TITLE)
         } else {
             TITLE
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
+        let bottom_title = Line::from(self.tip.as_str().bold().blue()).right_aligned();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
-        let task_list_title = Line::from("Important Actions ").right_aligned();
+        let task_list_title = Line::from(" Important Actions ").right_aligned();
 
         // Create the list widget with items
         let list = List::new(items)
@@ -420,11 +420,15 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
-        if matches!(
-            self.focus,
-            Focus::TabList | Focus::List | Focus::ConfirmationPrompt(_)
-        ) && (key.code == KeyCode::Char('q')
-            || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && (key.code == KeyCode::Char('q')
+                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        {
+            return false;
+        }
+
+        if matches!(self.focus, Focus::ConfirmationPrompt(_))
+            && (key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
         }
@@ -704,8 +708,10 @@ impl AppState {
 
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, "Command Description");
-            self.spawn_float(description, 80, 80);
+            if !command_description.is_empty() {
+                let description = FloatingText::new(command_description, "Command Description");
+                self.spawn_float(description, 80, 80);
+            }
         }
     }
 
@@ -783,6 +789,7 @@ impl AppState {
             0usize,
         )];
         self.selection.select(Some(0));
+        self.filter.clear_search();
         self.update_items();
     }
 
@@ -817,13 +824,13 @@ impl AppState {
 const TIPS: &str = include_str!("../cool_tips.txt");
 
 #[cfg(feature = "tips")]
-fn get_random_tip() -> &'static str {
+fn get_random_tip() -> String {
     let tips: Vec<&str> = TIPS.lines().collect();
     if tips.is_empty() {
-        return "";
+        return "".to_string();
     }
 
     let mut rng = rand::thread_rng();
     let random_index = rng.gen_range(0..tips.len());
-    tips[random_index]
+    format!(" {} ", tips[random_index])
 }
