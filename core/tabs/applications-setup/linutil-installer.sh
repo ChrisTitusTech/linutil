@@ -63,11 +63,11 @@ installLinutil() {
 
 installExtra() {
     printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    elevated_execution mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | elevated_execution tee '/usr/share/man/man1/linutil.1' > /dev/null
     printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    elevated_execution mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | elevated_execution tee /usr/share/applications/linutil.desktop > /dev/null
     printf "%b\n" "${GREEN}Done.${RC}"
 }
 

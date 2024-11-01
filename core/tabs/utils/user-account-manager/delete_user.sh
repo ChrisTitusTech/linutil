@@ -17,7 +17,7 @@ deleteUser() {
         read -r confirm
         confirmAction || exit 1
 
-        $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
+        elevated_execution userdel --remove "$username" 2>/dev/null
         printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
     else
         printf "%b\n" "${RED}User $username does not exist.${RC}"

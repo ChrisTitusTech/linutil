@@ -38,8 +38,8 @@ checkAURHelper() {
             done
 
             printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
-            cd /opt && "$ESCALATION_TOOL" git clone https://aur.archlinux.org/yay-bin.git && "$ESCALATION_TOOL" chown -R "$USER":"$USER" ./yay-bin
+            elevated_execution "$PACKAGER" -S --needed --noconfirm base-devel git
+            cd /opt && elevated_execution git clone https://aur.archlinux.org/yay-bin.git && elevated_execution chown -R "$USER":"$USER" ./yay-bin
             cd yay-bin && makepkg --noconfirm -si
 
             if command_exists yay; then

@@ -27,10 +27,10 @@ install_docker() {
             curl -fsSL https://get.docker.com | sh 
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-            "$ESCALATION_TOOL" "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
-            "$ESCALATION_TOOL" systemctl enable --now docker
+            elevated_execution "$PACKAGER" -y install dnf-plugins-core
+            elevated_execution "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            elevated_execution "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+            elevated_execution systemctl enable --now docker
             ;;
         zypper)
             elevated_execution "$PACKAGER" --non-interactive install docker
@@ -56,9 +56,9 @@ install_docker_compose() {
             elevated_execution "$PACKAGER" install -y docker-compose-plugin
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-            "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
+            elevated_execution "$PACKAGER" -y install dnf-plugins-core
+            elevated_execution "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            elevated_execution "$PACKAGER" install -y docker-compose-plugin
             ;;
         zypper)
             elevated_execution "$PACKAGER" --non-interactive install docker-compose

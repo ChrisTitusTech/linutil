@@ -37,7 +37,7 @@ removeFromGroup() {
     read -r confirm
     confirmAction || exit 1
 
-    $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+    elevated_execution usermod -rG $groups_to_remove "$username"
 
     printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
 }
