@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout source
@@ -66,12 +65,7 @@ jobs:
       - name: Create PR
         uses: peter-evans/create-pull-request@v7.0.5
         with:
-          title: "release: Preview for ${{ env.tag_name }}"
-          commit-message: "release: Preview for ${{ env.tag_name }}"
-          branch: "preview-${{ env.tag_name }}"
-          delete-branch: true
-          labels: "documentation"
-          body: |
-            ## Preview for ${{ env.tag_name }}
-            - Tag: [${{ env.tag_name }}](https://github.com/${{ github.repository }}/tree/${{ env.tag_name }})
-            - Preview: ![Preview](https://raw.githubusercontent.com/${{ github.repository }}/preview-${{ env.tag_name }}/docs/assets/preview.gif)
+          commit_message: Preview for ${{ env.tag_name }}
+          file_pattern: "docs/assets/preview.gif"
+          add_options: "--force"
+        if: success()
