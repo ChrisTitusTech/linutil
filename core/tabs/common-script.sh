@@ -51,6 +51,16 @@ elevated_execution() {
     fi
 }
 
+checkArch() {
+    case "$(uname -m)" in
+        x86_64 | amd64) ARCH="x86_64" ;;
+        aarch64 | arm64) ARCH="aarch64" ;;
+        *) printf "%b\n" "${RED}Unsupported architecture: $(uname -m)${RC}" && exit 1 ;;
+    esac
+
+    printf "%b\n" "${CYAN}System architecture: ${ARCH}${RC}"
+}
+
 checkAURHelper() {
     ## Check & Install AUR helper
     if [ "$PACKAGER" = "pacman" ]; then
@@ -169,6 +179,7 @@ checkDistro() {
 }
 
 checkEnv() {
+    checkArch
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
     checkPackageManager 'nala apt-get dnf pacman zypper'
