@@ -23,7 +23,7 @@ installSublime() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
                 "$ESCALATION_TOOL" "$PACKAGER" install -y sublime-text
                 ;;
             *)

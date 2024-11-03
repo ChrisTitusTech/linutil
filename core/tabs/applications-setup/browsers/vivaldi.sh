@@ -15,7 +15,7 @@ installVivaldi() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo https://repo.vivaldi.com/stable/vivaldi-fedora.repo
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://repo.vivaldi.com/stable/vivaldi-fedora.repo
                 "$ESCALATION_TOOL" "$PACKAGER" install -y vivaldi-stable
                 ;;
             zypper)
