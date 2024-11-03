@@ -1,9 +1,9 @@
-name: ShellCheck
+name: Script Checks
 
 on:
   pull_request:
     paths:
-      - 'core/tabs/**/*.sh'
+      - '**/*.sh'
   workflow_dispatch:
 
 jobs:
@@ -11,20 +11,25 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: git fetch origin ${{ github.base_ref }}
+      - name: Checkout sources
+        uses: actions/checkout@v4
 
-      - name: Download and set up shellcheck
-        run : |
-          wget https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
-          tar -xf shellcheck-v0.10.0.linux.x86_64.tar.xz
-          cd shellcheck-v0.10.0
-          chmod +x shellcheck
+      - name: Run ShellCheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          shellcheck_flags: '--source-path=${{ github.workspace }}/.shellcheckrc'
+          reviewdog_flags: '-fail-level=any'
 
-      - name: Run shellcheck
-        run: |
-          for file in $(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs); do
-              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
-                  ./shellcheck-v0.10.0/shellcheck -S error "$file"
-              fi
-          done
+  shfmt:
+    name: Shell Fomatting
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Run shfmt
+        uses: reviewdog/action-shfmt@v1
+        with:
+          shfmt_flags: '-i 4 -ci'
+          reviewdog_flags: '-fail-level=any'

@@ -23,7 +23,7 @@ installDepend() {
                 ncurses lib32-ncurses vulkan-icd-loader lib32-vulkan-icd-loader ocl-icd lib32-ocl-icd libva lib32-libva \
                 gst-plugins-base-libs lib32-gst-plugins-base-libs sdl2"
 
-            $AUR_HELPER -S --needed --noconfirm "$DEPENDENCIES" "$DISTRO_DEPS"
+            $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get|nala)
             DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
@@ -33,24 +33,24 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
             "$ESCALATION_TOOL" apt-add-repository contrib -y
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$DISTRO_DEPS"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
         dnf)
             if [ "$(rpm -E %fedora)" -le 41 ]; then 
                 "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             else
                 printf "%b\n" "${CYAN}Fedora < 41 detected. Installing rpmfusion repos.${RC}"
                 "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora)".noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora)".noarch.rpm -y
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264 -y
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             fi
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" -n install "$DEPENDENCIES"
+            "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             ;;
     esac
 }
@@ -59,7 +59,7 @@ installAdditionalDepend() {
     case "$PACKAGER" in
         pacman)
             DISTRO_DEPS='steam lutris goverlay'
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DISTRO_DEPS"
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
         apt-get|nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
