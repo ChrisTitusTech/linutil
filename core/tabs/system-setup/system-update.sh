@@ -78,7 +78,6 @@ updateSystem() {
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive dup
             ;;
         apk)
-            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" upgrade
             ;;
         *)

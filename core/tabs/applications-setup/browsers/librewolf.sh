@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installLibreWolf() {
-    if ! command_exists librewolf; then
+    if ! command_exists io.gitlab.librewolf-community && ! command_exists librewolf; then
         printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -33,12 +33,8 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
                 ;;
             apk)
-                alpine_version=$(grep . /etc/alpine-release | cut -d . -f 2)
-                if [ "$alpine_version" -le 20 ]; then
-                    printf "%b\n" "${RED}Only available in edge release of alpine linux${RC}"
-                    exit 1
-                fi
-                "$ESCALATION_TOOL" "$PACKAGER" add librewolf
+                checkFlatpak
+                flatpak install flathub io.gitlab.librewolf-community
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

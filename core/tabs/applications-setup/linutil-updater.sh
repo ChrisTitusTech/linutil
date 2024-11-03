@@ -23,6 +23,8 @@ updateLinutil() {
                     "$ESCALATION_TOOL" "$PACKAGER" add build-base
                     "$ESCALATION_TOOL" "$PACKAGER" add rustup
                     rustup-init
+                    # shellcheck disable=SC1091
+                    . "$HOME/.cargo/env"
                     ;;
                 *)
                     "$ESCALATION_TOOL" "$PACKAGER" install -y rustup

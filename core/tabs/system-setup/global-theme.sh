@@ -17,14 +17,6 @@ install_theme_tools() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qt6ct kvantum
             ;;
-        apk)
-            alpine_version=$(grep . /etc/alpine-release | cut -d . -f 2)
-            if [ "$alpine_version" -le 20 ]; then
-                printf "%b\n" "${RED}Only available in edge release of alpine linux${RC}"
-                exit 1
-            fi
-            "$ESCALATION_TOOL" "$PACKAGER" add qt6ct kvantum
-            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1

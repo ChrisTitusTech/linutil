@@ -12,7 +12,7 @@ install_package() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
                 ;;
             apk)
-                "$ESCALATION_TOOL" "$PACKAGER" add $PACKAGE
+                "$ESCALATION_TOOL" "$PACKAGER" add "$PACKAGE"
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
