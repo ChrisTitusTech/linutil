@@ -48,6 +48,8 @@ https://github.com/ChrisTitusTech/neovim
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.
 This command installs and condifures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
+- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
+https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.
 It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.
 This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.
