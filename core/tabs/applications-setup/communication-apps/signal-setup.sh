@@ -20,8 +20,8 @@ installSignal() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm signal-desktop
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" copr enable luminoso/Signal-Desktop
-                "$ESCALATION_TOOL" "$PACKAGER" install -y signal-desktop 
+                checkFlatpak
+                flatpak install -y flathub org.signal.Signal
                 ;;
             apk)
                 checkFlatpak
