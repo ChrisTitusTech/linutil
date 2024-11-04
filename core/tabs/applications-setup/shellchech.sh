@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
-. ./common-script.sh
+. ../common-script.sh
 
 hello () {
+echo "hi"
+}
