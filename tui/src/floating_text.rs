@@ -268,6 +268,8 @@ impl FloatContent for FloatingText {
         match event.kind {
             MouseEventKind::ScrollDown => self.scroll_down(),
             MouseEventKind::ScrollUp => self.scroll_up(),
+            MouseEventKind::ScrollLeft => self.scroll_left(),
+            MouseEventKind::ScrollRight => self.scroll_right(),
             _ => {}
         }
         false

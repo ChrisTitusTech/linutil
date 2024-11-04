@@ -424,18 +424,24 @@ impl AppState {
         match &mut self.focus {
             Focus::TabList => match event.kind {
                 MouseEventKind::ScrollDown => {
-                    self.current_tab.select_next();
+                    if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
+                        self.current_tab.select_next();
+                    }
                     self.refresh_tab();
                 }
                 MouseEventKind::ScrollUp => {
-                    self.current_tab.select_next();
+                    if self.current_tab.selected().unwrap() != 0 {
+                        self.current_tab.select_previous();
+                    }
                     self.refresh_tab();
                 }
+                MouseEventKind::ScrollRight => self.focus = Focus::List,
                 _ => {}
             },
             Focus::List => match event.kind {
                 MouseEventKind::ScrollDown => self.selection.select_next(),
                 MouseEventKind::ScrollUp => self.selection.select_previous(),
+                MouseEventKind::ScrollLeft => self.focus = Focus::TabList,
                 _ => {}
             },
             Focus::FloatingWindow(float) => {
