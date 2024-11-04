@@ -16,6 +16,7 @@ cd linutil
    ```
 
 ## 3. Make your changes
+
 - **Edit the files you want to change**: Make your changes to the relevant files.
 - **Test your changes**: Run `cargo run` to test your modifications in a local environment and ensure everything works as expected.
 
@@ -60,6 +61,7 @@ cd linutil
 ## 11. Documentation
 
 - **Update the documentation**: If your change affects the functionality, please update the relevant documentation files to reflect this.
+- **Automatic generation**: If you decide to add functionality through a new shell script, make sure to fill out all fields in `tab_data.toml` and run `cargo xtask docgen`.
 
 ## 12. License
 

@@ -30,6 +30,7 @@ pub struct FloatingText {
     v_scroll: usize,
     h_scroll: usize,
     mode_title: String,
+    frame_height: usize,
 }
 
 macro_rules! style {
@@ -137,6 +138,7 @@ impl FloatingText {
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
+            frame_height: 0,
         }
     }
 
@@ -167,11 +169,13 @@ impl FloatingText {
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
+            frame_height: 0,
         })
     }
 
     fn scroll_down(&mut self) {
-        if self.v_scroll + 1 < self.src.len() {
+        let visible_lines = self.frame_height.saturating_sub(2);
+        if self.v_scroll + visible_lines < self.src.len() {
             self.v_scroll += 1;
         }
     }
@@ -197,6 +201,8 @@ impl FloatingText {
 
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        self.frame_height = area.height as usize;
+
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
@@ -205,7 +211,8 @@ impl FloatContent for FloatingText {
             .title_style(Style::default().reversed())
             .style(Style::default());
 
-        // Draw the Block first
+        frame.render_widget(Clear, area);
+
         frame.render_widget(block.clone(), area);
 
         // Calculate the inner area to ensure text is not drawn over the border
@@ -252,9 +259,6 @@ impl FloatContent for FloatingText {
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
-
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
