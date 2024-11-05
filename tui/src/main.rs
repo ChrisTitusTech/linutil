@@ -86,7 +86,6 @@ fn run(
                 if !state.handle_mouse(&mouse_event) {
                     return Ok(());
                 }
-                continue;
             }
             _ => {}
         }
