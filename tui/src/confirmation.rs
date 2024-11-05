@@ -88,14 +88,12 @@ impl FloatContent for ConfirmPrompt {
         match event.kind {
             MouseEventKind::ScrollDown => {
                 self.scroll_down();
-                ConfirmStatus::None
             }
             MouseEventKind::ScrollUp => {
                 self.scroll_up();
-                ConfirmStatus::None
             }
-            _ => ConfirmStatus::None,
-        };
+            _ => {}
+        }
         false
     }
 
