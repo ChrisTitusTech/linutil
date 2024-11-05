@@ -12,12 +12,12 @@ changePassword() {
     printf "%b" "${YELLOW}Enter the username: ${RC}"
     read -r username
 
-    if id "$username" > /dev/null 2>&1; then
+    if id "$username" >/dev/null 2>&1; then
         printf "%b" "${YELLOW}Enter new password: ${RC}"
         read -r password
 
         printf "%b" "${YELLOW}Are you sure you want to change password for ""$username""? [Y/n]: ${RC}"
-        read -r confirm
+        read -r _
         confirmAction || exit 1
 
         echo "$username:$password" | "$ESCALATION_TOOL" chpasswd

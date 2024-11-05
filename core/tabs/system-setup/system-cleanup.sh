@@ -5,9 +5,9 @@
 cleanup_system() {
     printf "%b\n" "${YELLOW}Performing system cleanup...${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" clean
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y 
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
             "$ESCALATION_TOOL" du -h /var/cache/apt
             ;;
         zypper)
@@ -21,7 +21,8 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
+            # shellcheck disable=SC2046
+            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm >/dev/null 2>&1
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
@@ -46,7 +47,7 @@ clean_data() {
     printf "%b" "${YELLOW}Clean up old cache files and empty the trash? (y/N): ${RC}"
     read -r clean_response
     case $clean_response in
-        y|Y)
+        y | Y)
             printf "%b\n" "${YELLOW}Cleaning up old cache files and emptying trash...${RC}"
             if [ -d "$HOME/.cache" ]; then
                 find "$HOME/.cache/" -type f -atime +5 -delete

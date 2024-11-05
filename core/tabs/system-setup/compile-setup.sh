@@ -2,8 +2,8 @@
 
 . ../common-script.sh
 
+# shellcheck disable=SC2086
 installDepend() {
-    ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
@@ -17,7 +17,7 @@ installDepend() {
             fi
             "$AUR_HELPER" -S --needed --noconfirm $DEPENDENCIES
             ;;
-        apt-get|nala)
+        apt-get | nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
@@ -33,7 +33,7 @@ installDepend() {
             ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
-            "$ESCALATION_TOOL" "$PACKAGER" refresh 
+            "$ESCALATION_TOOL" "$PACKAGER" refresh
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install $DEPENDENCIES $COMPILEDEPS
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;

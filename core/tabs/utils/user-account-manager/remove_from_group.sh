@@ -12,7 +12,7 @@ removeFromGroup() {
     printf "%b" "${YELLOW}Enter the username: ${RC}"
     read -r username
 
-    if ! id "$username" > /dev/null 2>&1; then
+    if ! id "$username" >/dev/null 2>&1; then
         printf "%b\n" "${RED}User $username does not exist.${RC}"
         exit 1
     fi
@@ -34,10 +34,11 @@ removeFromGroup() {
     groups_to_remove=$(echo "$groups" | tr ' ' ',')
 
     printf "%b" "${YELLOW}Are you sure you want to remove user $username from $groups_to_remove? [Y/n]: ${RC}"
-    read -r confirm
+    read -r _
     confirmAction || exit 1
 
-    $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+    # shellcheck disable=SC2086
+    "$ESCALATION_TOOL" usermod -rG $groups_to_remove "$username"
 
     printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
 }

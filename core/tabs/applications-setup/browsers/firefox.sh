@@ -6,7 +6,7 @@ installFirefox() {
     if ! command_exists firefox; then
         printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
                 ;;
             zypper)

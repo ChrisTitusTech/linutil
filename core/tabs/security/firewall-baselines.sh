@@ -4,7 +4,7 @@
 
 installPkg() {
     if ! command_exists ufw; then
-     printf "%b\n" "${YELLOW}Installing UFW...${RC}"
+        printf "%b\n" "${YELLOW}Installing UFW...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm ufw

@@ -3,20 +3,20 @@
 . ../common-script.sh
 
 install_adb() {
-    if ! command_exists adb ; then
+    if ! command_exists adb; then
         printf "%b\n" "${YELLOW}Installing ADB...${RC}."
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-sdk-platform-tools
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm android-tools
                 ;;
-            dnf|zypper)
+            dnf | zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y android-tools
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
                 exit 1
                 ;;
         esac
@@ -34,9 +34,9 @@ install_universal_android_debloater() {
     else
         printf "%b\n" "${GREEN}Universal Android Debloater is already installed. Run 'uad' command to execute.${RC}"
     fi
-}                   
+}
 
 checkEnv
 checkEscalationTool
 install_adb
-install_universal_android_debloater 
+install_universal_android_debloater

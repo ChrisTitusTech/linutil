@@ -9,11 +9,11 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-for cmd in "$@"; do
-    export PATH=/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH
-    command -v "$cmd" >/dev/null 2>&1 || return 1
-done
-return 0
+    for cmd in "$@"; do
+        export PATH="/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
+        command -v "$cmd" >/dev/null 2>&1 || return 1
+    done
+    return 0
 }
 
 checkFlatpak() {
@@ -157,9 +157,10 @@ checkCurrentDirectoryWritable() {
 }
 
 checkDistro() {
-    DTYPE="unknown"  # Default to unknown
+    DTYPE="unknown" # Default to unknown
     # Use /etc/os-release for modern distro identification
     if [ -f /etc/os-release ]; then
+        # shellcheck disable=SC1091
         . /etc/os-release
         DTYPE=$ID
     fi

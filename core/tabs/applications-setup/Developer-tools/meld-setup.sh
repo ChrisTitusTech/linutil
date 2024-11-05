@@ -9,7 +9,7 @@ installMeld() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm meld
                 ;;
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install meld
                 ;;
             *)

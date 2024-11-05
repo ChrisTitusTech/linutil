@@ -5,7 +5,7 @@
 install_theme_tools() {
     printf "%b\n" "${YELLOW}Installing theme tools (qt6ct and kvantum)...${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y qt6ct kvantum
             ;;
         zypper)
@@ -47,7 +47,7 @@ applyTheming() {
 configure_qt6ct() {
     printf "%b\n" "${YELLOW}Configuring qt6ct...${RC}"
     mkdir -p "$HOME/.config/qt6ct"
-    cat <<EOF > "$HOME/.config/qt6ct/qt6ct.conf"
+    cat <<EOF >"$HOME/.config/qt6ct/qt6ct.conf"
 [Appearance]
 style=kvantum
 color_scheme=default
@@ -58,7 +58,7 @@ EOF
     # Add QT_QPA_PLATFORMTHEME to /etc/environment
     if ! grep -q "QT_QPA_PLATFORMTHEME=qt6ct" /etc/environment; then
         printf "%b\n" "${YELLOW}Adding QT_QPA_PLATFORMTHEME to /etc/environment...${RC}"
-        echo "QT_QPA_PLATFORMTHEME=qt6ct" | "$ESCALATION_TOOL" tee -a /etc/environment > /dev/null
+        echo "QT_QPA_PLATFORMTHEME=qt6ct" | "$ESCALATION_TOOL" tee -a /etc/environment >/dev/null
         printf "%b\n" "${GREEN}QT_QPA_PLATFORMTHEME added to /etc/environment.${RC}"
     else
         printf "%b\n" "${GREEN}QT_QPA_PLATFORMTHEME already set in /etc/environment.${RC}"
@@ -68,7 +68,7 @@ EOF
 configure_kvantum() {
     printf "%b\n" "${YELLOW}Configuring Kvantum...${RC}"
     mkdir -p "$HOME/.config/Kvantum"
-    cat <<EOF > "$HOME/.config/Kvantum/kvantum.kvconfig"
+    cat <<EOF >"$HOME/.config/Kvantum/kvantum.kvconfig"
 [General]
 theme=KvArcDark
 EOF

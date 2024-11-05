@@ -14,7 +14,7 @@ enable_monitor() {
     printf "%b\n" "${YELLOW}  Enable Monitor${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}Choose a monitor to enable: ${RC}"
-    
+
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"

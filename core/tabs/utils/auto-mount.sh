@@ -58,21 +58,20 @@ update_fstab() {
     fstab_entry="UUID=$UUID $mount_point $FSTYPE defaults 0 2"
 
     # Append the comment and the entry to /etc/fstab
-    printf "%b\n" "$comment" | "$ESCALATION_TOOL"  tee -a /etc/fstab > /dev/null
-    printf "%b\n" "$fstab_entry" | "$ESCALATION_TOOL"  tee -a /etc/fstab > /dev/null
-    printf "%b\n" "" | "$ESCALATION_TOOL" tee -a /etc/fstab > /dev/null
+    printf "%b\n" "$comment" | "$ESCALATION_TOOL" tee -a /etc/fstab >/dev/null
+    printf "%b\n" "$fstab_entry" | "$ESCALATION_TOOL" tee -a /etc/fstab >/dev/null
+    printf "%b\n" "" | "$ESCALATION_TOOL" tee -a /etc/fstab >/dev/null
 
     printf "%b\n" "Entry added to /etc/fstab:"
     printf "%b\n" "$comment"
     printf "%b\n" "$fstab_entry"
 }
 
-
 # Function to mount the drive
 mount_drive() {
     printf "%b\n" "Mounting the drive..."
-    "$ESCALATION_TOOL"  mount -a
-    if mount | grep "$mount_point" > /dev/null; then
+    "$ESCALATION_TOOL" mount -a
+    if mount | grep "$mount_point" >/dev/null; then
         printf "%b\n" "${GREEN}Drive mounted successfully at $mount_point${RC}."
     else
         printf "%b\n" "${RED}Failed to mount the drive.${RC}"

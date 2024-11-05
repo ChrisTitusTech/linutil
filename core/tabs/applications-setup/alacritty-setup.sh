@@ -4,7 +4,7 @@
 
 installAlacritty() {
     if ! command_exists alacritty; then
-    printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
+        printf "%b\n" "${YELLOW}Installing Alacritty...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm alacritty

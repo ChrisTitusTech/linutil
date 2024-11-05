@@ -6,7 +6,7 @@ installChrome() {
     if ! command_exists google-chrome; then
         printf "%b\n" "${YELLOW}Installing Google Chrome...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get | nala)
                 curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
                 ;;

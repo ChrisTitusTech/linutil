@@ -86,7 +86,7 @@ select_option() {
             fi
         done
 
-        last_selected=$selected
+        last_selected="$selected"
 
         # Read user input
         read -rsn1 key
@@ -96,13 +96,13 @@ select_option() {
                 case $key in
                     '[A') # Up arrow
                         ((selected--))
-                        if [ $selected -lt 0 ]; then
+                        if [ "$selected" -lt 0 ]; then
                             selected=$((num_options - 1))
                         fi
                         ;;
                     '[B') # Down arrow
                         ((selected++))
-                        if [ $selected -ge $num_options ]; then
+                        if [ "$selected" -ge "$num_options" ]; then
                             selected=0
                         fi
                         ;;
@@ -119,9 +119,9 @@ select_option() {
 
 # @description Displays ArchTitus logo
 # @noargs
-logo () {
-# This will be shown on every set as user is progressing
-echo -ne "
+logo() {
+    # This will be shown on every set as user is progressing
+    echo -ne "
 -------------------------------------------------------------------------
  █████╗ ██████╗  ██████╗██╗  ██╗████████╗██╗████████╗██╗   ██╗███████╗
 ██╔══██╗██╔══██╗██╔════╝██║  ██║╚══██╔══╝██║╚══██╔══╝██║   ██║██╔════╝
@@ -136,7 +136,7 @@ echo -ne "
 }
 # @description This function will handle file systems. At this movement we are handling only
 # btrfs and ext4. Others will be added in future.
-filesystem () {
+filesystem() {
     echo -ne "
     Please Select your file system for both boot and root
     "
@@ -144,19 +144,22 @@ filesystem () {
     select_option "${options[@]}"
 
     case $? in
-    0) export FS=btrfs;;
-    1) export FS=ext4;;
-    2)
-        set_password "LUKS_PASSWORD"
-        export FS=luks
-        ;;
-    3) exit ;;
-    *) echo "Wrong option please select again"; filesystem;;
+        0) export FS=btrfs ;;
+        1) export FS=ext4 ;;
+        2)
+            set_password "LUKS_PASSWORD"
+            export FS=luks
+            ;;
+        3) exit ;;
+        *)
+            echo "Wrong option please select again"
+            filesystem
+            ;;
     esac
 }
 
 # @description Detects and sets timezone.
-timezone () {
+timezone() {
     # Added this from arch wiki https://wiki.archlinux.org/title/System_time
     time_zone="$(curl --fail https://ipapi.co/timezone)"
     echo -ne "
@@ -167,23 +170,28 @@ timezone () {
     select_option "${options[@]}"
 
     case ${options[$?]} in
-        y|Y|yes|Yes|YES)
-        echo "${time_zone} set as timezone"
-        export TIMEZONE=$time_zone;;
-        n|N|no|NO|No)
-        echo "Please enter your desired timezone e.g. Europe/London :"
-        read -r new_timezone
-        echo "${new_timezone} set as timezone"
-        export TIMEZONE=$new_timezone;;
-        *) echo "Wrong option. Try again";timezone;;
+        y | Y | yes | Yes | YES)
+            echo "${time_zone} set as timezone"
+            export TIMEZONE=$time_zone
+            ;;
+        n | N | no | NO | No)
+            echo "Please enter your desired timezone e.g. Europe/London :"
+            read -r new_timezone
+            echo "${new_timezone} set as timezone"
+            export TIMEZONE=$new_timezone
+            ;;
+        *)
+            echo "Wrong option. Try again"
+            timezone
+            ;;
     esac
 }
 # @description Set user's keyboard mapping.
-keymap () {
+keymap() {
     echo -ne "
     Please select key board layout from this list"
     # These are default key maps as presented in official arch repo archinstall
-    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg ua uk)
+    options=('us' 'by' 'ca' 'cf' 'cz' 'de' 'dk' 'es' 'et' 'fa' 'fi' 'fr' 'gr' 'hu' 'il' 'it' 'lt' 'lv' 'mk' 'nl' 'no' 'pl' 'ro' 'ru' 'se' 'sg' 'ua' 'uk')
 
     select_option "${options[@]}"
     keymap=${options[$?]}
@@ -193,7 +201,7 @@ keymap () {
 }
 
 # @description Choose whether drive is SSD or not.
-drivessd () {
+drivessd() {
     echo -ne "
     Is this an ssd? yes/no:
     "
@@ -202,17 +210,22 @@ drivessd () {
     select_option "${options[@]}"
 
     case ${options[$?]} in
-        y|Y|yes|Yes|YES)
-        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-        n|N|no|NO|No)
-        export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-        *) echo "Wrong option. Try again";drivessd;;
+        y | Y | yes | Yes | YES)
+            export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120"
+            ;;
+        n | N | no | NO | No)
+            export MOUNT_OPTIONS="noatime,compress=zstd,commit=120"
+            ;;
+        *)
+            echo "Wrong option. Try again"
+            drivessd
+            ;;
     esac
 }
 
 # @description Disk selection for drive to be used with installation.
-diskpart () {
-echo -ne "
+diskpart() {
+    echo -ne "
 ------------------------------------------------------------------------
     THIS WILL FORMAT AND DELETE ALL DATA ON THE DISK
     Please make sure you know what you are doing because
@@ -225,33 +238,31 @@ echo -ne "
 
     PS3='
     Select the disk to install on: '
+    # shellcheck disable=SC2207
     options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
 
     select_option "${options[@]}"
     disk=${options[$?]%|*}
 
     echo -e "\n${disk%|*} selected \n"
-        export DISK=${disk%|*}
+    export DISK=${disk%|*}
 
     drivessd
 }
 
 # @description Gather username and password to be used for installation.
-userinfo () {
+userinfo() {
     # Loop through user input until the user gives a valid username
-    while true
-    do
-            read -r -p "Please enter username: " username
-            if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-            then
-                    break
-            fi
-            echo "Incorrect username."
+    while true; do
+        read -r -p "Please enter username: " username
+        if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]; then
+            break
+        fi
+        echo "Incorrect username."
     done
     export USERNAME=$username
 
-    while true
-    do
+    while true; do
         read -rs -p "Please enter password: " PASSWORD1
         echo -ne "\n"
         read -rs -p "Please re-enter password: " PASSWORD2
@@ -264,21 +275,18 @@ userinfo () {
     done
     export PASSWORD=$PASSWORD1
 
-     # Loop through user input until the user gives a valid hostname, but allow the user to force save
-    while true
-    do
-            read -r -p "Please name your machine: " name_of_machine
-            # hostname regex (!!couldn't find spec for computer name!!)
-            if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-            then
-                    break
-            fi
-            # if validation fails allow the user to force saving of the hostname
-            read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force
-            if [[ "${force,,}" = "y" ]]
-            then
-                    break
-            fi
+    # Loop through user input until the user gives a valid hostname, but allow the user to force save
+    while true; do
+        read -r -p "Please name your machine: " name_of_machine
+        # hostname regex (!!couldn't find spec for computer name!!)
+        if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]; then
+            break
+        fi
+        # if validation fails allow the user to force saving of the hostname
+        read -r -p "Hostname doesn't seem correct. Do you still want to save it? (y/n)" force
+        if [[ "${force,,}" = "y" ]]; then
+            break
+        fi
     done
     export NAME_OF_MACHINE=$name_of_machine
 }
@@ -333,14 +341,14 @@ echo -ne "
 "
 umount -A --recursive /mnt # make sure everything is unmounted before we start
 # disk prep
-sgdisk -Z "${DISK}" # zap all on disk
+sgdisk -Z "${DISK}"         # zap all on disk
 sgdisk -a 2048 -o "${DISK}" # new gpt disk 2048 alignment
 
 # create partitions
-sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' "${DISK}" # partition 1 (BIOS Boot Partition)
+sgdisk -n 1::+1M --typecode=1:ef02 --change-name=1:'BIOSBOOT' "${DISK}"  # partition 1 (BIOS Boot Partition)
 sgdisk -n 2::+1GiB --typecode=2:ef00 --change-name=2:'EFIBOOT' "${DISK}" # partition 2 (UEFI Boot Partition)
-sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' "${DISK}" # partition 3 (Root), default start, remaining
-if [[ ! -d "/sys/firmware/efi" ]]; then # Checking for bios system
+sgdisk -n 3::-0 --typecode=3:8300 --change-name=3:'ROOT' "${DISK}"       # partition 3 (Root), default start, remaining
+if [[ ! -d "/sys/firmware/efi" ]]; then                                  # Checking for bios system
     sgdisk -A 1:set:2 "${DISK}"
 fi
 partprobe "${DISK}" # reread partition table to ensure it is correct
@@ -352,27 +360,27 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 # @description Creates the btrfs subvolumes.
-createsubvolumes () {
+createsubvolumes() {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
 }
 
 # @description Mount all btrfs subvolumes after root has been mounted.
-mountallsubvol () {
+mountallsubvol() {
     mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
 }
 
 # @description BTRFS subvolulme creation and mounting.
-subvolumesetup () {
-# create nonroot subvolumes
+subvolumesetup() {
+    # create nonroot subvolumes
     createsubvolumes
-# unmount root to remount with subvolume
+    # unmount root to remount with subvolume
     umount /mnt
-# mount @ subvolume
+    # mount @ subvolume
     mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
-# make directories home, .snapshots, var, tmp
+    # make directories home, .snapshots, var, tmp
     mkdir -p /mnt/home
-# mount subvolumes
+    # mount subvolumes
     mountallsubvol
 }
 
@@ -395,13 +403,13 @@ elif [[ "${FS}" == "ext4" ]]; then
     mount -t ext4 "${partition3}" /mnt
 elif [[ "${FS}" == "luks" ]]; then
     mkfs.vfat -F32 "${partition2}"
-# enter luks password to cryptsetup and format root partition
+    # enter luks password to cryptsetup and format root partition
     echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
-# open luks container and ROOT will be place holder
+    # open luks container and ROOT will be place holder
     echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
-# now format that container
+    # now format that container
     mkfs.btrfs "${partition3}"
-# create subvolumes for btrfs
+    # create subvolumes for btrfs
     mount -t btrfs "${partition3}" /mnt
     subvolumesetup
     ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value "${partition3}")
@@ -435,10 +443,10 @@ if [[ ! -d "/sys/firmware/efi" ]]; then
 else
     pacstrap /mnt base base-devel linux-lts linux-firmware efibootmgr --noconfirm --needed
 fi
-echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
+echo "keyserver hkp://keyserver.ubuntu.com" >>/mnt/etc/pacman.d/gnupg/gpg.conf
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
-genfstab -U /mnt >> /mnt/etc/fstab
+genfstab -U /mnt >>/mnt/etc/fstab
 echo "
   Generated /etc/fstab:
 "
@@ -456,8 +464,8 @@ echo -ne "
                     Checking for low memory systems <8G
 -------------------------------------------------------------------------
 "
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -lt 8000000 ]]; then
+TOTAL_MEM=$(grep -i 'memtotal' /proc/meminfo | grep -o '[[:digit:]]*')
+if [[ $TOTAL_MEM -lt 8000000 ]]; then
     # Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
     mkdir -p /mnt/opt/swap # make a dir that we can apply NOCOW to to make it btrfs-friendly.
     if findmnt -n -o FSTYPE /mnt | grep -q btrfs; then
@@ -469,11 +477,12 @@ if [[  $TOTAL_MEM -lt 8000000 ]]; then
     mkswap /mnt/opt/swap/swapfile
     swapon /mnt/opt/swap/swapfile
     # The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the system itself.
-    echo "/opt/swap/swapfile    none    swap    sw    0    0" >> /mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
+    echo "/opt/swap/swapfile    none    swap    sw    0    0" >>/mnt/etc/fstab # Add swap to fstab, so it KEEPS working after installation.
 fi
 
 gpu_type=$(lspci | grep -E "VGA|3D|Display")
 
+# shellcheck disable=SC2154
 arch-chroot /mnt /bin/bash -c "KEYMAP='${KEYMAP}' /bin/bash" <<EOF
 
 echo -ne "
@@ -500,7 +509,7 @@ echo -ne "
                 changing the compression settings.
 -------------------------------------------------------------------------
 "
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+TOTAL_MEM=$(grep -i 'memtotal' /proc/meminfo | grep -o '[[:digit:]]*')
 if [[  $TOTAL_MEM -gt 8000000 ]]; then
 sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
 sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf

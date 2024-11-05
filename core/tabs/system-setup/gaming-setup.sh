@@ -1,14 +1,14 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC2086
+
 . ../common-script.sh
 
 installDepend() {
-    # Check for dependencies
     DEPENDENCIES='wine dbus'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
-            #Check for multilib
             if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                 echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                 echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
@@ -25,7 +25,7 @@ installDepend() {
 
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             DISTRO_DEPS="libasound2 libsdl2 wine64 wine32"
 
             "$ESCALATION_TOOL" "$PACKAGER" update
@@ -36,7 +36,7 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
         dnf)
-            if [ "$(rpm -E %fedora)" -le 41 ]; then 
+            if [ "$(rpm -E %fedora)" -le 41 ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             else
@@ -61,7 +61,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='steam lutris goverlay'
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
                 tail -n1 |
@@ -69,7 +69,7 @@ installAdditionalDepend() {
 
             version_no_v=$(echo "$version" | tr -d v)
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
-            
+
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
             "$ESCALATION_TOOL" "$PACKAGER" install ./lutris_"${version_no_v}"_all.deb
 
@@ -94,8 +94,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
             ;;
-        *)
-            ;;
+        *) ;;
     esac
 }
 

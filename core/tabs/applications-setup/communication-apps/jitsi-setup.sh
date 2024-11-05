@@ -6,9 +6,9 @@ installJitsi() {
     if ! command_exists jitsi-meet; then
         printf "%b\n" "${YELLOW}Installing Jitsi meet...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
-                curl https://download.jitsi.org/jitsi-key.gpg.key | "$ESCALATION_TOOL" gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg
-                printf "%b\n" 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/jitsi-stable.list > /dev/null
+            apt-get | nala)
+                curl https://download.jitsi.org/jitsi-key.gpg.key | "$ESCALATION_TOOL" gpg --dearmor >/usr/share/keyrings/jitsi-keyring.gpg
+                printf "%b\n" 'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/' | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/jitsi-stable.list >/dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" -y install jitsi-meet
                 ;;

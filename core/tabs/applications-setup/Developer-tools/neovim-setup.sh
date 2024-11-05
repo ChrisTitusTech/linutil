@@ -15,25 +15,25 @@ cloneNeovim() {
 
 installNeovim() {
     if ! command_exists neovim ripgrep git fzf; then
-    printf "%b\n" "${YELLOW}Installing Neovim...${RC}"
-    case "$PACKAGER" in
-        pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck git
-            ;;
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y ripgrep fd-find python3-venv luarocks golang-go shellcheck git
-            curl -sSLo /tmp/nvim.appimage https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-            chmod u+x /tmp/nvim.appimage
-            "$ESCALATION_TOOL" mv /tmp/nvim.appimage /usr/local/bin/nvim
-            ;;
-        dnf|zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
-            ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            exit 1
-            ;;
-    esac
+        printf "%b\n" "${YELLOW}Installing Neovim...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck git
+                ;;
+            apt-get | nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y ripgrep fd-find python3-venv luarocks golang-go shellcheck git
+                curl -sSLo /tmp/nvim.appimage https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+                chmod u+x /tmp/nvim.appimage
+                "$ESCALATION_TOOL" mv /tmp/nvim.appimage /usr/local/bin/nvim
+                ;;
+            dnf | zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
     fi
 }
 

@@ -6,7 +6,7 @@ installSublime() {
     if ! command_exists sublime; then
         printf "%b\n" "${YELLOW}Installing Sublime...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get | nala)
                 curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | "$ESCALATION_TOOL" apt-key add -
                 echo "deb https://download.sublimetext.com/ apt/stable/" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/sublime-text.list
                 "$ESCALATION_TOOL" "$PACKAGER" update

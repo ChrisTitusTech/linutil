@@ -10,7 +10,7 @@ installThunderBird() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm thunderbird
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 
+                "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird
                 ;;
         esac
     else

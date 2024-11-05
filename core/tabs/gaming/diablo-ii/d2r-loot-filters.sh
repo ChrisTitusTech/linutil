@@ -41,7 +41,7 @@ print_menu() {
     if [ $start -lt 0 ]; then start=0; fi
     if [ $((start + max_display)) -gt $total ]; then start=$((total - max_display)); fi
     if [ $start -lt 0 ]; then start=0; fi
-    
+
     printf "%b\n" "Please select the Diablo II: Resurrected installation path:"
     i=0
     echo "$paths_string" | tr '|' '\n' | while IFS= read -r path; do

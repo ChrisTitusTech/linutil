@@ -1,9 +1,9 @@
 #!/bin/sh -e
 
 # Load common script functions
-. ../common-script.sh  
+. ../common-script.sh
 
-#external services directory 
+#external services directory
 SCRIPT_DIR="./services"
 
 # Function to show the main menu
@@ -78,7 +78,7 @@ add_service() {
 
     # Create the service unit file
     SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
-    
+
     # Create the service file with conditionals for optional fields
     {
         printf "%b\n" "[Unit]"
@@ -87,12 +87,12 @@ add_service() {
         printf "%b\n" "[Service]"
         printf "%b\n" "ExecStart=$EXEC_START"
         [ -n "$SERVICE_USER" ] && printf "%b\n" "User=$SERVICE_USER"
-        [ -n "$WORKING_DIRECTORY" ] && printf "%b\n"  "WorkingDirectory=$WORKING_DIRECTORY"
+        [ -n "$WORKING_DIRECTORY" ] && printf "%b\n" "WorkingDirectory=$WORKING_DIRECTORY"
         [ -n "$RESTART_POLICY" ] && printf "%b\n" "Restart=$RESTART_POLICY"
         printf "\n"
         printf "%b\n" "[Install]"
         printf "%b\n" "WantedBy=multi-user.target"
-    } | "$ESCALATION_TOOL" tee "$SERVICE_FILE" > /dev/null
+    } | "$ESCALATION_TOOL" tee "$SERVICE_FILE" >/dev/null
 
     # Set permissions and reload systemd
     "$ESCALATION_TOOL" chmod 644 "$SERVICE_FILE"
@@ -260,14 +260,17 @@ main() {
             6) start_service ;;
             7) stop_service ;;
             8) enable_service ;;
-            9) disable_service ;; 
+            9) disable_service ;;
             10) create_service_from_external ;;
-            11) printf "%b\n" "Exiting..."; exit 0 ;;
+            11)
+                printf "%b\n" "Exiting..."
+                exit 0
+                ;;
             *) printf "%b\n" "Invalid choice. Please try again." ;;
         esac
 
         printf "%b\n" "Press [Enter] to continue..."
-        read -r dummy
+        read -r _
     done
 }
 

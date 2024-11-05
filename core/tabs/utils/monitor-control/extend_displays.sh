@@ -11,7 +11,7 @@ extend_displays() {
     i=1
     for monitor in $monitor_array; do
         if [ "$i" -gt 1 ]; then
-            prev_monitor=$(echo "$monitor_array" | cut -d' ' -f$((i-1)))
+            prev_monitor=$(echo "$monitor_array" | cut -d' ' -f$((i - 1)))
             if confirm_action "Extend $monitor to the right of $prev_monitor?"; then
                 printf "%b\n" "${GREEN}Extending $monitor to the right of $prev_monitor${RC}"
                 execute_command "xrandr --output $monitor --right-of $prev_monitor"

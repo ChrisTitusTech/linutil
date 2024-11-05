@@ -13,18 +13,30 @@ choose_installation() {
     read -r CHOICE
 
     case "$CHOICE" in
-        1) INSTALL_DOCKER=1; INSTALL_COMPOSE=0 ;;
-        2) INSTALL_DOCKER=0; INSTALL_COMPOSE=1 ;;
-        3) INSTALL_DOCKER=1; INSTALL_COMPOSE=1 ;;
-        *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
+        1)
+            INSTALL_DOCKER=1
+            INSTALL_COMPOSE=0
+            ;;
+        2)
+            INSTALL_DOCKER=0
+            INSTALL_COMPOSE=1
+            ;;
+        3)
+            INSTALL_DOCKER=1
+            INSTALL_COMPOSE=1
+            ;;
+        *)
+            printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"
+            exit 1
+            ;;
     esac
 }
 
 install_docker() {
     printf "%b\n" "${YELLOW}Installing Docker...${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
-            curl -fsSL https://get.docker.com | sh 
+        apt-get | nala)
+            curl -fsSL https://get.docker.com | sh
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
@@ -52,7 +64,7 @@ install_docker() {
 install_docker_compose() {
     printf "%b\n" "${YELLOW}Installing Docker Compose...${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
             ;;
         dnf)
@@ -74,7 +86,7 @@ install_docker_compose() {
 }
 
 install_components() {
-    choose_installation 
+    choose_installation
 
     if [ "$INSTALL_DOCKER" -eq 1 ]; then
         if ! command_exists docker; then

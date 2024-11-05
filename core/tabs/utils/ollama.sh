@@ -11,7 +11,7 @@ installollama() {
     else
         printf "%b\n" "${YELLOW}Installing ollama...${RC}"
         curl -fsSL https://ollama.com/install.sh | sh
-        "$ESCALATION_TOOL" systemctl start ollama 
+        "$ESCALATION_TOOL" systemctl start ollama
     fi
 }
 
@@ -52,27 +52,26 @@ display_models() {
     printf "%b\n" "16. Solar - 10.7B (6.1GB)"
 }
 
-# Function to select model based on user input
 select_model() {
     choice="$1"
     case $choice in
-        1) printf "%b\n" "llama3.1";;
-        2) printf "%b\n" "llama3.1:70b";;
-        3) printf "%b\n" "llama3.1:405b";;
-        4) printf "%b\n" "phi3";;
-        5) printf "%b\n" "phi3:medium";;
-        6) printf "%b\n" "gemma2:2b";;
-        7) printf "%b\n" "gemma2";;
-        8) printf "%b\n" "gemma2:27b";;
-        9) printf "%b\n" "mistral";;
-        10) printf "%b\n" "moondream";;
-        11) printf "%b\n" "neural-chat";;
-        12) printf "%b\n" "starling-lm";;
-        13) printf "%b\n" "codellama";;
-        14) printf "%b\n" "llama2-uncensored";;
-        15) printf "%b\n" "llava";;
-        16) printf "%b\n" "solar";;
-        *) printf "%b\n" "$choice";;
+        1) printf "%b\n" "llama3.1" ;;
+        2) printf "%b\n" "llama3.1:70b" ;;
+        3) printf "%b\n" "llama3.1:405b" ;;
+        4) printf "%b\n" "phi3" ;;
+        5) printf "%b\n" "phi3:medium" ;;
+        6) printf "%b\n" "gemma2:2b" ;;
+        7) printf "%b\n" "gemma2" ;;
+        8) printf "%b\n" "gemma2:27b" ;;
+        9) printf "%b\n" "mistral" ;;
+        10) printf "%b\n" "moondream" ;;
+        11) printf "%b\n" "neural-chat" ;;
+        12) printf "%b\n" "starling-lm" ;;
+        13) printf "%b\n" "codellama" ;;
+        14) printf "%b\n" "llama2-uncensored" ;;
+        15) printf "%b\n" "llava" ;;
+        16) printf "%b\n" "solar" ;;
+        *) printf "%b\n" "$choice" ;;
     esac
 }
 
@@ -82,10 +81,11 @@ run_model() {
 
     printf "%b\n" "${GREEN}Installed Models${RC}"
     installed_models=$(ollama list)
-    printf "%b\n" "${installed_models}"
+    printf "%b\n" "$installed_models"
 
     printf "%b\n" "${YELLOW}Custom Models${RC}"
-    custom_models=$(ollama list | grep 'custom-model-prefix') 
+    custom_models=$(ollama list | grep 'custom-model-prefix')
+    printf "%b\n" "$custom_models"
 
     printf "%b" "Select a model to run: "
     printf "%b" "Enter the number corresponding to the model or enter the name of a custom model: "
@@ -103,7 +103,6 @@ create_model() {
     printf "%b\n" "${YELLOW}Let's create a new model in Ollama!${RC}"
     display_models
 
-    # Prompt for base model
     printf "%b" "Enter the base model (e.g. '13' for codellama): "
     read -r base_model
 
@@ -112,11 +111,9 @@ create_model() {
     printf "%b\n" "${YELLOW}Running the model: $model...${RC}"
     ollama pull "$model"
 
-    # Prompt for custom model name
     printf "%b" "Enter a name for the new customized model: "
     read -r custom_model_name
 
-    # Prompt for temperature setting
     printf "%b" "Enter the desired temperature (higher values are more creative, lower values are more coherent, e.g., 1): "
     read -r temperature
 
@@ -124,13 +121,11 @@ create_model() {
         temperature=${temperature:-1}
     fi
 
-    # Prompt for system message
     printf "%b" "Enter the system message for the model customization (e.g., 'You are Mario from Super Mario Bros. Answer as Mario, the assistant, only.'): "
     read -r system_message
 
-    # Create the Modelfile
     printf "%b\n" "${YELLOW}Creating the Modelfile...${RC}"
-    cat << EOF > Modelfile
+    cat <<EOF >Modelfile
 FROM $base_model
 
 # set the temperature to $temperature
@@ -142,13 +137,11 @@ $system_message
 """
 EOF
 
-    # Create the model in Ollama
     printf "%b\n" "${YELLOW}Creating the model in Ollama...${RC}"
     ollama create "$custom_model_name" -f Modelfile
     printf "%b\n" "${GREEN}Model '$custom_model_name' created successfully.${RC}"
 }
 
-# Function to remove a model
 remove_model() {
     clear
     printf "%b\n" "${GREEN}Installed Models${RC}"
@@ -189,13 +182,16 @@ menu() {
             2) show_model_info ;;
             3) create_model ;;
             4) run_model ;;
-            5) remove_model;;
-            6) printf "%b\n" "${GREEN}Exiting...${RC}"; exit 0 ;;
+            5) remove_model ;;
+            6)
+                printf "%b\n" "${GREEN}Exiting...${RC}"
+                exit 0
+                ;;
             *) printf "%b\n" "${RED}Invalid choice. Please try again.${RC}" ;;
         esac
 
         printf "%b\n" "${YELLOW}Press Enter to continue...${RC}"
-        read -r dummy
+        read -r _
     done
 }
 
@@ -203,4 +199,3 @@ checkEnv
 checkEscalationTool
 installollama
 menu
-

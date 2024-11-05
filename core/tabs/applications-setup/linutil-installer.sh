@@ -2,6 +2,7 @@
 
 . ../common-script.sh
 
+#shellcheck disable=SC1091
 installLinutil() {
     printf "%b\n" "${YELLOW}Installing Linutil...${RC}"
     case "$PACKAGER" in
@@ -30,7 +31,7 @@ installLinutil() {
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
             read -r choice
             case $choice in
-                y|Y)
+                y | Y)
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
@@ -43,11 +44,11 @@ installLinutil() {
                             zypper)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-                                . $HOME/.cargo/env
+                                . "$HOME/.cargo/env"
                                 ;;
                             *)
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-                                . $HOME/.cargo/env
+                                . "$HOME/.cargo/env"
                                 ;;
                         esac
                     fi
@@ -58,16 +59,17 @@ installLinutil() {
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;
             esac
+            ;;
     esac
 }
 
 installExtra() {
     printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
     "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' >/dev/null
     printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
     "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop >/dev/null
     printf "%b\n" "${GREEN}Done.${RC}"
 }
 

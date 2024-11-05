@@ -2,6 +2,7 @@
 
 . ../common-script.sh
 
+#shellcheck disable=SC1091
 updateLinutil() {
     if [ ! -e "$HOME/.cargo/bin/linutil" ]; then
         printf "%b\n" "${RED}This script only updates the binary installed through cargo.\nlinutil_tui is not installed.${RC}"
@@ -10,19 +11,19 @@ updateLinutil() {
 
     if ! command_exists cargo; then
         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
-            case "$PACKAGER" in
-                pacman)
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
-                    ;;
-                zypper)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-                    . $HOME/.cargo/env
-                    ;;
-                *)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
-                    ;;
-            esac
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
+                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+                . "$HOME/.cargo/env"
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                ;;
+        esac
     fi
 
     INSTALLED_VERSION=$(cargo install --list | grep "linutil_tui" | awk '{print $2}' | tr -d 'v:')

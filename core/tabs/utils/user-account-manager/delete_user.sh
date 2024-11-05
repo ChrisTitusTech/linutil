@@ -12,12 +12,12 @@ deleteUser() {
     printf "%b" "${YELLOW}Enter the username: ${RC}"
     read -r username
 
-    if id "$username" > /dev/null 2>&1; then
+    if id "$username" >/dev/null 2>&1; then
         printf "%b" "${YELLOW}Are you sure you want to delete user ""$username""? [Y/n]: ${RC}"
-        read -r confirm
+        read -r _
         confirmAction || exit 1
 
-        $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null
+        "$ESCALATION_TOOL" userdel --remove "$username" 2>/dev/null
         printf "%b\n" "${GREEN}User $username deleted successfully${RC}"
     else
         printf "%b\n" "${RED}User $username does not exist.${RC}"

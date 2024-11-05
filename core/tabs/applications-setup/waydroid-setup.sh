@@ -3,7 +3,7 @@
 . ../common-script.sh
 
 checkGpu() {
-    if lspci | grep -i nvidia > /dev/null; then
+    if lspci | grep -i nvidia >/dev/null; then
         printf "%b\n" "${RED}Waydroid is not compatible with NVIDIA GPUs.${RC}"
         exit 1
     fi
@@ -11,7 +11,7 @@ checkGpu() {
 
 installWaydroid() {
     if ! command_exists waydroid; then
-    printf "%b\n" "${YELLOW}Installing Waydroid...${RC}"
+        printf "%b\n" "${YELLOW}Installing Waydroid...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm waydroid
@@ -27,7 +27,7 @@ installWaydroid() {
                 "$AUR_HELPER" -S --needed --noconfirm binder_linux-dkms
                 "$ESCALATION_TOOL" modprobe binder-linux device=binder,hwbinder,vndbinder
                 ;;
-            apt-get|nala)
+            apt-get | nala)
                 curl https://repo.waydro.id | "$ESCALATION_TOOL" sh
                 "$ESCALATION_TOOL" "$PACKAGER" install -y waydroid
                 if command_exists dkms; then

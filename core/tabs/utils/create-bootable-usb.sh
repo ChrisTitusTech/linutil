@@ -1,10 +1,9 @@
 #!/bin/sh -e
 
-. ../common-script.sh  
+. ../common-script.sh
 
 CONFIGURATION_URL="https://github.com/quickemu-project/quickget_configs/releases/download/daily/quickget_data.json"
 
-# Function to display all available block devices
 list_devices() {
     printf "%b\n" "${YELLOW} Available devices and partitions: ${RC}"
     printf "\n"
@@ -12,17 +11,21 @@ list_devices() {
     printf "\n"
 }
 
+# shellcheck disable=SC2086
 installDependencies() {
     DEPENDENCIES="xz gzip bzip2 jq"
     if ! command_exists ${DEPENDENCIES}; then
         printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
         case "${PACKAGER}" in
-            apt-get|nala)
-                "${ESCALATION_TOOL}" "${PACKAGER}" install -y xz-utils gzip bzip2 jq;;
-            dnf|zypper)
-                "${ESCALATION_TOOL}" "${PACKAGER}" install -y ${DEPENDENCIES};;
+            apt-get | nala)
+                "${ESCALATION_TOOL}" "${PACKAGER}" install -y xz-utils gzip bzip2 jq
+                ;;
+            dnf | zypper)
+                "${ESCALATION_TOOL}" "${PACKAGER}" install -y ${DEPENDENCIES}
+                ;;
             pacman)
-                "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES};;
+                "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES}
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager.${RC}"
                 exit 1
@@ -31,7 +34,6 @@ installDependencies() {
     fi
 }
 
-# Function to ask whether to use local or online ISO
 choose_iso_source() {
     printf "%b\n" "${YELLOW} Do you want to use a local ISO or download online? ${RC}"
     printf "1) Download online\n"
@@ -64,14 +66,17 @@ decompress_iso() {
     case "${ISO_ARCHIVE_FORMAT}" in
         xz)
             xz -d "${ISO_PATH}"
-            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.xz//')";;
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.xz//')"
+            ;;
         gz)
             gzip -d "${ISO_PATH}"
-            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.gz//')";;
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.gz//')"
+            ;;
         bz2)
             bzip2 -d "${ISO_PATH}"
-            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.bz2//')";;
-        *) 
+            ISO_PATH="$(echo "${ISO_PATH}" | sed 's/\.bz2//')"
+            ;;
+        *)
             printf "%b\n" "${RED}Unsupported archive format. Try manually decompressing the ISO and choosing it as a local file instead.${RC}"
             exit 1
             ;;
@@ -82,12 +87,14 @@ decompress_iso() {
 
 check_hash() {
     case "${#ISO_CHECKSUM}" in
-        32) HASH_ALGO="md5sum";;
-        40) HASH_ALGO="sha1sum";;
-        64) HASH_ALGO="sha256sum";;
-        128) HASH_ALGO="sha512sum";;
-        *) printf "%b\n" "${RED}Invalid checksum length. Skipping checksum verification.${RC}"
-            return;;
+        32) HASH_ALGO="md5sum" ;;
+        40) HASH_ALGO="sha1sum" ;;
+        64) HASH_ALGO="sha256sum" ;;
+        128) HASH_ALGO="sha512sum" ;;
+        *)
+            printf "%b\n" "${RED}Invalid checksum length. Skipping checksum verification.${RC}"
+            return
+            ;;
     esac
     printf "%b\n" "Checking ISO integrity using ${HASH_ALGO}..."
     if ! echo "${ISO_CHECKSUM} ${ISO_PATH}" | "${HASH_ALGO}" --check --status; then
@@ -115,9 +122,9 @@ get_architecture() {
     printf "%b" "Select an option (1-3): "
     read -r ARCH
     case "${ARCH}" in
-        1) ARCH="x86_64";;
-        2) ARCH="aarch64";;
-        3) ARCH="riscv64";;
+        1) ARCH="x86_64" ;;
+        2) ARCH="aarch64" ;;
+        3) ARCH="riscv64" ;;
         *)
             printf "%b\n" "${RED}Invalid architecture selected. ${RC}"
             exit 1
@@ -209,27 +216,21 @@ get_online_iso() {
     fi
 }
 
-write_iso(){  
+write_iso() {
     clear
-
-     # Ask whether to use a local or online ISO
     choose_iso_source
 
     clear
-    # Display all available devices
     list_devices
 
-    # Prompt user for USB device
     printf "%b" "Enter the USB device (e.g. /dev/sdX): "
     read -r USB_DEVICE
 
-    # Verify that the USB device exists
     if [ ! -b "$USB_DEVICE" ]; then
         printf "%b\n" "${RED}USB device not found: $USB_DEVICE${RC}"
         exit 1
     fi
 
-    # Confirm the device selection with the user
     printf "%b" "${RED}WARNING: This will erase all data on ${USB_DEVICE}. Are you sure you want to continue? (y/N): ${RC}"
     read -r CONFIRMATION
 
@@ -238,22 +239,19 @@ write_iso(){
         exit 1
     fi
 
-    # Display progress and create the bootable USB drive
     printf "%b\n" "${YELLOW}Creating bootable USB drive...${RC}"
     if ! "$ESCALATION_TOOL" dd if="$ISO_PATH" of="$USB_DEVICE" bs=4M status=progress oflag=sync; then
         printf "%b\n" "${RED}Failed to create bootable USB drive${RC}"
         exit 1
     fi
 
-    # Sync to ensure all data is written
     if ! "$ESCALATION_TOOL" sync; then
-        printf "%b\n" "${RED}Failed to sync data${RC}"                              
+        printf "%b\n" "${RED}Failed to sync data${RC}"
         exit 1
     fi
 
     printf "%b\n" "${GREEN}Bootable USB drive created successfully!${RC}"
 
-    # Eject the USB device
     printf "%b\n" "${YELLOW}Ejecting ${USB_DEVICE}...${RC}"
     if ! "$ESCALATION_TOOL" umount "${USB_DEVICE}"* 2>/dev/null; then
         printf "%b\n" "${RED}Failed to unmount ${USB_DEVICE}${RC}"

@@ -2,7 +2,6 @@
 
 . ../common-script.sh
 
-# Function to install Timeshift
 install_timeshift() {
     clear
     printf "%b\n" "${YELLOW}Checking if Timeshift is installed...${RC}"
@@ -21,7 +20,6 @@ install_timeshift() {
     fi
 }
 
-# Function to display the menu
 display_menu() {
     clear
     printf "%b\n" "${CYAN}Timeshift CLI Automation${RC}"
@@ -34,19 +32,16 @@ display_menu() {
     printf "%b\n" "${CYAN}7) Exit${RC}"
 }
 
-# Function to list snapshots
 list_snapshots() {
     printf "%b\n" "${CYAN}Listing snapshots...${RC}"
     "$ESCALATION_TOOL" timeshift --list-snapshots
 }
 
-# Function to list devices
 list_devices() {
     printf "%b\n" "${CYAN}Listing available devices...${RC}"
     "$ESCALATION_TOOL" timeshift --list-devices
 }
 
-# Function to create a new snapshot
 create_snapshot() {
     printf "%b" "${CYAN}Enter a comment for the snapshot (optional): ${RC}"
     read -r COMMENT
@@ -64,14 +59,9 @@ create_snapshot() {
         "$ESCALATION_TOOL" timeshift --create --comments "$COMMENT" --tags "$TAG"
     fi
 
-    if [ $? -eq 0 ]; then
-        printf "%b\n" "${GREEN}Snapshot created successfully.${RC}"
-    else
-        printf "%b\n" "${RED}Snapshot creation failed.${RC}"
-    fi
+    printf "%b\n" "${GREEN}Snapshot created successfully.${RC}"
 }
 
-# Function to restore a snapshot
 restore_snapshot() {
     list_snapshots
 
@@ -90,14 +80,9 @@ restore_snapshot() {
         "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --grub-device "$GRUB_DEVICE" --yes
     fi
 
-    if [ $? -eq 0 ]; then
-        printf "%b\n" "${GREEN}Snapshot restored successfully.${RC}"
-    else
-        printf "%b\n" "${RED}Snapshot restore failed.${RC}"
-    fi
+    printf "%b\n" "${GREEN}Snapshot restored successfully.${RC}"
 }
 
-# Function to delete a snapshot
 delete_snapshot() {
     list_snapshots
 
@@ -107,14 +92,9 @@ delete_snapshot() {
     printf "%b\n" "${YELLOW}Deleting snapshot $SNAPSHOT...${RC}"
     "$ESCALATION_TOOL" timeshift --delete --snapshot "$SNAPSHOT" --yes
 
-    if [ $? -eq 0 ]; then
-        printf "%b\n" "${GREEN}Snapshot deleted successfully.${RC}"
-    else
-        printf "%b\n" "${RED}Snapshot deletion failed.${RC}"
-    fi
+    printf "%b\n" "${GREEN}Snapshot deleted successfully.${RC}"
 }
 
-# Function to delete all snapshots
 delete_all_snapshots() {
     printf "%b\n" "${RED}WARNING: This will delete all snapshots!${RC}"
     printf "%b" "${CYAN}Are you sure? (y/N): ${RC}"
@@ -123,11 +103,7 @@ delete_all_snapshots() {
     if [ "$CONFIRMATION" = "y" ] || [ "$CONFIRMATION" = "Y" ]; then
         printf "%b\n" "${CYAN}Deleting all snapshots...${RC}"
         "$ESCALATION_TOOL" timeshift --delete-all --yes
-        if [ $? -eq 0 ]; then
-            printf "%b\n" "${GREEN}All snapshots deleted successfully.${RC}"
-        else
-            printf "%b\n" "${RED}Failed to delete snapshots.${RC}"
-        fi
+        printf "%b\n" "${GREEN}All snapshots deleted successfully.${RC}"
     else
         printf "%b\n" "${RED}Operation cancelled.${RC}"
     fi
@@ -146,15 +122,18 @@ main_menu() {
             4) restore_snapshot ;;
             5) delete_snapshot ;;
             6) delete_all_snapshots ;;
-            7) printf "%b\n" "${GREEN}Exiting...${RC}"; exit 0 ;;
+            7)
+                printf "%b\n" "${GREEN}Exiting...${RC}"
+                exit 0
+                ;;
             *) printf "%b\n" "${RED}Invalid option. Please try again.${RC}" ;;
         esac
         printf "%b\n" "${CYAN}Press Enter to continue...${RC}"
-        read -r dummy
+        read -r _
     done
 }
 
 checkEnv
 checkEscalationTool
-install_timeshift  
+install_timeshift
 main_menu

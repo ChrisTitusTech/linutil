@@ -1,24 +1,24 @@
 #!/bin/sh -e
 
 # Load common script functions
-. ../common-script.sh  
+. ../common-script.sh
 
 # Function to install packages based on the package manager
 install_package() {
-    PACKAGE=$1
-    if ! command_exists "$PACKAGE"; then
+    package=$1
+    if ! command_exists "$package"; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$package"
                 ;;
             *)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$package"
                 ;;
         esac
     else
-        echo "$PACKAGE is already installed."
+        echo "$package is already installed."
     fi
-}       
+}
 
 # Function to setup and configure SSH
 setup_ssh() {
@@ -26,18 +26,18 @@ setup_ssh() {
 
     # Detect package manager and install appropriate SSH package
     case "$PACKAGER" in
-    apt-get|nala)
-        install_package openssh-server
-        SSH_SERVICE="ssh"
-        ;;
-    pacman)
-        install_package openssh
-        SSH_SERVICE="sshd"
-        ;;
-    *)
-        install_package openssh-server
-        SSH_SERVICE="sshd"
-        ;;
+        apt-get | nala)
+            install_package openssh-server
+            SSH_SERVICE="ssh"
+            ;;
+        pacman)
+            install_package openssh
+            SSH_SERVICE="sshd"
+            ;;
+        *)
+            install_package openssh-server
+            SSH_SERVICE="sshd"
+            ;;
     esac
 
     # Enable and start the appropriate SSH service
@@ -60,7 +60,7 @@ setup_ssh() {
 # Function to setup and configure Samba
 setup_samba() {
     printf "%b\n" "${YELLOW}Setting up Samba...${RC}"
-    
+
     # Install Samba if not installed
     install_package samba
 
@@ -112,7 +112,7 @@ setup_samba() {
         "$ESCALATION_TOOL" smbpasswd -a "$SAMBA_USER"
 
         # Configure Samba settings
-        "$ESCALATION_TOOL" tee "$SAMBA_CONFIG" > /dev/null <<EOL
+        "$ESCALATION_TOOL" tee "$SAMBA_CONFIG" >/dev/null <<EOL
 [global]
    workgroup = WORKGROUP
    server string = Samba Server
@@ -157,7 +157,7 @@ configure_firewall() {
     fi
 }
 
-setup_ssh_samba(){
+setup_ssh_samba() {
     printf "%b\n" "Samba and SSH Setup Script"
     printf "%b\n" "--------------------------"
     clear
@@ -171,7 +171,7 @@ setup_ssh_samba(){
     printf "%b\n" "5. Exit"
 
     printf "%b" "Enter your choice (1-5): "
-    read CHOICE
+    read -r CHOICE
 
     case "$CHOICE" in
         1)

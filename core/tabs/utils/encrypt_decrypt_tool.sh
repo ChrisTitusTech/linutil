@@ -1,16 +1,17 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC2181
+
 . ../common-script.sh
-# Function to display the menu
+
 printf "%b\n" "${YELLOW}Ensuring OpenSSL is installed...${RC}"
 
-# Install OpenSSL
 if ! command_exists openssl; then
     case "$PACKAGER" in
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed openssl
             ;;
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         dnf)
@@ -40,7 +41,6 @@ show_menu() {
     printf "%b\n" "========================================================"
 }
 
-# Function to encrypt a file
 encrypt_file() {
     printf "%b" "Enter the path to the file or directory to encrypt: "
     read -r INPUT_PATH
@@ -49,7 +49,7 @@ encrypt_file() {
         printf "%b\n" "Path does not exist!"
         return
     fi
-    
+
     printf "%b" "Enter the path for the encrypted file or directory: "
     read -r OUTPUT_PATH
 
@@ -59,15 +59,12 @@ encrypt_file() {
     if [ -d "$INPUT_PATH" ]; then
         # Encrypt each file in the directory
         find "$INPUT_PATH" -type f | while read -r FILE; do
-            REL_PATH="${FILE#$INPUT_PATH/}"
+            REL_PATH="${FILE#"$INPUT_PATH"/}"
             OUTPUT_FILE="$OUTPUT_PATH/$REL_PATH.enc"
             mkdir -p "$(dirname "$OUTPUT_FILE")"
             openssl enc -aes-256-cbc -salt -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD"
-            if [ $? -eq 0 ]; then
-                printf "%b\n" "Encrypted: $OUTPUT_FILE"
-            else
-                printf "%b\n" "Failed to encrypt: $FILE"
-            fi
+
+            printf "%b\n" "Encrypted: $OUTPUT_FILE"
         done
     else
         # Encrypt a single file
@@ -77,15 +74,11 @@ encrypt_file() {
         fi
         mkdir -p "$(dirname "$OUTPUT_PATH")"
         openssl enc -aes-256-cbc -salt -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD"
-        if [ $? -eq 0 ]; then
-            printf "%b\n" "Encrypted: $OUTPUT_PATH"
-        else
-            printf "%b\n" "Failed to encrypt: $INPUT_PATH"
-        fi
+
+        printf "%b\n" "Encrypted: $OUTPUT_PATH"
     fi
 }
 
-# Function to decrypt a file
 decrypt_file() {
     printf "%b" "Enter the path to the file or directory to decrypt: "
     read -r INPUT_PATH
@@ -104,15 +97,12 @@ decrypt_file() {
     if [ -d "$INPUT_PATH" ]; then
         # Decrypt each file in the directory
         find "$INPUT_PATH" -type f -name '*.enc' | while read -r FILE; do
-            REL_PATH="${FILE#$INPUT_PATH/}"
+            REL_PATH="${FILE#"$INPUT_PATH"/}"
             OUTPUT_FILE="$OUTPUT_PATH/${REL_PATH%.enc}"
             mkdir -p "$(dirname "$OUTPUT_FILE")"
             openssl enc -aes-256-cbc -d -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD"
-            if [ $? -eq 0 ]; then
-                printf "%b\n" "Decrypted: $OUTPUT_FILE"
-            else
-                printf "%b\n" "Failed to decrypt: $FILE"
-            fi
+
+            printf "%b\n" "Decrypted: $OUTPUT_FILE"
         done
     else
         # Decrypt a single file
@@ -122,15 +112,12 @@ decrypt_file() {
         fi
         mkdir -p "$(dirname "$OUTPUT_PATH")"
         openssl enc -aes-256-cbc -d -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD"
-        if [ $? -eq 0 ]; then
-            printf "%b\n" "Decrypted: $OUTPUT_PATH"
-        else
-            printf "%b\n" "Failed to decrypt: $INPUT_PATH"
-        fi
+
+        printf "%b\n" "Decrypted: $OUTPUT_PATH"
     fi
 }
 
-main(){
+main() {
     clear
     while true; do
         show_menu
@@ -140,12 +127,15 @@ main(){
         case $CHOICE in
             1) encrypt_file ;;
             2) decrypt_file ;;
-            3) printf "%b\n" "Exiting..."; exit 0 ;;
+            3)
+                printf "%b\n" "Exiting..."
+                exit 0
+                ;;
             *) printf "%b\n" "Invalid choice. Please try again." ;;
         esac
 
         printf "%b\n" "Press [Enter] to continue..."
-        read -r dummy
+        read -r _
     done
 }
 

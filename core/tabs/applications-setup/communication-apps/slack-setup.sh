@@ -9,7 +9,7 @@ installSlack() {
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm slack-desktop
                 ;;
-            *)  
+            *)
                 checkFlatpak
                 flatpak install -y flathub com.slack.Slack
                 ;;

@@ -8,7 +8,7 @@ setupDWM() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit
             ;;
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
             ;;
         dnf)
@@ -25,7 +25,7 @@ setupDWM() {
 makeDWM() {
     cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
     # This path can be changed (e.g. to linux-toolbox directory)
-    cd dwm-titus/ # Hardcoded path, maybe not the best.
+    cd dwm-titus/                         # Hardcoded path, maybe not the best.
     "$ESCALATION_TOOL" make clean install # Run make clean install
 }
 
@@ -105,7 +105,10 @@ picom_animations() {
         printf "%b\n" "${GREEN}Repository already exists, skipping clone${RC}"
     fi
 
-    cd "$HOME/.local/share/ftlabs-picom" || { printf "%b\n" "${RED}Failed to change directory to picom${RC}"; return 1; }
+    cd "$HOME/.local/share/ftlabs-picom" || {
+        printf "%b\n" "${RED}Failed to change directory to picom${RC}"
+        return 1
+    }
 
     # Build the project
     if ! meson setup --buildtype=release build; then
@@ -172,7 +175,7 @@ configure_backgrounds() {
         # Rename the cloned directory to 'backgrounds'
         mv "$PIC_DIR/nord-background" "$PIC_DIR/backgrounds"
         # Print a success message indicating that the backgrounds have been downloaded
-        printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"    
+        printf "%b\n" "${GREEN}Downloaded desktop backgrounds to $BG_DIR${RC}"
     else
         # If the backgrounds directory already exists, print a message indicating that the download is being skipped
         printf "%b\n" "${GREEN}Path $BG_DIR exists for desktop backgrounds, skipping download of backgrounds${RC}"
@@ -185,14 +188,14 @@ setupDisplayManager() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
-        apt-get|nala)
+        apt-get | nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
             exit 1
             ;;
     esac
@@ -207,41 +210,44 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        printf "%b\n" "${YELLOW}--------------------------${RC}" 
-        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
-        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
-        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
-        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b\n" "${YELLOW}--------------------------${RC}"
+        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}"
+        printf "%b\n" "${YELLOW}1. SDDM ${RC}"
+        printf "%b\n" "${YELLOW}2. LightDM ${RC}"
+        printf "%b\n" "${YELLOW}3. GDM ${RC}"
+        printf "%b\n" "${YELLOW} ${RC}"
         printf "%b" "${YELLOW}Please select one: ${RC}"
         read -r DM
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
                 ;;
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
                 exit 1
                 ;;
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
         systemctl enable "$DM"
-        
+
     fi
 }
 
 install_slstatus() {
     printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
-    read -r response # -r flag to prevent backslashes from being interpreted
+    read -r response                                  # -r flag to prevent backslashes from being interpreted
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
-        cd "$HOME/dwm-titus/slstatus" || { printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"; return 1; }
+        cd "$HOME/dwm-titus/slstatus" || {
+            printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"
+            return 1
+        }
         if "$ESCALATION_TOOL" make clean install; then
             printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else

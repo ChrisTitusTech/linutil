@@ -1,6 +1,6 @@
-#!/bin/sh -e 
+#!/bin/sh -e
 
-. ../common-script.sh   
+. ../common-script.sh
 
 # Function to list common session options
 list_sessions() {
@@ -28,12 +28,14 @@ list_sessions() {
         7) session="mate.desktop" ;;
         8) session="openbox.desktop" ;;
         9) session="i3.desktop" ;;
-        10) 
+        10)
             printf "%b" "Enter custom session name (e.g., mysession): "
-            read -r session ;;
-        *) 
+            read -r session
+            ;;
+        *)
             printf "%b\n" "Invalid option selected."
-            exit 1 ;;
+            exit 1
+            ;;
     esac
 }
 
@@ -84,7 +86,7 @@ configure_sddm() {
     printf "%b\n" "Configuring SDDM for autologin..."
     printf "%b" "Enter username for SDDM autologin: "
     read -r user
-    list_sessions  # Show session options
+    list_sessions # Show session options
 
     printf "%b\n" '[Autologin]' | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
     printf "%s\n" "User=$user" | "$ESCALATION_TOOL" tee -a /etc/sddm.conf
@@ -105,8 +107,8 @@ configure_lxdm() {
     printf "%b\n" "Configuring LXDM for autologin..."
     printf "%b" "Enter username for LXDM autologin: "
     read -r user
-    list_sessions  # Show session options
-    
+    list_sessions # Show session options
+
     "$ESCALATION_TOOL" sed -i'' "s/^#.*autologin=.*$/autologin=${user}/" /etc/lxdm/lxdm.conf
     "$ESCALATION_TOOL" sed -i'' "s|^#.*session=.*$|session=/usr/bin/${session}|; s|^session=.*$|session=/usr/bin/${session}|" /etc/lxdm/lxdm.conf
 

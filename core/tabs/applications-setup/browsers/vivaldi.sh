@@ -6,7 +6,7 @@ installVivaldi() {
     if ! command_exists vivaldi; then
         printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor | sudo dd of=/usr/share/keyrings/vivaldi-browser.gpg
                 "$ESCALATION_TOOL" echo "deb [signed-by=/usr/share/keyrings/vivaldi-browser.gpg arch=$(dpkg --print-architecture)] https://repo.vivaldi.com/archive/deb/ stable main" | sudo dd of=/etc/apt/sources.list.d/vivaldi-archive.list

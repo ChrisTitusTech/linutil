@@ -45,7 +45,10 @@ manage_arrangement() {
         2) position="--right-of" ;;
         3) position="--above" ;;
         4) position="--below" ;;
-        *) printf "%b\n" "${RED}Invalid selection.${RC}"; return ;;
+        *)
+            printf "%b\n" "${RED}Invalid selection.${RC}"
+            return
+            ;;
     esac
 
     printf "%b\n" "${YELLOW}Choose the reference monitor:${RC}"

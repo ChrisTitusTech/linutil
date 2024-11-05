@@ -2,7 +2,7 @@
 
 . ../common-script.sh
 
-themeinstall(){
+themeinstall() {
     mkdir -p "$HOME/.local/share"
     cd "$HOME/.local/share"
     if [ -d 'Top-5-Bootloader-Themes' ]; then
