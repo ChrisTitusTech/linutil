@@ -2,7 +2,7 @@ use crate::{
     confirmation::{ConfirmPrompt, ConfirmStatus},
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
-    floating_text::{FloatingText, FloatingTextMode},
+    floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
     running_command::RunningCommand,
     theme::Theme,
@@ -709,9 +709,7 @@ impl AppState {
         if let Some(list_node) = self.get_selected_node() {
             let mut preview_title = "[Preview] - ".to_string();
             preview_title.push_str(list_node.name.as_str());
-            if let Some(preview) =
-                FloatingText::from_command(&list_node.command, FloatingTextMode::Preview)
-            {
+            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
                 self.spawn_float(preview, 80, 80);
             }
         }
@@ -721,7 +719,7 @@ impl AppState {
         if let Some(command_description) = self.get_selected_description() {
             if !command_description.is_empty() {
                 let description =
-                    FloatingText::new(command_description, FloatingTextMode::Description);
+                    FloatingText::new(command_description, "Command Description", true);
                 self.spawn_float(description, 80, 80);
             }
         }
@@ -807,7 +805,7 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), FloatingTextMode::ActionsGuide),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
             80,
             80,
         );

@@ -25,13 +25,6 @@ use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
 use zips::zip_result;
 
-#[derive(Clone)]
-pub enum FloatingTextMode {
-    Preview,
-    Description,
-    ActionsGuide,
-}
-
 pub struct FloatingText {
     pub src: String,
     wrapped_lines: Vec<String>,
@@ -39,7 +32,7 @@ pub struct FloatingText {
     v_scroll: usize,
     h_scroll: usize,
     mode_title: String,
-    mode: FloatingTextMode,
+    wrap_words: bool,
     frame_height: usize,
 }
 
@@ -129,25 +122,30 @@ fn get_lines_owned(s: &str) -> Vec<String> {
 }
 
 impl FloatingText {
-    pub fn new(text: String, mode: FloatingTextMode) -> Self {
+    pub fn new(text: String, title: &str, wrap_words: bool) -> Self {
         let max_line_width = 80;
-        let wrapped_lines = wrap(&text, max_line_width)
-            .into_iter()
-            .map(|cow| cow.into_owned())
-            .collect();
+        let wrapped_lines = if wrap_words {
+            wrap(&text, max_line_width)
+                .into_iter()
+                .map(|cow| cow.into_owned())
+                .collect()
+        } else {
+            get_lines_owned(&text)
+        };
+
         Self {
             src: text,
             wrapped_lines,
-            mode_title: Self::get_mode_title(&mode).to_string(),
+            mode_title: title.to_string(),
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
-            mode,
+            wrap_words,
             frame_height: 0,
         }
     }
 
-    pub fn from_command(command: &Command, mode: FloatingTextMode) -> Option<Self> {
+    pub fn from_command(command: &Command, title: String) -> Option<Self> {
         let src = match command {
             Command::Raw(cmd) => Some(cmd.clone()),
             Command::LocalFile { file, .. } => std::fs::read_to_string(file)
@@ -157,32 +155,18 @@ impl FloatingText {
         }?;
 
         let max_line_width = 80;
-        let wrapped_lines = match mode {
-            FloatingTextMode::Description => wrap(&src, max_line_width)
-                .into_iter()
-                .map(|cow| cow.into_owned())
-                .collect(),
-            _ => get_lines_owned(&get_highlighted_string(&src)?),
-        };
+        let wrapped_lines = get_lines_owned(&get_highlighted_string(&src)?);
 
         Some(Self {
             src,
             wrapped_lines,
-            mode_title: Self::get_mode_title(&mode).to_string(),
+            mode_title: title,
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
-            mode,
+            wrap_words: false,
             frame_height: 0,
         })
-    }
-
-    fn get_mode_title(mode: &FloatingTextMode) -> &'static str {
-        match mode {
-            FloatingTextMode::Preview => "Command Preview",
-            FloatingTextMode::Description => "Command Description",
-            FloatingTextMode::ActionsGuide => "Important Actions Guide",
-        }
     }
 
     fn scroll_down(&mut self) {
@@ -213,14 +197,13 @@ impl FloatingText {
     fn update_wrapping(&mut self, width: usize) {
         if self.max_line_width != width {
             self.max_line_width = width;
-            self.wrapped_lines = match self.mode {
-                FloatingTextMode::Description => wrap(&self.src, width)
+            self.wrapped_lines = if self.wrap_words {
+                wrap(&self.src, width)
                     .into_iter()
                     .map(|cow| cow.into_owned())
-                    .collect(),
-                _ => {
-                    get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
-                }
+                    .collect()
+            } else {
+                get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
             };
         }
     }
@@ -254,7 +237,7 @@ impl FloatContent for FloatingText {
             .skip(self.v_scroll)
             .take(height as usize)
             .flat_map(|l| {
-                if let FloatingTextMode::Description = self.mode {
+                if self.wrap_words {
                     vec![Line::raw(l.clone())]
                 } else {
                     l.into_text().unwrap().lines
