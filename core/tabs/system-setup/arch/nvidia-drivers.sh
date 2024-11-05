@@ -2,11 +2,12 @@
 
 . ../../common-script.sh
 
-LIBVA_DIR="$HOME/linuxtoolbox/libva"
+LIBVA_DIR="$HOME/.local/share/linutil/libva"
+MPV_CONF="$HOME/.config/mpv/mpv.conf"
 
 installDeps() {
-    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel dkms ninja meson
-    
+    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel dkms ninja meson git
+
     installed_kernels=$("$PACKAGER" -Q | grep -E '^linux(| |-rt|-rt-lts|-hardened|-zen|-lts)[^-headers]' | cut -d ' ' -f 1)
 
     for kernel in $installed_kernels; do
@@ -20,8 +21,8 @@ checkNvidiaHardware() {
     # Refer https://nouveau.freedesktop.org/CodeNames.html for model code names
     model=$(lspci -k | grep -A 2 -E "(VGA|3D)" | grep NVIDIA | sed 's/.*Corporation //;s/ .*//' | cut -c 1-2)
     case "$model" in
-        GM|GP|GV) return 1 ;;
-        TU|GA|AD) return 0 ;;
+        GM | GP | GV) return 1 ;;
+        TU | GA | AD) return 0 ;;
         *) printf "%b\n" "${RED}Unsupported hardware." && exit 1 ;;
     esac
 }
@@ -52,12 +53,12 @@ setKernelParam() {
 setupHardwareAcceleration() {
     if ! command_exists grub-mkconfig; then
         printf "%b\n" "${RED}Currently hardware acceleration is only available with GRUB.${RC}"
-        return;
+        return
     fi
 
     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libva-nvidia-driver
 
-    mkdir -p "$HOME/linuxtoolbox"
+    mkdir -p "$HOME/.local/share/linutil"
     if [ -d "$LIBVA_DIR" ]; then
         rm -rf "$LIBVA_DIR"
     fi
@@ -72,15 +73,16 @@ setupHardwareAcceleration() {
     "$ESCALATION_TOOL" sed -i '/^MOZ_DISABLE_RDD_SANDBOX/d' "/etc/environment"
     "$ESCALATION_TOOL" sed -i '/^LIBVA_DRIVER_NAME/d' "/etc/environment"
 
-    printf "LIBVA_DRIVER_NAME=nvidia\nMOZ_DISABLE_RDD_SANDBOX=1" | "$ESCALATION_TOOL" tee -a /etc/environment > /dev/null
+    printf "LIBVA_DRIVER_NAME=nvidia\nMOZ_DISABLE_RDD_SANDBOX=1" | "$ESCALATION_TOOL" tee -a /etc/environment >/dev/null
 
     printf "%b\n" "${GREEN}Hardware Acceleration setup completed successfully.${RC}"
-    
+
     if promptUser "enable Hardware Acceleration in MPV player"; then
-        if [ -f "$HOME/.config/mpv/mpv.conf" ];then
-            sed -i '/^hwdec/d' "$HOME/.config/mpv/mpv.conf"
+        mkdir -p "$HOME/.config/mpv"
+        if [ -f "$MPV_CONF" ]; then
+            sed -i '/^hwdec/d' "$MPV_CONF"
         fi
-        printf "hwdec=auto" | tee -a "$HOME/.config/mpv/mpv.conf" > /dev/null
+        printf "hwdec=auto" | tee -a "$MPV_CONF" >/dev/null
         printf "%b\n" "${GREEN}MPV Hardware Acceleration enabled successfully.${RC}"
     fi
 }
@@ -90,11 +92,11 @@ installDriver() {
     if checkNvidiaHardware && promptUser "install nvidia's open source drivers"; then
         printf "%b\n" "${YELLOW}Installing nvidia open source driver...${RC}"
         installDeps
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-open-dkms
+        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-open-dkms nvidia-utils
     else
         printf "%b\n" "${YELLOW}Installing nvidia proprietary driver...${RC}"
         installDeps
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-dkms
+        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-dkms nvidia-utils
     fi
 
     if checkIntelHardware; then
