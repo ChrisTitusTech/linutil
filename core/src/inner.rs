@@ -33,30 +33,18 @@ pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
 
     let tabs: Vec<Tab> = tabs
         .into_iter()
-        .map(
-            |(
-                TabEntry {
-                    name,
-                    data,
-                    multi_selectable,
-                },
-                directory,
-            )| {
-                let mut tree = Tree::new(Rc::new(ListNode {
-                    name: "root".to_string(),
-                    description: String::new(),
-                    command: Command::None,
-                    task_list: String::new(),
-                }));
-                let mut root = tree.root_mut();
-                create_directory(data, &mut root, &directory, validate);
-                Tab {
-                    name,
-                    tree,
-                    multi_selectable,
-                }
-            },
-        )
+        .map(|(TabEntry { name, data }, directory)| {
+            let mut tree = Tree::new(Rc::new(ListNode {
+                name: "root".to_string(),
+                description: String::new(),
+                command: Command::None,
+                task_list: String::new(),
+                multi_select: false,
+            }));
+            let mut root = tree.root_mut();
+            create_directory(data, &mut root, &directory, validate, true);
+            Tab { name, tree }
+        })
         .collect();
 
     if tabs.is_empty() {
@@ -74,12 +62,6 @@ struct TabList {
 struct TabEntry {
     name: String,
     data: Vec<Entry>,
-    #[serde(default = "default_multi_selectable")]
-    multi_selectable: bool,
-}
-
-fn default_multi_selectable() -> bool {
-    true
 }
 
 #[derive(Deserialize)]
@@ -94,6 +76,12 @@ struct Entry {
     entry_type: EntryType,
     #[serde(default)]
     task_list: String,
+    #[serde(default = "default_true")]
+    multi_select: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(Deserialize)]
@@ -174,8 +162,11 @@ fn create_directory(
     node: &mut NodeMut<Rc<ListNode>>,
     command_dir: &Path,
     validate: bool,
+    parent_multi_select: bool,
 ) {
     for entry in data {
+        let multi_select = parent_multi_select && entry.multi_select;
+
         match entry.entry_type {
             EntryType::Entries(entries) => {
                 let mut node = node.append(Rc::new(ListNode {
@@ -183,8 +174,9 @@ fn create_directory(
                     description: entry.description,
                     command: Command::None,
                     task_list: String::new(),
+                    multi_select,
                 }));
-                create_directory(entries, &mut node, command_dir, validate);
+                create_directory(entries, &mut node, command_dir, validate, multi_select);
             }
             EntryType::Command(command) => {
                 node.append(Rc::new(ListNode {
@@ -192,6 +184,7 @@ fn create_directory(
                     description: entry.description,
                     command: Command::Raw(command),
                     task_list: String::new(),
+                    multi_select,
                 }));
             }
             EntryType::Script(script) => {
@@ -210,6 +203,7 @@ fn create_directory(
                             file: script,
                         },
                         task_list: entry.task_list,
+                        multi_select,
                     }));
                 }
             }
