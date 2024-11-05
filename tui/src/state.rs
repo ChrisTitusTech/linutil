@@ -13,7 +13,7 @@ use linutil_core::{ListNode, Tab};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Flex, Layout},
+    layout::{Alignment, Constraint, Direction, Flex, Layout, Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListState, Paragraph},
@@ -62,6 +62,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: String,
+    areas: Option<Areas>,
 }
 
 pub enum Focus {
@@ -76,6 +77,11 @@ pub struct ListEntry {
     pub node: Rc<ListNode>,
     pub id: NodeId,
     pub has_children: bool,
+}
+
+pub struct Areas {
+    tab_list: Rect,
+    list: Rect,
 }
 
 enum SelectedItem {
@@ -104,6 +110,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            areas: None,
         };
 
         state.update_items();
@@ -282,6 +289,11 @@ impl AppState {
             .split(horizontal[0]);
         frame.render_widget(label, left_chunks[0]);
 
+        self.areas = Some(Areas {
+            tab_list: left_chunks[1],
+            list: horizontal[1],
+        });
+
         let tabs = self
             .tabs
             .iter()
@@ -421,29 +433,43 @@ impl AppState {
             return true;
         }
 
-        match &mut self.focus {
-            Focus::TabList => match event.kind {
-                MouseEventKind::ScrollDown => {
-                    if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
-                        self.current_tab.select_next();
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            let position = Position::new(event.column, event.row);
+            let mouse_in_tab_list = self.areas.as_ref().unwrap().tab_list.contains(position);
+            let mouse_in_list = self.areas.as_ref().unwrap().list.contains(position);
+
+            match event.kind {
+                MouseEventKind::Moved => {
+                    if mouse_in_list {
+                        self.focus = Focus::List
+                    } else if mouse_in_tab_list {
+                        self.focus = Focus::TabList
                     }
-                    self.refresh_tab();
+                }
+                MouseEventKind::ScrollDown => {
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
+                            self.current_tab.select_next();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_next()
+                    }
                 }
                 MouseEventKind::ScrollUp => {
-                    if self.current_tab.selected().unwrap() != 0 {
-                        self.current_tab.select_previous();
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != 0 {
+                            self.current_tab.select_previous();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_previous()
                     }
-                    self.refresh_tab();
                 }
-                MouseEventKind::ScrollRight => self.focus = Focus::List,
                 _ => {}
-            },
-            Focus::List => match event.kind {
-                MouseEventKind::ScrollDown => self.selection.select_next(),
-                MouseEventKind::ScrollUp => self.selection.select_previous(),
-                MouseEventKind::ScrollLeft => self.focus = Focus::TabList,
-                _ => {}
-            },
+            }
+        }
+        match &mut self.focus {
             Focus::FloatingWindow(float) => {
                 float.content.handle_mouse_event(event);
             }
