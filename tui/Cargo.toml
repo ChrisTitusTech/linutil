@@ -14,22 +14,22 @@ default = ["tips"]
 tips = ["rand"]
 
 [dependencies]
-clap = { version = "4.5.20", features = ["derive"] }
-crossterm = "0.28.1"
+clap = { version = "4.5.20", features = ["std", "derive"], default-features = false }
+crossterm = { default-features = false, version = "0.28.1" }
 ego-tree = { workspace = true }
-oneshot = "0.1.8"
+oneshot = { version = "0.1.8", features = ["std"], default-features = false }
 portable-pty = "0.8.1"
-ratatui = "0.29.0"
+ratatui = { version = "0.29.0", features = ["crossterm"], default-features = false }
 tui-term = "0.2.0"
 temp-dir = "0.1.14"
-unicode-width = "0.2.0"
+unicode-width = { version = "0.2.0", default-features = false }
 rand = { version = "0.8.5", optional = true }
 linutil_core = { path = "../core", version = "24.9.28" }
 tree-sitter-highlight = "0.24.3"
 tree-sitter-bash = "0.23.1"
-textwrap = "0.16.1"
-anstyle = "1.0.8"
-ansi-to-tui = "7.0.0"
+textwrap = { version = "0.16.1", default-features = false }
+anstyle = { version = "1.0.8", default-features = false }
+ansi-to-tui = { version = "7.0.0", default-features = false }
 zips = "0.1.7"
 
 [[bin]]
