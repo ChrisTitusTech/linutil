@@ -217,19 +217,19 @@ impl AppState {
             self.drawable = true;
         }
 
-        let label_block =
-            Block::default()
-                .borders(Borders::all())
-                .border_set(ratatui::symbols::border::Set {
-                    top_left: " ",
-                    top_right: " ",
-                    bottom_left: " ",
-                    bottom_right: " ",
-                    vertical_left: " ",
-                    vertical_right: " ",
-                    horizontal_top: "*",
-                    horizontal_bottom: "*",
-                });
+        let label_block = Block::default()
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
+            .border_set(ratatui::symbols::border::Set {
+                top_left: " ",
+                top_right: " ",
+                bottom_left: " ",
+                bottom_right: " ",
+                vertical_left: " ",
+                vertical_right: " ",
+                horizontal_top: "*",
+                horizontal_bottom: "*",
+            });
         let str1 = "Linutil ";
         let str2 = "by Chris Titus";
         let label = Paragraph::new(Line::from(vec![
@@ -253,7 +253,8 @@ impl AppState {
 
         let keybinds_block = Block::default()
             .title(format!(" {} ", keybind_scope))
-            .borders(Borders::all());
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED);
 
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
         let n_lines = keybinds.len() as u16;
@@ -297,7 +298,11 @@ impl AppState {
         };
 
         let list = List::new(tabs)
-            .block(Block::default().borders(Borders::ALL))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(ratatui::symbols::border::ROUNDED),
+            )
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
@@ -409,6 +414,7 @@ impl AppState {
             .block(
                 Block::default()
                     .borders(Borders::ALL & !Borders::RIGHT)
+                    .border_set(ratatui::symbols::border::ROUNDED)
                     .title(title)
                     .title_bottom(bottom_title),
             )
@@ -418,6 +424,7 @@ impl AppState {
         let disclaimer_list = List::new(task_items).highlight_style(style).block(
             Block::default()
                 .borders(Borders::ALL & !Borders::LEFT)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title(task_list_title),
         );
 
