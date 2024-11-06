@@ -62,6 +62,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: String,
+    size_bypass: bool,
 }
 
 pub enum Focus {
@@ -86,7 +87,7 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
+    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -104,6 +105,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            size_bypass,
         };
 
         state.update_items();
@@ -186,7 +188,9 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
+        if !self.size_bypass
+            && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
+        {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
