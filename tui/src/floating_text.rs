@@ -20,16 +20,20 @@ use ratatui::{
 
 use ansi_to_tui::IntoText;
 
+use textwrap::wrap;
 use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
 use zips::zip_result;
 
 pub struct FloatingText {
-    pub src: Vec<String>,
+    pub src: String,
+    wrapped_lines: Vec<String>,
     max_line_width: usize,
     v_scroll: usize,
     h_scroll: usize,
     mode_title: String,
+    wrap_words: bool,
+    frame_height: usize,
 }
 
 macro_rules! style {
@@ -107,12 +111,6 @@ fn get_highlighted_string(s: &str) -> Option<String> {
     Some(output)
 }
 
-macro_rules! max_width {
-    ($($lines:tt)+) => {{
-        $($lines)+.iter().fold(0, |accum, val| accum.max(val.len()))
-    }}
-}
-
 #[inline]
 fn get_lines(s: &str) -> Vec<&str> {
     s.lines().collect::<Vec<_>>()
@@ -124,54 +122,56 @@ fn get_lines_owned(s: &str) -> Vec<String> {
 }
 
 impl FloatingText {
-    pub fn new(text: String, title: &str) -> Self {
-        let src = get_lines(&text)
-            .into_iter()
-            .map(|s| s.to_string())
-            .collect::<Vec<_>>();
+    pub fn new(text: String, title: &str, wrap_words: bool) -> Self {
+        let max_line_width = 80;
+        let wrapped_lines = if wrap_words {
+            wrap(&text, max_line_width)
+                .into_iter()
+                .map(|cow| cow.into_owned())
+                .collect()
+        } else {
+            get_lines_owned(&text)
+        };
 
-        let max_line_width = max_width!(src);
         Self {
-            src,
+            src: text,
+            wrapped_lines,
             mode_title: title.to_string(),
             max_line_width,
             v_scroll: 0,
             h_scroll: 0,
+            wrap_words,
+            frame_height: 0,
         }
     }
 
     pub fn from_command(command: &Command, title: String) -> Option<Self> {
-        let (max_line_width, src) = match command {
-            Command::Raw(cmd) => {
-                // just apply highlights directly
-                (max_width!(get_lines(cmd)), Some(cmd.clone()))
-            }
-            Command::LocalFile { file, .. } => {
-                // have to read from tmp dir to get cmd src
-                let raw = std::fs::read_to_string(file)
-                    .map_err(|_| format!("File not found: {:?}", file))
-                    .unwrap();
+        let src = match command {
+            Command::Raw(cmd) => Some(cmd.clone()),
+            Command::LocalFile { file, .. } => std::fs::read_to_string(file)
+                .map_err(|_| format!("File not found: {:?}", file))
+                .ok(),
+            Command::None => None,
+        }?;
 
-                (max_width!(get_lines(&raw)), Some(raw))
-            }
-
-            // If command is a folder, we don't display a preview
-            Command::None => (0usize, None),
-        };
-
-        let src = get_lines_owned(&get_highlighted_string(&src?)?);
+        let max_line_width = 80;
+        let wrapped_lines = get_lines_owned(&get_highlighted_string(&src)?);
 
         Some(Self {
             src,
+            wrapped_lines,
             mode_title: title,
             max_line_width,
             h_scroll: 0,
             v_scroll: 0,
+            wrap_words: false,
+            frame_height: 0,
         })
     }
 
     fn scroll_down(&mut self) {
-        if self.v_scroll + 1 < self.src.len() {
+        let visible_lines = self.frame_height.saturating_sub(2);
+        if self.v_scroll + visible_lines < self.src.len() {
             self.v_scroll += 1;
         }
     }
@@ -193,10 +193,26 @@ impl FloatingText {
             self.h_scroll += 1;
         }
     }
+
+    fn update_wrapping(&mut self, width: usize) {
+        if self.max_line_width != width {
+            self.max_line_width = width;
+            self.wrapped_lines = if self.wrap_words {
+                wrap(&self.src, width)
+                    .into_iter()
+                    .map(|cow| cow.into_owned())
+                    .collect()
+            } else {
+                get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
+            };
+        }
+    }
 }
 
 impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
+        self.frame_height = area.height as usize;
+
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
@@ -205,18 +221,28 @@ impl FloatContent for FloatingText {
             .title_style(Style::default().reversed())
             .style(Style::default());
 
-        // Draw the Block first
+        frame.render_widget(Clear, area);
+
         frame.render_widget(block.clone(), area);
 
         // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
-        let Rect { height, .. } = inner_area;
+        let Rect { width, height, .. } = inner_area;
+
+        self.update_wrapping(width as usize);
+
         let lines = self
-            .src
+            .wrapped_lines
             .iter()
             .skip(self.v_scroll)
             .take(height as usize)
-            .flat_map(|l| l.into_text().unwrap())
+            .flat_map(|l| {
+                if self.wrap_words {
+                    vec![Line::raw(l.clone())]
+                } else {
+                    l.into_text().unwrap().lines
+                }
+            })
             .map(|line| {
                 let mut skipped = 0;
                 let mut spans = line
@@ -252,9 +278,6 @@ impl FloatContent for FloatingText {
         let list = List::new(lines)
             .block(Block::default())
             .highlight_style(Style::default().reversed());
-
-        // Clear the text underneath the floats rendered area
-        frame.render_widget(Clear, inner_area);
 
         // Render the list inside the bordered area
         frame.render_widget(list, inner_area);
