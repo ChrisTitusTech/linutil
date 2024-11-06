@@ -30,6 +30,7 @@ D  - disk modifications (ex. partitioning) (privileged)
 FI - flatpak installation
 FM - file modification
 I  - installation (privileged)
+K  - kernel modifications (privileged)
 MP - package manager actions
 SI - full system installation
 SS - systemd actions (privileged)

@@ -16,6 +16,17 @@ task_list = "SI D"
 multi_select = false
 
 [[data.entries]]
+name ="Linux Neptune for SteamDeck"
+description = "Valve's fork of Linux Kernel for the SteamDeck"
+script = "arch/linux-neptune.sh"
+task_list = "I PFM K"
+
+[[data.entries.preconditions]]
+matches = true
+data = { file = "/sys/devices/virtual/dmi/id/board_vendor" }
+values = [ "Valve" ]
+
+[[data.entries]]
 name = "Paru AUR Helper"
 description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
