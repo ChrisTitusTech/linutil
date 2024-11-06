@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC2086
+
 . ../common-script.sh
 
 installDepend() {
@@ -24,7 +26,7 @@ installDepend() {
 
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32"
 
             "$ESCALATION_TOOL" dpkg --add-architecture i386
@@ -64,7 +66,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='steam lutris goverlay'
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
                 tail -n1 |
