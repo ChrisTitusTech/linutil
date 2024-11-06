@@ -15,10 +15,11 @@ installVivaldi() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
-                if command -v dnf5 >/dev/null 2>&1; then
-                    "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://repo.vivaldi.com/stable/vivaldi-fedora.repo
-                elif command -v dnf >/dev/null 2>&1; then
+                dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
+                if [ "$dnf_version" -eq 4 ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://repo.vivaldi.com/stable/vivaldi-fedora.repo
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://repo.vivaldi.com/stable/vivaldi-fedora.repo
                 fi
                 "$ESCALATION_TOOL" "$PACKAGER" install -y vivaldi-stable
                 ;;

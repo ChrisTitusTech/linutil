@@ -28,10 +28,11 @@ install_docker() {
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            if command -v dnf5 >/dev/null 2>&1; then
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
-            elif command -v dnf >/dev/null 2>&1; then
+            dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
+            if [ "$dnf_version" -eq 4 ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            else
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
             fi
             "$ESCALATION_TOOL" "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
             "$ESCALATION_TOOL" systemctl enable --now docker
@@ -61,10 +62,11 @@ install_docker_compose() {
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            if command -v dnf5 >/dev/null 2>&1; then
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
-            elif command -v dnf >/dev/null 2>&1; then
+            dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
+            if [ "$dnf_version" -eq 4 ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            else
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
             fi
             "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
             ;;
