@@ -84,7 +84,7 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
+    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
         let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
