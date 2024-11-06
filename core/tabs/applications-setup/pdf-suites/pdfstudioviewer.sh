@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installPdfstudioviewer() {
     if ! command_exists pdfstudioviewer2024; then
