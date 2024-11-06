@@ -105,7 +105,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
-            size_bypass: size_bypass,
+            size_bypass,
         };
 
         state.update_items();
@@ -188,8 +188,8 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if !self.size_bypass && terminal_size.width < MIN_WIDTH
-            || !self.size_bypass && terminal_size.height < MIN_HEIGHT
+        if !self.size_bypass
+            && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
         {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
