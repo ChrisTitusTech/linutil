@@ -9,7 +9,7 @@ use crate::{
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
-use linutil_core::{ListNode, Tab};
+use linutil_core::{ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -20,7 +20,6 @@ use ratatui::{
     Frame,
 };
 use std::rc::Rc;
-use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
@@ -40,14 +39,12 @@ P* - privileged *
 ";
 
 pub struct AppState {
-    /// This must be passed to retain the temp dir until the end of the program
-    _temp_dir: TempDir,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
     pub focus: Focus,
     /// List of tabs
-    tabs: Vec<Tab>,
+    tabs: TabList,
     /// Current tab
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
@@ -88,11 +85,10 @@ enum SelectedItem {
 
 impl AppState {
     pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
-        let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
+        let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
         let mut state = Self {
-            _temp_dir: temp_dir,
             theme,
             focus: Focus::List,
             tabs,
