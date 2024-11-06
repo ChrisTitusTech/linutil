@@ -56,6 +56,9 @@ All of the layouts can be applied dynamically, optimising the environment for th
 This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
+- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
