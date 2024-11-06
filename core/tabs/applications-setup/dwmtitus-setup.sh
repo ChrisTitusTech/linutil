@@ -214,10 +214,28 @@ setupDisplayManager() {
         printf "%b\n" "${YELLOW}3. GDM ${RC}" 
         printf "%b\n" "${YELLOW} ${RC}" 
         printf "%b" "${YELLOW}Please select one: ${RC}"
-        read -r DM
+        read -r choice
+        case "$choice" in
+        1)
+            DM="sddm"
+            ;;
+        2)
+            DM="lightdm"
+            ;;
+        3)
+            DM="gdm"
+            ;;
+        *)
+            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
+            exit 1
+            ;;
+        esac
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
+                fi
                 ;;
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
