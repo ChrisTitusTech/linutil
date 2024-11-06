@@ -186,7 +186,9 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
+        if !matches!(self.focus, Focus::FloatingWindow(_)) && terminal_size.width < MIN_WIDTH
+            || terminal_size.height < MIN_HEIGHT
+        {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
