@@ -60,6 +60,7 @@ impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
             .title(" Confirm selections ")
             .title_bottom(" [y] to continue, [n] to abort ")
             .title_alignment(Alignment::Center)

@@ -206,6 +206,7 @@ impl FloatContent for FloatingText {
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
             .title(self.mode_title.clone())
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())

@@ -215,7 +215,8 @@ impl AppState {
 
         let label_block =
             Block::default()
-                .borders(Borders::all())
+                .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .border_set(ratatui::symbols::border::Set {
                     top_left: " ",
                     top_right: " ",
@@ -249,7 +250,8 @@ impl AppState {
 
         let keybinds_block = Block::default()
             .title(format!(" {} ", keybind_scope))
-            .borders(Borders::all());
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED);
 
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
         let n_lines = keybinds.len() as u16;
@@ -293,7 +295,7 @@ impl AppState {
         };
 
         let list = List::new(tabs)
-            .block(Block::default().borders(Borders::ALL))
+            .block(Block::default().borders(Borders::ALL).border_set(ratatui::symbols::border::ROUNDED))
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
