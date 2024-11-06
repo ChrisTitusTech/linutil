@@ -23,10 +23,11 @@ installSublime() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
-                if command -v dnf5 >/dev/null 2>&1; then
-                    "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.sublimetext.com/rpm/dev/x86_64/sublime-text.repo
-                elif command -v dnf >/dev/null 2>&1; then
+                dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
+                if [ "$dnf_version" -eq 4 ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.sublimetext.com/rpm/dev/x86_64/sublime-text.repo
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.sublimetext.com/rpm/dev/x86_64/sublime-text.repo
                 fi
                 "$ESCALATION_TOOL" "$PACKAGER" install -y sublime-text
                 ;;
