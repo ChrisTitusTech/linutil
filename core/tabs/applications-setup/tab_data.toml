@@ -80,7 +80,7 @@ task_list = "I"
 
 [[data.entries]]
 name = "ZapZap (Whatsapp Client)"
-description = "ZapZap is a whatsapp desktop client for linux users, It is an open source project developed by rafatosta."
+description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
 script = "communication-apps/zapzap-setup.sh"
 task_list = "I"
 
