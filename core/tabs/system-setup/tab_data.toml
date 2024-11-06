@@ -1,5 +1,4 @@
 name = "System Setup"
-multi_selectable = false
 
 [[data]]
 name = "Arch Linux"
@@ -14,6 +13,18 @@ name = "Arch Server Setup"
 description = "This command installs a minimal arch server setup under 5 minutes."
 script = "arch/server-setup.sh"
 task_list = "SI D"
+multi_select = false
+
+[[data.entries]]
+name ="Linux Neptune for SteamDeck"
+description = "Valve's fork of Linux Kernel for the SteamDeck"
+script = "arch/linux-neptune.sh"
+task_list = "I PFM K"
+
+[[data.entries.preconditions]]
+matches = true
+data = { file = "/sys/devices/virtual/dmi/id/board_vendor" }
+values = [ "Valve" ]
 
 [[data.entries]]
 name = "Nvidia Drivers && Hardware Acceleration"
@@ -23,13 +34,13 @@ task_list = "I FM SS"
 
 [[data.entries]]
 name = "Paru AUR Helper"
-description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
+description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Yay AUR Helper"
-description = "Yet Another Yogurt - An AUR Helper Written in Go.\nTo know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
+description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/yay-setup.sh"
 task_list = "I"
 
@@ -61,8 +72,14 @@ task_list = "I"
 
 [[data.entries]]
 name = "RPM Fusion"
-description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
+description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship. That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit. For more information visit: https://rpmfusion.org/"
 script = "fedora/rpm-fusion-setup.sh"
+task_list = "MP"
+
+[[data.entries]]
+name = "Upgrade to a New Fedora Release"
+description = "Upgrades system to the next Fedora release"
+script = "fedora/fedora-upgrade.sh"
 task_list = "MP"
 
 [[data.entries]]
@@ -70,6 +87,17 @@ name = "Virtualization"
 description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 task_list = "I"
+
+[[data.entries]]
+name = "Btrfs Assistant, Snapper Config, grub-btrfs"
+description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
+script = "fedora/fedora-btrfs-assistant.sh"
+task_list = "I PFM SS"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "btrfs" ]
 
 [[data]]
 name = "Build Prerequisites"
@@ -82,12 +110,14 @@ name = "Full System Cleanup"
 description = "This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash."
 script = "system-cleanup.sh"
 task_list = "RP PFM"
+multi_select = false
 
 [[data]]
 name = "Full System Update"
 description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
 task_list = "PFM"
+multi_select = false
 
 [[data]]
 name = "Gaming Dependencies"
