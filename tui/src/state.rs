@@ -7,12 +7,12 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ego_tree::NodeId;
 use linutil_core::{ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     layout::{Alignment, Constraint, Direction, Flex, Layout},
     style::{Style, Stylize},
     text::{Line, Span, Text},

@@ -1,11 +1,11 @@
 use crate::{float::FloatContent, hint::Shortcut};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
     style::{Color, Style, Stylize},
     text::{Line, Span},
