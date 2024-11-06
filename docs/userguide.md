@@ -128,7 +128,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Numlock on Startup**: This utility is designed to configure auto enabling of numlock on boot
+- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **WiFi Manager**: This utility is designed to manage wifi in your system
