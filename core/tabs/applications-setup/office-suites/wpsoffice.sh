@@ -1,16 +1,16 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installWpsOffice() {
-    if ! command_exists com.wps.Office; then
+    if ! command_exists com.wps.Office && ! command_exists wps; then
         printf "%b\n" "${YELLOW}Installing WPS Office...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm wps-office
                 ;;
             *)
-                . ./setup-flatpak.sh
+                checkFlatpak
                 flatpak install flathub com.wps.Office
                 ;;
         esac

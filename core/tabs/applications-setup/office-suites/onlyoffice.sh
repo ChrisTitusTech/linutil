@@ -1,9 +1,9 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installOnlyOffice() {
-    if ! command_exists onlyoffice-desktopeditors; then
+    if ! command_exists org.onlyoffice.desktopeditors && ! command_exists onlyoffice-desktopeditors; then
         printf "%b\n" "${YELLOW}Installing Only Office..${RC}."
         case "$PACKAGER" in
             apt-get|nala)
@@ -11,7 +11,7 @@ installOnlyOffice() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
                 ;;
             zypper|dnf)
-                . ./setup-flatpak.sh
+                checkFlatpak
                 flatpak install -y flathub org.onlyoffice.desktopeditors
                 ;;
             pacman)

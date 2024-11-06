@@ -4,7 +4,7 @@ use linutil_core::Tab;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Position, Rect},
-    style::Style,
+    style::{Color, Style},
     text::Span,
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -22,6 +22,7 @@ pub struct Filter {
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
+    completion_preview: Option<String>,
 }
 
 impl Filter {
@@ -31,17 +32,23 @@ impl Filter {
             in_search_mode: false,
             input_position: 0,
             items: vec![],
+            completion_preview: None,
         }
     }
+
     pub fn item_list(&self) -> &[ListEntry] {
         &self.items
     }
+
     pub fn activate_search(&mut self) {
         self.in_search_mode = true;
     }
+
     pub fn deactivate_search(&mut self) {
         self.in_search_mode = false;
+        self.completion_preview = None;
     }
+
     pub fn update_items(&mut self, tabs: &[Tab], current_tab: usize, node: NodeId) {
         if self.search_input.is_empty() {
             let curr = tabs[current_tab].tree.get(node).unwrap();
@@ -78,13 +85,34 @@ impl Filter {
             }
             self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
         }
+
+        self.update_completion_preview();
     }
+
+    fn update_completion_preview(&mut self) {
+        if self.search_input.is_empty() {
+            self.completion_preview = None;
+            return;
+        }
+
+        let input = self.search_input.iter().collect::<String>().to_lowercase();
+        self.completion_preview = self.items.iter().find_map(|item| {
+            let item_name_lower = item.node.name.to_lowercase();
+            if item_name_lower.starts_with(&input) {
+                Some(item_name_lower[input.len()..].to_string())
+            } else {
+                None
+            }
+        });
+    }
+
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         //Set the search bar text (If empty use the placeholder)
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
             Span::raw("Press / to search")
         } else {
-            Span::raw(self.search_input.iter().collect::<String>())
+            let input_text = self.search_input.iter().collect::<String>();
+            Span::styled(input_text, Style::default().fg(theme.focused_color()))
         };
 
         let search_color = if self.in_search_mode {
@@ -95,7 +123,7 @@ impl Filter {
 
         //Create the search bar widget
         let search_bar = Paragraph::new(display_text)
-            .block(Block::default().borders(Borders::ALL).title("Search"))
+            .block(Block::default().borders(Borders::ALL).title(" Search "))
             .style(Style::default().fg(search_color));
 
         //Render the search bar (First chunk of the screen)
@@ -110,11 +138,22 @@ impl Filter {
             let x = area.x + cursor_position as u16 + 1;
             let y = area.y + 1;
             frame.set_cursor_position(Position::new(x, y));
+
+            if let Some(preview) = &self.completion_preview {
+                let preview_span = Span::styled(preview, Style::default().fg(Color::DarkGray));
+                let preview_paragraph = Paragraph::new(preview_span).style(Style::default());
+                let preview_area = Rect::new(
+                    x,
+                    y,
+                    (preview.len() as u16).min(area.width - cursor_position as u16 - 1),
+                    1,
+                );
+                frame.render_widget(preview_paragraph, preview_area);
+            }
         }
     }
     // Handles key events. Returns true if search must be exited
     pub fn handle_key(&mut self, event: &KeyEvent) -> SearchAction {
-        //Insert user input into the search bar
         match event.code {
             KeyCode::Char('c') if event.modifiers.contains(KeyModifiers::CONTROL) => {
                 return self.exit_search()
@@ -124,10 +163,17 @@ impl Filter {
             KeyCode::Delete => self.remove_next(),
             KeyCode::Left => return self.cursor_left(),
             KeyCode::Right => return self.cursor_right(),
+            KeyCode::Tab => return self.complete_search(),
+            KeyCode::Esc => {
+                self.input_position = 0;
+                self.search_input.clear();
+                self.completion_preview = None;
+                return SearchAction::Exit;
+            }
             KeyCode::Enter => return SearchAction::Exit,
-            KeyCode::Esc => return self.exit_search(),
             _ => return SearchAction::None,
         };
+        self.update_completion_preview();
         SearchAction::Update
     }
 
@@ -141,16 +187,19 @@ impl Filter {
         self.input_position = self.input_position.saturating_sub(1);
         SearchAction::None
     }
+
     fn cursor_right(&mut self) -> SearchAction {
         if self.input_position < self.search_input.len() {
             self.input_position += 1;
         }
         SearchAction::None
     }
+
     fn insert_char(&mut self, input: char) {
         self.search_input.insert(self.input_position, input);
         self.cursor_right();
     }
+
     fn remove_previous(&mut self) {
         let current = self.input_position;
         if current > 0 {
@@ -158,10 +207,27 @@ impl Filter {
             self.cursor_left();
         }
     }
+
     fn remove_next(&mut self) {
         let current = self.input_position;
         if current < self.search_input.len() {
             self.search_input.remove(current);
         }
+    }
+
+    fn complete_search(&mut self) -> SearchAction {
+        if let Some(completion) = self.completion_preview.take() {
+            self.search_input.extend(completion.chars());
+            self.input_position = self.search_input.len();
+            self.update_completion_preview();
+            SearchAction::Update
+        } else {
+            SearchAction::None
+        }
+    }
+
+    pub fn clear_search(&mut self) {
+        self.search_input.clear();
+        self.input_position = 0;
     }
 }
