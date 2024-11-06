@@ -55,7 +55,7 @@ setupLibvirt() {
     "$ESCALATION_TOOL" usermod "$USER" -aG libvirt
 
     for value in libvirt libvirt_guest; do
-        if ! grep -wq "$value" /etc/nsswitch.conf;then
+        if ! grep -wq "$value" /etc/nsswitch.conf; then
             "$ESCALATION_TOOL" sed -i "/^hosts:/ s/$/ ${value}/" /etc/nsswitch.conf
         fi
     done
@@ -70,7 +70,7 @@ installLibvirt() {
     if ! command_exists libvirtd; then
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libvirt dmidecode
     else
-        printf "%b\n" "${GREEN}Libvirt is already installed.${RC}"  
+        printf "%b\n" "${GREEN}Libvirt is already installed.${RC}"
     fi
     setupLibvirt
 }
@@ -85,16 +85,17 @@ main() {
     printf "%b" "Enter your choice [1-5]: "
     read -r CHOICE
     case "$CHOICE" in
-        1)  installQEMUDesktop ;;
-        2)  installQEMUEmulators ;;
-        3)  installLibvirt ;;
-        4)  installVirtManager ;;
-        5)  installQEMUDesktop
-            installQEMUEmulators 
-            installLibvirt 
-            installVirtManager 
+        1) installQEMUDesktop ;;
+        2) installQEMUEmulators ;;
+        3) installLibvirt ;;
+        4) installVirtManager ;;
+        5)
+            installQEMUDesktop
+            installQEMUEmulators
+            installLibvirt
+            installVirtManager
             ;;
-        *)  printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
 
