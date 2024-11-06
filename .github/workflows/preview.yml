@@ -3,8 +3,8 @@ name: LinUtil Preview
 on:
   workflow_dispatch:
     inputs:
-        run_id:
-          description: 'Run ID of LinUtil Release'
+        tag_name:
+          description: 'Tag name'
           required: true
   workflow_run:
     workflows: ["LinUtil Release"]
@@ -14,29 +14,47 @@ on:
 jobs:
   generate_preview:
     runs-on: ubuntu-latest
+    environment: linutil_env
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Set Run ID
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_ENV
-          else
-            echo "run_id=${{ github.event.inputs.run_id }}" >> $GITHUB_ENV
-          fi
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Get tag name ( Workflow Run )
+        id: latest_tag
+        uses: actions/github-script@v7
+        if: github.event_name == 'workflow_run'
         with:
-          name: linutil-artifact
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ env.run_id }}
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1
+            });
+            core.setOutput('result', releases.data[0].tag_name);
+          result-encoding: string
+
+      - name: Set tag name ( Workflow Run )
+        if: github.event_name == 'workflow_run'
+        run: echo "tag_name=${{ steps.latest_tag.outputs.result }}" >> $GITHUB_ENV
+
+      - name: Set tag name ( Workflow Dispatch )
+        if: ${{ github.event_name }} == 'workflow_dispatch'
+        run: echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+
+      - name: Download binary
+        run: |
+          curl -LO "https://github.com/${{ github.repository }}/releases/download/${{ env.tag_name }}/linutil"
 
       - name: Set env
         run: |
           chmod +x linutil
-          echo "${{ github.workspace }}" >> $GITHUB_PATH
+          mkdir -p build
+          mv linutil build/linutil
+          echo "${{ github.workspace }}/build" >> $GITHUB_PATH
 
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
@@ -46,10 +64,15 @@ jobs:
       - name: Move preview
         run: mv preview.gif docs/assets/preview.gif
 
-      - name: Upload preview
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7.0.5
         with:
-          commit_message: Preview for ${{ env.run_id }}
-          file_pattern: "docs/assets/preview.gif"
-          add_options: "--force"
+          commit-message: Preview for ${{ env.tag_name }}
+          file-pattern: "docs/assets/preview.gif"
+          add-options: "--force"
+          token: ${{ secrets.PAT_TOKEN }}
+          branch: feature/preview-${{ env.tag_name }}
+          title: "Update preview for ${{ env.tag_name }}"
+          body: |
+            Automated PR to update preview gif for version ${{ env.tag_name }}
         if: success()

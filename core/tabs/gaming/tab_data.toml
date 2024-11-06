@@ -5,6 +5,6 @@ name = "Diablo II Resurrected"
 
 [[data.entries]]
 name = "Loot Filter"
-description = "This is a loot filter for Diablo II Resurrected.\nIt's designed to be a simple, clean, and easy to read loot filter that highlights the most important items.\nWorks on battle.net and single player.\nNo frills, no config, just highlights high runes and other valuable items.\nFor more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter"
+description = "This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter"
 script = "diablo-ii/d2r-loot-filters.sh"
 task_list = "FM"

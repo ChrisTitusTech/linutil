@@ -36,12 +36,20 @@ struct Args {
     #[arg(long, default_value_t = false)]
     #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
     override_validation: bool,
+    #[arg(long, default_value_t = false)]
+    #[clap(help = "Bypass the terminal size limit")]
+    size_bypass: bool,
 }
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(args.theme, args.override_validation, args.config);
+    let mut state = AppState::new(
+        args.config,
+        args.theme,
+        args.override_validation,
+        args.size_bypass,
+    );
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
