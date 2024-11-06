@@ -62,6 +62,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: String,
+    size_bypass: bool,
 }
 
 pub enum Focus {
@@ -86,7 +87,7 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
+    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -104,6 +105,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            size_bypass,
         };
 
         state.update_items();
@@ -186,8 +188,9 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if !matches!(self.focus, Focus::FloatingWindow(_)) && terminal_size.width < MIN_WIDTH
-            || terminal_size.height < MIN_HEIGHT
+        if !self.size_bypass
+            && !matches!(self.focus, Focus::FloatingWindow(_))
+            && (terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT)
         {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
@@ -720,7 +723,8 @@ impl AppState {
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
             if !command_description.is_empty() {
-                let description = FloatingText::new(command_description, "Command Description");
+                let description =
+                    FloatingText::new(command_description, "Command Description", true);
                 self.spawn_float(description, 80, 80);
             }
         }
@@ -806,7 +810,7 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
             80,
             80,
         );
