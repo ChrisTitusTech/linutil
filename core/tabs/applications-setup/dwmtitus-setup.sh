@@ -218,6 +218,9 @@ setupDisplayManager() {
         case "$PACKAGER" in
             pacman)
                 elevated_execution "$PACKAGER" -S --needed --noconfirm "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    elevated_execution "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
+                fi
                 ;;
             apt-get|nala)
                 elevated_execution "$PACKAGER" install -y "$DM"
