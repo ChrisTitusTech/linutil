@@ -4,7 +4,7 @@
 
 installZapZap() {
   if ! command_exists com.rtosta.zapzap && ! command_exists zapzap; then
-    printf "%b\n" "${YELLOW}Installing Whatsapp(Zap-Zap by rtosta)${RC}"
+    printf "%b\n" "${YELLOW}Installing Zap-Zap...${RC}"
     case "$PACKAGER" in
       pacman)
         "$AUR_HELPER" -S --needed --noconfirm zapzap
