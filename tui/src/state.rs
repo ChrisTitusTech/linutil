@@ -62,6 +62,7 @@ pub struct AppState {
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: String,
+    size_bypass: bool,
 }
 
 pub enum Focus {
@@ -86,7 +87,7 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
+    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
         let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -104,6 +105,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            size_bypass,
         };
 
         state.update_items();
@@ -153,12 +155,10 @@ impl AppState {
                 hints.push(Shortcut::new("Select item below", ["j", "Down"]));
                 hints.push(Shortcut::new("Next theme", ["t"]));
                 hints.push(Shortcut::new("Previous theme", ["T"]));
-
-                if self.is_current_tab_multi_selectable() {
-                    hints.push(Shortcut::new("Toggle multi-selection mode", ["v"]));
+                hints.push(Shortcut::new("Multi-selection mode", ["v"]));
+                if self.multi_select {
                     hints.push(Shortcut::new("Select multiple commands", ["Space"]));
                 }
-
                 hints.push(Shortcut::new("Next tab", ["Tab"]));
                 hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
                 hints.push(Shortcut::new("Important actions guide", ["g"]));
@@ -188,7 +188,9 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
+        if !self.size_bypass
+            && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
+        {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
@@ -330,7 +332,12 @@ impl AppState {
                 let (indicator, style) = if is_selected {
                     (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    ("", Style::new())
+                    let ms_style = if self.multi_select && !node.multi_select {
+                        Style::default().fg(self.theme.multi_select_disabled_color())
+                    } else {
+                        Style::new()
+                    };
+                    ("", ms_style)
                 };
                 if *has_children {
                     Line::from(format!(
@@ -340,6 +347,7 @@ impl AppState {
                         indicator
                     ))
                     .style(self.theme.dir_color())
+                    .patch_style(style)
                 } else {
                     Line::from(format!(
                         "{}  {} {}",
@@ -357,13 +365,21 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
+                let ms_style = if self.multi_select && !node.multi_select {
+                    Style::default().fg(self.theme.multi_select_disabled_color())
+                } else {
+                    Style::new()
+                };
                 if *has_children {
-                    Line::from(" ").style(self.theme.dir_color())
+                    Line::from(" ")
+                        .style(self.theme.dir_color())
+                        .patch_style(ms_style)
                 } else {
                     Line::from(format!("{} ", node.task_list))
                         .alignment(Alignment::Right)
                         .style(self.theme.cmd_color())
                         .bold()
+                        .patch_style(ms_style)
                 }
             },
         ));
@@ -479,6 +495,13 @@ impl AppState {
                         // enabled, need to clear it to prevent state corruption
                         if !self.multi_select {
                             self.selected_commands.clear()
+                        } else {
+                            // Prevents non multi_selectable cmd from being pushed into the selected list
+                            if let Some(node) = self.get_selected_node() {
+                                if !node.multi_select {
+                                    self.selected_commands.retain(|cmd| cmd.name != node.name);
+                                }
+                            }
                         }
                     }
                     ConfirmStatus::Confirm => self.handle_confirm_command(),
@@ -556,29 +579,22 @@ impl AppState {
     }
 
     fn toggle_multi_select(&mut self) {
-        if self.is_current_tab_multi_selectable() {
-            self.multi_select = !self.multi_select;
-            if !self.multi_select {
-                self.selected_commands.clear();
-            }
+        self.multi_select = !self.multi_select;
+        if !self.multi_select {
+            self.selected_commands.clear();
         }
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_node() {
-            if self.selected_commands.contains(&command) {
-                self.selected_commands.retain(|c| c != &command);
-            } else {
-                self.selected_commands.push(command);
+        if let Some(node) = self.get_selected_node() {
+            if node.multi_select {
+                if self.selected_commands.contains(&node) {
+                    self.selected_commands.retain(|c| c != &node);
+                } else {
+                    self.selected_commands.push(node);
+                }
             }
         }
-    }
-
-    pub fn is_current_tab_multi_selectable(&self) -> bool {
-        let index = self.current_tab.selected().unwrap_or(0);
-        self.tabs
-            .get(index)
-            .map_or(false, |tab| tab.multi_selectable)
     }
 
     fn update_items(&mut self) {
@@ -587,10 +603,7 @@ impl AppState {
             self.current_tab.selected().unwrap(),
             self.visit_stack.last().unwrap().0,
         );
-        if !self.is_current_tab_multi_selectable() {
-            self.multi_select = false;
-            self.selected_commands.clear();
-        }
+
         let len = self.filter.item_list().len();
         if len > 0 {
             let current = self.selection.selected().unwrap_or(0);
@@ -709,7 +722,8 @@ impl AppState {
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
             if !command_description.is_empty() {
-                let description = FloatingText::new(command_description, "Command Description");
+                let description =
+                    FloatingText::new(command_description, "Command Description", true);
                 self.spawn_float(description, 80, 80);
             }
         }
@@ -795,7 +809,7 @@ impl AppState {
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
             80,
             80,
         );

@@ -218,6 +218,9 @@ setupDisplayManager() {
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
+                fi
                 ;;
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
