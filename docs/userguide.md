@@ -97,6 +97,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **RPM Fusion**: RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship. That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit. For more information visit: https://rpmfusion.org/
 - **Upgrade to a New Fedora Release**: Upgrades system to the next Fedora release
 - **Virtualization**: Enables Virtualization through dnf
+- **Btrfs Assistant, Snapper Config, grub-btrfs**: Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately.
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
