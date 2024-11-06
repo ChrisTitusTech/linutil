@@ -2,8 +2,7 @@
 
 . ../../common-script.sh
 
-installWhatsapp() {
-  printf "%b\n" "${YELLOW}The app we are installing is Zap-Zap, an Open Source Desktop Client for Linux${RC}"
+installZapZap() {
   if ! command_exists com.rtosta.zapzap && ! command_exists zapzap; then
     printf "%b\n" "${YELLOW}Installing Whatsapp(Zap-Zap by rtosta)${RC}"
     case "$PACKAGER" in
