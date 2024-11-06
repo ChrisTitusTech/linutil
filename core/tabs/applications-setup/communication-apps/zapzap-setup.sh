@@ -15,7 +15,7 @@ installZapZap() {
         ;;
     esac
   else
-    printf "%b\n" "${GREEN}WhatsApp(Zap-Zap by rtosta) is already installed.${RC}"
+    printf "%b\n" "${GREEN}Zap-Zap is already installed.${RC}"
   fi
 }
 
