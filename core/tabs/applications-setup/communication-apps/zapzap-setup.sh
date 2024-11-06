@@ -20,4 +20,4 @@ installZapZap() {
 }
 
 checkEnv
-installWhatsapp
+installZapZap
