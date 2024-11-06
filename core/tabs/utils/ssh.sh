@@ -4,6 +4,7 @@
 
 # Check if $HOME/.ssh/config exists, if not, create it
 if [ ! -f "$HOME/.ssh/config" ]; then
+    mkdir -p "$HOME/.ssh"\
     touch "$HOME/.ssh/config"
     chmod 600 "$HOME/.ssh/config"
 fi

@@ -1,5 +1,4 @@
 name = "System Setup"
-multi_selectable = false
 
 [[data]]
 name = "Arch Linux"
@@ -14,6 +13,7 @@ name = "Arch Server Setup"
 description = "This command installs a minimal arch server setup under 5 minutes."
 script = "arch/server-setup.sh"
 task_list = "SI D"
+multi_select = false
 
 [[data.entries]]
 name = "Paru AUR Helper"
@@ -43,11 +43,13 @@ task_list = "PFM"
 
 [[data.entries]]
 name = "Multimedia Codecs"
+description = "This script is designed to install multimedia codecs, and to ensure RPM Fusion repositories are installed."
 script = "fedora/multimedia-codecs.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Nvidia Proprietary Drivers"
+description = "This script is designed to download the proprietary NVIDIA drivers in Fedora."
 script = "fedora/nvidia-proprietary-driver-setup.sh"
 task_list = "I"
 
@@ -55,6 +57,12 @@ task_list = "I"
 name = "RPM Fusion"
 description = "RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship.\nThat software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit.\nFor more information visit: https://rpmfusion.org/"
 script = "fedora/rpm-fusion-setup.sh"
+task_list = "MP"
+
+[[data.entries]]
+name = "Upgrade to a New Fedora Release"
+description = "Upgrades system to the next Fedora release"
+script = "fedora/fedora-upgrade.sh"
 task_list = "MP"
 
 [[data.entries]]
@@ -71,14 +79,17 @@ task_list = "I"
 
 [[data]]
 name = "Full System Cleanup"
+description = "This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash."
 script = "system-cleanup.sh"
 task_list = "RP PFM"
+multi_select = false
 
 [[data]]
 name = "Full System Update"
 description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
 task_list = "PFM"
+multi_select = false
 
 [[data]]
 name = "Gaming Dependencies"
@@ -97,3 +108,9 @@ name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
 task_list = "RP"
+
+[[data]]
+name = "TTY Fonts"
+description = "This Script will set the default TTY font to Terminus size 32 Bold"
+script = "terminus-tty.sh"
+task_list = "I PFM"

@@ -15,9 +15,9 @@ installLinutil() {
             printf "%b" "Enter your choice: "
             read -r choice
             case $choice in
-                1) "$AUR_HELPER" -S --noconfirm linutil ;;
-                2) "$AUR_HELPER" -S --noconfirm linutil-bin ;;
-                3) "$AUR_HELPER" -S --noconfirm linutil-git ;;
+                1) "$AUR_HELPER" -S --needed --noconfirm linutil ;;
+                2) "$AUR_HELPER" -S --needed --noconfirm linutil-bin ;;
+                3) "$AUR_HELPER" -S --needed --noconfirm linutil-git ;;
                 *)
                     printf "%b\n" "${RED}Invalid choice:${RC} $choice"
                     exit 1
@@ -35,10 +35,10 @@ installLinutil() {
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
                             pacman)
-                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
+                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm curl rustup man-db
                                 ;;
                             dnf)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                "$ESCALATION_TOOL" "$PACKAGER" install -y curl rustup man-pages man-db man
                                 ;;
                             zypper)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
@@ -54,10 +54,21 @@ installLinutil() {
                     rustup default stable
                     cargo install --force linutil_tui
                     printf "%b\n" "${GREEN}Installed successfully.${RC}"
+                    installExtra
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;
             esac
     esac
+}
+
+installExtra() {
+    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    printf "%b\n" "${GREEN}Done.${RC}"
 }
 
 checkEnv

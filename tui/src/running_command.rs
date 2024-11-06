@@ -1,7 +1,4 @@
-use crate::{
-    float::FloatContent,
-    hint::{Shortcut, ShortcutList},
-};
+use crate::{float::FloatContent, hint::Shortcut};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
@@ -40,6 +37,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    scroll_offset: usize,
 }
 
 impl FloatContent for RunningCommand {
@@ -76,7 +74,7 @@ impl FloatContent for RunningCommand {
 
             title_line.push_span(
                 Span::default()
-                    .content(" press <ENTER> to close this window ")
+                    .content(" Press <ENTER> to close this window ")
                     .style(Style::default()),
             );
 
@@ -105,6 +103,12 @@ impl FloatContent for RunningCommand {
             KeyCode::Enter if self.is_finished() => {
                 return true;
             }
+            KeyCode::PageUp => {
+                self.scroll_offset = self.scroll_offset.saturating_add(10);
+            }
+            KeyCode::PageDown => {
+                self.scroll_offset = self.scroll_offset.saturating_sub(10);
+            }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
         }
@@ -120,17 +124,25 @@ impl FloatContent for RunningCommand {
         }
     }
 
-    fn get_shortcut_list(&self) -> ShortcutList {
+    fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         if self.is_finished() {
-            ShortcutList {
-                scope_name: "Finished command",
-                hints: vec![Shortcut::new(vec!["Enter", "q"], "Close window")],
-            }
+            (
+                "Finished command",
+                Box::new([
+                    Shortcut::new("Close window", ["Enter", "q"]),
+                    Shortcut::new("Scroll up", ["Page up"]),
+                    Shortcut::new("Scroll down", ["Page down"]),
+                ]),
+            )
         } else {
-            ShortcutList {
-                scope_name: "Running command",
-                hints: vec![Shortcut::new(vec!["CTRL-c"], "Kill the command")],
-            }
+            (
+                "Running command",
+                Box::new([
+                    Shortcut::new("Kill the command", ["CTRL-c"]),
+                    Shortcut::new("Scroll up", ["Page up"]),
+                    Shortcut::new("Scroll down", ["Page down"]),
+                ]),
+            )
         }
     }
 }
@@ -223,6 +235,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            scroll_offset: 0,
         }
     }
 
@@ -240,10 +253,12 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 0);
+        let mut parser = vt100::Parser::new(size.height, size.width, 200);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
+        // Adjust the screen content based on the scroll offset
+        parser.screen_mut().set_scrollback(self.scroll_offset);
         parser.screen().clone()
     }
 
@@ -300,8 +315,6 @@ impl RunningCommand {
             KeyCode::Tab => vec![9],
             KeyCode::Home => vec![27, 91, 72],
             KeyCode::End => vec![27, 91, 70],
-            KeyCode::PageUp => vec![27, 91, 53, 126],
-            KeyCode::PageDown => vec![27, 91, 54, 126],
             KeyCode::BackTab => vec![27, 91, 90],
             KeyCode::Delete => vec![27, 91, 51, 126],
             KeyCode::Insert => vec![27, 91, 50, 126],

@@ -3,7 +3,7 @@ name: Check for bashisms
 on:
   pull_request:
     paths:
-      - core/tabs/**
+      - 'core/tabs/**/*.sh'
   merge_group:
   workflow_dispatch:
 
@@ -15,21 +15,33 @@ jobs:
       - uses: actions/checkout@v4
       - run: git fetch origin ${{ github.base_ref }}
 
-      - name: Get a list of changed script files
-        id: get_sh_files
-        run: |
-          sh_files=$(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs | grep '\.sh$' || true)
-          echo "::set-output name=sh_files::$sh_files"
-      
       - name: Install devscripts
-        if: steps.get_sh_files.outputs.sh_files != ''
-        run: sudo apt-get update && sudo apt-get install devscripts
+        run: sudo apt-get update && sudo apt-get install -y devscripts
+
+      - name: Get changed .sh files (PR only)
+        id: changed-sh-files
+        if: github.event_name == 'pull_request'
+        uses: tj-actions/changed-files@v45
+        with:
+          files: '**/*.sh'
+
+      - name: Get all .sh files (if workflow dispatched)
+        id: sh-files
+        if: github.event_name != 'pull_request'
+        run: |
+          files=$(find . -type f -name "*.sh" | tr '\n' ' ')
+          echo "files=${files:-none}" >> $GITHUB_ENV
+
+      - name: Set FILES for bashism check
+        id: set-files
+        run: |
+          if [[ "${{ steps.changed-sh-files.outputs.any_changed }}" == 'true' ]]; then
+            echo "FILES=${{ steps.changed-sh-files.outputs.all_changed_files }}" >> $GITHUB_ENV
+          else
+            echo "FILES=${{ env.files }}" >> $GITHUB_ENV
+          fi
 
       - name: Check for bashisms
-        if: steps.get_sh_files.outputs.sh_files != ''
         run: |
-          for file in ${{ steps.get_sh_files.outputs.sh_files }}; do
-              if [[ -f "$file" ]]; then
-                  checkbashisms "$file"
-              fi
-          done
+          IFS=' ' read -r -a file_array <<< "$FILES"
+          checkbashisms "${file_array[@]}"

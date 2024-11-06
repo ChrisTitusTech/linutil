@@ -1,8 +1,8 @@
 name = "Utilities"
-multi_selectable = false
 
 [[data]]
 name = "Monitor Control"
+multi_select = false
 
 [[data.preconditions]]
 matches = true
@@ -16,62 +16,69 @@ values = [":0", ":1", ":2", ":3", ":4", ":5", ":6", ":7", ":8", ":9"]
 
 [[data.entries]]
 name = "Auto Detect Displays"
-description = "This utility is designed to detect and apply recommended configuration for monitors connected with your system"
+description = "This script is designed to detect and apply recommended configuration for monitors connected with your system"
 script = "monitor-control/auto_detect_displays.sh"
 
 [[data.entries]]
 name = "Change Orientation"
-description = "This utility is designed to change the orientation of monitors in your system"
+description = "This script is designed to change the orientation of monitors in your system"
 script = "monitor-control/change_orientation.sh"
 
 [[data.entries]]
 name = "Disable Monitor"
-description = "This utility is designed to disable a monitor in your system"
+description = "This script is designed to disable a monitor in your system"
 script = "monitor-control/disable_monitor.sh"
 
 [[data.entries]]
 name = "Duplicate Displays"
-description = "This utility is designed to duplicate display among multi-monitor setup in your system"
+description = "This script is designed to duplicate display among multi-monitor setup in your system"
 script = "monitor-control/duplicate_displays.sh"
 
 [[data.entries]]
 name = "Enable Monitor"
-description = "This utility is designed to enable a monitor in your system"
+description = "This script is designed to enable a monitor in your system"
 script = "monitor-control/enable_monitor.sh"
 
 [[data.entries]]
 name = "Extend Displays"
-description = "This utility is designed to extend display among multi-monitor setup in your system"
+description = "This script is designed to extend display among multi-monitor setup in your system"
 script = "monitor-control/extend_displays.sh"
 
 [[data.entries]]
 name = "Manage Arrangement"
-description = "This utility is designed to arrange monitors in multi-monitor setup in your system"
+description = "This script is designed to arrange monitors in multi-monitor setup in your system"
 script = "monitor-control/manage_arrangement.sh"
 
 [[data.entries]]
 name = "Reset Scaling"
-description = "This utility is designed to reset scaling of a monitor in your system"
+description = "This script is designed to reset scaling of a monitor in your system"
 script = "monitor-control/reset_scaling.sh"
 matches = true
 
 [[data.entries]]
 name = "Scale Monitors"
-description = "This utility is designed to change the scaling of monitors in your system"
+description = "This script is designed to change the scaling of monitors in your system"
 script = "monitor-control/scale_monitor.sh"
 
 [[data.entries]]
 name = "Set Brightness"
 script = "monitor-control/set_brightness.sh"
+description = "This script is designed to change the Brightness of monitors connected to your system"
 matches = true
 
 [[data.entries]]
 name = "Set Primary Monitor"
-description = "This utility is designed to set a Primary monitor in your system"
+description = "This script is designed to set a Primary monitor in your system"
 script = "monitor-control/set_primary_monitor.sh"
+
+[[data.entries]]
+name = "Set Resolution"
+description = "This script is designed to change the resolution of monitors connected to your system"
+script = "monitor-control/set_resolutions.sh"
 
 [[data]]
 name = "User Account Manager"
+multi_select = false
 
 [[data.entries]]
 name = "Add User"
@@ -98,6 +105,7 @@ name = "Auto Mount Drive"
 description = "This utility is designed to help with automating the process of mounting a drive on to your system."
 script = "auto-mount.sh"
 task_list = "PFM"
+multi_select = false
 
 [[data]]
 name = "Auto Login"
@@ -114,6 +122,7 @@ name = "Bluetooth Manager"
 description = "This utility is designed to manage bluetooth in your system"
 script = "bluetooth-control.sh"
 task_list = "I SS"
+multi_select = false
 
 [[data]]
 name = "Bootable USB Creator"
@@ -157,6 +166,11 @@ task_list = "I SS PFM"
 name = "Timeshift Backup"
 script = "timeshift.sh"
 task_list = "I"
+
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = [ "dnf" ]
 
 [[data]]
 name = "WiFi Manager"

@@ -1,4 +1,6 @@
-# How to Contribute?
+<!-- THIS FILE IS GENERATED AUTOMATICALLY. EDIT .github/CONTRIBUTING.md -->
+
+# Contributing Guidelines for Linutil
 
 Thank you for considering contributing to Linutil! We appreciate your effort in helping improve this project. To ensure that your contributions align with the goals and quality standards of Linutil, please follow these guidelines:
 
@@ -16,6 +18,7 @@ cd linutil
    ```
 
 ## 3. Make your changes
+
 - **Edit the files you want to change**: Make your changes to the relevant files.
 - **Test your changes**: Run `cargo run` to test your modifications in a local environment and ensure everything works as expected.
 
@@ -40,22 +43,29 @@ cd linutil
 - **Make small, targeted PRs**: Focus on one feature or fix per pull request. This makes it easier to review and increases the likelihood of acceptance.
 - **Avoid combining unrelated changes**: PRs that tackle multiple unrelated issues are harder to review and might be rejected because of a single problem.
 
-## 8. Code Review and Feedback
+## 8. Understand and Test the Code You Write
+
+- **Review your code**: Before submitting your changes, take the time to review your code for readability, efficiency and performance. Consider how your changes affect the project.
+- **Avoid using LLMs**: Don't submit AI-generated code without reviewing and testing it first. Ensure that any code you submit is thoroughly understood and meets the project's standards.
+- **Testing Requirements**: Failure to conduct testing after multiple requests may result in the closure of your Pull Request.
+
+## 9. Code Review and Feedback
 
 - **Expect feedback**: PRs will undergo code review. Be open to feedback and willing to make adjustments as needed.
 - **Participate in reviews**: If you feel comfortable, review other contributors' PRs as well. Peer review is a great way to learn and ensure high-quality contributions.
 
-## 9. Contributing Is More Than Just Code
+## 10. Contributing Is More Than Just Code
 
 - **Test the tool**: Running tests and providing feedback on how the tool works in different environments is a valuable contribution.
 - **Write well-formed issues**: Clearly describe bugs or problems you encounter, providing as much detail as possible, including steps to reproduce the issue.
 - **Propose reasonable feature requests**: When suggesting new features, ensure they fit within the scope, style, and design of the project. Provide clear reasoning and use cases.
 
-## 10. Documentation
+## 11. Documentation
 
 - **Update the documentation**: If your change affects the functionality, please update the relevant documentation files to reflect this.
+- **Automatic generation**: If you decide to add functionality through a new shell script, make sure to fill out all fields in `tab_data.toml` and run `cargo xtask docgen`.
 
-## 11. License
+## 12. License
 
 - **Agree to the license**: By contributing to Linutil, you agree that your contributions will be licensed under the project's MIT license.
 

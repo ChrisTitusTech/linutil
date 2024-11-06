@@ -16,7 +16,7 @@ set_primary_monitor() {
     printf "%b\n" "${YELLOW}Choose a monitor to set as primary:${RC}"
     i=1
     for monitor in $monitor_array; do
-        printf "%b\n" "$i. ${YELLOW}$monitor${RC}"
+        printf "%b\n" "$i. ${GREEN}$monitor${RC}"
         i=$((i + 1))
     done
 
