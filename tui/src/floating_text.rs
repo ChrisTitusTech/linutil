@@ -8,9 +8,8 @@ use crate::{float::FloatContent, hint::Shortcut};
 
 use linutil_core::Command;
 
-use crossterm::event::{KeyCode, KeyEvent};
-
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent},
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
@@ -216,6 +215,7 @@ impl FloatContent for FloatingText {
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
             .title(self.mode_title.clone())
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())

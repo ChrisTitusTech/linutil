@@ -229,6 +229,18 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Podman"
+description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
+script = "podman-setup.sh"
+task_list = "I SS"
+
+[[data]]
+name = "Podman-compose"
+description = "Podman Compose is a tool for defining and running multi-container applications using Podman."
+script = "podman-compose-setup.sh"
+task_list = "I SS"
+
+[[data]]
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"

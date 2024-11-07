@@ -56,6 +56,9 @@ All of the layouts can be applied dynamically, optimising the environment for th
 This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
+- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
@@ -83,6 +86,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### Arch Linux
 
 - **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
+- **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
+- **Nvidia Drivers && Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 
@@ -94,6 +99,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **RPM Fusion**: RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship. That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit. For more information visit: https://rpmfusion.org/
 - **Upgrade to a New Fedora Release**: Upgrades system to the next Fedora release
 - **Virtualization**: Enables Virtualization through dnf
+- **Btrfs Assistant, Snapper Config, grub-btrfs**: Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately.
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
@@ -124,7 +130,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Numlock on Startup**: This utility is designed to configure auto enabling of numlock on boot
+- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **WiFi Manager**: This utility is designed to manage wifi in your system

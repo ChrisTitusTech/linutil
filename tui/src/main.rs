@@ -14,13 +14,17 @@ use std::{
 
 use crate::theme::Theme;
 use clap::Parser;
-use crossterm::{
-    event::{self, DisableMouseCapture, Event, KeyEventKind},
-    style::ResetColor,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-    ExecutableCommand,
+
+use ratatui::{
+    backend::CrosstermBackend,
+    crossterm::{
+        event::{self, DisableMouseCapture, Event, KeyEventKind},
+        style::ResetColor,
+        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+        ExecutableCommand,
+    },
+    Terminal,
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
 use state::AppState;
 
 // Linux utility toolbox

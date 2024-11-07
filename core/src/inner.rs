@@ -1,6 +1,7 @@
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
+    ops::{Deref, DerefMut},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     rc::Rc,
@@ -14,8 +15,34 @@ use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
-pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
-    let (temp_dir, tab_files) = TabList::get_tabs();
+// Allow the unused TempDir to be stored for later destructor call
+#[allow(dead_code)]
+pub struct TabList(pub Vec<Tab>, TempDir);
+
+// Implement deref to allow Vec<Tab> methods to be called on TabList
+impl Deref for TabList {
+    type Target = Vec<Tab>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl DerefMut for TabList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+impl IntoIterator for TabList {
+    type Item = Tab;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+pub fn get_tabs(validate: bool) -> TabList {
+    let (temp_dir, tab_files) = TabDirectories::get_tabs();
 
     let tabs: Vec<_> = tab_files
         .into_iter()
@@ -50,11 +77,11 @@ pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
     if tabs.is_empty() {
         panic!("No tabs found");
     }
-    (temp_dir, tabs)
+    TabList(tabs, temp_dir)
 }
 
 #[derive(Deserialize)]
-struct TabList {
+struct TabDirectories {
     directories: Vec<PathBuf>,
 }
 
@@ -246,9 +273,9 @@ fn is_executable(path: &Path) -> bool {
         .unwrap_or(false)
 }
 
-impl TabList {
+impl TabDirectories {
     fn get_tabs() -> (TempDir, Vec<PathBuf>) {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::with_prefix("linutil_scripts").unwrap();
         TAB_DATA
             .extract(&temp_dir)
             .expect("Failed to extract the saved directory");
