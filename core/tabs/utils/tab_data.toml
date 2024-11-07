@@ -136,7 +136,7 @@ task_list = "I FM"
 
 [[data]]
 name = "Numlock on Startup"
-description = "This utility is designed to configure auto enabling of numlock on boot"
+description = "This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME"
 script = "numlock.sh"
 task_list = "PFM SS"
 
