@@ -9,6 +9,9 @@ installTelegram() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm telegram-desktop 
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add telegram-desktop
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram-desktop 
                 ;;

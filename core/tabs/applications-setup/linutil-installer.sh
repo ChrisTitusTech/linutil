@@ -45,6 +45,13 @@ installLinutil() {
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
                                 . $HOME/.cargo/env
                                 ;;
+                            apk)
+                                "$ESCALATION_TOOL" "$PACKAGER" add build-base
+                                "$ESCALATION_TOOL" "$PACKAGER" add rustup
+                                rustup-init
+                                # shellcheck disable=SC1091
+                                . "$HOME/.cargo/env"
+                                ;;
                             *)
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
                                 . $HOME/.cargo/env

@@ -12,6 +12,7 @@ list_devices() {
     printf "\n"
 }
 
+# shellcheck disable=SC2086
 installDependencies() {
     DEPENDENCIES="xz gzip bzip2 jq"
     if ! command_exists ${DEPENDENCIES}; then
@@ -23,6 +24,8 @@ installDependencies() {
                 "${ESCALATION_TOOL}" "${PACKAGER}" install -y ${DEPENDENCIES};;
             pacman)
                 "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES};;
+            apk)
+                "${ESCALATION_TOOL}" "${PACKAGER}" add ${DEPENDENCIES};;
             *)
                 printf "%b\n" "${RED}Unsupported package manager.${RC}"
                 exit 1
