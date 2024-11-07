@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installEvince() {
     if ! command_exists evince; then
@@ -8,6 +8,9 @@ installEvince() {
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm evince
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add evince
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y evince

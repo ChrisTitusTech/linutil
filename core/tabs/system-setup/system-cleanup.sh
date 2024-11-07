@@ -1,16 +1,15 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 cleanup_system() {
     printf "%b\n" "${YELLOW}Performing system cleanup...${RC}"
     case "$PACKAGER" in
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" clean
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y
-            "$ESCALATION_TOOL" "$PACKAGER" autoclean
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove -y 
             "$ESCALATION_TOOL" du -h /var/cache/apt
-            "$ESCALATION_TOOL" "$PACKAGER" clean
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" clean -a
@@ -25,18 +24,28 @@ cleanup_system() {
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
             "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" cache clean
+            ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            return 1
+            printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
             ;;
     esac
 }
 
 common_cleanup() {
-    "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
-    "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
-    "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    if [ -d /var/tmp ]; then
+        "$ESCALATION_TOOL" find /var/tmp -type f -atime +5 -delete
+    fi
+    if [ -d /tmp ]; then
+        "$ESCALATION_TOOL" find /tmp -type f -atime +5 -delete
+    fi
+    if [ -d /var/log ]; then
+        "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
+    fi
+    if [ "$INIT_MANAGER" = "systemctl" ]; then
+        "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    fi
 }
 
 clean_data() {
@@ -45,8 +54,12 @@ clean_data() {
     case $clean_response in
         y|Y)
             printf "%b\n" "${YELLOW}Cleaning up old cache files and emptying trash...${RC}"
-            find "$HOME/.cache/" -type f -atime +5 -delete
-            find "$HOME/.local/share/Trash" -mindepth 1 -delete
+            if [ -d "$HOME/.cache" ]; then
+                find "$HOME/.cache/" -type f -atime +5 -delete
+            fi
+            if [ -d "$HOME/.local/share/Trash" ]; then
+                find "$HOME/.local/share/Trash" -mindepth 1 -delete
+            fi
             printf "%b\n" "${GREEN}Cache and trash cleanup completed.${RC}"
             ;;
         *)

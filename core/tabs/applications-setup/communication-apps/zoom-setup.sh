@@ -3,14 +3,14 @@
 . ../../common-script.sh
 
 installZoom() {
-    if ! command_exists zoom; then
+    if ! command_exists us.zoom.Zoom && ! command_exists zoom; then
         printf "%b\n" "${YELLOW}Installing Zoom...${RC}"
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm zoom
                 ;;
             *)
-                . ../setup-flatpak.sh
+                checkFlatpak
                 flatpak install -y flathub us.zoom.Zoom
                 ;;
         esac

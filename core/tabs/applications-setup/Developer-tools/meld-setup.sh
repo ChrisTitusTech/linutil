@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installMeld() {
-    if ! command_exists meld; then
+    if ! command_exists org.gnome.meld && ! command_exists meld; then
         printf "%b\n" "${YELLOW}Installing Meld...${RC}"
         case "$PACKAGER" in
             pacman)
@@ -12,8 +12,11 @@ installMeld() {
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install meld
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add meld
+                ;;
             *)
-                . ../setup-flatpak.sh
+                checkFlatpak
                 flatpak install -y flathub org.gnome.meld
                 ;;
         esac

@@ -14,6 +14,9 @@ installFastfetch() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y /tmp/fastfetch.deb
                 rm /tmp/fastfetch.deb
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add fastfetch
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y fastfetch
                 ;;

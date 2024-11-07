@@ -11,7 +11,7 @@ installollama() {
     else
         printf "%b\n" "${YELLOW}Installing ollama...${RC}"
         curl -fsSL https://ollama.com/install.sh | "$ESCALATION_TOOL" sh
-        "$ESCALATION_TOOL" systemctl start ollama 
+        "$ESCALATION_TOOL" startService ollama 
     fi
 }
 
