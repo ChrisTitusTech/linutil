@@ -7,12 +7,12 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use ego_tree::NodeId;
-use linutil_core::{ListNode, Tab};
+
+use linutil_core::{ego_tree::NodeId, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     layout::{Alignment, Constraint, Direction, Flex, Layout},
     style::{Style, Stylize},
     text::{Line, Span, Text},
@@ -20,17 +20,17 @@ use ratatui::{
     Frame,
 };
 use std::rc::Rc;
-use temp_dir::TempDir;
 
-const MIN_WIDTH: u16 = 77;
-const MIN_HEIGHT: u16 = 19;
-const TITLE: &str = concat!("Linux Toolbox - ", env!("BUILD_DATE"));
+const MIN_WIDTH: u16 = 100;
+const MIN_HEIGHT: u16 = 25;
+const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
 FI - flatpak installation
 FM - file modification
 I  - installation (privileged)
+K  - kernel modifications (privileged)
 MP - package manager actions
 SI - full system installation
 SS - systemd actions (privileged)
@@ -40,19 +40,17 @@ P* - privileged *
 ";
 
 pub struct AppState {
-    /// This must be passed to retain the temp dir until the end of the program
-    _temp_dir: TempDir,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
     pub focus: Focus,
     /// List of tabs
-    tabs: Vec<Tab>,
+    tabs: TabList,
     /// Current tab
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
-    visit_stack: Vec<NodeId>,
+    visit_stack: Vec<(NodeId, usize)>,
     /// This is the state associated with the list widget, used to display the selection in the
     /// widget
     selection: ListState,
@@ -61,7 +59,8 @@ pub struct AppState {
     selected_commands: Vec<Rc<ListNode>>,
     drawable: bool,
     #[cfg(feature = "tips")]
-    tip: &'static str,
+    tip: String,
+    size_bypass: bool,
 }
 
 pub enum Focus {
@@ -78,18 +77,24 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+enum SelectedItem {
+    UpDir,
+    Directory,
+    Command,
+    None,
+}
+
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool) -> Self {
-        let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
+    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
+        let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
         let mut state = Self {
-            _temp_dir: temp_dir,
             theme,
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
-            visit_stack: vec![root_id],
+            visit_stack: vec![(root_id, 0usize)],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
             multi_select: false,
@@ -97,6 +102,7 @@ impl AppState {
             drawable: false,
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
+            size_bypass,
         };
 
         state.update_items();
@@ -119,7 +125,10 @@ impl AppState {
         match self.focus {
             Focus::Search => (
                 "Search bar",
-                Box::new([Shortcut::new("Finish search", ["Enter"])]),
+                Box::new([
+                    Shortcut::new("Abort search", ["Esc", "CTRL-c"]),
+                    Shortcut::new("Search", ["Enter"]),
+                ]),
             ),
 
             Focus::List => {
@@ -143,12 +152,10 @@ impl AppState {
                 hints.push(Shortcut::new("Select item below", ["j", "Down"]));
                 hints.push(Shortcut::new("Next theme", ["t"]));
                 hints.push(Shortcut::new("Previous theme", ["T"]));
-
-                if self.is_current_tab_multi_selectable() {
-                    hints.push(Shortcut::new("Toggle multi-selection mode", ["v"]));
+                hints.push(Shortcut::new("Multi-selection mode", ["v"]));
+                if self.multi_select {
                     hints.push(Shortcut::new("Select multiple commands", ["Space"]));
                 }
-
                 hints.push(Shortcut::new("Next tab", ["Tab"]));
                 hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
                 hints.push(Shortcut::new("Important actions guide", ["g"]));
@@ -178,7 +185,9 @@ impl AppState {
     pub fn draw(&mut self, frame: &mut Frame) {
         let terminal_size = frame.area();
 
-        if terminal_size.width < MIN_WIDTH || terminal_size.height < MIN_HEIGHT {
+        if !self.size_bypass
+            && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
+        {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
                 terminal_size.width,
@@ -205,19 +214,19 @@ impl AppState {
             self.drawable = true;
         }
 
-        let label_block =
-            Block::default()
-                .borders(Borders::all())
-                .border_set(ratatui::symbols::border::Set {
-                    top_left: " ",
-                    top_right: " ",
-                    bottom_left: " ",
-                    bottom_right: " ",
-                    vertical_left: " ",
-                    vertical_right: " ",
-                    horizontal_top: "*",
-                    horizontal_bottom: "*",
-                });
+        let label_block = Block::default()
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
+            .border_set(ratatui::symbols::border::Set {
+                top_left: " ",
+                top_right: " ",
+                bottom_left: " ",
+                bottom_right: " ",
+                vertical_left: " ",
+                vertical_right: " ",
+                horizontal_top: "*",
+                horizontal_bottom: "*",
+            });
         let str1 = "Linutil ";
         let str2 = "by Chris Titus";
         let label = Paragraph::new(Line::from(vec![
@@ -241,7 +250,8 @@ impl AppState {
 
         let keybinds_block = Block::default()
             .title(format!(" {} ", keybind_scope))
-            .borders(Borders::all());
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED);
 
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
         let n_lines = keybinds.len() as u16;
@@ -285,7 +295,11 @@ impl AppState {
         };
 
         let list = List::new(tabs)
-            .block(Block::default().borders(Borders::ALL))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(ratatui::symbols::border::ROUNDED),
+            )
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
@@ -320,7 +334,12 @@ impl AppState {
                 let (indicator, style) = if is_selected {
                     (self.theme.multi_select_icon(), Style::default().bold())
                 } else {
-                    ("", Style::new())
+                    let ms_style = if self.multi_select && !node.multi_select {
+                        Style::default().fg(self.theme.multi_select_disabled_color())
+                    } else {
+                        Style::new()
+                    };
+                    ("", ms_style)
                 };
                 if *has_children {
                     Line::from(format!(
@@ -330,6 +349,7 @@ impl AppState {
                         indicator
                     ))
                     .style(self.theme.dir_color())
+                    .patch_style(style)
                 } else {
                     Line::from(format!(
                         "{}  {} {}",
@@ -347,13 +367,21 @@ impl AppState {
             |ListEntry {
                  node, has_children, ..
              }| {
+                let ms_style = if self.multi_select && !node.multi_select {
+                    Style::default().fg(self.theme.multi_select_disabled_color())
+                } else {
+                    Style::new()
+                };
                 if *has_children {
-                    Line::from(" ").style(self.theme.dir_color())
+                    Line::from(" ")
+                        .style(self.theme.dir_color())
+                        .patch_style(ms_style)
                 } else {
                     Line::from(format!("{} ", node.task_list))
                         .alignment(Alignment::Right)
                         .style(self.theme.cmd_color())
                         .bold()
+                        .patch_style(ms_style)
                 }
             },
         ));
@@ -365,17 +393,17 @@ impl AppState {
         };
 
         let title = if self.multi_select {
-            &format!("{} [Multi-Select]", TITLE)
+            &format!("{}[Multi-Select] ", TITLE)
         } else {
             TITLE
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.bold().blue()).right_aligned();
+        let bottom_title = Line::from(self.tip.as_str().bold().blue()).right_aligned();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
-        let task_list_title = Line::from("Important Actions ").right_aligned();
+        let task_list_title = Line::from(" Important Actions ").right_aligned();
 
         // Create the list widget with items
         let list = List::new(items)
@@ -383,6 +411,7 @@ impl AppState {
             .block(
                 Block::default()
                     .borders(Borders::ALL & !Borders::RIGHT)
+                    .border_set(ratatui::symbols::border::ROUNDED)
                     .title(title)
                     .title_bottom(bottom_title),
             )
@@ -392,6 +421,7 @@ impl AppState {
         let disclaimer_list = List::new(task_items).highlight_style(style).block(
             Block::default()
                 .borders(Borders::ALL & !Borders::LEFT)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title(task_list_title),
         );
 
@@ -410,11 +440,15 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
-        if matches!(
-            self.focus,
-            Focus::TabList | Focus::List | Focus::ConfirmationPrompt(_)
-        ) && (key.code == KeyCode::Char('q')
-            || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && (key.code == KeyCode::Char('q')
+                || key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
+        {
+            return false;
+        }
+
+        if matches!(self.focus, Focus::ConfirmationPrompt(_))
+            && (key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
         }
@@ -465,6 +499,13 @@ impl AppState {
                         // enabled, need to clear it to prevent state corruption
                         if !self.multi_select {
                             self.selected_commands.clear()
+                        } else {
+                            // Prevents non multi_selectable cmd from being pushed into the selected list
+                            if let Some(node) = self.get_selected_node() {
+                                if !node.multi_select {
+                                    self.selected_commands.retain(|cmd| cmd.name != node.name);
+                                }
+                            }
                         }
                     }
                     ConfirmStatus::Confirm => self.handle_confirm_command(),
@@ -481,17 +522,9 @@ impl AppState {
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
 
-                KeyCode::Char('j') | KeyCode::Down
-                    if self.current_tab.selected().unwrap() + 1 < self.tabs.len() =>
-                {
-                    self.current_tab.select_next();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_tab_down(),
 
-                KeyCode::Char('k') | KeyCode::Up => {
-                    self.current_tab.select_previous();
-                    self.refresh_tab();
-                }
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_tab_up(),
 
                 KeyCode::Char('/') => self.enter_search(),
                 KeyCode::Char('t') => self.theme.next(),
@@ -501,8 +534,8 @@ impl AppState {
             },
 
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
-                KeyCode::Char('j') | KeyCode::Down => self.selection.select_next(),
-                KeyCode::Char('k') | KeyCode::Up => self.selection.select_previous(),
+                KeyCode::Char('j') | KeyCode::Down => self.scroll_down(),
+                KeyCode::Char('k') | KeyCode::Up => self.scroll_up(),
                 KeyCode::Char('p') | KeyCode::Char('P') => self.enable_preview(),
                 KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
@@ -521,41 +554,66 @@ impl AppState {
         true
     }
 
+    fn scroll_down(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current + 1 > max_index {
+            0
+        } else {
+            current + 1
+        };
+
+        self.selection.select(Some(next));
+    }
+
+    fn scroll_up(&mut self) {
+        let len = self.filter.item_list().len();
+        if len == 0 {
+            return;
+        }
+        let current = self.selection.selected().unwrap_or(0);
+        let max_index = if self.at_root() { len - 1 } else { len };
+        let next = if current == 0 { max_index } else { current - 1 };
+
+        self.selection.select(Some(next));
+    }
+
     fn toggle_multi_select(&mut self) {
-        if self.is_current_tab_multi_selectable() {
-            self.multi_select = !self.multi_select;
-            if !self.multi_select {
-                self.selected_commands.clear();
-            }
+        self.multi_select = !self.multi_select;
+        if !self.multi_select {
+            self.selected_commands.clear();
         }
     }
 
     fn toggle_selection(&mut self) {
-        if let Some(command) = self.get_selected_node() {
-            if self.selected_commands.contains(&command) {
-                self.selected_commands.retain(|c| c != &command);
-            } else {
-                self.selected_commands.push(command);
+        if let Some(node) = self.get_selected_node() {
+            if node.multi_select {
+                if self.selected_commands.contains(&node) {
+                    self.selected_commands.retain(|c| c != &node);
+                } else {
+                    self.selected_commands.push(node);
+                }
             }
         }
-    }
-
-    pub fn is_current_tab_multi_selectable(&self) -> bool {
-        let index = self.current_tab.selected().unwrap_or(0);
-        self.tabs
-            .get(index)
-            .map_or(false, |tab| tab.multi_selectable)
     }
 
     fn update_items(&mut self) {
         self.filter.update_items(
             &self.tabs,
             self.current_tab.selected().unwrap(),
-            *self.visit_stack.last().unwrap(),
+            self.visit_stack.last().unwrap().0,
         );
-        if !self.is_current_tab_multi_selectable() {
-            self.multi_select = false;
-            self.selected_commands.clear();
+
+        let len = self.filter.item_list().len();
+        if len > 0 {
+            let current = self.selection.selected().unwrap_or(0);
+            self.selection.select(Some(current.min(len - 1)));
+        } else {
+            self.selection.select(None);
         }
     }
 
@@ -575,9 +633,10 @@ impl AppState {
     }
 
     fn enter_parent_directory(&mut self) {
-        self.visit_stack.pop();
-        self.selection.select(Some(0));
-        self.update_items();
+        if let Some((_, previous_position)) = self.visit_stack.pop() {
+            self.selection.select(Some(previous_position));
+            self.update_items();
+        }
     }
 
     fn get_selected_node(&self) -> Option<Rc<ListNode>> {
@@ -604,20 +663,22 @@ impl AppState {
     }
 
     pub fn go_to_selected_dir(&mut self) {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
+        let selected_index = self.selection.selected().unwrap_or(0);
 
         if !self.at_root() && selected_index == 0 {
             self.enter_parent_directory();
             return;
         }
 
-        if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
-        }
+        let actual_index = if self.at_root() {
+            selected_index
+        } else {
+            selected_index - 1
+        };
 
-        if let Some(item) = self.filter.item_list().get(selected_index) {
+        if let Some(item) = self.filter.item_list().get(actual_index) {
             if item.has_children {
-                self.visit_stack.push(item.id);
+                self.visit_stack.push((item.id, selected_index));
                 self.selection.select(Some(0));
                 self.update_items();
             }
@@ -649,7 +710,6 @@ impl AppState {
 
     pub fn selected_item_is_up_dir(&self) -> bool {
         let selected_index = self.selection.selected().unwrap_or(0);
-
         !self.at_root() && selected_index == 0
     }
 
@@ -665,29 +725,47 @@ impl AppState {
 
     fn enable_description(&mut self) {
         if let Some(command_description) = self.get_selected_description() {
-            let description = FloatingText::new(command_description, "Command Description");
-            self.spawn_float(description, 80, 80);
+            if !command_description.is_empty() {
+                let description =
+                    FloatingText::new(command_description, "Command Description", true);
+                self.spawn_float(description, 80, 80);
+            }
+        }
+    }
+
+    fn get_selected_item_type(&self) -> SelectedItem {
+        if self.selected_item_is_up_dir() {
+            SelectedItem::UpDir
+        } else if self.selected_item_is_dir() {
+            SelectedItem::Directory
+        } else if self.selected_item_is_cmd() {
+            SelectedItem::Command
+        } else {
+            SelectedItem::None
         }
     }
 
     fn handle_enter(&mut self) {
-        if self.selected_item_is_cmd() {
-            if self.selected_commands.is_empty() {
-                if let Some(node) = self.get_selected_node() {
-                    self.selected_commands.push(node);
+        match self.get_selected_item_type() {
+            SelectedItem::UpDir => self.enter_parent_directory(),
+            SelectedItem::Directory => self.go_to_selected_dir(),
+            SelectedItem::Command => {
+                if self.selected_commands.is_empty() {
+                    if let Some(node) = self.get_selected_node() {
+                        self.selected_commands.push(node);
+                    }
                 }
+
+                let cmd_names = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect::<Vec<_>>();
+
+                let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
             }
-
-            let cmd_names = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect::<Vec<_>>();
-
-            let prompt = ConfirmPrompt::new(&cmd_names[..]);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
-        } else {
-            self.go_to_selected_dir();
+            SelectedItem::None => {}
         }
     }
 
@@ -721,20 +799,42 @@ impl AppState {
     }
 
     fn refresh_tab(&mut self) {
-        self.visit_stack = vec![self.tabs[self.current_tab.selected().unwrap()]
-            .tree
-            .root()
-            .id()];
+        self.visit_stack = vec![(
+            self.tabs[self.current_tab.selected().unwrap()]
+                .tree
+                .root()
+                .id(),
+            0usize,
+        )];
         self.selection.select(Some(0));
+        self.filter.clear_search();
         self.update_items();
     }
 
     fn toggle_task_list_guide(&mut self) {
         self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide"),
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
             80,
             80,
         );
+    }
+
+    fn scroll_tab_down(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current + 1 >= len { 0 } else { current + 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
+    }
+
+    fn scroll_tab_up(&mut self) {
+        let len = self.tabs.len();
+        let current = self.current_tab.selected().unwrap_or(0);
+        let next = if current == 0 { len - 1 } else { current - 1 };
+
+        self.current_tab.select(Some(next));
+        self.refresh_tab();
     }
 }
 
@@ -742,13 +842,13 @@ impl AppState {
 const TIPS: &str = include_str!("../cool_tips.txt");
 
 #[cfg(feature = "tips")]
-fn get_random_tip() -> &'static str {
+fn get_random_tip() -> String {
     let tips: Vec<&str> = TIPS.lines().collect();
     if tips.is_empty() {
-        return "";
+        return "".to_string();
     }
 
     let mut rng = rand::thread_rng();
     let random_index = rng.gen_range(0..tips.len());
-    tips[random_index]
+    format!(" {} ", tips[random_index])
 }

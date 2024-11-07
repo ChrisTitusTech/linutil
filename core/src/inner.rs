@@ -1,6 +1,7 @@
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
+    ops::{Deref, DerefMut},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     rc::Rc,
@@ -14,8 +15,34 @@ use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
-pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
-    let (temp_dir, tab_files) = TabList::get_tabs();
+// Allow the unused TempDir to be stored for later destructor call
+#[allow(dead_code)]
+pub struct TabList(pub Vec<Tab>, TempDir);
+
+// Implement deref to allow Vec<Tab> methods to be called on TabList
+impl Deref for TabList {
+    type Target = Vec<Tab>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl DerefMut for TabList {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+impl IntoIterator for TabList {
+    type Item = Tab;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+pub fn get_tabs(validate: bool) -> TabList {
+    let (temp_dir, tab_files) = TabDirectories::get_tabs();
 
     let tabs: Vec<_> = tab_files
         .into_iter()
@@ -33,40 +60,28 @@ pub fn get_tabs(validate: bool) -> (TempDir, Vec<Tab>) {
 
     let tabs: Vec<Tab> = tabs
         .into_iter()
-        .map(
-            |(
-                TabEntry {
-                    name,
-                    data,
-                    multi_selectable,
-                },
-                directory,
-            )| {
-                let mut tree = Tree::new(Rc::new(ListNode {
-                    name: "root".to_string(),
-                    description: String::new(),
-                    command: Command::None,
-                    task_list: String::new(),
-                }));
-                let mut root = tree.root_mut();
-                create_directory(data, &mut root, &directory, validate);
-                Tab {
-                    name,
-                    tree,
-                    multi_selectable,
-                }
-            },
-        )
+        .map(|(TabEntry { name, data }, directory)| {
+            let mut tree = Tree::new(Rc::new(ListNode {
+                name: "root".to_string(),
+                description: String::new(),
+                command: Command::None,
+                task_list: String::new(),
+                multi_select: false,
+            }));
+            let mut root = tree.root_mut();
+            create_directory(data, &mut root, &directory, validate, true);
+            Tab { name, tree }
+        })
         .collect();
 
     if tabs.is_empty() {
         panic!("No tabs found");
     }
-    (temp_dir, tabs)
+    TabList(tabs, temp_dir)
 }
 
 #[derive(Deserialize)]
-struct TabList {
+struct TabDirectories {
     directories: Vec<PathBuf>,
 }
 
@@ -74,12 +89,6 @@ struct TabList {
 struct TabEntry {
     name: String,
     data: Vec<Entry>,
-    #[serde(default = "default_multi_selectable")]
-    multi_selectable: bool,
-}
-
-fn default_multi_selectable() -> bool {
-    true
 }
 
 #[derive(Deserialize)]
@@ -94,6 +103,12 @@ struct Entry {
     entry_type: EntryType,
     #[serde(default)]
     task_list: String,
+    #[serde(default = "default_true")]
+    multi_select: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[derive(Deserialize)]
@@ -174,8 +189,11 @@ fn create_directory(
     node: &mut NodeMut<Rc<ListNode>>,
     command_dir: &Path,
     validate: bool,
+    parent_multi_select: bool,
 ) {
     for entry in data {
+        let multi_select = parent_multi_select && entry.multi_select;
+
         match entry.entry_type {
             EntryType::Entries(entries) => {
                 let mut node = node.append(Rc::new(ListNode {
@@ -183,8 +201,9 @@ fn create_directory(
                     description: entry.description,
                     command: Command::None,
                     task_list: String::new(),
+                    multi_select,
                 }));
-                create_directory(entries, &mut node, command_dir, validate);
+                create_directory(entries, &mut node, command_dir, validate, multi_select);
             }
             EntryType::Command(command) => {
                 node.append(Rc::new(ListNode {
@@ -192,6 +211,7 @@ fn create_directory(
                     description: entry.description,
                     command: Command::Raw(command),
                     task_list: String::new(),
+                    multi_select,
                 }));
             }
             EntryType::Script(script) => {
@@ -210,6 +230,7 @@ fn create_directory(
                             file: script,
                         },
                         task_list: entry.task_list,
+                        multi_select,
                     }));
                 }
             }
@@ -252,9 +273,9 @@ fn is_executable(path: &Path) -> bool {
         .unwrap_or(false)
 }
 
-impl TabList {
+impl TabDirectories {
     fn get_tabs() -> (TempDir, Vec<PathBuf>) {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::with_prefix("linutil_scripts").unwrap();
         TAB_DATA
             .extract(&temp_dir)
             .expect("Failed to extract the saved directory");

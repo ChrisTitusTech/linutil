@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../common-script.sh
+. ../../common-script.sh
 
 installOkular() {
     if ! command_exists okular; then
@@ -8,6 +8,9 @@ installOkular() {
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm okular
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add okular
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y okular

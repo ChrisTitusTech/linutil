@@ -1,9 +1,9 @@
-name: ShellCheck
+name: Script Checks
 
 on:
   pull_request:
     paths:
-      - 'core/tabs/**/*.sh'
+      - '**/*.sh'
   workflow_dispatch:
 
 jobs:
@@ -11,45 +11,25 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: git fetch origin ${{ github.base_ref }}
+      - name: Checkout sources
+        uses: actions/checkout@v4
 
-      - name: Download, setup, and run ShellCheck
-        shell: bash {0}
-        run : |
-          SC_URL="https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz"
-          curl -fsSL "$SC_URL" | tar -Jx
-          chmod +x "./shellcheck-v0.10.0/shellcheck"
+      - name: Run ShellCheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          shellcheck_flags: '--source-path=${{ github.workspace }}/.shellcheckrc'
+          reviewdog_flags: '-fail-level=any'
 
-          error=0
-          files_to_check=$(git diff --name-only origin/${{ github.base_ref }} HEAD core/tabs)
+  shfmt:
+    name: Shell Fomatting
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
 
-          for file in $files_to_check; do
-              if [[ "$file" == *.sh ]] && [[ -f "$file" ]]; then
-                  sc_output=$(./shellcheck-v0.10.0/shellcheck -fgcc -Serror "$file")
-                  iter_safe_parsed_errors=$(echo -e "$sc_output" | sed -n 's/\(.\+\)\:\([0-9]\+\)\:\([0-9]\+\)\: \(.*\)/::error file=\1,line=\2,col=\3::\4/p' | sed 's/ /:space:/g')
-
-                  for error in $iter_safe_parsed_errors; do
-                      echo "$error" | sed 's/:space:/ /g'
-                      error=1
-                  done
-
-                  tabs_detected=$(grep -nP '^\t+\S+' "$file")
-
-                  # fast fail on the action runner would fail immediately if there weren't any tabs found
-                  # this check makes sure that we don't continue if there's something really weird going on
-                  if [ "$?" = "2" ]; then
-                      echo "::error file=$file::There was a critical error while grepping $file, aborting"
-                      exit 1
-                  fi
-
-                  iter_safe_parsed_tabs_detected=$(echo "$tabs_detected" | sed -n 's,\([0-9]\+\).*,::error file='"$file"'\,line=\1::Found tab indentations,p' | sed 's/ /:space:/g')
-
-                  for error in $iter_safe_parsed_tabs_detected; do
-                      echo "$error" | sed 's/:space:/ /g'
-                      error=1
-                  done
-              fi
-          done
-
-          exit $error
+      - name: Run shfmt
+        uses: reviewdog/action-shfmt@v1
+        with:
+          shfmt_flags: '-i 4 -ci'
+          reviewdog_flags: '-fail-level=any'

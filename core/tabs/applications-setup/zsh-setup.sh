@@ -10,6 +10,9 @@ installZsh() {
           pacman)
               "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm zsh
               ;;
+          apk)
+              "$ESCALATION_TOOL" "$PACKAGER" add zsh
+              ;;
           *)
               "$ESCALATION_TOOL" "$PACKAGER" install -y zsh
               ;;
