@@ -78,13 +78,13 @@ If you find Linutil helpful, please consider giving it a ⭐️ to show your sup
 
 ## 🎓 Documentation
 
-For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://christitustech.github.io/linutil/).
+For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://chris-titus-docs.github.io/linutil-docs/).
 
 ## 🛠 Contributing
 
 We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](.github/CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
 
-[Official LinUtil Roadmap](https://christitustech.github.io/linutil/roadmap)
+[Official LinUtil Roadmap](https://chris-titus-docs.github.io/linutil-docs/roadmap/)
 
 Docs are now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
 
