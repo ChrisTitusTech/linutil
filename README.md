@@ -58,7 +58,15 @@ paru -S linutil
 Replace `paru` with your preferred helper and `linutil` with your preferred package.
 
 </details>
+<details>
+  <summary>OpenSUSE</summary>
+  
+Linutil can be installed on OpenSUSE with:
+```bash
+sudo zypper install linutil
+```
 
+</details>
 <details>
   <summary>Cargo</summary>
 
