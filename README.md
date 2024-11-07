@@ -100,6 +100,28 @@ Note that crates installed using `cargo install` require manual updating with `c
 
 </details>
 
+## Configuration
+
+Linutil supports configuration through a TOML config file. Path to the file can be specified with `--config` (or `-c`).
+
+Available options:
+- `auto_execute` - a list of commands to execute automatically (can be combined with `--skip-confirmation`)
+
+Example config:
+```toml
+# example_config.toml
+
+auto_execute = [
+    "Fastfetch",
+    "Alacritty",
+    "Kitty"
+]
+```
+
+```bash
+linutil --config /path/to/example_config.toml
+```
+
 ## 💖 Support
 
 If you find Linutil helpful, please consider giving it a ⭐️ to show your support!
