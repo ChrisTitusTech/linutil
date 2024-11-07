@@ -126,6 +126,11 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
 - **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
 
+### Printers
+
+- **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
+- **Epson printer drivers**: This script will install the Epson printer drivers.
+
 ### User Account Manager
 
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
