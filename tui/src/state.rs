@@ -7,8 +7,8 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use ego_tree::NodeId;
-use linutil_core::{ListNode, TabList};
+
+use linutil_core::{ego_tree::NodeId, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
