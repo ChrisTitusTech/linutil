@@ -44,6 +44,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
 - **Thorium**: Thorium is a Chromium-based browser focused on privacy and performance.
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
+- **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
