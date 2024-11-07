@@ -1,11 +1,11 @@
 use crate::{float::FloatContent, hint::Shortcut};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
     style::{Color, Style, Stylize},
     text::{Line, Span},
@@ -53,6 +53,7 @@ impl FloatContent for RunningCommand {
             // Display a block indicating the command is running
             Block::default()
                 .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title_top(Line::from("Running the command....").centered())
                 .title_style(Style::default().reversed())
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
@@ -74,12 +75,13 @@ impl FloatContent for RunningCommand {
 
             title_line.push_span(
                 Span::default()
-                    .content(" press <ENTER> to close this window ")
+                    .content(" Press <ENTER> to close this window ")
                     .style(Style::default()),
             );
 
             Block::default()
                 .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title_top(title_line.centered())
         };
 
@@ -253,7 +255,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 200);
+        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);

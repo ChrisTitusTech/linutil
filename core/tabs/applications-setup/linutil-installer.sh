@@ -25,6 +25,10 @@ installLinutil() {
             esac
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install linutil -y
+            printf "%b\n" "${GREEN}Installed successfully.${RC}"
+            ;;
         *)
             printf "%b\n" "${RED}There are no official packages for your distro.${RC}"
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
@@ -35,15 +39,17 @@ installLinutil() {
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
                             pacman)
-                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
+                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm curl rustup man-db
                                 ;;
                             dnf)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
+                                "$ESCALATION_TOOL" "$PACKAGER" install -y curl rustup man-pages man-db man
                                 ;;
-                            zypper)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-                                . $HOME/.cargo/env
+                            apk)
+                                "$ESCALATION_TOOL" "$PACKAGER" add build-base
+                                "$ESCALATION_TOOL" "$PACKAGER" add rustup
+                                rustup-init
+                                # shellcheck disable=SC1091
+                                . "$HOME/.cargo/env"
                                 ;;
                             *)
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -54,10 +60,21 @@ installLinutil() {
                     rustup default stable
                     cargo install --force linutil_tui
                     printf "%b\n" "${GREEN}Installed successfully.${RC}"
+                    installExtra
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;
             esac
     esac
+}
+
+installExtra() {
+    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    printf "%b\n" "${GREEN}Done.${RC}"
 }
 
 checkEnv

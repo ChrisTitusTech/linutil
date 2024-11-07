@@ -9,6 +9,9 @@ if ! command_exists chromium; then
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm chromium
             ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add chromium
+            ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
             ;;

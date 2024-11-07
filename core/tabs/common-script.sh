@@ -9,7 +9,48 @@ CYAN='\033[36m'
 GREEN='\033[32m'
 
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+for cmd in "$@"; do
+    export PATH="$HOME/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
+    command -v "$cmd" >/dev/null 2>&1 || return 1
+done
+return 0
+}
+
+checkFlatpak() {
+    if ! command_exists flatpak; then
+        printf "%b\n" "${YELLOW}Installing Flatpak...${RC}"
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add flatpak
+                ;;
+            *)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
+                ;;
+        esac
+        printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
+        "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        printf "%b\n" "${YELLOW}Applications installed by Flatpak may not appear on your desktop until the user session is restarted...${RC}"
+    else
+        if ! flatpak remotes | grep -q "flathub"; then
+            printf "%b\n" "${YELLOW}Adding Flathub remote...${RC}"
+            "$ESCALATION_TOOL" flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        else
+            printf "%b\n" "${CYAN}Flatpak is installed${RC}"
+        fi
+    fi
+}
+
+checkArch() {
+    case "$(uname -m)" in
+        x86_64 | amd64) ARCH="x86_64" ;;
+        aarch64 | arm64) ARCH="aarch64" ;;
+        *) printf "%b\n" "${RED}Unsupported architecture: $(uname -m)${RC}" && exit 1 ;;
+    esac
+
+    printf "%b\n" "${CYAN}System architecture: ${ARCH}${RC}"
 }
 
 checkAURHelper() {
@@ -82,6 +123,12 @@ checkPackageManager() {
         fi
     done
 
+    ## Enable apk community packages
+    if [ "$PACKAGER" = "apk" ] && grep -qE '^#.*community' /etc/apk/repositories; then
+        "$ESCALATION_TOOL" sed -i '/community/s/^#//' /etc/apk/repositories
+        "$ESCALATION_TOOL" "$PACKAGER" update
+    fi
+
     if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
@@ -125,9 +172,10 @@ checkDistro() {
 }
 
 checkEnv() {
+    checkArch
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
-    checkPackageManager 'nala apt-get dnf pacman zypper'
+    checkPackageManager 'nala apt-get dnf pacman zypper apk'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

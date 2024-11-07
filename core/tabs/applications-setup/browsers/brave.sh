@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installBrave() {
-    if ! command_exists brave; then
+    if ! command_exists com.brave.Browser && ! command_exists brave; then
         printf "%b\n" "${YELLOW}Installing Brave...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -28,6 +28,10 @@ installBrave() {
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
                 "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
+                ;;
+            apk)
+                checkFlatpak
+                flatpak install -y flathub com.brave.Browser
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

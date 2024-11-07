@@ -19,6 +19,9 @@ installAutoCpufreq() {
                 pacman)
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm git
                     ;;
+                apk)
+                    "$ESCALATION_TOOL" "$PACKAGER" add git
+                    ;;
                 *)
                     "$ESCALATION_TOOL" "$PACKAGER" install -y git
                     ;;

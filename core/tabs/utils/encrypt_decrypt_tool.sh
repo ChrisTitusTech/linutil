@@ -8,7 +8,7 @@ printf "%b\n" "${YELLOW}Ensuring OpenSSL is installed...${RC}"
 if ! command_exists openssl; then
     case "$PACKAGER" in
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm openssl
+            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed openssl
             ;;
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
@@ -18,6 +18,9 @@ if ! command_exists openssl; then
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install openssl
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add openssl
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
