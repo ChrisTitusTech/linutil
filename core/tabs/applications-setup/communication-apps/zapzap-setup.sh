@@ -10,7 +10,7 @@ installZapZap() {
         "$AUR_HELPER" -S --needed --noconfirm zapzap
         ;;
       *)
-        . ../setup-flatpak.sh
+        checkFlatpak
         flatpak install flathub com.rtosta.zapzap
         ;;
     esac
