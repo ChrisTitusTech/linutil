@@ -444,7 +444,6 @@ dependencies = [
  "ansi-to-tui",
  "anstyle",
  "clap",
- "crossterm",
  "ego-tree",
  "linutil_core",
  "oneshot",

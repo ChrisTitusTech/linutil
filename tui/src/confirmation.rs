@@ -2,8 +2,8 @@ use std::borrow::Cow;
 
 use crate::{float::FloatContent, hint::Shortcut};
 
-use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent},
     layout::Alignment,
     prelude::*,
     widgets::{Block, Borders, Clear, List},
@@ -60,6 +60,7 @@ impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect) {
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
             .title(" Confirm selections ")
             .title_bottom(" [y] to continue, [n] to abort ")
             .title_alignment(Alignment::Center)

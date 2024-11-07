@@ -1,11 +1,11 @@
 use crate::{float::FloatContent, hint::Shortcut};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
     style::{Color, Style, Stylize},
     text::{Line, Span},
@@ -54,6 +54,7 @@ impl FloatContent for RunningCommand {
             // Display a block indicating the command is running
             Block::default()
                 .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title_top(Line::from("Running the command....").centered())
                 .title_style(Style::default().reversed())
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
@@ -81,6 +82,7 @@ impl FloatContent for RunningCommand {
 
             let mut block = Block::default()
                 .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title_top(title_line.centered());
 
             if let Some(log_path) = &self.log_path {
