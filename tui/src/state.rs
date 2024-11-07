@@ -7,8 +7,8 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use ego_tree::NodeId;
-use linutil_core::{Config, ListNode, TabList};
+
+use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -62,6 +62,7 @@ pub struct AppState {
     #[cfg(feature = "tips")]
     tip: String,
     size_bypass: bool,
+    skip_confirmation: bool,
 }
 
 pub enum Focus {
@@ -91,6 +92,7 @@ impl AppState {
         theme: Theme,
         override_validation: bool,
         size_bypass: bool,
+        skip_confirmation: bool,
     ) -> Self {
         let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
@@ -111,6 +113,7 @@ impl AppState {
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
             size_bypass,
+            skip_confirmation,
         };
 
         state.update_items();
@@ -786,14 +789,18 @@ impl AppState {
                     }
                 }
 
-                let cmd_names = self
-                    .selected_commands
-                    .iter()
-                    .map(|node| node.name.as_str())
-                    .collect::<Vec<_>>();
+                if self.skip_confirmation {
+                    self.handle_confirm_command();
+                } else {
+                    let cmd_names = self
+                        .selected_commands
+                        .iter()
+                        .map(|node| node.name.as_str())
+                        .collect::<Vec<_>>();
 
-                let prompt = ConfirmPrompt::new(&cmd_names[..]);
-                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                    let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                    self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                }
             }
             SelectedItem::None => {}
         }

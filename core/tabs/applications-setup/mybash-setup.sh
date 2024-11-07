@@ -11,6 +11,9 @@ installDepend() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add bash bash-completion tar bat tree unzip fontconfig git
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y bash bash-completion tar bat tree unzip fontconfig git
                 ;;
@@ -54,7 +57,7 @@ installStarshipAndFzf() {
         return
     fi
 
-    if ! curl -sSL https://starship.rs/install.sh | sh; then
+    if ! curl -sSL https://starship.rs/install.sh | "$ESCALATION_TOOL" sh; then
         printf "%b\n" "${RED}Something went wrong during starship install!${RC}"
         exit 1
     fi

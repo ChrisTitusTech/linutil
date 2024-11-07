@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 # Function to check Bluez is installed
 setupBluetooth() {
@@ -10,6 +11,9 @@ setupBluetooth() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez-utils
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add bluez
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
                 ;;
@@ -18,15 +22,7 @@ setupBluetooth() {
         printf "%b\n" "${GREEN}Bluez is already installed.${RC}"
     fi
 
-    # Check if bluetooth service is running
-    if ! systemctl is-active --quiet bluetooth; then
-        printf "%b\n" "${YELLOW}Bluetooth service is not running. Starting it now...${RC}"
-        "$ESCALATION_TOOL" systemctl start bluetooth
-        
-        if systemctl is-active --quiet bluetooth; then
-            printf "%b\n" "${GREEN}Bluetooth service started successfully.${RC}"
-        fi
-    fi
+    startService bluetooth
 }
 
 # Function to display the main menu
