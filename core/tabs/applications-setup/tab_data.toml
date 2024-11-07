@@ -85,8 +85,7 @@ script = "Developer-tools/sublime-setup.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "
-(Whatsapp Client)"
+name = "ZapZap"
 description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
 script = "communication-apps/zapzap-setup.sh"
 task_list = "I"
