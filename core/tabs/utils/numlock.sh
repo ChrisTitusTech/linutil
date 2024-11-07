@@ -2,11 +2,6 @@
 
 . ../common-script.sh
 
-# setleds can be used in all distros
-# This method works by calling a script using systemd service
-
-# Create a script to toggle numlock
-
 create_file() {
   printf "%b\n" "Creating script..."
   "$ESCALATION_TOOL" tee "/usr/local/bin/numlock" >/dev/null <<'EOF'
@@ -21,7 +16,6 @@ EOF
   "$ESCALATION_TOOL" chmod +x /usr/local/bin/numlock
 }
 
-# Create a systemd service to run the script on boot
 create_service() {
   printf "%b\n" "Creating service..."
   "$ESCALATION_TOOL" tee "/etc/systemd/system/numlock.service" >/dev/null <<'EOF'
@@ -39,7 +33,6 @@ EOF
 }
 
 numlockSetup() {
-  # Check if the script and service files exists
   if [ ! -f "/usr/local/bin/numlock" ]; then
     create_file
   fi

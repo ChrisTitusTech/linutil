@@ -1,5 +1,5 @@
-use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, MouseEvent},
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
 };
