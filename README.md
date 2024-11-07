@@ -24,6 +24,26 @@ curl -fsSL https://christitus.com/linux | sh
 ```bash
 curl -fsSL https://christitus.com/linuxdev | sh
 ```
+<details>
+  <summary>CLI arguments</summary>
+
+Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
+
+- `-t, --theme <THEME>` : Set the theme to use in the application [default: default] [possible values: default, compatible].
+- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
+- `-h, --help` : Print help.
+
+For more detailed usage, run:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
+```
+
+```bash
+linutil --help
+```
+</details>
+
 ## ⬇️ Installation
 
 Linutil is also available as a package in various repositories:
