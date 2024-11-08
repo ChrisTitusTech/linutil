@@ -873,6 +873,10 @@ impl AppState {
         self.current_tab.select(Some(next));
         self.refresh_tab();
     }
+
+    pub fn set_float_window(&mut self, float: Float<dyn FloatContent + 'static>) {
+        self.focus = Focus::FloatingWindow(float);
+    }
 }
 
 #[cfg(feature = "tips")]

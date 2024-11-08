@@ -29,6 +29,7 @@ textwrap = "0.16.1"
 anstyle = "1.0.8"
 ansi-to-tui = "7.0.0"
 zips = "0.1.7"
+nix = { version = "0.29.0", features = [ "user" ] }
 
 [[bin]]
 name = "linutil"

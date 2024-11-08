@@ -3,6 +3,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
 pub mod state;
 mod theme;
@@ -27,6 +28,8 @@ use ratatui::{
     Terminal,
 };
 use state::AppState;
+
+use crate::root::create_app_state;
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
@@ -54,7 +57,7 @@ struct Args {
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(
+    let mut state = create_app_state(
         args.config,
         args.theme,
         args.override_validation,
