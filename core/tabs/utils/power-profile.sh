@@ -48,7 +48,7 @@ configureAutoCpufreq() {
 
     if command_exists auto-cpufreq; then
         # Check if the system has a battery to determine if it's a laptop
-        if [ -d /sys/class/power_supply/BAT0 ]; then
+        if ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
             printf "%b\n" "${GREEN}System detected as laptop. Updating auto-cpufreq for laptop...${RC}"
             "$ESCALATION_TOOL" auto-cpufreq --force powersave
         else
