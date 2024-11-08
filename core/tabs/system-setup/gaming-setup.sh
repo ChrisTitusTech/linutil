@@ -1,10 +1,11 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC2086
+
 . ../common-script.sh
 
 installDepend() {
-    # Check for dependencies
-    DEPENDENCIES='wine dbus'
+    DEPENDENCIES='wine dbus git'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
@@ -25,13 +26,16 @@ installDepend() {
 
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32"
 
-            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
-            "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
-            "$ESCALATION_TOOL" apt-add-repository contrib -y
+
+            if [ "$DTYPE" != "pop" ]; then
+                "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
+                "$ESCALATION_TOOL" apt-add-repository contrib -y
+            fi
+
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
@@ -62,7 +66,7 @@ installAdditionalDepend() {
             DISTRO_DEPS='steam lutris goverlay'
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get|nala)
+        apt-get | nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'beta' |
                 tail -n1 |
@@ -72,7 +76,7 @@ installAdditionalDepend() {
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
 
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" install ./lutris_"${version_no_v}"_all.deb
+            "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris_"${version_no_v}"_all.deb
 
             rm lutris_"${version_no_v}"_all.deb
 
@@ -91,7 +95,6 @@ installAdditionalDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         zypper)
-            # Flatpak
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
             ;;
