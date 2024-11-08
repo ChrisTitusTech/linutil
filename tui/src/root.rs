@@ -25,7 +25,11 @@ pub fn create_app_state(
             );
 
             let warning = FloatingText::new(
-                "WARNING: You are running this utility as root!\n\nThis means you have full system access and commands can potentially damage your system if used incorrectly.\n\nPlease proceed with caution and make sure you understand what each command does before executing it.".into(),
+                "\
+                WARNING: You are running this utility as root!\n\n\
+                This means you have full system access and commands can potentially damage your system if used incorrectly.\n\n\
+                Please proceed with caution and make sure you understand what each command does before executing it.\
+                ".into(),
                 "Root User Warning",
                 true,
             );
