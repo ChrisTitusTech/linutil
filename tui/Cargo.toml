@@ -20,6 +20,7 @@ portable-pty = "0.8.1"
 ratatui = "0.29.0"
 tui-term = "0.2.0"
 temp-dir = "0.1.14"
+time = { version = "0.3.36", features = ["local-offset", "macros", "formatting"] }
 unicode-width = "0.2.0"
 rand = { version = "0.8.5", optional = true }
 linutil_core = { path = "../core", version = "24.9.28" }

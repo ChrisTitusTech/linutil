@@ -54,7 +54,7 @@ applyTweak() {
     printf "%b\n" "${YELLOW}Configuring auto-cpufreq.${RC}"
 
     if command_exists auto-cpufreq; then
-        if [ -d /sys/class/power_supply/BAT0 ]; then
+        if ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
             printf "%b\n" "${GREEN}System detected as laptop. Updating auto-cpufreq for laptop.${RC}"
             "$ESCALATION_TOOL" auto-cpufreq --force powersave
         else
