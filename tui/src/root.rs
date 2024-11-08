@@ -28,7 +28,7 @@ pub fn create_app_state(
                 "\
                 WARNING: You are running this utility as root!\n\n\
                 This means you have full system access and commands can potentially damage your system if used incorrectly.\n\n\
-                Please proceed with caution and make sure you understand what each command does before executing it.\
+                Please proceed with caution and make sure you understand what each script does before executing it.\
                 ".into(),
                 "Root User Warning",
                 true,
