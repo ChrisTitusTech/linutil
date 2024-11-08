@@ -7,8 +7,8 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use ego_tree::NodeId;
-use linutil_core::{ListNode, TabList};
+
+use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -19,6 +19,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
+use std::path::PathBuf;
 use std::rc::Rc;
 
 const MIN_WIDTH: u16 = 100;
@@ -61,6 +62,7 @@ pub struct AppState {
     #[cfg(feature = "tips")]
     tip: String,
     size_bypass: bool,
+    skip_confirmation: bool,
 }
 
 pub enum Focus {
@@ -85,9 +87,17 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
+    pub fn new(
+        config_path: Option<PathBuf>,
+        theme: Theme,
+        override_validation: bool,
+        size_bypass: bool,
+        skip_confirmation: bool,
+    ) -> Self {
         let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
+
+        let auto_execute_commands = config_path.map(|path| Config::from_file(&path).auto_execute);
 
         let mut state = Self {
             theme,
@@ -103,10 +113,33 @@ impl AppState {
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
             size_bypass,
+            skip_confirmation,
         };
 
         state.update_items();
+        if let Some(auto_execute_commands) = auto_execute_commands {
+            state.handle_initial_auto_execute(&auto_execute_commands);
+        }
+
         state
+    }
+
+    fn handle_initial_auto_execute(&mut self, auto_execute_commands: &[String]) {
+        self.selected_commands = auto_execute_commands
+            .iter()
+            .filter_map(|name| self.tabs.iter().find_map(|tab| tab.find_command(name)))
+            .collect();
+
+        if !self.selected_commands.is_empty() {
+            let cmd_names: Vec<_> = self
+                .selected_commands
+                .iter()
+                .map(|node| node.name.as_str())
+                .collect();
+
+            let prompt = ConfirmPrompt::new(&cmd_names);
+            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+        }
     }
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
@@ -756,14 +789,18 @@ impl AppState {
                     }
                 }
 
-                let cmd_names = self
-                    .selected_commands
-                    .iter()
-                    .map(|node| node.name.as_str())
-                    .collect::<Vec<_>>();
+                if self.skip_confirmation {
+                    self.handle_confirm_command();
+                } else {
+                    let cmd_names = self
+                        .selected_commands
+                        .iter()
+                        .map(|node| node.name.as_str())
+                        .collect::<Vec<_>>();
 
-                let prompt = ConfirmPrompt::new(&cmd_names[..]);
-                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                    let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                    self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                }
             }
             SelectedItem::None => {}
         }

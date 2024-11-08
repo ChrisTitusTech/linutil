@@ -18,6 +18,9 @@ installFirefox() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add firefox
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

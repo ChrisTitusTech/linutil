@@ -9,6 +9,9 @@ installEvince() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm evince
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add evince
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y evince
                 ;;

@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 # Function to check if NetworkManager is installed
 setupNetworkManager() {
@@ -13,6 +14,9 @@ setupNetworkManager() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y NetworkManager-1
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add networkmanager-wifi iwd
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
                 ;;
@@ -22,13 +26,11 @@ setupNetworkManager() {
     fi
     
     # Check if NetworkManager service is running
-    if ! systemctl is-active --quiet NetworkManager; then
+    if ! isServiceActive NetworkManager; then
         printf "%b\n" "${YELLOW}NetworkManager service is not running. Starting it now...${RC}"
-        "$ESCALATION_TOOL" systemctl start NetworkManager
-        
-        if systemctl is-active --quiet NetworkManager; then
-            printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"
-        fi
+        startService NetworkManager
+    else 
+        printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"
     fi
 }
 
