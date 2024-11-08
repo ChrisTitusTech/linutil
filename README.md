@@ -24,6 +24,26 @@ curl -fsSL https://christitus.com/linux | sh
 ```bash
 curl -fsSL https://christitus.com/linuxdev | sh
 ```
+<details>
+  <summary>CLI arguments</summary>
+
+Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
+
+- `-t, --theme <THEME>` : Set the theme to use in the application [default: default] [possible values: default, compatible].
+- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
+- `-h, --help` : Print help.
+
+For more detailed usage, run:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
+```
+
+```bash
+linutil --help
+```
+</details>
+
 ## ⬇️ Installation
 
 Linutil is also available as a package in various repositories:
@@ -58,7 +78,15 @@ paru -S linutil
 Replace `paru` with your preferred helper and `linutil` with your preferred package.
 
 </details>
+<details>
+  <summary>OpenSUSE</summary>
+  
+Linutil can be installed on OpenSUSE with:
+```bash
+sudo zypper install linutil
+```
 
+</details>
 <details>
   <summary>Cargo</summary>
 
@@ -71,6 +99,28 @@ cargo install linutil
 Note that crates installed using `cargo install` require manual updating with `cargo install --force` (update functionality is [included in LinUtil](https://christitustech.github.io/linutil/userguide/#applications-setup))
 
 </details>
+
+## Configuration
+
+Linutil supports configuration through a TOML config file. Path to the file can be specified with `--config` (or `-c`).
+
+Available options:
+- `auto_execute` - a list of commands to execute automatically (can be combined with `--skip-confirmation`)
+
+Example config:
+```toml
+# example_config.toml
+
+auto_execute = [
+    "Fastfetch",
+    "Alacritty",
+    "Kitty"
+]
+```
+
+```bash
+linutil --config /path/to/example_config.toml
+```
 
 ## 💖 Support
 

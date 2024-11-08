@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 cleanup_system() {
     printf "%b\n" "${YELLOW}Performing system cleanup...${RC}"
@@ -21,7 +22,10 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null 2>&1
+            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null || true
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" cache clean
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
@@ -39,7 +43,9 @@ common_cleanup() {
     if [ -d /var/log ]; then
         "$ESCALATION_TOOL" find /var/log -type f -name "*.log" -exec truncate -s 0 {} \;
     fi
-    "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    if [ "$INIT_MANAGER" = "systemctl" ]; then
+        "$ESCALATION_TOOL" journalctl --vacuum-time=3d
+    fi
 }
 
 clean_data() {

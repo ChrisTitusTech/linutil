@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installJitsi() {
-    if ! command_exists jitsi-meet; then
+    if ! command_exists org.jitsi.jitsi-meet && ! command_exists jitsi-meet; then
         printf "%b\n" "${YELLOW}Installing Jitsi meet...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -20,6 +20,10 @@ installJitsi() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
+                ;;
+            apk)
+                checkFlatpak
+                flatpak install flathub org.jitsi.jitsi-meet
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

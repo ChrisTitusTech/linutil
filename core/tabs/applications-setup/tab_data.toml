@@ -85,6 +85,17 @@ script = "Developer-tools/sublime-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ZapZap"
+description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
+script = "communication-apps/zapzap-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Zoom"
+description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
+script = "communication-apps/zoom-setup.sh"
+
+[[data.entries]]
 name = "VS Code"
 description = "Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks."
 script = "Developer-tools/vscode-setup.sh"
@@ -193,6 +204,12 @@ script = "browsers/vivaldi.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Tor Browser"
+description = "Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention."
+script = "browsers/tor-browser.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "waterfox"
 description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
 script = "browsers/waterfox.sh"
@@ -279,7 +296,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Linutil Updater"
@@ -290,7 +307,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Rofi"
@@ -306,7 +323,7 @@ task_list = "I SS"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
-values = [ "wayland", "Wayland" ]
+values = ["wayland", "Wayland"]
 
 [[data]]
 name = "ZSH Prompt"
