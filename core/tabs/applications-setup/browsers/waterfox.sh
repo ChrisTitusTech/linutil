@@ -3,14 +3,14 @@
 . ../../common-script.sh
 
 installWaterfox() {
-    if ! command_exists waterfox; then
+    if ! command_exists net.waterfox.waterfox && ! command_exists waterfox; then
         printf "%b\n" "${YELLOW}Installing waterfox...${RC}"
         case "$PACKAGER" in
             pacman)
-		"$AUR_HELPER" -S --needed --noconfirm waterfox-bin
+		        "$AUR_HELPER" -S --needed --noconfirm waterfox-bin
                 ;;
             *)
-		. ../setup-flatpak.sh
+		        checkFlatpak
                 flatpak install -y flathub net.waterfox.waterfox
                 ;;
         esac

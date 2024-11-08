@@ -44,21 +44,21 @@ https://github.com/ChrisTitusTech/neovim
 - **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
 - **Thorium**: Thorium is a Chromium-based browser focused on privacy and performance.
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
+- **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
 It manages windows in tiled, monocle and floating layouts.
 All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
 This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
-- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
@@ -89,6 +89,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
 - **Nvidia Drivers && Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 
 ### Fedora
@@ -125,6 +126,11 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Set Brightness**: This script is designed to change the Brightness of monitors connected to your system
 - **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
 - **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
+
+### Printers
+
+- **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
+- **Epson printer drivers**: This script will install the Epson printer drivers.
 
 ### User Account Manager
 

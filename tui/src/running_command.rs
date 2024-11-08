@@ -273,7 +273,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 200);
+        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
