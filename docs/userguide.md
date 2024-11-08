@@ -27,6 +27,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Sublime Text**: Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages.
 - **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
 - **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
+- **Zed**: Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI.
 
 ### Office Suites
 

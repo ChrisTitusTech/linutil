@@ -107,6 +107,12 @@ description = "VSCodium is a free, open-source version of Visual Studio Code (VS
 script = "Developer-tools/vscodium-setup.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "Zed"
+description = "Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI."
+script = "Developer-tools/zed.sh"
+task_list = "I"
+
 [[data]]
 name = "Office Suites"
 
