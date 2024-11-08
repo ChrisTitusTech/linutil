@@ -16,10 +16,33 @@ task_list = "SI D"
 multi_select = false
 
 [[data.entries]]
+name ="Linux Neptune for SteamDeck"
+description = "Valve's fork of Linux Kernel for the SteamDeck"
+script = "arch/linux-neptune.sh"
+task_list = "I PFM K"
+
+[[data.entries.preconditions]]
+matches = true
+data = { file = "/sys/devices/virtual/dmi/id/board_vendor" }
+values = [ "Valve" ]
+
+[[data.entries]]
+name = "Nvidia Drivers && Hardware Acceleration"
+description = "This script installs and configures nvidia drivers with Hardware Acceleration."
+script = "arch/nvidia-drivers.sh"
+task_list = "I FM SS"
+
+[[data.entries]]
 name = "Paru AUR Helper"
 description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
 task_list = "I"
+
+[[data.entries]]
+name = "Virtualization"
+description = "QEMU, Libvirt, Virt-Manager installation and configuration."
+script = "arch/virtualization.sh"
+task_list = "FM I SS RP"
 
 [[data.entries]]
 name = "Yay AUR Helper"
@@ -70,6 +93,17 @@ name = "Virtualization"
 description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 task_list = "I"
+
+[[data.entries]]
+name = "Btrfs Assistant, Snapper Config, grub-btrfs"
+description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
+script = "fedora/fedora-btrfs-assistant.sh"
+task_list = "I PFM SS"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "btrfs" ]
 
 [[data]]
 name = "Build Prerequisites"

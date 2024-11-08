@@ -8,9 +8,8 @@ use crate::{float::FloatContent, hint::Shortcut};
 
 use linutil_core::Command;
 
-use crossterm::event::{KeyCode, KeyEvent};
-
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent},
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
@@ -171,7 +170,7 @@ impl FloatingText {
 
     fn scroll_down(&mut self) {
         let visible_lines = self.frame_height.saturating_sub(2);
-        if self.v_scroll + visible_lines < self.src.len() {
+        if self.v_scroll + visible_lines < self.wrapped_lines.len() {
             self.v_scroll += 1;
         }
     }
@@ -216,6 +215,7 @@ impl FloatContent for FloatingText {
         // Define the Block with a border and background color
         let block = Block::default()
             .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
             .title(self.mode_title.clone())
             .title_alignment(ratatui::layout::Alignment::Center)
             .title_style(Style::default().reversed())

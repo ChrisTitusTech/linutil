@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installLibreWolf() {
-    if ! command_exists librewolf; then
+    if ! command_exists io.gitlab.librewolf-community && ! command_exists librewolf; then
         printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -31,6 +31,10 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
+                ;;
+            apk)
+                checkFlatpak
+                flatpak install flathub io.gitlab.librewolf-community
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

@@ -7,20 +7,20 @@ use crate::{
     running_command::RunningCommand,
     theme::Theme,
 };
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use ego_tree::NodeId;
-use linutil_core::{ListNode, Tab};
+
+use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     layout::{Alignment, Constraint, Direction, Flex, Layout},
     style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
+use std::path::PathBuf;
 use std::rc::Rc;
-use temp_dir::TempDir;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
@@ -31,6 +31,7 @@ D  - disk modifications (ex. partitioning) (privileged)
 FI - flatpak installation
 FM - file modification
 I  - installation (privileged)
+K  - kernel modifications (privileged)
 MP - package manager actions
 SI - full system installation
 SS - systemd actions (privileged)
@@ -40,14 +41,12 @@ P* - privileged *
 ";
 
 pub struct AppState {
-    /// This must be passed to retain the temp dir until the end of the program
-    _temp_dir: TempDir,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
     pub focus: Focus,
     /// List of tabs
-    tabs: Vec<Tab>,
+    tabs: TabList,
     /// Current tab
     current_tab: ListState,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
@@ -63,6 +62,7 @@ pub struct AppState {
     #[cfg(feature = "tips")]
     tip: String,
     size_bypass: bool,
+    skip_confirmation: bool,
 }
 
 pub enum Focus {
@@ -87,12 +87,19 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(theme: Theme, override_validation: bool, size_bypass: bool) -> Self {
-        let (temp_dir, tabs) = linutil_core::get_tabs(!override_validation);
+    pub fn new(
+        config_path: Option<PathBuf>,
+        theme: Theme,
+        override_validation: bool,
+        size_bypass: bool,
+        skip_confirmation: bool,
+    ) -> Self {
+        let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
+        let auto_execute_commands = config_path.map(|path| Config::from_file(&path).auto_execute);
+
         let mut state = Self {
-            _temp_dir: temp_dir,
             theme,
             focus: Focus::List,
             tabs,
@@ -106,10 +113,33 @@ impl AppState {
             #[cfg(feature = "tips")]
             tip: get_random_tip(),
             size_bypass,
+            skip_confirmation,
         };
 
         state.update_items();
+        if let Some(auto_execute_commands) = auto_execute_commands {
+            state.handle_initial_auto_execute(&auto_execute_commands);
+        }
+
         state
+    }
+
+    fn handle_initial_auto_execute(&mut self, auto_execute_commands: &[String]) {
+        self.selected_commands = auto_execute_commands
+            .iter()
+            .filter_map(|name| self.tabs.iter().find_map(|tab| tab.find_command(name)))
+            .collect();
+
+        if !self.selected_commands.is_empty() {
+            let cmd_names: Vec<_> = self
+                .selected_commands
+                .iter()
+                .map(|node| node.name.as_str())
+                .collect();
+
+            let prompt = ConfirmPrompt::new(&cmd_names);
+            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+        }
     }
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
@@ -217,19 +247,19 @@ impl AppState {
             self.drawable = true;
         }
 
-        let label_block =
-            Block::default()
-                .borders(Borders::all())
-                .border_set(ratatui::symbols::border::Set {
-                    top_left: " ",
-                    top_right: " ",
-                    bottom_left: " ",
-                    bottom_right: " ",
-                    vertical_left: " ",
-                    vertical_right: " ",
-                    horizontal_top: "*",
-                    horizontal_bottom: "*",
-                });
+        let label_block = Block::default()
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED)
+            .border_set(ratatui::symbols::border::Set {
+                top_left: " ",
+                top_right: " ",
+                bottom_left: " ",
+                bottom_right: " ",
+                vertical_left: " ",
+                vertical_right: " ",
+                horizontal_top: "*",
+                horizontal_bottom: "*",
+            });
         let str1 = "Linutil ";
         let str2 = "by Chris Titus";
         let label = Paragraph::new(Line::from(vec![
@@ -253,7 +283,8 @@ impl AppState {
 
         let keybinds_block = Block::default()
             .title(format!(" {} ", keybind_scope))
-            .borders(Borders::all());
+            .borders(Borders::ALL)
+            .border_set(ratatui::symbols::border::ROUNDED);
 
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
         let n_lines = keybinds.len() as u16;
@@ -297,7 +328,11 @@ impl AppState {
         };
 
         let list = List::new(tabs)
-            .block(Block::default().borders(Borders::ALL))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(ratatui::symbols::border::ROUNDED),
+            )
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
         frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
@@ -409,6 +444,7 @@ impl AppState {
             .block(
                 Block::default()
                     .borders(Borders::ALL & !Borders::RIGHT)
+                    .border_set(ratatui::symbols::border::ROUNDED)
                     .title(title)
                     .title_bottom(bottom_title),
             )
@@ -418,6 +454,7 @@ impl AppState {
         let disclaimer_list = List::new(task_items).highlight_style(style).block(
             Block::default()
                 .borders(Borders::ALL & !Borders::LEFT)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title(task_list_title),
         );
 
@@ -752,14 +789,18 @@ impl AppState {
                     }
                 }
 
-                let cmd_names = self
-                    .selected_commands
-                    .iter()
-                    .map(|node| node.name.as_str())
-                    .collect::<Vec<_>>();
+                if self.skip_confirmation {
+                    self.handle_confirm_command();
+                } else {
+                    let cmd_names = self
+                        .selected_commands
+                        .iter()
+                        .map(|node| node.name.as_str())
+                        .collect::<Vec<_>>();
 
-                let prompt = ConfirmPrompt::new(&cmd_names[..]);
-                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                    let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                    self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                }
             }
             SelectedItem::None => {}
         }

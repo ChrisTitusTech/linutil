@@ -6,7 +6,7 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit meson libev uthash libconfig
             ;;
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
@@ -214,7 +214,22 @@ setupDisplayManager() {
         printf "%b\n" "${YELLOW}3. GDM ${RC}" 
         printf "%b\n" "${YELLOW} ${RC}" 
         printf "%b" "${YELLOW}Please select one: ${RC}"
-        read -r DM
+        read -r choice
+        case "$choice" in
+        1)
+            DM="sddm"
+            ;;
+        2)
+            DM="lightdm"
+            ;;
+        3)
+            DM="gdm"
+            ;;
+        *)
+            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
+            exit 1
+            ;;
+        esac
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
