@@ -59,16 +59,16 @@ jobs:
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
         with:
-          path: "docs/assets/preview.tape"
+          path: ".github/preview.tape"
 
       - name: Move preview
-        run: mv preview.gif docs/assets/preview.gif
+        run: mv preview.gif .github/preview.gif
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v7.0.5
         with:
           commit-message: Preview for ${{ env.tag_name }}
-          file-pattern: "docs/assets/preview.gif"
+          file-pattern: ".github/preview.gif"
           add-options: "--force"
           token: ${{ secrets.PAT_TOKEN }}
           branch: feature/preview-${{ env.tag_name }}

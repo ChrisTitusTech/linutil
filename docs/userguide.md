@@ -140,3 +140,4 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **WiFi Manager**: This utility is designed to manage wifi in your system
+
