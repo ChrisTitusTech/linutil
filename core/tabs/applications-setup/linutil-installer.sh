@@ -25,6 +25,10 @@ installLinutil() {
             esac
             printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install linutil -y
+            printf "%b\n" "${GREEN}Installed successfully.${RC}"
+            ;;
         *)
             printf "%b\n" "${RED}There are no official packages for your distro.${RC}"
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
@@ -40,10 +44,12 @@ installLinutil() {
                             dnf)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl rustup man-pages man-db man
                                 ;;
-                            zypper)
-                                "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-                                . $HOME/.cargo/env
+                            apk)
+                                "$ESCALATION_TOOL" "$PACKAGER" add build-base
+                                "$ESCALATION_TOOL" "$PACKAGER" add rustup
+                                rustup-init
+                                # shellcheck disable=SC1091
+                                . "$HOME/.cargo/env"
                                 ;;
                             *)
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

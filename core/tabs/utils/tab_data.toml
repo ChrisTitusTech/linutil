@@ -1,8 +1,8 @@
 name = "Utilities"
-multi_selectable = false
 
 [[data]]
 name = "Monitor Control"
+multi_select = false
 
 [[data.preconditions]]
 matches = true
@@ -77,7 +77,23 @@ description = "This script is designed to change the resolution of monitors conn
 script = "monitor-control/set_resolutions.sh"
 
 [[data]]
+name = "Printers"
+
+[[data.entries]]
+name = "CUPS"
+script = "printers/install-cups.sh"
+description = "This script will install the CUPS system, required for most printer drivers on Linux."
+task_list = "I"
+
+[[data.entries]]
+name = "Epson printer drivers"
+script = "printers/install-epson-printer-drivers.sh"
+description = "This script will install the Epson printer drivers."
+task_list = "I"
+
+[[data]]
 name = "User Account Manager"
+multi_select = false
 
 [[data.entries]]
 name = "Add User"
@@ -104,6 +120,7 @@ name = "Auto Mount Drive"
 description = "This utility is designed to help with automating the process of mounting a drive on to your system."
 script = "auto-mount.sh"
 task_list = "PFM"
+multi_select = false
 
 [[data]]
 name = "Auto Login"
@@ -120,6 +137,7 @@ name = "Bluetooth Manager"
 description = "This utility is designed to manage bluetooth in your system"
 script = "bluetooth-control.sh"
 task_list = "I SS"
+multi_select = false
 
 [[data]]
 name = "Bootable USB Creator"
@@ -133,7 +151,7 @@ task_list = "I FM"
 
 [[data]]
 name = "Numlock on Startup"
-description = "This utility is designed to configure auto enabling of numlock on boot"
+description = "This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME"
 script = "numlock.sh"
 task_list = "PFM SS"
 

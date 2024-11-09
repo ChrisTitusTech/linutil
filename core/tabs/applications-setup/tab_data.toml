@@ -85,6 +85,17 @@ script = "Developer-tools/sublime-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ZapZap"
+description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
+script = "communication-apps/zapzap-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Zoom"
+description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
+script = "communication-apps/zoom-setup.sh"
+
+[[data.entries]]
 name = "VS Code"
 description = "Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks."
 script = "Developer-tools/vscode-setup.sh"
@@ -193,6 +204,12 @@ script = "browsers/vivaldi.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Tor Browser"
+description = "Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention."
+script = "browsers/tor-browser.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "waterfox"
 description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
 script = "browsers/waterfox.sh"
@@ -200,7 +217,7 @@ task_list = "FI"
 
 [[data]]
 name = "Alacritty"
-description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows.\nThis command installs and condifures alacritty terminal emulator."
+description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"
 task_list = "I FM"
 
@@ -212,13 +229,13 @@ task_list = "I"
 
 [[data]]
 name = "Bash Prompt"
-description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems.\nIt is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful.\nThis command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
+description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
 script = "mybash-setup.sh"
 task_list = "I FM"
 
 [[data]]
 name = "Bottles"
-description = "Bottles allows Windows software, like applications and games, to run on Linux.\nBottles also provides tools to categorize, organize and optimize your applications."
+description = "Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications."
 script = "bottles-setup.sh"
 task_list = "FI"
 
@@ -229,6 +246,18 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Podman"
+description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
+script = "podman-setup.sh"
+task_list = "I SS"
+
+[[data]]
+name = "Podman-compose"
+description = "Podman Compose is a tool for defining and running multi-container applications using Podman."
+script = "podman-compose-setup.sh"
+task_list = "I SS"
+
+[[data]]
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"
@@ -236,13 +265,13 @@ task_list = "I PFM SS"
 
 [[data]]
 name = "Fastfetch"
-description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily.\nIt is written mainly in C, with performance and customizability in mind.\nThis command installs fastfetch and configures from CTT's mybash repository.\nhttps://github.com/ChrisTitusTech/mybash"
+description = "Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
 script = "fastfetch-setup.sh"
 task_list = "I FM"
 
 [[data]]
 name = "Flatpak / Flathub"
-description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns.\nThis command installs Flatpak and adds the Flathub repository"
+description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 task_list = "I"
 
@@ -254,7 +283,7 @@ task_list = "PFM"
 
 [[data]]
 name = "Kitty"
-description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.\nkitty is written in a mix of C and Python programming languages.\n This command installs and configures kitty."
+description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty."
 script = "kitty-setup.sh"
 task_list = "I FM"
 
@@ -267,7 +296,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Linutil Updater"
@@ -278,11 +307,11 @@ task_list = "I"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = [ "linutil" ]
+values = ["linutil"]
 
 [[data]]
 name = "Rofi"
-description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport.\nThis command installs and configures rofi with configuration from CTT's DWM repo.\nhttps://github.com/ChrisTitusTech/dwm-titus"
+description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus"
 script = "rofi-setup.sh"
 task_list = "I FM"
 
@@ -294,10 +323,10 @@ task_list = "I SS"
 [[data.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
-values = [ "wayland", "Wayland" ]
+values = ["wayland", "Wayland"]
 
 [[data]]
 name = "ZSH Prompt"
-description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh.\nThis command installs ZSH prompt and provides basic configuration."
+description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
 task_list = "I FM"

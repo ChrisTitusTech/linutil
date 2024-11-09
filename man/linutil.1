@@ -23,6 +23,10 @@ curl -fsSL https://christitus.com/linuxdev | sh
 
 .SH OPTIONS
 .TP
+\fB\-c\fR, \fB\-\-config\fR \fI<path>\fR
+Path to the configuration file.
+
+.TP
 \fB\-t\fR, \fB\-\-theme\fR \fI<theme>\fR
 Set the theme to use in the TUI.
 .br
@@ -33,8 +37,16 @@ Possible values:
 Defaults to \fIdefault\fR.
 
 .TP
+\fB\-y\fR, \fB\-\-skip\-confirmation\fR
+Skip confirmation prompt before executing commands.
+
+.TP
 \fB\-\-override\-validation\fR
 Show all available entries, disregarding compatibility checks. (\fBUNSAFE\fR)
+
+.TP
+\fB\-\-size\-bypass\fR
+Bypass the terminal size limit
 
 .TP
 \fB\-h\fR, \fB\-\-help\fR

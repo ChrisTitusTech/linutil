@@ -1,8 +1,7 @@
 use crate::{state::ListEntry, theme::Theme};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use ego_tree::NodeId;
-use linutil_core::Tab;
+use linutil_core::{ego_tree::NodeId, Tab};
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Position, Rect},
     style::{Color, Style},
     text::Span,
@@ -123,7 +122,12 @@ impl Filter {
 
         //Create the search bar widget
         let search_bar = Paragraph::new(display_text)
-            .block(Block::default().borders(Borders::ALL).title(" Search "))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(ratatui::symbols::border::ROUNDED)
+                    .title(" Search "),
+            )
             .style(Style::default().fg(search_color));
 
         //Render the search bar (First chunk of the screen)

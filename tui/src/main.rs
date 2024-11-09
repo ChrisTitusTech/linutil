@@ -9,36 +9,58 @@ mod theme;
 
 use std::{
     io::{self, stdout},
+    path::PathBuf,
     time::Duration,
 };
 
 use crate::theme::Theme;
 use clap::Parser;
-use crossterm::{
-    event::{self, DisableMouseCapture, Event, KeyEventKind},
-    style::ResetColor,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-    ExecutableCommand,
+
+use ratatui::{
+    backend::CrosstermBackend,
+    crossterm::{
+        event::{self, DisableMouseCapture, Event, KeyEventKind},
+        style::ResetColor,
+        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+        ExecutableCommand,
+    },
+    Terminal,
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
 use state::AppState;
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
+    #[arg(short, long, help = "Path to the configuration file")]
+    config: Option<PathBuf>,
     #[arg(short, long, value_enum)]
     #[arg(default_value_t = Theme::Default)]
     #[arg(help = "Set the theme to use in the application")]
     theme: Theme,
+    #[arg(
+        short = 'y',
+        long,
+        help = "Skip confirmation prompt before executing commands"
+    )]
+    skip_confirmation: bool,
     #[arg(long, default_value_t = false)]
     #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
     override_validation: bool,
+    #[arg(long, default_value_t = false)]
+    #[clap(help = "Bypass the terminal size limit")]
+    size_bypass: bool,
 }
 
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(args.theme, args.override_validation);
+    let mut state = AppState::new(
+        args.config,
+        args.theme,
+        args.override_validation,
+        args.size_bypass,
+        args.skip_confirmation,
+    );
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

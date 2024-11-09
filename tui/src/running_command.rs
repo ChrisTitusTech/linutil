@@ -1,11 +1,11 @@
 use crate::{float::FloatContent, hint::Shortcut};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
     style::{Color, Style, Stylize},
     text::{Line, Span},
@@ -17,11 +17,11 @@ use std::{
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
+use time::{macros::format_description, OffsetDateTime};
 use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
-
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -37,6 +37,7 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    log_path: Option<String>,
     scroll_offset: usize,
 }
 
@@ -53,6 +54,7 @@ impl FloatContent for RunningCommand {
             // Display a block indicating the command is running
             Block::default()
                 .borders(Borders::ALL)
+                .border_set(ratatui::symbols::border::ROUNDED)
                 .title_top(Line::from("Running the command....").centered())
                 .title_style(Style::default().reversed())
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
@@ -78,9 +80,20 @@ impl FloatContent for RunningCommand {
                     .style(Style::default()),
             );
 
-            Block::default()
+            let mut block = Block::default()
                 .borders(Borders::ALL)
-                .title_top(title_line.centered())
+                .border_set(ratatui::symbols::border::ROUNDED)
+                .title_top(title_line.centered());
+
+            if let Some(log_path) = &self.log_path {
+                block =
+                    block.title_bottom(Line::from(format!(" Log saved: {} ", log_path)).centered());
+            } else {
+                block =
+                    block.title_bottom(Line::from(" Press 'l' to save command log ").centered());
+            }
+
+            block
         };
 
         // Process the buffer and create the pseudo-terminal widget
@@ -109,6 +122,11 @@ impl FloatContent for RunningCommand {
             KeyCode::PageDown => {
                 self.scroll_offset = self.scroll_offset.saturating_sub(10);
             }
+            KeyCode::Char('l') if self.is_finished() => {
+                if let Ok(log_path) = self.save_log() {
+                    self.log_path = Some(log_path);
+                }
+            }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
         }
@@ -132,6 +150,7 @@ impl FloatContent for RunningCommand {
                     Shortcut::new("Close window", ["Enter", "q"]),
                     Shortcut::new("Scroll up", ["Page up"]),
                     Shortcut::new("Scroll down", ["Page down"]),
+                    Shortcut::new("Save log", ["l"]),
                 ]),
             )
         } else {
@@ -235,6 +254,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            log_path: None,
             scroll_offset: 0,
         }
     }
@@ -253,7 +273,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 200);
+        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
@@ -280,6 +300,24 @@ impl RunningCommand {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
         }
+    }
+
+    fn save_log(&self) -> std::io::Result<String> {
+        let mut log_path = std::env::temp_dir();
+        let date_format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
+        log_path.push(format!(
+            "linutil_log_{}.log",
+            OffsetDateTime::now_local()
+                .unwrap_or(OffsetDateTime::now_utc())
+                .format(&date_format)
+                .unwrap()
+        ));
+
+        let mut file = std::fs::File::create(&log_path)?;
+        let buffer = self.buffer.lock().unwrap();
+        file.write_all(&buffer)?;
+
+        Ok(log_path.to_string_lossy().into_owned())
     }
 
     /// Convert the KeyEvent to pty key codes, and send them to the virtual terminal

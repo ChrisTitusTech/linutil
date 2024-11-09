@@ -7,7 +7,7 @@
 <!-- TODO: crates.io package here + <br> -->
 [![Crates.io Version](https://img.shields.io/crates/v/linutil_tui?style=for-the-badge&color=%23af3a03)](https://crates.io/crates/linutil_tui) [![linutil AUR Version](https://img.shields.io/aur/version/linutil?style=for-the-badge&label=%5BAUR%5D%20linutil&color=%23230567ff)](https://aur.archlinux.org/packages/linutil) [![linutil-bin AUR Version](https://img.shields.io/aur/version/linutil-bin?style=for-the-badge&label=%5BAUR%5D%20linutil-bin&color=%23230567ff)](https://aur.archlinux.org/packages/linutil-bin)
 
-![Preview](docs/assets/preview.gif)
+![Preview](/.github/preview.gif)
 
 **Linutil** is a distro-agnostic toolbox designed to simplify everyday Linux tasks. It helps you set up applications and optimize your system for specific use cases. The utility is actively developed in Rust 🦀, providing performance and reliability.
 
@@ -24,6 +24,26 @@ curl -fsSL https://christitus.com/linux | sh
 ```bash
 curl -fsSL https://christitus.com/linuxdev | sh
 ```
+<details>
+  <summary>CLI arguments</summary>
+
+Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
+
+- `-t, --theme <THEME>` : Set the theme to use in the application [default: default] [possible values: default, compatible].
+- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
+- `-h, --help` : Print help.
+
+For more detailed usage, run:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
+```
+
+```bash
+linutil --help
+```
+</details>
+
 ## ⬇️ Installation
 
 Linutil is also available as a package in various repositories:
@@ -58,7 +78,15 @@ paru -S linutil
 Replace `paru` with your preferred helper and `linutil` with your preferred package.
 
 </details>
+<details>
+  <summary>OpenSUSE</summary>
+  
+Linutil can be installed on OpenSUSE with:
+```bash
+sudo zypper install linutil
+```
 
+</details>
 <details>
   <summary>Cargo</summary>
 
@@ -72,19 +100,43 @@ Note that crates installed using `cargo install` require manual updating with `c
 
 </details>
 
+## Configuration
+
+Linutil supports configuration through a TOML config file. Path to the file can be specified with `--config` (or `-c`).
+
+Available options:
+- `auto_execute` - a list of commands to execute automatically (can be combined with `--skip-confirmation`)
+
+Example config:
+```toml
+# example_config.toml
+
+auto_execute = [
+    "Fastfetch",
+    "Alacritty",
+    "Kitty"
+]
+```
+
+```bash
+linutil --config /path/to/example_config.toml
+```
+
 ## 💖 Support
 
 If you find Linutil helpful, please consider giving it a ⭐️ to show your support!
 
 ## 🎓 Documentation
 
-For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://christitustech.github.io/linutil/).
+For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://chris-titus-docs.github.io/linutil-docs/).
 
 ## 🛠 Contributing
 
 We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](.github/CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
 
-[Official LinUtil Roadmap](https://christitustech.github.io/linutil/roadmap)
+[Official LinUtil Roadmap](https://chris-titus-docs.github.io/linutil-docs/roadmap/)
+
+Docs are now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
 
 ## 🏅 Thanks to All Contributors
 

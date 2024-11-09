@@ -13,8 +13,8 @@
 ## Milestones
 ### Q4 2024
 - [x] Finish the foundation of the project's CLI
-- [ ] Implement CLI arguments and configuration support
-- [ ] Add an option for logging script executions
+- [x] Implement CLI arguments and configuration support
+- [x] Add an option for logging script executions
 
 ### Q1 2025
 - [ ] GUI Brainstorming and Planning
@@ -25,3 +25,4 @@
 
 ## Community Feedback
 - Encourage community input and suggestions for future development.
+

@@ -10,7 +10,7 @@ GREEN='\033[32m'
 
 command_exists() {
 for cmd in "$@"; do
-    export PATH=/home/jeeva/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH
+    export PATH="$HOME/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
     command -v "$cmd" >/dev/null 2>&1 || return 1
 done
 return 0
@@ -123,6 +123,12 @@ checkPackageManager() {
         fi
     done
 
+    ## Enable apk community packages
+    if [ "$PACKAGER" = "apk" ] && grep -qE '^#.*community' /etc/apk/repositories; then
+        "$ESCALATION_TOOL" sed -i '/community/s/^#//' /etc/apk/repositories
+        "$ESCALATION_TOOL" "$PACKAGER" update
+    fi
+
     if [ -z "$PACKAGER" ]; then
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
@@ -169,7 +175,7 @@ checkEnv() {
     checkArch
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
-    checkPackageManager 'nala apt-get dnf pacman zypper'
+    checkPackageManager 'nala apt-get dnf pacman zypper apk'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro

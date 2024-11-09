@@ -23,6 +23,10 @@ installSignal() {
                 checkFlatpak
                 flatpak install -y flathub org.signal.Signal
                 ;;
+            apk)
+                checkFlatpak
+                flatpak install -y flathub org.signal.Signal
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
