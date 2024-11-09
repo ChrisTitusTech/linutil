@@ -72,5 +72,5 @@ jobs:
           title: "Update preview for ${{ env.tag_name }}"
           body: |
             Automated PR to update preview gif for version ${{ env.tag_name }}
-            ![preview](https://raw.githubusercontent.com/${{ github.repository }}/feature/preview-${{ env.tag_name }}/docs/assets/preview.gif)
+            ![preview](https://raw.githubusercontent.com/${{ github.repository }}/feature/preview-${{ env.tag_name }}/.github/preview.gif)
         if: success()
