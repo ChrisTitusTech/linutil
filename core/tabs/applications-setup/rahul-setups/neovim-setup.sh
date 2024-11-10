@@ -11,7 +11,7 @@ cloneNeovim() {
         rm -rf "$gitpath"
     fi
     mkdir -p "$HOME/.local/share" # Only create the directory if it doesn't exist
-    cd "$HOME" && git clone https://github.com/aarjaycreation/neovim-kickstart-config.git "$gitpath"
+    cd "$HOME" && git clone https://github.com/rahuljangirwork/neovim-kickstart-config.git "$gitpath"
 }
 
 installNeovim() {

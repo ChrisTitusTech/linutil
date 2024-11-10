@@ -28,8 +28,8 @@ findArch() {
 
 getUrl() {
     case "${arch}" in
-        x86_64) echo "https://github.com/aarjaycreation/linutil/releases/latest/download/linutil";;
-        *) echo "https://github.com/aarjaycreation/linutil/releases/latest/download/linutil-${arch}";;
+        x86_64) echo "https://github.com/rahuljangirwork/linutil/releases/latest/download/linutil";;
+        *) echo "https://github.com/rahuljangirwork/linutil/releases/latest/download/linutil-${arch}";;
     esac
 }
 
