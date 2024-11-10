@@ -72,14 +72,14 @@ impl Theme {
 
     pub fn success_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(199, 55, 44),
+            Theme::Default => Color::Rgb(5, 255, 55),
             Theme::Compatible => Color::Green,
         }
     }
 
     pub fn fail_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(5, 255, 55),
+            Theme::Default => Color::Rgb(199, 55, 44),
             Theme::Compatible => Color::Red,
         }
     }
@@ -88,6 +88,13 @@ impl Theme {
         match self {
             Theme::Default => Color::LightBlue,
             Theme::Compatible => Color::LightBlue,
+        }
+    }
+
+    pub fn search_preview_color(&self) -> Color {
+        match self {
+            Theme::Default => Color::DarkGray,
+            Theme::Compatible => Color::DarkGray,
         }
     }
 

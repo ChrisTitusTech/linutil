@@ -7,15 +7,8 @@ mod running_command;
 pub mod state;
 mod theme;
 
-use std::{
-    io::{self, stdout},
-    path::PathBuf,
-    time::Duration,
-};
-
 use crate::theme::Theme;
 use clap::Parser;
-
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
@@ -27,6 +20,11 @@ use ratatui::{
     Terminal,
 };
 use state::AppState;
+use std::{
+    io::{self, stdout},
+    path::PathBuf,
+    time::Duration,
+};
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]

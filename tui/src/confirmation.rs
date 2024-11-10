@@ -1,13 +1,11 @@
-use std::borrow::Cow;
-
-use crate::{float::FloatContent, hint::Shortcut};
-
+use crate::{float::FloatContent, hint::Shortcut, theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent},
     layout::Alignment,
     prelude::*,
     widgets::{Block, Borders, Clear, List},
 };
+use std::borrow::Cow;
 
 pub enum ConfirmStatus {
     Confirm,
@@ -57,12 +55,19 @@ impl ConfirmPrompt {
 }
 
 impl FloatContent for ConfirmPrompt {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
         let block = Block::default()
             .borders(Borders::ALL)
             .border_set(ratatui::symbols::border::ROUNDED)
             .title(" Confirm selections ")
-            .title_bottom(" [y] to continue, [n] to abort ")
+            .title_bottom(Line::from(vec![
+                Span::styled(" [", Style::default()),
+                Span::styled("y", Style::default().fg(theme.success_color())),
+                Span::styled("] to continue ", Style::default()),
+                Span::styled("[", Style::default()),
+                Span::styled("n", Style::default().fg(theme.fail_color())),
+                Span::styled("] to abort ", Style::default()),
+            ]))
             .title_alignment(Alignment::Center)
             .title_style(Style::default().bold())
             .style(Style::default());

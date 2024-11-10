@@ -1,13 +1,12 @@
+use crate::{hint::Shortcut, theme::Theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent},
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
 };
 
-use crate::hint::Shortcut;
-
 pub trait FloatContent {
-    fn draw(&mut self, frame: &mut Frame, area: Rect);
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme);
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
     fn is_finished(&self) -> bool;
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>);
@@ -48,9 +47,9 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
             .split(hor_float)[1]
     }
 
-    pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect) {
+    pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect, theme: &Theme) {
         let popup_area = self.floating_window(parent_area);
-        self.content.draw(frame, popup_area);
+        self.content.draw(frame, popup_area, theme);
     }
 
     // Returns true if the floating window is finished.

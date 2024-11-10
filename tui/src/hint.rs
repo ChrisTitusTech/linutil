@@ -1,9 +1,8 @@
-use std::borrow::Cow;
-
 use ratatui::{
     style::{Style, Stylize},
     text::{Line, Span},
 };
+use std::borrow::Cow;
 
 pub struct Shortcut {
     pub key_sequences: Vec<Span<'static>>,

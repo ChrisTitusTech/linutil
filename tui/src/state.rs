@@ -229,7 +229,7 @@ impl AppState {
                 MIN_HEIGHT,
             ))
                 .alignment(Alignment::Center)
-                .style(Style::default().fg(ratatui::style::Color::Red).bold())
+                .style(Style::default().fg(self.theme.fail_color()).bold())
                 .wrap(ratatui::widgets::Wrap { trim: true });
 
             let centered_layout = Layout::default()
@@ -461,8 +461,8 @@ impl AppState {
         frame.render_stateful_widget(disclaimer_list, list_chunks[1], &mut self.selection);
 
         match &mut self.focus {
-            Focus::FloatingWindow(float) => float.draw(frame, chunks[1]),
-            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1]),
+            Focus::FloatingWindow(float) => float.draw(frame, chunks[1], &self.theme),
+            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1], &self.theme),
             _ => {}
         }
 

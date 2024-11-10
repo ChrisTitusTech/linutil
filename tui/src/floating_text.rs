@@ -1,13 +1,6 @@
-use std::{
-    borrow::Cow,
-    collections::VecDeque,
-    io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
-};
-
-use crate::{float::FloatContent, hint::Shortcut};
-
+use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
+use ansi_to_tui::IntoText;
 use linutil_core::Command;
-
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent},
     layout::Rect,
@@ -16,9 +9,11 @@ use ratatui::{
     widgets::{Block, Borders, Clear, List},
     Frame,
 };
-
-use ansi_to_tui::IntoText;
-
+use std::{
+    borrow::Cow,
+    collections::VecDeque,
+    io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
+};
 use textwrap::wrap;
 use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
@@ -209,7 +204,7 @@ impl FloatingText {
 }
 
 impl FloatContent for FloatingText {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+    fn draw(&mut self, frame: &mut Frame, area: Rect, _theme: &Theme) {
         self.frame_height = area.height as usize;
 
         // Define the Block with a border and background color

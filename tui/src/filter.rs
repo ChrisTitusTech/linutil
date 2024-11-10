@@ -3,7 +3,7 @@ use linutil_core::{ego_tree::NodeId, Tab};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Position, Rect},
-    style::{Color, Style},
+    style::Style,
     text::Span,
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -144,7 +144,8 @@ impl Filter {
             frame.set_cursor_position(Position::new(x, y));
 
             if let Some(preview) = &self.completion_preview {
-                let preview_span = Span::styled(preview, Style::default().fg(Color::DarkGray));
+                let preview_span =
+                    Span::styled(preview, Style::default().fg(theme.search_preview_color()));
                 let preview_paragraph = Paragraph::new(preview_span).style(Style::default());
                 let preview_area = Rect::new(
                     x,

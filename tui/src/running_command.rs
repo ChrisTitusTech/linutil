@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, hint::Shortcut};
+use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -7,7 +7,7 @@ use portable_pty::{
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
-    style::{Color, Style, Stylize},
+    style::{Style, Stylize},
     text::{Line, Span},
     widgets::{Block, Borders},
     Frame,
@@ -22,6 +22,7 @@ use tui_term::{
     vt100::{self, Screen},
     widget::PseudoTerminal,
 };
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -42,7 +43,7 @@ pub struct RunningCommand {
 }
 
 impl FloatContent for RunningCommand {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
         // Calculate the inner size of the terminal area, considering borders
         let inner_size = Size {
             width: area.width - 2, // Adjust for border width
@@ -64,13 +65,13 @@ impl FloatContent for RunningCommand {
                 Line::from(
                     Span::default()
                         .content("SUCCESS!")
-                        .style(Style::default().fg(Color::Green).reversed()),
+                        .style(Style::default().fg(theme.success_color()).reversed()),
                 )
             } else {
                 Line::from(
                     Span::default()
                         .content("FAILED!")
-                        .style(Style::default().fg(Color::Red).reversed()),
+                        .style(Style::default().fg(theme.fail_color()).reversed()),
                 )
             };
 
