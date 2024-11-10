@@ -14,35 +14,30 @@ pub enum ConfirmStatus {
 }
 
 pub struct ConfirmPrompt {
-    pub names: Box<[String]>,
-    pub status: ConfirmStatus,
+    inner_area_height: usize,
+    names: Box<[String]>,
     scroll: usize,
+    pub status: ConfirmStatus,
 }
 
 impl ConfirmPrompt {
-    pub fn new(names: &[&str]) -> Self {
-        let max_count_str = format!("{}", names.len());
+    pub fn new(names: Vec<&str>) -> Self {
         let names = names
             .iter()
             .zip(1..)
-            .map(|(name, n)| {
-                let count_str = format!("{n}");
-                let space_str = (0..(max_count_str.len() - count_str.len()))
-                    .map(|_| ' ')
-                    .collect::<String>();
-                format!("{space_str}{n}. {name}")
-            })
+            .map(|(name, n)| format!(" {n}. {name}"))
             .collect();
 
         Self {
+            inner_area_height: 0,
             names,
-            status: ConfirmStatus::None,
             scroll: 0,
+            status: ConfirmStatus::None,
         }
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll < self.names.len() - 1 {
+        if self.scroll + self.inner_area_height < self.names.len() - 1 {
             self.scroll += 1;
         }
     }
@@ -72,9 +67,11 @@ impl FloatContent for ConfirmPrompt {
             .title_style(Style::default().bold())
             .style(Style::default());
 
-        frame.render_widget(block.clone(), area);
-
         let inner_area = block.inner(area);
+        self.inner_area_height = inner_area.height as usize;
+
+        frame.render_widget(Clear, area);
+        frame.render_widget(block, area);
 
         let paths_text = self
             .names
@@ -86,26 +83,25 @@ impl FloatContent for ConfirmPrompt {
             })
             .collect::<Text>();
 
-        frame.render_widget(Clear, inner_area);
         frame.render_widget(List::new(paths_text), inner_area);
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        use KeyCode::*;
+        use ConfirmStatus::*;
+        use KeyCode::{Char, Down, Esc, Up};
         self.status = match key.code {
-            Char('y') | Char('Y') => ConfirmStatus::Confirm,
-            Char('n') | Char('N') | Esc | Char('q') => ConfirmStatus::Abort,
-            Char('j') => {
+            Char('y') | Char('Y') => Confirm,
+            Char('n') | Char('N') | Esc | Char('q') => Abort,
+            Char('j') | Char('J') | Down => {
                 self.scroll_down();
-                ConfirmStatus::None
+                None
             }
-            Char('k') => {
+            Char('k') | Char('K') | Up => {
                 self.scroll_up();
-                ConfirmStatus::None
+                None
             }
-            _ => ConfirmStatus::None,
+            _ => None,
         };
-
         false
     }
 
@@ -123,8 +119,8 @@ impl FloatContent for ConfirmPrompt {
             Box::new([
                 Shortcut::new("Continue", ["Y", "y"]),
                 Shortcut::new("Abort", ["N", "n", "q", "Esc"]),
-                Shortcut::new("Scroll up", ["k"]),
-                Shortcut::new("Scroll down", ["j"]),
+                Shortcut::new("Scroll up", ["k", "Up"]),
+                Shortcut::new("Scroll down", ["j", "Down"]),
                 Shortcut::new("Close linutil", ["CTRL-c"]),
             ]),
         )

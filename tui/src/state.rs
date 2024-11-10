@@ -137,7 +137,7 @@ impl AppState {
                 .map(|node| node.name.as_str())
                 .collect();
 
-            let prompt = ConfirmPrompt::new(&cmd_names);
+            let prompt = ConfirmPrompt::new(cmd_names);
             self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
         }
     }
@@ -798,7 +798,7 @@ impl AppState {
                         .map(|node| node.name.as_str())
                         .collect::<Vec<_>>();
 
-                    let prompt = ConfirmPrompt::new(&cmd_names[..]);
+                    let prompt = ConfirmPrompt::new(cmd_names);
                     self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
                 }
             }
