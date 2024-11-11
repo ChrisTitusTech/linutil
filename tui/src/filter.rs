@@ -8,7 +8,7 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
-use regex::RegexBuilder;
+use unicode_width::UnicodeWidthChar;
 
 pub enum SearchAction {
     None,
@@ -17,17 +17,19 @@ pub enum SearchAction {
 }
 
 pub struct Filter {
-    search_input: String,
+    // Use Vec<char> to handle multi-byte characters like emojis
+    search_input: Vec<char>,
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
+    // No complex string manipulation is done with completion_preview so we can use String unlike search_input
     completion_preview: Option<String>,
 }
 
 impl Filter {
     pub fn new() -> Self {
         Self {
-            search_input: String::new(),
+            search_input: vec![],
             in_search_mode: false,
             input_position: 0,
             items: vec![],
@@ -62,26 +64,25 @@ impl Filter {
                 .collect();
         } else {
             self.items.clear();
-            if let Ok(regex) = self.regex_builder(&regex::escape(&self.search_input)) {
-                for tab in tabs {
-                    let mut stack = vec![tab.tree.root().id()];
-                    while let Some(node_id) = stack.pop() {
-                        let node = tab.tree.get(node_id).unwrap();
-                        if regex.is_match(&node.value().name) && !node.has_children() {
-                            self.items.push(ListEntry {
-                                node: node.value().clone(),
-                                id: node.id(),
-                                has_children: false,
-                            });
-                        }
-                        stack.extend(node.children().map(|child| child.id()));
+            let query_lower = self.search_input.iter().collect::<String>().to_lowercase();
+            for tab in tabs {
+                let mut stack = vec![tab.tree.root().id()];
+                while let Some(node_id) = stack.pop() {
+                    let node = tab.tree.get(node_id).unwrap();
+                    if node.value().name.to_lowercase().contains(&query_lower)
+                        && !node.has_children()
+                    {
+                        self.items.push(ListEntry {
+                            node: node.value().clone(),
+                            id: node.id(),
+                            has_children: false,
+                        });
                     }
+                    stack.extend(node.children().map(|child| child.id()));
                 }
-                self.items
-                    .sort_unstable_by(|a, b| a.node.name.cmp(&b.node.name));
-            } else {
-                self.search_input.clear();
             }
+            self.items
+                .sort_unstable_by(|a, b| a.node.name.cmp(&b.node.name));
         }
         self.update_completion_preview();
     }
@@ -90,16 +91,15 @@ impl Filter {
         self.completion_preview = if self.items.is_empty() || self.search_input.is_empty() {
             None
         } else {
-            let pattern = format!("(?i)^{}", regex::escape(&self.search_input));
-            if let Ok(regex) = self.regex_builder(&pattern) {
-                self.items.iter().find_map(|item| {
-                    regex
-                        .find(&item.node.name)
-                        .map(|mat| item.node.name[mat.end()..].to_string())
-                })
-            } else {
-                None
-            }
+            let input = self.search_input.iter().collect::<String>().to_lowercase();
+            self.items.iter().find_map(|item| {
+                let item_name_lower = &item.node.name.to_lowercase();
+                if item_name_lower.starts_with(&input) {
+                    Some(item_name_lower[input.len()..].to_string())
+                } else {
+                    None
+                }
+            })
         }
     }
 
@@ -108,10 +108,8 @@ impl Filter {
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
             Span::raw("Press / to search")
         } else {
-            Span::styled(
-                &self.search_input,
-                Style::default().fg(theme.focused_color()),
-            )
+            let input_text = self.search_input.iter().collect::<String>();
+            Span::styled(input_text, Style::default().fg(theme.focused_color()))
         };
 
         let search_color = if self.in_search_mode {
@@ -135,15 +133,31 @@ impl Filter {
 
         // Render cursor in search bar
         if self.in_search_mode {
-            let x = area.x + self.input_position as u16 + 1;
+            // Calculate the visual width of search input so that completion preview can be displayed after the search input
+            let search_input_size: u16 = self
+                .search_input
+                .iter()
+                .map(|c| c.width().unwrap_or(1) as u16)
+                .sum();
+
+            let cursor_position: u16 = self.search_input[..self.input_position]
+                .iter()
+                .map(|c| c.width().unwrap_or(1) as u16)
+                .sum();
+            let x = area.x + cursor_position + 1;
             let y = area.y + 1;
             frame.set_cursor_position(Position::new(x, y));
 
             if let Some(preview) = &self.completion_preview {
-                let preview_x = area.x + self.search_input.len() as u16 + 1;
+                let preview_x = area.x + search_input_size + 1;
                 let preview_span =
                     Span::styled(preview, Style::default().fg(theme.search_preview_color()));
-                let preview_area = Rect::new(preview_x, y, preview.len() as u16, 1);
+                let preview_area = Rect::new(
+                    preview_x,
+                    y,
+                    (preview.len() as u16).min(area.width - search_input_size - 1), // Ensure the completion preview stays within the search bar bounds
+                    1,
+                );
                 frame.render_widget(Paragraph::new(preview_span), preview_area);
             }
         }
@@ -211,35 +225,22 @@ impl Filter {
         }
     }
 
-    fn regex_builder(&self, pattern: &str) -> Result<regex::Regex, regex::Error> {
-        RegexBuilder::new(pattern).case_insensitive(true).build()
-    }
-
     fn complete_search(&mut self) -> SearchAction {
-        if self.completion_preview.is_none() {
-            SearchAction::None
-        } else {
-            let pattern = format!("(?i)^{}", self.search_input);
-            if let Ok(regex) = self.regex_builder(&pattern) {
-                self.search_input = self
-                    .items
-                    .iter()
-                    .find_map(|item| {
-                        if regex.is_match(&item.node.name) {
-                            Some(item.node.name.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .unwrap_or_default();
-
-                self.completion_preview = None;
-                self.input_position = self.search_input.len();
-
-                SearchAction::Update
-            } else {
-                SearchAction::None
+        if self.completion_preview.is_some() {
+            let input = &self.search_input.iter().collect::<String>().to_lowercase();
+            if let Some(search_completion) = self
+                .items
+                .iter()
+                .find(|item| item.node.name.to_lowercase().starts_with(input))
+            {
+                self.search_input = search_completion.node.name.chars().collect();
             }
+
+            self.input_position = self.search_input.len();
+            self.completion_preview = None;
+            SearchAction::Update
+        } else {
+            SearchAction::None
         }
     }
 

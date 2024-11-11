@@ -449,13 +449,13 @@ dependencies = [
  "portable-pty",
  "rand",
  "ratatui",
- "regex",
  "temp-dir",
  "textwrap",
  "time",
  "tree-sitter-bash",
  "tree-sitter-highlight",
  "tui-term",
+ "unicode-width 0.2.0",
  "zips",
 ]
 
