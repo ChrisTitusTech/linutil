@@ -9,7 +9,7 @@ use crate::{
     theme::Theme,
 };
 
-use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
+use linutil_core::{ego_tree::NodeId, Command, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -877,13 +877,13 @@ impl AppState {
     }
 
     fn handle_confirm_command(&mut self) {
-        let commands = self
+        let commands: Vec<&Command> = self
             .selected_commands
             .iter()
-            .map(|node| node.command.clone())
+            .map(|node| &node.command)
             .collect();
 
-        let command = RunningCommand::new(commands);
+        let command = RunningCommand::new(&commands);
         self.spawn_float(command, 80, 80);
         self.selected_commands.clear();
     }

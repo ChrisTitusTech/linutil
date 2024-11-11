@@ -8,7 +8,7 @@ use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
     layout::{Rect, Size},
     style::{Style, Stylize},
-    text::{Line, Span},
+    text::Line,
     widgets::{Block, Borders},
     Frame,
 };
@@ -19,7 +19,7 @@ use std::{
 };
 use time::{macros::format_description, OffsetDateTime};
 use tui_term::{
-    vt100::{self, Screen},
+    vt100::{Parser, Screen},
     widget::PseudoTerminal,
 };
 
@@ -44,12 +44,6 @@ pub struct RunningCommand {
 
 impl FloatContent for RunningCommand {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        // Calculate the inner size of the terminal area, considering borders
-        let inner_size = Size {
-            width: area.width - 2, // Adjust for border width
-            height: area.height - 2,
-        };
-
         // Define the block for the terminal display
         let block = if !self.is_finished() {
             // Display a block indicating the command is running
@@ -61,42 +55,33 @@ impl FloatContent for RunningCommand {
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
         } else {
             // Display a block with the command's exit status
-            let mut title_line = if self.get_exit_status().success() {
-                Line::from(
-                    Span::default()
-                        .content("SUCCESS!")
-                        .style(Style::default().fg(theme.success_color()).reversed()),
+            let title_line = if self.get_exit_status().success() {
+                Line::styled(
+                    "SUCCESS! Press <ENTER> to close this window",
+                    Style::default().fg(theme.success_color()).reversed(),
                 )
             } else {
-                Line::from(
-                    Span::default()
-                        .content("FAILED!")
-                        .style(Style::default().fg(theme.fail_color()).reversed()),
+                Line::styled(
+                    "FAILED! Press <ENTER> to close this window",
+                    Style::default().fg(theme.fail_color()).reversed(),
                 )
             };
 
-            title_line.push_span(
-                Span::default()
-                    .content(" Press <ENTER> to close this window ")
-                    .style(Style::default()),
-            );
+            let log_path = if let Some(log_path) = &self.log_path {
+                Line::from(format!(" Log saved: {} ", log_path)).centered()
+            } else {
+                Line::from(" Press 'l' to save command log ").centered()
+            };
 
-            let mut block = Block::default()
+            Block::default()
                 .borders(Borders::ALL)
                 .border_set(ratatui::symbols::border::ROUNDED)
-                .title_top(title_line.centered());
-
-            if let Some(log_path) = &self.log_path {
-                block =
-                    block.title_bottom(Line::from(format!(" Log saved: {} ", log_path)).centered());
-            } else {
-                block =
-                    block.title_bottom(Line::from(" Press 'l' to save command log ").centered());
-            }
-
-            block
+                .title_top(title_line.centered())
+                .title_bottom(log_path)
         };
 
+        // Calculate the inner size of the terminal area, considering borders
+        let inner_size = block.inner(area).as_size();
         // Process the buffer and create the pseudo-terminal widget
         let screen = self.screen(inner_size);
         let pseudo_term = PseudoTerminal::new(&screen).block(block);
@@ -180,7 +165,7 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(commands: Vec<Command>) -> Self {
+    pub fn new(commands: &[&Command]) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -200,10 +185,10 @@ impl RunningCommand {
                     if let Some(parent_directory) = file.parent() {
                         script.push_str(&format!("cd {}\n", parent_directory.display()));
                     }
-                    script.push_str(&executable);
+                    script.push_str(executable);
                     for arg in args {
                         script.push(' ');
-                        script.push_str(&arg);
+                        script.push_str(arg);
                     }
                     script.push('\n'); // Ensures that each command is properly separated for execution preventing directory errors
                 }
@@ -286,7 +271,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
+        let mut parser = Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
