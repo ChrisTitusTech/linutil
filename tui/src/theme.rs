@@ -14,70 +14,95 @@ pub enum Theme {
 }
 
 impl Theme {
-    fn get_color_variant(&self, default: Color, compatible: Color) -> Color {
-        match self {
-            Theme::Default => default,
-            Theme::Compatible => compatible,
-        }
-    }
-
-    fn get_icon_variant(&self, default: &'static str, compatible: &'static str) -> &'static str {
-        match self {
-            Theme::Default => default,
-            Theme::Compatible => compatible,
-        }
-    }
-
     pub fn dir_color(&self) -> Color {
-        self.get_color_variant(Color::Blue, Color::Blue)
+        match self {
+            Theme::Default => Color::Blue,
+            Theme::Compatible => Color::Blue,
+        }
     }
 
     pub fn cmd_color(&self) -> Color {
-        self.get_color_variant(Color::Rgb(204, 224, 208), Color::LightGreen)
+        match self {
+            Theme::Default => Color::Rgb(204, 224, 208),
+            Theme::Compatible => Color::LightGreen,
+        }
     }
 
     pub fn multi_select_disabled_color(&self) -> Color {
-        self.get_color_variant(Color::DarkGray, Color::DarkGray)
+        match self {
+            Theme::Default => Color::DarkGray,
+            Theme::Compatible => Color::DarkGray,
+        }
     }
 
     pub fn tab_color(&self) -> Color {
-        self.get_color_variant(Color::Rgb(255, 255, 85), Color::Yellow)
+        match self {
+            Theme::Default => Color::Rgb(255, 255, 85),
+            Theme::Compatible => Color::Yellow,
+        }
     }
 
     pub fn dir_icon(&self) -> &'static str {
-        self.get_icon_variant("  ", "[DIR]")
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => "[DIR]",
+        }
     }
 
     pub fn cmd_icon(&self) -> &'static str {
-        self.get_icon_variant("  ", "[CMD]")
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => "[CMD]",
+        }
     }
 
     pub fn tab_icon(&self) -> &'static str {
-        self.get_icon_variant("  ", ">> ")
+        match self {
+            Theme::Default => "  ",
+            Theme::Compatible => ">> ",
+        }
     }
 
     pub fn multi_select_icon(&self) -> &'static str {
-        self.get_icon_variant("", "*")
+        match self {
+            Theme::Default => "",
+            Theme::Compatible => "*",
+        }
     }
 
     pub fn success_color(&self) -> Color {
-        self.get_color_variant(Color::Rgb(5, 255, 55), Color::Green)
+        match self {
+            Theme::Default => Color::Rgb(5, 255, 55),
+            Theme::Compatible => Color::Green,
+        }
     }
 
     pub fn fail_color(&self) -> Color {
-        self.get_color_variant(Color::Rgb(199, 55, 44), Color::Red)
+        match self {
+            Theme::Default => Color::Rgb(199, 55, 44),
+            Theme::Compatible => Color::Red,
+        }
     }
 
     pub fn focused_color(&self) -> Color {
-        self.get_color_variant(Color::LightBlue, Color::LightBlue)
+        match self {
+            Theme::Default => Color::LightBlue,
+            Theme::Compatible => Color::LightBlue,
+        }
     }
 
     pub fn search_preview_color(&self) -> Color {
-        self.get_color_variant(Color::DarkGray, Color::DarkGray)
+        match self {
+            Theme::Default => Color::DarkGray,
+            Theme::Compatible => Color::DarkGray,
+        }
     }
 
     pub fn unfocused_color(&self) -> Color {
-        self.get_color_variant(Color::Gray, Color::Gray)
+        match self {
+            Theme::Default => Color::Gray,
+            Theme::Compatible => Color::Gray,
+        }
     }
 }
 
