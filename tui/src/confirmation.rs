@@ -21,7 +21,7 @@ pub struct ConfirmPrompt {
 }
 
 impl ConfirmPrompt {
-    pub fn new(names: Vec<&str>) -> Self {
+    pub fn new(names: &[&str]) -> Self {
         let names = names
             .iter()
             .zip(1..)
