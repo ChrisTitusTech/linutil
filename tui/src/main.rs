@@ -3,6 +3,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
 pub mod state;
 mod theme;

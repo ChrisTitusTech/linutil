@@ -4,6 +4,7 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
+    root::check_root_status,
     running_command::RunningCommand,
     theme::Theme,
 };
@@ -123,6 +124,11 @@ impl AppState {
             size_bypass,
             skip_confirmation,
         };
+
+        #[cfg(unix)]
+        if let Some(root_warning) = check_root_status() {
+            state.spawn_float(root_warning, 60, 40);
+        }
 
         state.update_items();
         if let Some(auto_execute_commands) = auto_execute_commands {

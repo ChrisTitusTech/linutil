@@ -30,6 +30,7 @@ textwrap = { version = "0.16.1", default-features = false }
 anstyle = { version = "1.0.8", default-features = false }
 ansi-to-tui = { version = "7.0.0", default-features = false }
 zips = "0.1.7"
+nix = { version = "0.29.0", features = [ "user" ] }
 
 [[bin]]
 name = "linutil"
