@@ -1,5 +1,5 @@
 .\" manpage for Linutil
-.TH "linutil" "1" "October 2024" "" "Linutil Manual"
+.TH "linutil" "1" "November 2024" "Linutil 2024.10.31" "Linutil Manual"
 
 .SH NAME
 linutil \- Chris Titus Tech's Linux Toolbox
@@ -27,6 +27,18 @@ curl -fsSL https://christitus.com/linuxdev | sh
 Path to the configuration file.
 
 .TP
+\fB\-\-override\-validation\fR
+Show all available entries, disregarding compatibility checks (\fBUNSAFE\fR).
+
+.TP
+\fB\-\-size\-bypass\fR
+Bypass the terminal size limit.
+
+.TP
+\fB\-y\fR, \fB\-\-skip\-confirmation\fR
+Skip confirmation prompt before executing commands.
+
+.TP
 \fB\-t\fR, \fB\-\-theme\fR \fI<theme>\fR
 Set the theme to use in the TUI.
 .br
@@ -35,18 +47,6 @@ Possible values:
 \fIcompatible\fR.
 .br
 Defaults to \fIdefault\fR.
-
-.TP
-\fB\-y\fR, \fB\-\-skip\-confirmation\fR
-Skip confirmation prompt before executing commands.
-
-.TP
-\fB\-\-override\-validation\fR
-Show all available entries, disregarding compatibility checks. (\fBUNSAFE\fR)
-
-.TP
-\fB\-\-size\-bypass\fR
-Bypass the terminal size limit
 
 .TP
 \fB\-h\fR, \fB\-\-help\fR

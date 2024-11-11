@@ -128,11 +128,6 @@ script = "auto-login.sh"
 task_list = "DE setup"
 
 [[data]]
-name = "Auto Power Profiling"
-script = "power-profile.sh"
-task_list = "I"
-
-[[data]]
 name = "Bluetooth Manager"
 description = "This utility is designed to manage bluetooth in your system"
 script = "bluetooth-control.sh"

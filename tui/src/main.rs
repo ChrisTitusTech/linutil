@@ -3,6 +3,7 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
 pub mod state;
 mod theme;
@@ -12,7 +13,7 @@ use clap::Parser;
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
-        event::{self, DisableMouseCapture, Event, KeyEventKind},
+        event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyEventKind},
         style::ResetColor,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
@@ -61,6 +62,8 @@ fn main() -> io::Result<()> {
     );
 
     stdout().execute(EnterAlternateScreen)?;
+    stdout().execute(EnableMouseCapture)?;
+
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
@@ -90,15 +93,22 @@ fn run(
 
         // It's guaranteed that the `read()` won't block when the `poll()`
         // function returns `true`
-        if let Event::Key(key) = event::read()? {
-            // We are only interested in Press and Repeat events
-            if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
-                continue;
-            }
+        match event::read()? {
+            Event::Key(key) => {
+                if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
+                    continue;
+                }
 
-            if !state.handle_key(&key) {
-                return Ok(());
+                if !state.handle_key(&key) {
+                    return Ok(());
+                }
             }
+            Event::Mouse(mouse_event) => {
+                if !state.handle_mouse(&mouse_event) {
+                    return Ok(());
+                }
+            }
+            _ => {}
         }
     }
 }

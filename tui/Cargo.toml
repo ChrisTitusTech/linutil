@@ -14,18 +14,23 @@ default = ["tips"]
 tips = ["rand"]
 
 [dependencies]
-clap = { version = "4.5.20", features = ["derive"] }
-oneshot = "0.1.8"
+clap = { version = "4.5.20", features = ["derive", "std"], default-features = false }
+oneshot = { version = "0.1.8", features = ["std"], default-features = false }
 portable-pty = "0.8.1"
-ratatui = "0.29.0"
+ratatui = { version = "0.29.0", features = ["crossterm"], default-features = false }
 tui-term = "0.2.0"
 temp-dir = "0.1.14"
-time = { version = "0.3.36", features = ["local-offset", "macros", "formatting"] }
+time = { version = "0.3.36", features = ["formatting", "local-offset", "macros"], default-features = false }
+unicode-width = { version = "0.2.0", default-features = false }
 rand = { version = "0.8.5", optional = true }
-linutil_core = { path = "../core", version = "24.9.28" }
+linutil_core = { version = "24.9.28", path = "../core" }
 tree-sitter-highlight = "0.24.3"
 tree-sitter-bash = "0.23.1"
-unicode-width = "0.2.0"
+textwrap = { version = "0.16.1", default-features = false }
+anstyle = { version = "1.0.8", default-features = false }
+ansi-to-tui = { version = "7.0.0", default-features = false }
+zips = "0.1.7"
+nix = { version = "0.29.0", features = [ "user" ] }
 
 [[bin]]
 name = "linutil"
