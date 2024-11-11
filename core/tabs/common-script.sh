@@ -84,6 +84,7 @@ checkAURHelper() {
 }
 
 checkEscalationTool() {
+    ## Check for escalation tools.
     if [ -z "$ESCALATION_TOOL_CHECKED" ]; then
         if [ "$(id -u)" = "0" ]; then
             ESCALATION_TOOL="eval"
