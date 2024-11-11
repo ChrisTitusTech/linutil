@@ -29,8 +29,6 @@ use ratatui::{
 };
 use state::AppState;
 
-use crate::root::create_app_state;
-
 // Linux utility toolbox
 #[derive(Debug, Parser)]
 struct Args {
@@ -57,7 +55,7 @@ struct Args {
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = create_app_state(
+    let mut state = AppState::new(
         args.config,
         args.theme,
         args.override_validation,
