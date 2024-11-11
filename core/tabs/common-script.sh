@@ -84,14 +84,14 @@ checkAURHelper() {
 }
 
 checkEscalationTool() {
-    if [ "$(id -u)" = "0" ]; then
-        ESCALATION_TOOL="eval"
-        ESCALATION_TOOL_CHECKED=true
-        printf "%b\n" "${CYAN}Running as root, no escalation needed${RC}"
-        return 0
-    fi
-
     if [ -z "$ESCALATION_TOOL_CHECKED" ]; then
+        if [ "$(id -u)" = "0" ]; then
+            ESCALATION_TOOL="eval"
+            ESCALATION_TOOL_CHECKED=true
+            printf "%b\n" "${CYAN}Running as root, no escalation needed${RC}"
+            return 0
+        fi
+
         ESCALATION_TOOLS='sudo doas'
         for tool in ${ESCALATION_TOOLS}; do
             if command_exists "${tool}"; then
