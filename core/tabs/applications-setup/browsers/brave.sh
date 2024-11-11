@@ -25,7 +25,12 @@ installBrave() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
+                if [ "$dnf_version" -eq 4 ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+                fi
                 "$ESCALATION_TOOL" rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
                 "$ESCALATION_TOOL" "$PACKAGER" install -y brave-browser
                 ;;
