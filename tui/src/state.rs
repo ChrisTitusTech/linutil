@@ -12,8 +12,8 @@ use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
-    layout::{Alignment, Constraint, Direction, Flex, Layout},
+    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
+    layout::{Alignment, Constraint, Direction, Flex, Layout, Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListState, Paragraph},
@@ -41,6 +41,8 @@ P* - privileged *
 ";
 
 pub struct AppState {
+    /// Areas of tabs
+    areas: Option<Areas>,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
@@ -79,6 +81,11 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+pub struct Areas {
+    tab_list: Rect,
+    list: Rect,
+}
+
 enum SelectedItem {
     UpDir,
     Directory,
@@ -100,6 +107,7 @@ impl AppState {
         let auto_execute_commands = config_path.map(|path| Config::from_file(&path).auto_execute);
 
         let mut state = Self {
+            areas: None,
             theme,
             focus: Focus::List,
             tabs,
@@ -315,6 +323,11 @@ impl AppState {
             .split(horizontal[0]);
         frame.render_widget(label, left_chunks[0]);
 
+        self.areas = Some(Areas {
+            tab_list: left_chunks[1],
+            list: horizontal[1],
+        });
+
         let tabs = self
             .tabs
             .iter()
@@ -467,6 +480,59 @@ impl AppState {
         }
 
         frame.render_widget(keybind_para, vertical[1]);
+    }
+
+    pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
+        if !self.drawable {
+            return true;
+        }
+
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            let position = Position::new(event.column, event.row);
+            let mouse_in_tab_list = self.areas.as_ref().unwrap().tab_list.contains(position);
+            let mouse_in_list = self.areas.as_ref().unwrap().list.contains(position);
+
+            match event.kind {
+                MouseEventKind::Moved => {
+                    if mouse_in_list {
+                        self.focus = Focus::List
+                    } else if mouse_in_tab_list {
+                        self.focus = Focus::TabList
+                    }
+                }
+                MouseEventKind::ScrollDown => {
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
+                            self.current_tab.select_next();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_next()
+                    }
+                }
+                MouseEventKind::ScrollUp => {
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != 0 {
+                            self.current_tab.select_previous();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_previous()
+                    }
+                }
+                _ => {}
+            }
+        }
+        match &mut self.focus {
+            Focus::FloatingWindow(float) => {
+                float.content.handle_mouse_event(event);
+            }
+            Focus::ConfirmationPrompt(confirm) => {
+                confirm.content.handle_mouse_event(event);
+            }
+            _ => {}
+        }
+        true
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
