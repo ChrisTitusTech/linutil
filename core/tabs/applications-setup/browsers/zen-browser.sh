@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installZenBrowser() {
-    if ! command_exists zen-browser; then
+    if ! command_exists io.github.zen_browser.zen && ! command_exists zen-browser; then
         printf "%b\n" "${YELLOW}Installing Zen Browser...${RC}"
         case "$PACKAGER" in
         pacman)
