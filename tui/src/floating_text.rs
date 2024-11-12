@@ -2,11 +2,9 @@ use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
 use linutil_core::Command;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
-    layout::Rect,
-    style::{Color, Style, Stylize},
-    text::{Line, Span, Text},
+    prelude::*,
+    symbols::border,
     widgets::{Block, Borders, Clear, Paragraph, Wrap},
-    Frame,
 };
 use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
@@ -177,9 +175,9 @@ impl<'a> FloatContent for FloatingText<'a> {
     fn draw(&mut self, frame: &mut Frame, area: Rect, _theme: &Theme) {
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED)
+            .border_set(border::ROUNDED)
             .title(self.mode_title.as_str())
-            .title_alignment(ratatui::layout::Alignment::Center)
+            .title_alignment(Alignment::Center)
             .title_style(Style::default().reversed())
             .style(Style::default());
 

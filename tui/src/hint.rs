@@ -5,8 +5,8 @@ use ratatui::{
 use std::borrow::Cow;
 
 pub struct Shortcut {
-    pub key_sequences: Vec<Span<'static>>,
-    pub desc: &'static str,
+    key_sequences: Vec<Span<'static>>,
+    desc: &'static str,
 }
 
 fn add_spacing(list: Vec<Vec<Span>>) -> Line {
@@ -18,7 +18,7 @@ fn add_spacing(list: Vec<Vec<Span>>) -> Line {
         .collect()
 }
 
-pub fn span_vec_len(span_vec: &[Span]) -> usize {
+fn span_vec_len(span_vec: &[Span]) -> usize {
     span_vec.iter().rfold(0, |init, s| init + s.width())
 }
 
@@ -38,7 +38,7 @@ pub fn create_shortcut_list(
     let columns = (render_width as usize / (max_shortcut_width + 4)).max(1);
     let rows = (shortcut_spans.len() + columns - 1) / columns;
 
-    let mut lines: Vec<Line<'static>> = Vec::new();
+    let mut lines: Vec<Line<'static>> = Vec::with_capacity(rows);
 
     for row in 0..rows {
         let row_spans: Vec<_> = (0..columns)
@@ -73,13 +73,7 @@ impl Shortcut {
         let description = Span::styled(self.desc, Style::default().italic());
         self.key_sequences
             .iter()
-            .flat_map(|seq| {
-                [
-                    Span::default().content("["),
-                    seq.clone(),
-                    Span::default().content("] "),
-                ]
-            })
+            .flat_map(|seq| [Span::raw("["), seq.clone(), Span::raw("] ")])
             .chain(std::iter::once(description))
             .collect()
     }

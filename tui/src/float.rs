@@ -1,7 +1,7 @@
 use crate::{hint::Shortcut, theme::Theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent},
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Constraint, Layout, Rect},
     Frame,
 };
 
@@ -29,23 +29,19 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
     }
 
     fn floating_window(&self, size: Rect) -> Rect {
-        let hor_float = Layout::default()
-            .constraints([
-                Constraint::Percentage((100 - self.width_percent) / 2),
-                Constraint::Percentage(self.width_percent),
-                Constraint::Percentage((100 - self.width_percent) / 2),
-            ])
-            .direction(Direction::Horizontal)
-            .split(size)[1];
+        let hor_float = Layout::horizontal([
+            Constraint::Percentage((100 - self.width_percent) / 2),
+            Constraint::Percentage(self.width_percent),
+            Constraint::Percentage((100 - self.width_percent) / 2),
+        ])
+        .split(size)[1];
 
-        Layout::default()
-            .constraints([
-                Constraint::Percentage((100 - self.height_percent) / 2),
-                Constraint::Percentage(self.height_percent),
-                Constraint::Percentage((100 - self.height_percent) / 2),
-            ])
-            .direction(Direction::Vertical)
-            .split(hor_float)[1]
+        Layout::vertical([
+            Constraint::Percentage((100 - self.height_percent) / 2),
+            Constraint::Percentage(self.height_percent),
+            Constraint::Percentage((100 - self.height_percent) / 2),
+        ])
+        .split(hor_float)[1]
     }
 
     pub fn draw(&mut self, frame: &mut Frame, parent_area: Rect, theme: &Theme) {

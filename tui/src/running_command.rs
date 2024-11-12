@@ -6,14 +6,13 @@ use portable_pty::{
 };
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
-    layout::{Rect, Size},
-    style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Borders},
-    Frame,
+    prelude::*,
+    symbols::border,
+    widgets::Block,
 };
 use std::{
-    io::Write,
+    fs::File,
+    io::{Result, Write},
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
@@ -47,9 +46,8 @@ impl FloatContent for RunningCommand {
         // Define the block for the terminal display
         let block = if !self.is_finished() {
             // Display a block indicating the command is running
-            Block::default()
-                .borders(Borders::ALL)
-                .border_set(ratatui::symbols::border::ROUNDED)
+            Block::bordered()
+                .border_set(border::ROUNDED)
                 .title_top(Line::from("Running the command....").centered())
                 .title_style(Style::default().reversed())
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
@@ -68,16 +66,15 @@ impl FloatContent for RunningCommand {
             };
 
             let log_path = if let Some(log_path) = &self.log_path {
-                Line::from(format!(" Log saved: {} ", log_path)).centered()
+                Line::from(format!(" Log saved: {} ", log_path))
             } else {
-                Line::from(" Press 'l' to save command log ").centered()
+                Line::from(" Press 'l' to save command log ")
             };
 
-            Block::default()
-                .borders(Borders::ALL)
-                .border_set(ratatui::symbols::border::ROUNDED)
+            Block::bordered()
+                .border_set(border::ROUNDED)
                 .title_top(title_line.centered())
-                .title_bottom(log_path)
+                .title_bottom(log_path.centered())
         };
 
         // Calculate the inner size of the terminal area, considering borders
@@ -300,7 +297,7 @@ impl RunningCommand {
         }
     }
 
-    fn save_log(&self) -> std::io::Result<String> {
+    fn save_log(&self) -> Result<String> {
         let mut log_path = std::env::temp_dir();
         let date_format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
         log_path.push(format!(
@@ -311,7 +308,7 @@ impl RunningCommand {
                 .unwrap()
         ));
 
-        let mut file = std::fs::File::create(&log_path)?;
+        let mut file = File::create(&log_path)?;
         let buffer = self.buffer.lock().unwrap();
         file.write_all(&buffer)?;
 

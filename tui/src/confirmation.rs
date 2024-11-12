@@ -3,7 +3,8 @@ use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     layout::Alignment,
     prelude::*,
-    widgets::{Block, Borders, Clear, List},
+    symbols::border,
+    widgets::{Block, Clear, List},
 };
 use std::borrow::Cow;
 
@@ -22,10 +23,17 @@ pub struct ConfirmPrompt {
 
 impl ConfirmPrompt {
     pub fn new(names: &[&str]) -> Self {
+        let max_count_str = format!("{}", names.len());
         let names = names
             .iter()
             .zip(1..)
-            .map(|(name, n)| format!(" {n}. {name}"))
+            .map(|(name, n)| {
+                let count_str = format!("{n}");
+                let space_str = (0..(max_count_str.len() - count_str.len()))
+                    .map(|_| ' ')
+                    .collect::<String>();
+                format!("{space_str}{n}. {name}")
+            })
             .collect();
 
         Self {
@@ -51,17 +59,15 @@ impl ConfirmPrompt {
 
 impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED)
+        let block = Block::bordered()
+            .border_set(border::ROUNDED)
             .title(" Confirm selections ")
             .title_bottom(Line::from(vec![
-                Span::styled(" [", Style::default()),
+                Span::raw(" ["),
                 Span::styled("y", Style::default().fg(theme.success_color())),
-                Span::styled("] to continue ", Style::default()),
-                Span::styled("[", Style::default()),
+                Span::raw("] to continue ["),
                 Span::styled("n", Style::default().fg(theme.fail_color())),
-                Span::styled("] to abort ", Style::default()),
+                Span::raw("] to abort "),
             ]))
             .title_alignment(Alignment::Center)
             .title_style(Style::default().bold())

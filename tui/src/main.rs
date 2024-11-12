@@ -25,7 +25,7 @@ use ratatui::{
 };
 use state::AppState;
 use std::{
-    io::{self, stdout},
+    io::{stdout, Result, Stdout},
     path::PathBuf,
     time::Duration,
 };
@@ -53,7 +53,7 @@ pub struct Args {
     size_bypass: bool,
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let mut state = AppState::new(args);
@@ -77,10 +77,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run(
-    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
-    state: &mut AppState,
-) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event

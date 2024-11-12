@@ -2,11 +2,9 @@ use crate::{state::ListEntry, theme::Theme};
 use linutil_core::{ego_tree::NodeId, Tab};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
-    layout::{Position, Rect},
-    style::Style,
-    text::Span,
-    widgets::{Block, Borders, Paragraph},
-    Frame,
+    prelude::*,
+    symbols::border,
+    widgets::{Block, Paragraph},
 };
 use unicode_width::UnicodeWidthChar;
 
@@ -118,9 +116,8 @@ impl Filter {
         //Create the search bar widget
         let search_bar = Paragraph::new(display_text)
             .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_set(ratatui::symbols::border::ROUNDED)
+                Block::bordered()
+                    .border_set(border::ROUNDED)
                     .title(" Search "),
             )
             .style(Style::default().fg(search_color));

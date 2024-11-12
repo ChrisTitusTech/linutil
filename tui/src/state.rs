@@ -12,12 +12,10 @@ use crate::{
 use linutil_core::{ego_tree::NodeId, Command, Config, ListNode, TabList};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
-    layout::{Alignment, Constraint, Direction, Flex, Layout, Position, Rect},
-    style::{Style, Stylize},
+    layout::Flex,
+    prelude::*,
     symbols::border,
-    text::{Line, Span, Text},
     widgets::{Block, List, ListState, Paragraph},
-    Frame,
 };
 use std::rc::Rc;
 
@@ -242,6 +240,8 @@ impl AppState {
                     Shortcut::new("Previous theme", ["T"]),
                     Shortcut::new("Next tab", ["Tab"]),
                     Shortcut::new("Previous tab", ["Shift-Tab"]),
+                    Shortcut::new("Important actions guide", ["g"]),
+                    Shortcut::new("Multi-selection mode", ["v"]),
                 ]),
             ),
 

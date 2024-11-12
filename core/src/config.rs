@@ -1,6 +1,5 @@
 use serde::Deserialize;
-use std::path::Path;
-use std::process;
+use std::{path::Path, process};
 
 #[derive(Deserialize)]
 pub struct Config {
