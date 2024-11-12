@@ -8,6 +8,9 @@ mod running_command;
 pub mod state;
 mod theme;
 
+#[cfg(feature = "tips")]
+mod tips;
+
 use crate::theme::Theme;
 use clap::Parser;
 use ratatui::{
@@ -29,7 +32,7 @@ use std::{
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
-struct Args {
+pub struct Args {
     #[arg(short, long, help = "Path to the configuration file")]
     config: Option<PathBuf>,
     #[arg(short, long, value_enum)]
@@ -53,13 +56,7 @@ struct Args {
 fn main() -> io::Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(
-        args.config,
-        args.theme,
-        args.override_validation,
-        args.size_bypass,
-        args.skip_confirmation,
-    );
+    let mut state = AppState::new(args);
 
     stdout().execute(EnterAlternateScreen)?;
     stdout().execute(EnableMouseCapture)?;

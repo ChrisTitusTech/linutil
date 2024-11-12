@@ -36,16 +36,3 @@ pub struct ListNode {
     pub task_list: String,
     pub multi_select: bool,
 }
-
-impl Tab {
-    pub fn find_command(&self, name: &str) -> Option<Rc<ListNode>> {
-        self.tree.root().descendants().find_map(|node| {
-            let value = node.value();
-            if value.name == name && !node.has_children() {
-                Some(value.clone())
-            } else {
-                None
-            }
-        })
-    }
-}
