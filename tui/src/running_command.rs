@@ -5,7 +5,7 @@ use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     layout::{Rect, Size},
     style::{Color, Style, Stylize},
     text::{Line, Span},
@@ -104,18 +104,6 @@ impl FloatContent for RunningCommand {
         frame.render_widget(pseudo_term, area);
     }
 
-    fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
-        match event.kind {
-            MouseEventKind::ScrollUp => {
-                self.scroll_offset = self.scroll_offset.saturating_add(1);
-            }
-            MouseEventKind::ScrollDown => {
-                self.scroll_offset = self.scroll_offset.saturating_sub(1);
-            }
-            _ => {}
-        }
-        true
-    }
     /// Handle key events of the running command "window". Returns true when the "window" should be
     /// closed
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
