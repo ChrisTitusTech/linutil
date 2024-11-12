@@ -519,7 +519,11 @@ impl AppState {
                         if len > 0 {
                             let current = self.selection.selected().unwrap_or(0);
                             let max_index = if self.at_root() { len - 1 } else { len };
-                            let next = if current + 1 > max_index { 0 } else { current + 1 };
+                            let next = if current + 1 > max_index {
+                                0
+                            } else {
+                                current + 1
+                            };
                             self.selection.select(Some(next));
                         }
                     }
