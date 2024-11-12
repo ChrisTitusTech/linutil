@@ -21,7 +21,7 @@ checkFlatpak() {
         printf "%b\n" "${YELLOW}Installing Flatpak...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
+                  "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm flatpak
                 ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add flatpak
