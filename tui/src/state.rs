@@ -508,22 +508,38 @@ impl AppState {
                 }
                 MouseEventKind::ScrollDown => {
                     if mouse_in_tab_list {
-                        if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
+                        if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
+                            self.current_tab.select_first();
+                        } else {
                             self.current_tab.select_next();
                         }
                         self.refresh_tab();
                     } else if mouse_in_list {
-                        self.selection.select_next()
+                        let len = self.filter.item_list().len();
+                        if len > 0 {
+                            let current = self.selection.selected().unwrap_or(0);
+                            let max_index = if self.at_root() { len - 1 } else { len };
+                            let next = if current + 1 > max_index { 0 } else { current + 1 };
+                            self.selection.select(Some(next));
+                        }
                     }
                 }
                 MouseEventKind::ScrollUp => {
                     if mouse_in_tab_list {
-                        if self.current_tab.selected().unwrap() != 0 {
+                        if self.current_tab.selected().unwrap() == 0 {
+                            self.current_tab.select(Some(self.tabs.len() - 1));
+                        } else {
                             self.current_tab.select_previous();
                         }
                         self.refresh_tab();
                     } else if mouse_in_list {
-                        self.selection.select_previous()
+                        let len = self.filter.item_list().len();
+                        if len > 0 {
+                            let current = self.selection.selected().unwrap_or(0);
+                            let max_index = if self.at_root() { len - 1 } else { len };
+                            let next = if current == 0 { max_index } else { current - 1 };
+                            self.selection.select(Some(next));
+                        }
                     }
                 }
                 _ => {}
