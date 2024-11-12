@@ -66,6 +66,7 @@ pub struct AppState {
     tip: String,
     size_bypass: bool,
     skip_confirmation: bool,
+    mouse_enabled: bool,
 }
 
 pub enum Focus {
@@ -123,6 +124,7 @@ impl AppState {
             tip: get_random_tip(),
             size_bypass,
             skip_confirmation,
+            mouse_enabled: false,
         };
 
         #[cfg(unix)]
@@ -206,6 +208,7 @@ impl AppState {
                 hints.push(Shortcut::new("Next tab", ["Tab"]));
                 hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
                 hints.push(Shortcut::new("Important actions guide", ["g"]));
+                hints.push(Shortcut::new("Toggle mouse", ["m"]));
 
                 ("Command list", hints.into_boxed_slice())
             }
@@ -489,7 +492,7 @@ impl AppState {
     }
 
     pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
-        if !self.drawable {
+        if !self.drawable || !self.mouse_enabled {
             return true;
         }
 
@@ -651,6 +654,7 @@ impl AppState {
                 KeyCode::Char('g') => self.toggle_task_list_guide(),
                 KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
+                KeyCode::Char('m') => self.mouse_enabled = !self.mouse_enabled,
                 _ => {}
             },
 
