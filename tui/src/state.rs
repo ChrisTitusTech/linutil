@@ -505,7 +505,8 @@ impl AppState {
                     if mouse_in_list {
                         self.focus = Focus::List;
                         if let Some(areas) = &self.areas {
-                            let relative_y = position.y.saturating_sub(areas.list.y + 1);
+                            let list_start = areas.list.y + 4;
+                            let relative_y = position.y.saturating_sub(list_start);
                             let list_len = self.filter.item_list().len();
                             if relative_y < list_len as u16 {
                                 self.selection.select(Some(relative_y as usize));
