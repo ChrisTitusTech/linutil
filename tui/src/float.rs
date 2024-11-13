@@ -4,9 +4,7 @@ use ratatui::{
     Frame,
 };
 
-use crate::event::MouseButton;
-use crate::event::MouseEventKind;
-use crate::hint::Shortcut;
+use crate::{event::MouseButton, event::MouseEventKind, hint::Shortcut};
 
 pub trait FloatContent {
     fn draw(&mut self, frame: &mut Frame, area: Rect);
