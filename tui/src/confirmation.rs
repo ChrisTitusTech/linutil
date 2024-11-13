@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use crate::{float::FloatContent, hint::Shortcut};
 
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
+    crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind},
     layout::Alignment,
     prelude::*,
     widgets::{Block, Borders, Clear, List},
@@ -87,15 +87,20 @@ impl FloatContent for ConfirmPrompt {
 
     fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
         match event.kind {
+            MouseEventKind::Down(MouseButton::Left) => {
+                self.status = ConfirmStatus::Confirm;
+                true
+            }
             MouseEventKind::ScrollDown => {
                 self.scroll_down();
+                false
             }
             MouseEventKind::ScrollUp => {
                 self.scroll_up();
+                false
             }
-            _ => {}
+            _ => false,
         }
-        false
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {

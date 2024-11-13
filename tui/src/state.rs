@@ -483,7 +483,7 @@ impl AppState {
 
         match &mut self.focus {
             Focus::FloatingWindow(float) => float.draw(frame, chunks[1]),
-            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1]),
+            Focus::ConfirmationPrompt(confirm) => confirm.draw(frame, chunks[1]),
             _ => {}
         }
 
@@ -502,12 +502,25 @@ impl AppState {
                 }
                 return true;
             }
-            Focus::ConfirmationPrompt(prompt) => {
-                if prompt.handle_mouse_event(event) {
-                    self.focus = Focus::List;
-                    self.selected_commands.clear();
+            Focus::ConfirmationPrompt(confirm) => {
+                if confirm.handle_mouse_event(event) {
+                    match confirm.content.status {
+                        ConfirmStatus::Abort => {
+                            self.focus = Focus::List;
+                            if !self.multi_select {
+                                self.selected_commands.clear()
+                            } else {
+                                if let Some(node) = self.get_selected_node() {
+                                    if !node.multi_select {
+                                        self.selected_commands.retain(|cmd| cmd.name != node.name);
+                                    }
+                                }
+                            }
+                        }
+                        ConfirmStatus::Confirm => self.handle_confirm_command(),
+                        ConfirmStatus::None => {}
+                    }
                 }
-                return true;
             }
             _ => {}
         }
