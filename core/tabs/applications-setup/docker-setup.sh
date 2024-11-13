@@ -54,7 +54,6 @@ install_docker() {
 
     startAndEnableService docker
 
-    # Add the current user to the docker group
     printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
     "$ESCALATION_TOOL" usermod -aG docker "$USER"
     printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
