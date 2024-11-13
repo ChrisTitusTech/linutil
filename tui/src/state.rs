@@ -508,7 +508,12 @@ impl AppState {
                             let list_start = areas.list.y + 4;
                             let relative_y = position.y.saturating_sub(list_start);
                             let list_len = self.filter.item_list().len();
-                            if relative_y < list_len as u16 {
+                            let adjusted_len = if self.at_root() {
+                                list_len
+                            } else {
+                                list_len + 1
+                            };
+                            if relative_y < adjusted_len as u16 {
                                 self.selection.select(Some(relative_y as usize));
                             }
                         }
