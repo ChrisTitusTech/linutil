@@ -113,7 +113,7 @@ impl FloatContent for RunningCommand {
             }
             _ => {}
         }
-        true
+        false
     }
     /// Handle key events of the running command "window". Returns true when the "window" should be
     /// closed

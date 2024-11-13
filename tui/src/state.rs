@@ -509,11 +509,9 @@ impl AppState {
                             self.focus = Focus::List;
                             if !self.multi_select {
                                 self.selected_commands.clear()
-                            } else {
-                                if let Some(node) = self.get_selected_node() {
-                                    if !node.multi_select {
-                                        self.selected_commands.retain(|cmd| cmd.name != node.name);
-                                    }
+                            } else if let Some(node) = self.get_selected_node() {
+                                if !node.multi_select {
+                                    self.selected_commands.retain(|cmd| cmd.name != node.name);
                                 }
                             }
                         }
