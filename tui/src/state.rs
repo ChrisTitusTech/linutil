@@ -13,7 +13,9 @@ use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
+    crossterm::event::{
+        KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseButton, MouseEvent, MouseEventKind,
+    },
     layout::{Alignment, Constraint, Direction, Flex, Layout, Position, Rect},
     style::{Style, Stylize},
     text::{Line, Span, Text},
@@ -501,9 +503,30 @@ impl AppState {
             match event.kind {
                 MouseEventKind::Moved => {
                     if mouse_in_list {
-                        self.focus = Focus::List
+                        self.focus = Focus::List;
+                        if let Some(areas) = &self.areas {
+                            let relative_y = position.y.saturating_sub(areas.list.y + 1);
+                            let list_len = self.filter.item_list().len();
+                            if relative_y < list_len as u16 {
+                                self.selection.select(Some(relative_y as usize));
+                            }
+                        }
                     } else if mouse_in_tab_list {
-                        self.focus = Focus::TabList
+                        self.focus = Focus::TabList;
+                        if let Some(areas) = &self.areas {
+                            let relative_y = position.y.saturating_sub(areas.tab_list.y + 1);
+                            if relative_y < self.tabs.len() as u16 {
+                                self.current_tab.select(Some(relative_y as usize));
+                                self.refresh_tab();
+                            }
+                        }
+                    }
+                }
+                MouseEventKind::Down(MouseButton::Left) => {
+                    if mouse_in_list {
+                        self.handle_enter();
+                    } else if mouse_in_tab_list {
+                        self.focus = Focus::List;
                     }
                 }
                 MouseEventKind::ScrollDown => {
@@ -513,7 +536,7 @@ impl AppState {
                         }
                         self.refresh_tab();
                     } else if mouse_in_list {
-                        self.selection.select_next()
+                        self.scroll_down();
                     }
                 }
                 MouseEventKind::ScrollUp => {
@@ -523,7 +546,7 @@ impl AppState {
                         }
                         self.refresh_tab();
                     } else if mouse_in_list {
-                        self.selection.select_previous()
+                        self.scroll_up();
                     }
                 }
                 _ => {}
