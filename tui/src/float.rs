@@ -4,6 +4,8 @@ use ratatui::{
     Frame,
 };
 
+use crate::event::MouseButton;
+use crate::event::MouseEventKind;
 use crate::hint::Shortcut;
 
 pub trait FloatContent {
@@ -54,8 +56,11 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
         self.content.draw(frame, popup_area);
     }
 
-    pub fn handle_mouse_event(&mut self, event: &MouseEvent) {
-        self.content.handle_mouse_event(event);
+    pub fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
+        match event.kind {
+            MouseEventKind::Down(MouseButton::Right) => true,
+            _ => self.content.handle_mouse_event(event),
+        }
     }
 
     // Returns true if the floating window is finished.

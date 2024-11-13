@@ -495,6 +495,23 @@ impl AppState {
             return true;
         }
 
+        match &mut self.focus {
+            Focus::FloatingWindow(float) => {
+                if float.handle_mouse_event(event) {
+                    self.focus = Focus::List;
+                }
+                return true;
+            }
+            Focus::ConfirmationPrompt(prompt) => {
+                if prompt.handle_mouse_event(event) {
+                    self.focus = Focus::List;
+                    self.selected_commands.clear();
+                }
+                return true;
+            }
+            _ => {}
+        }
+
         if matches!(self.focus, Focus::TabList | Focus::List | Focus::Search) {
             let position = Position::new(event.column, event.row);
             let mouse_in_tab_list = self.areas.as_ref().unwrap().tab_list.contains(position);
@@ -561,7 +578,7 @@ impl AppState {
                             if matches!(self.focus, Focus::Search) {
                                 self.exit_search();
                             }
-                            self.focus = Focus::List;
+                            self.focus = Focus::TabList;
                         }
                     }
                     MouseButton::Right if mouse_in_list => {
@@ -597,15 +614,6 @@ impl AppState {
                 }
                 _ => {}
             }
-        }
-        match &mut self.focus {
-            Focus::FloatingWindow(float) => {
-                float.content.handle_mouse_event(event);
-            }
-            Focus::ConfirmationPrompt(confirm) => {
-                confirm.content.handle_mouse_event(event);
-            }
-            _ => {}
         }
         true
     }
