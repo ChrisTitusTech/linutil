@@ -9,7 +9,7 @@ use crate::{float::FloatContent, hint::Shortcut};
 use linutil_core::Command;
 
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
+    crossterm::event::{KeyCode, KeyEvent, MouseButton, MouseEvent, MouseEventKind},
     layout::Rect,
     style::{Style, Stylize},
     text::Line,
@@ -33,6 +33,8 @@ pub struct FloatingText {
     mode_title: String,
     wrap_words: bool,
     frame_height: usize,
+    drag_start_y: Option<u16>,
+    drag_start_scroll: Option<usize>,
 }
 
 macro_rules! style {
@@ -141,6 +143,8 @@ impl FloatingText {
             h_scroll: 0,
             wrap_words,
             frame_height: 0,
+            drag_start_y: None,
+            drag_start_scroll: None,
         }
     }
 
@@ -165,6 +169,8 @@ impl FloatingText {
             v_scroll: 0,
             wrap_words: false,
             frame_height: 0,
+            drag_start_y: None,
+            drag_start_scroll: None,
         })
     }
 
@@ -204,6 +210,19 @@ impl FloatingText {
             } else {
                 get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
             };
+        }
+    }
+
+    fn handle_drag(&mut self, current_y: u16) {
+        if let (Some(start_y), Some(start_scroll)) = (self.drag_start_y, self.drag_start_scroll) {
+            let delta = start_y as i32 - current_y as i32;
+            let new_scroll = start_scroll as i32 + delta;
+
+            let max_scroll = self
+                .wrapped_lines
+                .len()
+                .saturating_sub(self.frame_height.saturating_sub(2));
+            self.v_scroll = new_scroll.clamp(0, max_scroll as i32) as usize;
         }
     }
 }
@@ -285,6 +304,17 @@ impl FloatContent for FloatingText {
 
     fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
         match event.kind {
+            MouseEventKind::Down(MouseButton::Left) => {
+                self.drag_start_y = Some(event.row);
+                self.drag_start_scroll = Some(self.v_scroll);
+            }
+            MouseEventKind::Up(MouseButton::Left) => {
+                self.drag_start_y = None;
+                self.drag_start_scroll = None;
+            }
+            MouseEventKind::Drag(MouseButton::Left) => {
+                self.handle_drag(event.row);
+            }
             MouseEventKind::ScrollDown => self.scroll_down(),
             MouseEventKind::ScrollUp => self.scroll_up(),
             MouseEventKind::ScrollLeft => self.scroll_left(),
