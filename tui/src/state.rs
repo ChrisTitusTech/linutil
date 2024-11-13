@@ -495,14 +495,31 @@ impl AppState {
             return true;
         }
 
-        if matches!(self.focus, Focus::TabList | Focus::List) {
+        if matches!(self.focus, Focus::TabList | Focus::List | Focus::Search) {
             let position = Position::new(event.column, event.row);
             let mouse_in_tab_list = self.areas.as_ref().unwrap().tab_list.contains(position);
             let mouse_in_list = self.areas.as_ref().unwrap().list.contains(position);
 
+            let mouse_in_search = if let Some(areas) = &self.areas {
+                position.y >= areas.list.y
+                    && position.y < areas.list.y + 3
+                    && position.x >= areas.list.x
+                    && position.x < areas.list.x + areas.list.width
+            } else {
+                false
+            };
+
             match event.kind {
                 MouseEventKind::Moved => {
-                    if mouse_in_list {
+                    if mouse_in_search {
+                        if !matches!(self.focus, Focus::Search) {
+                            self.focus = Focus::Search;
+                            self.filter.activate_search();
+                        }
+                    } else if mouse_in_list {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
                         self.focus = Focus::List;
                         if let Some(areas) = &self.areas {
                             let list_start = areas.list.y + 4;
@@ -518,6 +535,9 @@ impl AppState {
                             }
                         }
                     } else if mouse_in_tab_list {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
                         self.focus = Focus::TabList;
                         if let Some(areas) = &self.areas {
                             let relative_y = position.y.saturating_sub(areas.tab_list.y + 1);
@@ -529,30 +549,35 @@ impl AppState {
                     }
                 }
                 MouseEventKind::Down(MouseButton::Left) => {
-                    if mouse_in_list {
+                    if mouse_in_search {
+                        self.enter_search();
+                    } else if mouse_in_list {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
                         self.handle_enter();
                     } else if mouse_in_tab_list {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
                         self.focus = Focus::List;
                     }
                 }
-                MouseEventKind::ScrollDown => {
+                MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
+                    if matches!(self.focus, Focus::Search) {
+                        self.exit_search();
+                    }
                     if mouse_in_tab_list {
                         if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
                             self.current_tab.select_next();
                         }
                         self.refresh_tab();
                     } else if mouse_in_list {
-                        self.scroll_down();
-                    }
-                }
-                MouseEventKind::ScrollUp => {
-                    if mouse_in_tab_list {
-                        if self.current_tab.selected().unwrap() != 0 {
-                            self.current_tab.select_previous();
+                        if event.kind == MouseEventKind::ScrollDown {
+                            self.scroll_down();
+                        } else {
+                            self.scroll_up();
                         }
-                        self.refresh_tab();
-                    } else if mouse_in_list {
-                        self.scroll_up();
                     }
                 }
                 _ => {}
