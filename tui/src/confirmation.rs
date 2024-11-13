@@ -91,6 +91,10 @@ impl FloatContent for ConfirmPrompt {
                 self.status = ConfirmStatus::Confirm;
                 true
             }
+            MouseEventKind::Down(MouseButton::Right) => {
+                self.status = ConfirmStatus::Abort;
+                false
+            }
             MouseEventKind::ScrollDown => {
                 self.scroll_down();
                 false

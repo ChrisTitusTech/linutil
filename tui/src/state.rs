@@ -519,6 +519,7 @@ impl AppState {
                         ConfirmStatus::None => {}
                     }
                 }
+                return true;
             }
             _ => {}
         }

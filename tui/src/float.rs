@@ -56,7 +56,10 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
 
     pub fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
         match event.kind {
-            MouseEventKind::Down(MouseButton::Right) => true,
+            MouseEventKind::Down(MouseButton::Right) => {
+                self.content.handle_mouse_event(event);
+                true
+            }
             _ => self.content.handle_mouse_event(event),
         }
     }
