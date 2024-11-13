@@ -548,21 +548,36 @@ impl AppState {
                         }
                     }
                 }
-                MouseEventKind::Down(MouseButton::Left) => {
-                    if mouse_in_search {
-                        self.enter_search();
-                    } else if mouse_in_list {
-                        if matches!(self.focus, Focus::Search) {
-                            self.exit_search();
+                MouseEventKind::Down(button) => match button {
+                    MouseButton::Left => {
+                        if mouse_in_search {
+                            self.enter_search();
+                        } else if mouse_in_list {
+                            if matches!(self.focus, Focus::Search) {
+                                self.exit_search();
+                            }
+                            self.handle_enter();
+                        } else if mouse_in_tab_list {
+                            if matches!(self.focus, Focus::Search) {
+                                self.exit_search();
+                            }
+                            self.focus = Focus::List;
                         }
-                        self.handle_enter();
-                    } else if mouse_in_tab_list {
-                        if matches!(self.focus, Focus::Search) {
-                            self.exit_search();
-                        }
-                        self.focus = Focus::List;
                     }
-                }
+                    MouseButton::Right if mouse_in_list => {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
+                        self.enable_preview();
+                    }
+                    MouseButton::Middle if mouse_in_list => {
+                        if matches!(self.focus, Focus::Search) {
+                            self.exit_search();
+                        }
+                        self.enable_description();
+                    }
+                    _ => {}
+                },
                 MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
                     if matches!(self.focus, Focus::Search) {
                         self.exit_search();
