@@ -251,7 +251,8 @@ impl AppState {
     }
 
     fn is_terminal_drawable(&mut self, terminal_size: Rect) -> bool {
-        !self.size_bypass && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
+        !(self.size_bypass || matches!(self.focus, Focus::FloatingWindow(_)))
+            && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
     }
 
     pub fn draw(&mut self, frame: &mut Frame) {
