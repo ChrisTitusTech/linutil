@@ -22,7 +22,7 @@ pub struct ConfigValues {
 }
 
 impl Config {
-    pub fn new(path: &Path, tabs: &TabList) -> ConfigValues {
+    pub fn read_config(path: &Path, tabs: &TabList) -> ConfigValues {
         let content = match fs::read_to_string(path) {
             Ok(content) => content,
             Err(e) => {

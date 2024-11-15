@@ -131,7 +131,7 @@ impl AppState {
         state.update_items();
 
         if let Some(config_path) = args.config {
-            let config = Config::new(&config_path, &state.tabs);
+            let config = Config::read_config(&config_path, &state.tabs);
             state.apply_config(config);
         }
 
