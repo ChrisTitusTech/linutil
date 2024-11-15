@@ -9,7 +9,7 @@ use crate::{
     theme::Theme,
     Args,
 };
-use linutil_core::{ego_tree::NodeId, Command, Config, ListNode, TabList};
+use linutil_core::{ego_tree::NodeId, Command, Config, ConfigValues, ListNode, TabList};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
     layout::Flex,
@@ -98,10 +98,6 @@ impl AppState {
         let tabs = linutil_core::get_tabs(!args.override_validation);
         let root_id = tabs[0].tree.root().id();
 
-        let auto_execute_commands = args
-            .config
-            .map(|path| Config::from_file(&path).auto_execute);
-
         let longest_tab_display_len = tabs
             .iter()
             .map(|tab| tab.name.len() + args.theme.tab_icon().len())
@@ -133,28 +129,26 @@ impl AppState {
         }
 
         state.update_items();
-        if let Some(auto_execute_commands) = auto_execute_commands {
-            state.handle_initial_auto_execute(&auto_execute_commands);
+
+        if let Some(config_path) = args.config {
+            let config = Config::new(&config_path, &state.tabs);
+            state.apply_config(config);
         }
 
         state
     }
 
-    fn find_command_by_name(&self, name: &str) -> Option<Rc<ListNode>> {
-        self.tabs.iter().find_map(|tab| {
-            tab.tree.root().descendants().find_map(|node| {
-                let node_value = node.value();
-                (node_value.name == name && !node.has_children()).then_some(node_value.clone())
-            })
-        })
+    fn apply_config(&mut self, config_values: ConfigValues) {
+        self.skip_confirmation = self.skip_confirmation || config_values.skip_confirmation;
+        self.size_bypass = self.size_bypass || config_values.size_bypass;
+
+        if !config_values.auto_execute_commands.is_empty() {
+            self.selected_commands = config_values.auto_execute_commands;
+            self.handle_initial_auto_execute();
+        }
     }
 
-    fn handle_initial_auto_execute(&mut self, auto_execute_commands: &[String]) {
-        self.selected_commands = auto_execute_commands
-            .iter()
-            .filter_map(|name| self.find_command_by_name(name))
-            .collect();
-
+    fn handle_initial_auto_execute(&mut self) {
         if !self.selected_commands.is_empty() {
             self.spawn_confirmprompt();
         }
