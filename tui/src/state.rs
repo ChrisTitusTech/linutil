@@ -9,7 +9,7 @@ use crate::{
     theme::Theme,
 };
 
-use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
+use linutil_core::{ego_tree::NodeId, Config, ConfigValues, ListNode, TabList};
 #[cfg(feature = "tips")]
 use rand::Rng;
 use ratatui::{
@@ -105,8 +105,6 @@ impl AppState {
         let tabs = linutil_core::get_tabs(!override_validation);
         let root_id = tabs[0].tree.root().id();
 
-        let auto_execute_commands = config_path.map(|path| Config::from_file(&path).auto_execute);
-
         let mut state = Self {
             areas: None,
             theme,
@@ -131,28 +129,38 @@ impl AppState {
         }
 
         state.update_items();
-        if let Some(auto_execute_commands) = auto_execute_commands {
-            state.handle_initial_auto_execute(&auto_execute_commands);
+
+        if let Some(config_path) = config_path {
+            let config = Config::new(&config_path, &state.tabs);
+            state.apply_config(config);
         }
 
         state
     }
 
-    fn handle_initial_auto_execute(&mut self, auto_execute_commands: &[String]) {
-        self.selected_commands = auto_execute_commands
-            .iter()
-            .filter_map(|name| self.tabs.iter().find_map(|tab| tab.find_command(name)))
-            .collect();
+    fn apply_config(&mut self, config_values: ConfigValues) {
+        self.skip_confirmation = config_values.skip_confirmation;
+        self.size_bypass = config_values.size_bypass;
+        if !config_values.auto_execute_commands.is_empty() {
+            self.selected_commands = config_values.auto_execute_commands;
+            self.handle_initial_auto_execute();
+        }
+    }
 
+    fn handle_initial_auto_execute(&mut self) {
         if !self.selected_commands.is_empty() {
-            let cmd_names: Vec<_> = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect();
+            if !self.skip_confirmation {
+                let cmd_names: Vec<_> = self
+                    .selected_commands
+                    .iter()
+                    .map(|node| node.name.as_str())
+                    .collect();
 
-            let prompt = ConfirmPrompt::new(&cmd_names);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                let prompt = ConfirmPrompt::new(&cmd_names);
+                self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+            } else {
+                self.handle_confirm_command();
+            }
         }
     }
 
