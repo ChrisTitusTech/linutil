@@ -369,7 +369,21 @@ checksum = "8e9489c2807c139ffd9c1794f4af0ebe86a828db53ecdc7fea2111d0fed085d1"
 
 [[package]]
 name = "linutil_core"
-version = "24.9.28"
+version = "24.10.31"
+dependencies = [
+ "ego-tree",
+ "include_dir",
+ "serde",
+ "temp-dir",
+ "toml",
+ "which",
+]
+
+[[package]]
+name = "linutil_core"
+version = "24.10.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2990ea580e635f6700ae19bd0f5fa60c7037799908da476b0c233b9e514c1481"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -381,10 +395,10 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "24.9.28"
+version = "24.10.31"
 dependencies = [
  "clap",
- "linutil_core",
+ "linutil_core 24.10.31 (registry+https://github.com/rust-lang/crates.io-index)",
  "nix 0.29.0",
  "oneshot",
  "portable-pty",
@@ -1264,9 +1278,9 @@ checksum = "d135d17ab770252ad95e9a872d365cf3090e3be864a34ab46f48555993efc904"
 
 [[package]]
 name = "xtask"
-version = "24.9.28"
+version = "24.10.31"
 dependencies = [
- "linutil_core",
+ "linutil_core 24.10.31",
 ]
 
 [[package]]
