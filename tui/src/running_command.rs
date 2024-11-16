@@ -18,10 +18,9 @@ use std::{
     thread::JoinHandle,
 };
 use time::{macros::format_description, OffsetDateTime};
-use tui_term::{
-    vt100::{self, Screen},
-    widget::PseudoTerminal,
-};
+use tui_term::widget::PseudoTerminal;
+use vt100_ctt::{Parser, Screen};
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -285,7 +284,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
+        let mut parser = Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
