@@ -56,6 +56,7 @@ install_docker() {
 
     printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
     "$ESCALATION_TOOL" usermod -aG docker "$USER"
+    newgrp docker
     printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
 }
 
