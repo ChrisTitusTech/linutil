@@ -1148,20 +1148,22 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vt100-ctt"
-version = "0.15.3"
-source = "git+https://github.com/ChrisTitusTech/vt100-rust#39136a6232d043d8447afa7d47805b6f6baa09ee"
+version = "0.16.0"
+source = "git+https://github.com/ChrisTitusTech/vt100-rust#b660c85faaa32323892c3154835c2bc901d7bf57"
 dependencies = [
  "itoa",
  "log",
- "unicode-width 0.1.14",
+ "ratatui",
+ "tui-term",
+ "unicode-width 0.2.0",
  "vte",
 ]
 
 [[package]]
 name = "vte"
-version = "0.11.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5022b5fbf9407086c180e9557be968742d839e68346af7792b8592489732197"
+checksum = "40eb22ae96f050e0c0d6f7ce43feeae26c348fc4dea56928ca81537cfaa6188b"
 dependencies = [
  "arrayvec",
  "utf8parse",
