@@ -8,15 +8,11 @@ mod running_command;
 pub mod state;
 mod theme;
 
-use std::{
-    io::{self, stdout},
-    path::PathBuf,
-    time::Duration,
-};
+#[cfg(feature = "tips")]
+mod tips;
 
 use crate::theme::Theme;
 use clap::Parser;
-
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
@@ -28,10 +24,15 @@ use ratatui::{
     Terminal,
 };
 use state::AppState;
+use std::{
+    io::{stdout, Result, Stdout},
+    path::PathBuf,
+    time::Duration,
+};
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
-struct Args {
+pub struct Args {
     #[arg(short, long, help = "Path to the configuration file")]
     config: Option<PathBuf>,
     #[arg(short, long, value_enum)]
@@ -52,16 +53,10 @@ struct Args {
     size_bypass: bool,
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(
-        args.config,
-        args.theme,
-        args.override_validation,
-        args.size_bypass,
-        args.skip_confirmation,
-    );
+    let mut state = AppState::new(args);
 
     stdout().execute(EnterAlternateScreen)?;
     stdout().execute(EnableMouseCapture)?;
@@ -82,10 +77,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run(
-    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
-    state: &mut AppState,
-) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event

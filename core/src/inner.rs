@@ -1,3 +1,7 @@
+use crate::{Command, ListNode, Tab};
+use ego_tree::{NodeMut, Tree};
+use include_dir::{include_dir, Dir};
+use serde::Deserialize;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
@@ -6,11 +10,6 @@ use std::{
     path::{Path, PathBuf},
     rc::Rc,
 };
-
-use crate::{Command, ListNode, Tab};
-use ego_tree::{NodeMut, Tree};
-use include_dir::{include_dir, Dir};
-use serde::Deserialize;
 use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
