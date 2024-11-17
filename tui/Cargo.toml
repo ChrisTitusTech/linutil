@@ -18,7 +18,7 @@ clap = { version = "4.5.20", features = ["derive", "std"], default-features = fa
 oneshot = { version = "0.1.8", features = ["std"], default-features = false }
 portable-pty = "0.8.1"
 ratatui = { version = "0.29.0", features = ["crossterm"], default-features = false }
-tui-term = "0.2.0"
+tui-term = { version = "0.2.0", default-features = false }
 time = { version = "0.3.36", features = ["formatting", "local-offset", "macros"], default-features = false }
 unicode-width = { version = "0.2.0", default-features = false }
 rand = { version = "0.8.5", optional = true }
@@ -26,6 +26,7 @@ linutil_core = { version = "24.10.31", path = "../core" }
 tree-sitter-highlight = "0.24.4"
 tree-sitter-bash = "0.23.3"
 nix = { version = "0.29.0", features = [ "user" ] }
+vt100-ctt = "0.16.0"
 
 [[bin]]
 name = "linutil"

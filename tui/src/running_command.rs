@@ -17,10 +17,8 @@ use std::{
     thread::JoinHandle,
 };
 use time::{macros::format_description, OffsetDateTime};
-use tui_term::{
-    vt100::{Parser, Screen},
-    widget::PseudoTerminal,
-};
+use tui_term::widget::PseudoTerminal;
+use vt100_ctt::{Parser, Screen};
 
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
