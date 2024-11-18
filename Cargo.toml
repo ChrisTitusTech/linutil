@@ -1,15 +1,12 @@
 [workspace.package]
 license = "MIT"
-version = "24.9.28"
+version = "24.10.31"
 edition = "2021"
 
 [workspace]
 members = ["tui", "core", "xtask"]
 default-members = ["tui", "core"]
 resolver = "2"
-
-[patch.crates-io]
-vt100 = { git = "https://github.com/ChrisTitusTech/vt100-rust" }
 
 [profile.release]
 opt-level = "z"

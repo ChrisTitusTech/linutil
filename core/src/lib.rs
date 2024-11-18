@@ -7,7 +7,7 @@ pub use ego_tree;
 use ego_tree::Tree;
 use std::path::PathBuf;
 
-pub use config::Config;
+pub use config::{Config, ConfigValues};
 pub use inner::{get_tabs, TabList};
 
 #[derive(Clone, Hash, Eq, PartialEq)]
@@ -38,14 +38,10 @@ pub struct ListNode {
 }
 
 impl Tab {
-    pub fn find_command(&self, name: &str) -> Option<Rc<ListNode>> {
+    fn find_command_by_name(&self, name: &str) -> Option<Rc<ListNode>> {
         self.tree.root().descendants().find_map(|node| {
-            let value = node.value();
-            if value.name == name && !node.has_children() {
-                Some(value.clone())
-            } else {
-                None
-            }
+            let node_value = node.value();
+            (node_value.name == name && !node.has_children()).then_some(node_value.clone())
         })
     }
 }
