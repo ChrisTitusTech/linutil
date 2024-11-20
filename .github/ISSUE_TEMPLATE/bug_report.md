@@ -26,10 +26,11 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 ## System
-Distribution: Your Linux Distribution
-DE/WM: Gnome, Hyprland...
-Communication Protocol: X11/Wayland
-Version and branch of linutil: Version can be found inside linutil. Branch (Stable/Dev).
+Distribution: 
+DE/WM (GNOME, Hyprland, etc): 
+Windowing System (X11/Wayland): 
+Linutil version (found above the list within linutil):
+Branch (stable/prerelease/master): 
 
 ## Checklist
 - [ ] I checked for duplicate issues.
