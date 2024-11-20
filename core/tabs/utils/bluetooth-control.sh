@@ -8,7 +8,7 @@ setupBluetooth() {
     if ! command_exists bluetoothctl; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez-utils
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez bluez-utils
                 ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bluez
@@ -98,7 +98,7 @@ prompt_for_mac() {
         if echo "$choice" | grep -qE '^[0-9]+$' && [ -n "$choice" ] && [ "$choice" -le "$count" ] && [ "$choice" -gt 0 ]; then
             device=$(echo "$device_list" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
-            if bluetoothctl info "$mac" > /dev/null 2>&1; then
+            if bluetoothctl info "$mac" >/dev/null 2>&1; then
                 if bluetoothctl "$command" "$mac"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                     break
@@ -117,7 +117,6 @@ prompt_for_mac() {
         else
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
             read -r _
-
         fi
     done
 }
