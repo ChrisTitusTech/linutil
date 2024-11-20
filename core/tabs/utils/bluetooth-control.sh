@@ -82,9 +82,8 @@ prompt_for_mac() {
         fi
 
         # Display devices with numbers
-        device_list="$devices"
         i=1
-        echo "$device_list" | while IFS= read -r device; do
+        echo "$devices" | while IFS= read -r device; do
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
@@ -92,11 +91,11 @@ prompt_for_mac() {
         printf "%b" "$prompt_msg"
         read -r choice
 
-        count=$(printf "%b" "$device_list" | wc -l)
+        count=$(printf "%b" "$devices" | wc -l)
         count=$((count + 1))
 
         if echo "$choice" | grep -qE '^[0-9]+$' && [ -n "$choice" ] && [ "$choice" -le "$count" ] && [ "$choice" -gt 0 ]; then
-            device=$(echo "$device_list" | sed -n "${choice}p")
+            device=$(echo "$devices" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
             if bluetoothctl info "$mac" >/dev/null 2>&1; then
                 if bluetoothctl "$command" "$mac"; then
@@ -105,12 +104,10 @@ prompt_for_mac() {
                 else
                     printf "%b\n" "${RED}$failure_msg${RC}"
                     read -r _
-
                 fi
             else
                 printf "%b\n" "${RED}Invalid MAC address. Please try again.${RC}"
                 read -r _
-
             fi
         elif [ "$choice" -eq 0 ]; then
             return
