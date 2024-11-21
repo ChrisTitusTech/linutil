@@ -10,7 +10,7 @@ setup_xrandr() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm xorg-xrandr
                 ;;
-            apt-get|nala)
+            apt-get | nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y x11-xserver-utils
                 ;;
             apk)
@@ -30,6 +30,7 @@ execute_command() {
     command="$1"
     printf "Executing: %s\n" "$command"
     eval "$command" 2>&1 | tee /tmp/xrandr.log | tail -n 20
+    #shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         printf "%b\n" "${RED}An error occurred while executing the command. Check /tmp/xrandr.log for details.${RC}"
     fi
@@ -52,25 +53,25 @@ get_unique_resolutions() {
     monitor="$1"
     xrandr_output=$(xrandr)
     available_resolutions=$(printf "%s" "$xrandr_output" | sed -n "/$monitor connected/,/^[^ ]/p" | grep -oP '\d+x\d+' | sort -u)
-    
+
     standard_resolutions="1920x1080 1280x720 1600x900 2560x1440 3840x2160"
-    
+
     temp_file=$(mktemp)
-    printf "%s" "$available_resolutions" > "$temp_file"
-    
+    printf "%s" "$available_resolutions" >"$temp_file"
+
     filtered_standard_resolutions=$(printf "%s" "$standard_resolutions" | tr ' ' '\n' | grep -xF -f "$temp_file")
-    
+
     rm "$temp_file"
-    
+
     available_res_file=$(mktemp)
     filtered_standard_res_file=$(mktemp)
-    printf "%s" "$available_resolutions" | sort > "$available_res_file"
-    printf "%s" "$filtered_standard_resolutions" | sort > "$filtered_standard_res_file"
-    
+    printf "%s" "$available_resolutions" | sort >"$available_res_file"
+    printf "%s" "$filtered_standard_resolutions" | sort >"$filtered_standard_res_file"
+
     remaining_resolutions=$(comm -23 "$available_res_file" "$filtered_standard_res_file")
-    
+
     rm "$available_res_file" "$filtered_standard_res_file"
-    
+
     printf "%b\n" "$filtered_standard_resolutions\n$remaining_resolutions" | head -n 10
 }
 
@@ -84,31 +85,6 @@ confirm_action() {
         return 0
     else
         return 1
-    fi
-}
-
-checkEmpty() {
-    if [ -z "$1" ]; then
-        printf "%b\n" "${RED}Empty value is not allowed${RC}" >&2
-        exit 1
-    fi
-}
-
-checkGroups() {
-    groups="$1"
-    available_groups="$2"
-    for group in $groups; do
-        if ! echo "$available_groups" | grep -q -w "$group"; then
-            return 1
-        fi
-    done
-    return 0
-}
-
-confirmAction() {
-    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
-        printf "%b\n" "${RED}Cancelled operation...${RC}" >&2
-        exit 1
     fi
 }
 

@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
-
-. ../../common-script.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to duplicate displays
 duplicate_displays() {

@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
-
-. ../../common-script.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to set resolutions
 set_resolutions() {
@@ -33,7 +32,7 @@ set_resolutions() {
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "%b\n" "Press [Enter] to continue..."
-            read -r dummy
+            read -r _
             continue
         fi
 
@@ -41,13 +40,13 @@ set_resolutions() {
         resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
         temp_res_file=$(mktemp)
-        printf "%b\n" "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
+        printf "%b\n" "$resolutions" | awk '{print NR " " $0}' >"$temp_res_file"
 
         i=1
         while read -r resolution; do
-            echo "$resolution" >> "$temp_res_file"
+            echo "$resolution" >>"$temp_res_file"
             i=$((i + 1))
-        done < "$temp_res_file"
+        done <"$temp_res_file"
 
         clear
         printf "%b\n" "${YELLOW}=========================================${RC}"

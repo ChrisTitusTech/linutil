@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
-
-. ../../common-script.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to change monitor orientation
 change_orientation() {
@@ -47,7 +46,10 @@ change_orientation() {
         2) orientation="left" ;;
         3) orientation="right" ;;
         4) orientation="inverted" ;;
-        *) printf "%b\n" "${RED}Invalid selection.${RC}"; return ;;
+        *)
+            printf "%b\n" "${RED}Invalid selection.${RC}"
+            return
+            ;;
     esac
 
     if confirm_action "Change orientation of $monitor_name to $orientation?"; then

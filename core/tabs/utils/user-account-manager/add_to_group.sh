@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
-
-. ../utility_functions.sh
+# shellcheck disable=SC1091
+. ./user-manager-functions.sh
 
 addToGroup() {
     clear
@@ -24,7 +23,7 @@ addToGroup() {
     printf "%b" "${YELLOW}Enter the groups you want to add user $username to (space-separated): ${RC}"
     read -r groups
 
-    checkEmpty "$groups" || exit 1
+    checkEmpty "$groups"
     if ! checkGroups "$groups" "$available_groups"; then
         printf "%b\n" "${RED}One or more groups are not available.${RC}"
         exit 1
@@ -34,14 +33,11 @@ addToGroup() {
 
     printf "%b" "${YELLOW}Are you sure you want to add user $username to $groups_to_add? [Y/n]: ${RC}"
     read -r confirm
-    confirmAction || exit 1
+    confirmAction "$confirm"
 
     "$ESCALATION_TOOL" usermod -aG "$groups_to_add" "$username"
 
     printf "%b\n" "${GREEN}User successfully added to the $groups_to_add${RC}"
 }
 
-checkEnv
-checkEscalationTool
-checkGroups
 addToGroup
