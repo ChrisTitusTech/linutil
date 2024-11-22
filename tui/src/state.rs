@@ -596,13 +596,13 @@ impl AppState {
     }
 
     fn scroll_down(&mut self) {
-        let entries = if self.at_root() {
+        let num_entries = if self.at_root() {
             self.filter.item_list().len() - 1
         } else {
             self.filter.item_list().len()
         };
         if let Some(selected) = self.selection.selected() {
-            if selected == entries {
+            if selected == num_entries {
                 self.selection.select_first();
             } else {
                 self.selection.select_next();
