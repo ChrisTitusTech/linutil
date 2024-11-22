@@ -95,7 +95,7 @@ sudo zypper install linutil
 Linutil can be installed via [Cargo](https://doc.rust-lang.org/cargo) with:
 
 ```bash
-cargo install linutil
+cargo install linutil_tui
 ```
 
 Note that crates installed using `cargo install` require manual updating with `cargo install --force` (update functionality is [included in LinUtil](https://christitustech.github.io/linutil/userguide/#applications-setup))
