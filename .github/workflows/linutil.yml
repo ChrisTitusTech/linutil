@@ -42,7 +42,7 @@ jobs:
       - name: Update package version
         run: |
           prev_version=$(grep 'version' Cargo.toml | head -n +1 | cut -d'"' -f2)
-          if ! echo "${prev_version}" | grep -q -E '[0-9]{2}\.[0-9]{2}\.[0-9]{2}'; then
+          if ! echo " ${prev_version} " | grep -q -E ' [0-9]{2}\.[0-9]{2}\.[0-9]{2} '; then
             echo "Could not accurately determine the previous version"
             exit 1
           fi
