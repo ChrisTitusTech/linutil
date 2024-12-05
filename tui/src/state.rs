@@ -480,7 +480,7 @@ impl AppState {
         }
         match &mut self.focus {
             Focus::FloatingWindow(float) => {
-                float.content.handle_mouse_event(event);
+                float.handle_mouse_event(event);
             }
             Focus::ConfirmationPrompt(confirm) => {
                 confirm.content.handle_mouse_event(event);
