@@ -14,38 +14,6 @@
 > [!NOTE]
 > Since the project is still in active development, you may encounter some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues) if you do.
 
-## 💡 Usage
-To get started, pick which branch you would like to use, then run the command in your terminal:
-### Stable Branch (Recommended)
-```bash
-curl -fsSL https://christitus.com/linux | sh
-```
-### Dev branch
-```bash
-curl -fsSL https://christitus.com/linuxdev | sh
-```
-
-### CLI arguments
-
-Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
-
-- `-c, --config <CONFIG>` : Path to the configuration file.
-- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
-- `--size-bypass` : Bypass the terminal size limit.
-- `-y, --skip-confirmation` : Skip confirmation prompt before executing commands.
-- `-t, --theme <THEME>` : Set the theme to use in the application [default: `default`] [possible values: `default`, `compatible`].
-- `-h, --help` : Print help.
-
-For more detailed usage, run:
-
-```bash
-curl -fsSL https://christitus.com/linux | sh -s -- --help
-```
-
-```bash
-linutil --help
-```
-
 ## ⬇️ Installation
 
 Linutil is also available as a package in various repositories:
@@ -101,6 +69,38 @@ cargo install linutil_tui
 Note that crates installed using `cargo install` require manual updating with `cargo install --force` (update functionality is [included in LinUtil](https://christitustech.github.io/linutil/userguide/#applications-setup))
 
 </details>
+
+## 💡 Usage
+To get started, pick which branch you would like to use, then run the command in your terminal:
+### Stable Branch (Recommended)
+```bash
+curl -fsSL https://christitus.com/linux | sh
+```
+### Dev branch
+```bash
+curl -fsSL https://christitus.com/linuxdev | sh
+```
+
+### CLI arguments
+
+Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
+
+- `-c, --config <CONFIG>` : Path to the configuration file.
+- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
+- `--size-bypass` : Bypass the terminal size limit.
+- `-y, --skip-confirmation` : Skip confirmation prompt before executing commands.
+- `-t, --theme <THEME>` : Set the theme to use in the application [default: `default`] [possible values: `default`, `compatible`].
+- `-h, --help` : Print help.
+
+For more detailed usage, run:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
+```
+
+```bash
+linutil --help
+```
 
 ## Configuration
 
