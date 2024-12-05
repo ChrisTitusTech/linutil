@@ -78,3 +78,14 @@ impl Shortcut {
             .collect()
     }
 }
+
+#[macro_export]
+macro_rules! shortcuts {
+    ($(($name:literal,[$($key:literal),+ $(,)?])),* $(,)?) => {
+        vec![
+            $(
+                Shortcut::new($name, [$($key),*])
+            ),*
+        ].into_boxed_slice()
+    };
+}
