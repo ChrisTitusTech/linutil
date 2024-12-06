@@ -25,6 +25,13 @@ If applicable, add screenshots to help explain your problem.
 ## Additional context
 Add any other context about the problem here.
 
+## System
+Distribution: 
+DE/WM (GNOME, Hyprland, etc): 
+Windowing System (X11/Wayland): 
+Linutil version (found above the list within linutil):
+Branch (stable/prerelease/master): 
+
 ## Checklist
 - [ ] I checked for duplicate issues.
 - [ ] I checked already existing discussions.
