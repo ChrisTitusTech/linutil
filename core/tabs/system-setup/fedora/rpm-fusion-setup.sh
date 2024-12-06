@@ -13,7 +13,10 @@ installRPMFusion() {
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled rpmfusion-nonfree-updates
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled rpmfusion-free-updates
-                printf "%b\n" "${GREEN}RPM Fusion installed and enabled${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" install rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted -y
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled rpmfusion-free-release-tainted
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled rpmfusion-nonfree-release-tainted
+                printf "%b\n" "${GREEN}RPM Fusion and Tainted repositories installed and enabled${RC}"
             else
                 printf "%b\n" "${GREEN}RPM Fusion already installed${RC}"
             fi
