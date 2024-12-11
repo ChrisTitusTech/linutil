@@ -107,42 +107,92 @@ setup_macos() {
         echo "Virtual hard disk image already exists. Skipping creation."
     fi
 
-    # Step 8: Start macOS installation using QEMU and OpenCore Boot script
-    echo "Starting macOS installation using QEMU..."
-    MY_OPTIONS="+ssse3,+sse4.2,+popcnt,+avx,+aes,+xsave,+xsaveopt,check"
-    ALLOCATED_RAM="4096" # MiB
-    CPU_SOCKETS="1"
-    CPU_CORES="2"
-    CPU_THREADS="4"
-    REPO_PATH="."
-    VMS_PATH="$HOME/VMS" # Path for the virtual HDD image
-    OVMF_DIR="."
 
-    args=(
-      -enable-kvm -m "$ALLOCATED_RAM" -cpu Penryn,kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on,"$MY_OPTIONS"
-      -machine q35
-      -device qemu-xhci,id=xhci
-      -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0
-      -smp "$CPU_THREADS",cores="$CPU_CORES",sockets="$CPU_SOCKETS"
-      -device usb-ehci,id=ehci
-      -device isa-applesmc,osk="ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
-      -drive if=pflash,format=raw,readonly=on,file="$REPO_PATH/$OVMF_DIR/OVMF_CODE.fd"
-      -drive if=pflash,format=raw,file="$REPO_PATH/$OVMF_DIR/OVMF_VARS-1920x1080.fd"
-      -smbios type=2
-      -device ich9-intel-hda -device hda-duplex
-      -device ich9-ahci,id=sata
-      -drive id=OpenCoreBoot,if=none,snapshot=on,format=qcow2,file="$REPO_PATH/OpenCore/OpenCore.qcow2"
-      -device ide-hd,bus=sata.2,drive=OpenCoreBoot
-      -device ide-hd,bus=sata.3,drive=InstallMedia
-      -drive id=InstallMedia,if=none,file="$REPO_PATH/BaseSystem.img",format=raw
-      -drive id=MacHDD,if=none,file="$VMS_PATH/mac_hdd_ng.img",format=qcow2
-      -device ide-hd,bus=sata.4,drive=MacHDD
-      -netdev user,id=net0,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=net0,id=net0,mac=52:54:00:c9:18:27
-      -monitor stdio
-      -device vmware-svga
-    )
+        # Step 8: Create a shortcut to launch the macOS VM
+#     echo "Creating a desktop shortcut to launch the macOS VM..."
+#     DESKTOP_FILE="$HOME/Desktop/mac_vm.desktop"
+#     SCRIPT_PATH="$HOME/github/MAC-KVM/start.sh"
+#     ICON_PATH="$HOME/github/MAC-KVM/apple.png"
 
-    qemu-system-x86_64 "${args[@]}"
+#     cat <<EOL > "$DESKTOP_FILE"
+# [Desktop Entry]
+# Type=Application
+# Name=Launch macOS VM
+# Comment=Launches macOS in QEMU with MAC-KVM
+# Exec=$SCRIPT_PATH
+# Icon=$ICON_PATH
+# Terminal=true
+# Categories=Utility;Application;
+# EOL
+
+#     chmod +x "$DESKTOP_FILE"
+#     echo "Shortcut created on the Desktop: $DESKTOP_FILE"
+
+
+
+    # Step 9: Create a shortcut to launch the macOS VM for use in Rofi and other application launchers
+    echo "Creating a launcher shortcut for the macOS VM..."
+    LAUNCHER_FILE="$HOME/.local/share/applications/macos.desktop"
+    SCRIPT_PATH="$HOME/github/MAC-KVM/start.sh"
+    ICON_PATH="$HOME/github/MAC-KVM/apple.png"
+
+    # Create the .desktop file
+    cat <<EOL > "$LAUNCHER_FILE"
+[Desktop Entry]
+Type=Application
+Name=Launch macOS VM
+Comment=Launches macOS in QEMU with MAC-KVM
+Exec=$SCRIPT_PATH
+Icon=$ICON_PATH
+Terminal=false
+Categories=Utility;Application;
+EOL
+
+    # Ensure the file is executable
+    chmod +x "$LAUNCHER_FILE"
+    echo "Launcher shortcut created: $LAUNCHER_FILE"
+
+
+
+    
+
+
+    # Step 9: Start macOS installation using QEMU and OpenCore Boot script
+    # echo "Starting macOS installation using QEMU..."
+    # MY_OPTIONS="+ssse3,+sse4.2,+popcnt,+avx,+aes,+xsave,+xsaveopt,check"
+    # ALLOCATED_RAM="4096" # MiB
+    # CPU_SOCKETS="1"
+    # CPU_CORES="2"
+    # CPU_THREADS="4"
+    # REPO_PATH="."
+    # VMS_PATH="$HOME/VMS" # Path for the virtual HDD image
+    # OVMF_DIR="."
+
+    # args=(
+    #   -enable-kvm -m "$ALLOCATED_RAM" -cpu Penryn,kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on,"$MY_OPTIONS"
+    #   -machine q35
+    #   -device qemu-xhci,id=xhci
+    #   -device usb-kbd,bus=xhci.0 -device usb-tablet,bus=xhci.0
+    #   -smp "$CPU_THREADS",cores="$CPU_CORES",sockets="$CPU_SOCKETS"
+    #   -device usb-ehci,id=ehci
+    #   -device isa-applesmc,osk="ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
+    #   -drive if=pflash,format=raw,readonly=on,file="$REPO_PATH/$OVMF_DIR/OVMF_CODE.fd"
+    #   -drive if=pflash,format=raw,file="$REPO_PATH/$OVMF_DIR/OVMF_VARS-1920x1080.fd"
+    #   -smbios type=2
+    #   -device ich9-intel-hda -device hda-duplex
+    #   -device ich9-ahci,id=sata
+    #   -drive id=OpenCoreBoot,if=none,snapshot=on,format=qcow2,file="$REPO_PATH/OpenCore/OpenCore.qcow2"
+    #   -device ide-hd,bus=sata.2,drive=OpenCoreBoot
+    #   -device ide-hd,bus=sata.3,drive=InstallMedia
+    #   -drive id=InstallMedia,if=none,file="$REPO_PATH/BaseSystem.img",format=raw
+    #   -drive id=MacHDD,if=none,file="$VMS_PATH/mac_hdd_ng.img",format=qcow2
+    #   -device ide-hd,bus=sata.4,drive=MacHDD
+    #   -netdev user,id=net0,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=net0,id=net0,mac=52:54:00:c9:18:27
+    #   -monitor stdio
+    #   -device vmware-svga
+    # )
+
+    # qemu-system-x86_64 "${args[@]}"
 
     echo "Installation started. Use Disk Utility to partition and format the virtual disk as APFS."
     echo "Proceed with macOS installation."
