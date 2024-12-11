@@ -13,5 +13,4 @@ installBrave() {
 
 checkEnv
 checkEscalationTool
-checkAURHelper
 installBrave
