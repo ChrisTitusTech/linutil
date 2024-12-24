@@ -31,6 +31,9 @@ installVsCode() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y vscode
                 ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" -y install vscode
+                ;;
             apk)
                 checkFlatpak
                 flatpak install -y flathub com.visualstudio.code

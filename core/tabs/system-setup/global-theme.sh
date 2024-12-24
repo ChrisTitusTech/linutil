@@ -20,6 +20,9 @@ install_theme_tools() {
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -y qt6ct kvantum
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" -y install qt6ct kvantum
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1

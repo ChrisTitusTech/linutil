@@ -30,6 +30,9 @@ installVivaldi() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm vivaldi
                 ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" -y install vivaldi-stable
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

@@ -19,6 +19,9 @@ setup_xrandr() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y xrandr
                 ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y xrandr
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-server-utils
                 ;;

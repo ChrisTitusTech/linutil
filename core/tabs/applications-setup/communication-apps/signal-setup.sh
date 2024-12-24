@@ -21,7 +21,10 @@ installSignal() {
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y Signal-Desktop
-                ;;                
+                ;;    
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" -y install signal-desktop
+                ;;            
             dnf)
                 checkFlatpak
                 flatpak install -y flathub org.signal.Signal
