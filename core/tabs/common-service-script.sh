@@ -23,6 +23,9 @@ startService() {
         rc-service)
             "$ESCALATION_TOOL" "$INIT_MANAGER" "$1" start
             ;;
+        runit)
+            "$ESCALATION_TOOL" sv start "$1"
+            ;;
     esac
 }
 
@@ -33,6 +36,9 @@ stopService() {
             ;;
         rc-service)
             "$ESCALATION_TOOL" "$INIT_MANAGER" "$1" stop
+            ;;
+        runit)
+            "$ESCALATION_TOOL" sv stop "$1"
             ;;
     esac
 }
@@ -45,6 +51,11 @@ enableService() {
         rc-service)
             "$ESCALATION_TOOL" rc-update add "$1"
             ;;
+        runit)
+            "$ESCALATION_TOOL" mkdir -p "/run/runit/supervise.$1"
+            "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
+            sleep 2
+            ;;
     esac
 }
 
@@ -56,6 +67,9 @@ disableService() {
         rc-service)
             "$ESCALATION_TOOL" rc-update del "$1"
             ;;
+        runit)
+            "$ESCALATION_TOOL" rm -f "/var/service/$1"
+            ;;
     esac
 }
 
@@ -65,6 +79,10 @@ startAndEnableService() {
             "$ESCALATION_TOOL" "$INIT_MANAGER" enable --now "$1"
             ;;
         rc-service)
+            enableService "$1"
+            startService "$1"
+            ;;
+        runit)
             enableService "$1"
             startService "$1"
             ;;
@@ -79,7 +97,10 @@ isServiceActive() {
         rc-service)
             "$ESCALATION_TOOL" "$INIT_MANAGER" "$1" status --quiet
             ;;
+        runit)
+            "$ESCALATION_TOOL" sv status "$1" >/dev/null 2>&1
+            ;;
     esac
 }
 
-checkInitManager 'systemctl rc-service'
+checkInitManager 'systemctl rc-service runit'
