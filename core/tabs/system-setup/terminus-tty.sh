@@ -15,6 +15,9 @@ InstallTermiusFonts() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-fonts-console
+                ;;            
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -y terminus-font
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -28,7 +31,7 @@ InstallTermiusFonts() {
 
 SetTermiusFonts() {
         case "$DTYPE" in
-            arch)
+            arch|fedora|void)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
@@ -48,14 +51,6 @@ SetTermiusFonts() {
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then                    
                    "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/Uni3-TerminusBold32x16.psf.gz
                 fi
-                printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
-                ;;
-            fedora)
-                printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
-                "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
-                if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then 
-                  "$ESCALATION_TOOL" setfont -C /dev/tty1 ter-v32b
-                fi               
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
                 ;;
         esac

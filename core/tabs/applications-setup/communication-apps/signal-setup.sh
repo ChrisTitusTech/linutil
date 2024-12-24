@@ -19,6 +19,9 @@ installSignal() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm signal-desktop
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -y Signal-Desktop
+                ;;                
             dnf)
                 checkFlatpak
                 flatpak install -y flathub org.signal.Signal

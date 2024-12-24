@@ -17,6 +17,9 @@ setupNetworkManager() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add networkmanager-wifi iwd
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -y NetworkManager iwd
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y network-manager
                 ;;

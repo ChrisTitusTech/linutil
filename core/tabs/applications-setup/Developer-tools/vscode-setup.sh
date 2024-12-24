@@ -28,6 +28,9 @@ installVsCode() {
                 printf "%b\n" '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' | "$ESCALATION_TOOL" tee /etc/yum.repos.d/vscode.repo > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" install -y code
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -y vscode
+                ;;
             apk)
                 checkFlatpak
                 flatpak install -y flathub com.visualstudio.code

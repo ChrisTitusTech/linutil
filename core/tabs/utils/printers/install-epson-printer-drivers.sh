@@ -16,6 +16,9 @@ installEpsonPrinterDriver() {
     dnf)
         "$ESCALATION_TOOL" "$PACKAGER" install -y epson-inkjet-printer-escpr
         ;;
+    xbps-install) 
+        "$ESCALATION_TOOL" "$PACKAGER" -y epson-inkjet-printer-escpr
+        ;;
     *)
         printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
         exit 1
