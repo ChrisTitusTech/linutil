@@ -14,6 +14,9 @@ setupBluetooth() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bluez
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
                 ;;

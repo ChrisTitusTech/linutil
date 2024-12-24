@@ -12,6 +12,9 @@ if ! command_exists chromium; then
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add chromium
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -y chromium
+            ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
             ;;
