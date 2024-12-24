@@ -26,6 +26,8 @@ installDependencies() {
                 "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES};;
             apk)
                 "${ESCALATION_TOOL}" "${PACKAGER}" add ${DEPENDENCIES};;
+            xbps-install)
+                "${ESCALATION_TOOL}" "${PACKAGER}" -Sy ${DEPENDENCIES};;
             *)
                 printf "%b\n" "${RED}Unsupported package manager.${RC}"
                 exit 1
