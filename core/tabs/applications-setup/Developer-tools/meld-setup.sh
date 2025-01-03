@@ -9,7 +9,7 @@ installMeld() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm meld
                 ;;
-            apt-get|nala)
+            apt-get|nala|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install meld
                 ;;
             apk)
@@ -17,9 +17,6 @@ installMeld() {
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y meld
-                ;;
-            eopkg)
-                "$ESCALATION_TOOL" "$PACKAGER" -y install meld
                 ;;
             *)
                 checkFlatpak
