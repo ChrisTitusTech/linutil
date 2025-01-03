@@ -9,17 +9,11 @@ installCUPS() {
     pacman)
         "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm cups
         ;;
-    apt-get | nala)
-        "$ESCALATION_TOOL" "$PACKAGER" install -y cups
-        ;;
-    dnf)
+    apt-get|nala|dnf|eopkg)
         "$ESCALATION_TOOL" "$PACKAGER" install -y cups
         ;;
     xbps-install)
         "$ESCALATION_TOOL" "$PACKAGER" -y cups
-        ;;
-    eopkg)
-        "$ESCALATION_TOOL" "$PACKAGER" install -y cups
         ;;
     *)
         printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
