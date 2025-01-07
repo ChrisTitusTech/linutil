@@ -57,7 +57,7 @@ fastUpdate() {
             "$ESCALATION_TOOL" "$PACKAGER" update
             ;;
         xbps-install)
-            "$ESCALATION_TOOL" xbps-install -S
+            "$ESCALATION_TOOL" "$PACKAGER" -S
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
