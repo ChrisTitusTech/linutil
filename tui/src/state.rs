@@ -733,7 +733,7 @@ impl AppState {
         self.filter
             .item_list()
             .get(selected_index)
-            .map_or(false, |item| item.has_children)
+            .is_some_and(|i| i.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
