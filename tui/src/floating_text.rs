@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
+use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
 use linutil_core::Command;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
@@ -228,13 +228,13 @@ impl FloatContent for FloatingText<'_> {
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         (
             &self.mode_title,
-            Box::new([
-                Shortcut::new("Scroll down", ["j", "Down"]),
-                Shortcut::new("Scroll up", ["k", "Up"]),
-                Shortcut::new("Scroll left", ["h", "Left"]),
-                Shortcut::new("Scroll right", ["l", "Right"]),
-                Shortcut::new("Close window", ["Enter", "p", "q", "d", "g"]),
-            ]),
+            shortcuts!(
+                ("Scroll down", ["j", "Down"]),
+                ("Scroll up", ["k", "Up"]),
+                ("Scroll left", ["h", "Left"]),
+                ("Scroll right", ["l", "Right"]),
+                ("Close window", ["Enter", "p", "q", "d", "g"])
+            ),
         )
     }
 }
