@@ -54,7 +54,7 @@ enableService() {
         runit)
             "$ESCALATION_TOOL" mkdir -p "/run/runit/supervise.$1"
             "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
-            sleep 2
+            sleep 5
             ;;
     esac
 }
