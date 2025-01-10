@@ -171,7 +171,7 @@ impl<'a> FloatingText<'a> {
     }
 }
 
-impl<'a> FloatContent for FloatingText<'a> {
+impl FloatContent for FloatingText<'_> {
     fn draw(&mut self, frame: &mut Frame, area: Rect, _theme: &Theme) {
         let block = Block::default()
             .borders(Borders::ALL)

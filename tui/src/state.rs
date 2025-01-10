@@ -482,7 +482,7 @@ impl AppState {
         }
         match &mut self.focus {
             Focus::FloatingWindow(float) => {
-                float.content.handle_mouse_event(event);
+                float.handle_mouse_event(event);
             }
             Focus::ConfirmationPrompt(confirm) => {
                 confirm.content.handle_mouse_event(event);
@@ -735,7 +735,7 @@ impl AppState {
         self.filter
             .item_list()
             .get(selected_index)
-            .map_or(false, |item| item.has_children)
+            .is_some_and(|i| i.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
