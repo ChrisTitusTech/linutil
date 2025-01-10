@@ -6,7 +6,7 @@ installPodman() {
     if ! command_exists podman; then
         printf "%b\n" "${YELLOW}Installing Podman...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get|nala|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman
                 ;;
             zypper)
@@ -14,9 +14,6 @@ installPodman() {
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed podman
-                ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y podman
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y podman

@@ -19,6 +19,9 @@ InstallTermiusFonts() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y terminus-font
                 ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y font-terminus-console
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
@@ -31,7 +34,7 @@ InstallTermiusFonts() {
 
 SetTermiusFonts() {
         case "$DTYPE" in
-            arch|fedora|void)
+            arch|fedora|void|solus)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then

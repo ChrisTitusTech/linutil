@@ -35,6 +35,9 @@ installNeovim() {
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -y neovim ripgrep fzf python3-virtualenv luarocks go shellcheck git
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" -y install neovim ripgrep fzf python3 luarocks golang shellcheck git
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1

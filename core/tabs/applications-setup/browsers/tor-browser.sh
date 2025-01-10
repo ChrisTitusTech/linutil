@@ -6,7 +6,7 @@ installTorBrowser() {
     if ! command_exists torbrowser-launcher; then
         printf "%b\n" "${YELLOW}Installing Tor Browser...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get|nala|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y torbrowser-launcher
                 ;;
             zypper)
@@ -14,9 +14,6 @@ installTorBrowser() {
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm torbrowser-launcher
-                ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y torbrowser-launcher
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y torbrowser-launcher

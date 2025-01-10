@@ -82,6 +82,10 @@ startAndEnableService() {
             enableService "$1"
             startService "$1"
             ;;
+        runit)
+            enableService "$1"
+            startService "$1"
+            ;;
     esac
 }
 
