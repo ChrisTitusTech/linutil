@@ -5,7 +5,7 @@ mod floating_text;
 mod hint;
 mod root;
 mod running_command;
-pub mod state;
+mod state;
 mod theme;
 
 #[cfg(feature = "tips")]
