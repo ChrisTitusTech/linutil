@@ -85,7 +85,8 @@ run_model() {
     printf "%b\n" "${installed_models}"
 
     printf "%b\n" "${YELLOW}Custom Models${RC}"
-    custom_models=$(ollama list | grep 'custom-model-prefix') 
+    custom_models=$(ollama list | grep 'custom-model-prefix')
+    printf "%b\n" "${custom_models}"
 
     printf "%b" "Select a model to run: "
     printf "%b" "Enter the number corresponding to the model or enter the name of a custom model: "
@@ -195,7 +196,7 @@ menu() {
         esac
 
         printf "%b\n" "${YELLOW}Press Enter to continue...${RC}"
-        read -r dummy
+        read -r _
     done
 }
 

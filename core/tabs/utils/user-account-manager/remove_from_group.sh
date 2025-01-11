@@ -34,10 +34,10 @@ removeFromGroup() {
     groups_to_remove=$(echo "$groups" | tr ' ' ',')
 
     printf "%b" "${YELLOW}Are you sure you want to remove user $username from $groups_to_remove? [Y/n]: ${RC}"
-    read -r confirm
+    read -r _
     confirmAction || exit 1
 
-    $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
+    $ESCALATION_TOOL usermod -rG "$groups_to_remove" "$username"
 
     printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"
 }

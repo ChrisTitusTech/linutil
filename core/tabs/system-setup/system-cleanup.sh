@@ -22,7 +22,7 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null || true
+            "$ESCALATION_TOOL" "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm > /dev/null || true
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" cache clean

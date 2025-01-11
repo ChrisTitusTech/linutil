@@ -192,7 +192,7 @@ setupDisplayManager() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
@@ -244,7 +244,7 @@ setupDisplayManager() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
                 exit 1
                 ;;
         esac
