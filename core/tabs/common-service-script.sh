@@ -78,7 +78,7 @@ startAndEnableService() {
         systemctl)
             "$ESCALATION_TOOL" "$INIT_MANAGER" enable --now "$1"
             ;;
-        rc-service|runit)
+        rc-service | runit)
             enableService "$1"
             startService "$1"
             ;;
