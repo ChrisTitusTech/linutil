@@ -32,6 +32,10 @@ Signed-By: /usr/share/keyrings/librewolf.gpg" | "$ESCALATION_TOOL" tee /etc/apt/
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm librewolf-bin
                 ;;
+            xbps-install)
+                printf '%s\n' 'repository=https://github.com/index-0/librewolf-void/releases/latest/download/' | "$ESCALATION_TOOL" tee /etc/xbps.d/20-librewolf.conf > /dev/null
+                "$ESCALATION_TOOL" "$PACKAGER" -Syu librewolf
+                ;;
             apk)
                 checkFlatpak
                 flatpak install flathub io.gitlab.librewolf-community

@@ -14,6 +14,9 @@ install_package() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add "$PACKAGE"
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -y "$PACKAGE"
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
                 ;;
@@ -38,6 +41,10 @@ setup_ssh() {
         SSH_SERVICE="sshd"
         ;;
     apk)
+        install_package openssh
+        SSH_SERVICE="sshd"
+        ;;
+    xbps-install)
         install_package openssh
         SSH_SERVICE="sshd"
         ;;

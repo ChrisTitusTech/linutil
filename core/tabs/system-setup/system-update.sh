@@ -56,6 +56,9 @@ fastUpdate() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" update
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" xbps-install -S
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
             exit 1
@@ -81,6 +84,9 @@ updateSystem() {
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" upgrade
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Su
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
