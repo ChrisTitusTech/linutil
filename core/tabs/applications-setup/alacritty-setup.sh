@@ -12,7 +12,7 @@ installAlacritty() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add alacritty
                 ;;
-            bps-install)
+            xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -y alacritty
                 ;;
             *)
