@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
-
-. ../../common-script.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to enable a monitor
 enable_monitor() {
@@ -14,7 +13,7 @@ enable_monitor() {
     printf "%b\n" "${YELLOW}  Enable Monitor${RC}"
     printf "%b\n" "${YELLOW}=========================================${RC}"
     printf "%b\n" "${YELLOW}Choose a monitor to enable: ${RC}"
-    
+
     i=1
     for monitor in $monitor_array; do
         printf "%b\n" "$i. ${GREEN}$monitor${RC}"

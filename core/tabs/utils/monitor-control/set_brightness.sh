@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to adjust brightness for a selected monitor
 adjust_monitor_brightness() {
@@ -29,7 +30,7 @@ adjust_monitor_brightness() {
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$'; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "Press [Enter] to continue..."
-            read -r dummy
+            read -r _
             continue
         fi
 
@@ -37,7 +38,7 @@ adjust_monitor_brightness() {
         if [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$monitor_count" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "Press [Enter] to continue..."
-            read -r dummy
+            read -r _
             continue
         fi
 

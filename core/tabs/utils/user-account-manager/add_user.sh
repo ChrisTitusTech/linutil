@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
-
-. ../utility_functions.sh
+# shellcheck disable=SC1091
+. ./user-manager-functions.sh
 
 createUser() {
     clear
@@ -11,7 +10,9 @@ createUser() {
     printf "%b" "${YELLOW}Enter the username: ${RC}"
     read -r username
 
-    if ! echo "$username" | grep '^[a-zA-Z]*$' > /dev/null; then
+    checkEmpty "$username"
+
+    if ! echo "$username" | grep '^[a-zA-Z]*$' >/dev/null; then
         printf "%b\n" "${RED}Username must only contain letters and cannot contain spaces.${RC}"
         exit 1
     fi
@@ -33,6 +34,4 @@ createUser() {
     printf "%b\n" "${GREEN}To add additional groups use Add User To Groups${RC}"
 }
 
-checkEnv
-checkEscalationTool
 createUser
