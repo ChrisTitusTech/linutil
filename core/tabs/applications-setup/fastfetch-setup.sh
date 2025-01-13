@@ -35,7 +35,52 @@ setupFastfetchConfig() {
     curl -sSLo "${HOME}/.config/fastfetch/config.jsonc" https://raw.githubusercontent.com/ChrisTitusTech/mybash/main/config.jsonc
 }
 
+setupFastfetchShell() {
+    printf "%b\n" "${YELLOW}Configuring shell integration...${RC}"
+    
+    # Get current shell and RC file path
+    current_shell=$(basename "$SHELL")
+    rc_file=""
+    
+    case "$current_shell" in
+        "bash")
+            rc_file="$HOME/.bashrc"
+            ;;
+        "zsh")
+            rc_file="$HOME/.zshrc"
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported shell: $current_shell${RC}"
+            return 1
+            ;;
+    esac
+    
+    # Check if RC file exists
+    if [ ! -f "$rc_file" ]; then
+        printf "%b\n" "${RED}Shell config file not found: $rc_file${RC}"
+        return 1
+    fi
+    
+    # Check if fastfetch is already in RC file
+    if grep -q "fastfetch" "$rc_file"; then
+        printf "%b\n" "${YELLOW}Fastfetch is already configured in $rc_file${RC}"
+        return 0
+    fi
+    
+    # Ask for confirmation
+    printf "%b" "${GREEN}Would you like to add fastfetch to $rc_file? [y/N] ${RC}"
+    read -r response
+    
+    if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
+        printf "\n# Run fastfetch on terminal start\nfastfetch\n" >> "$rc_file"
+        printf "%b\n" "${GREEN}Added fastfetch to $rc_file${RC}"
+    else
+        printf "%b\n" "${YELLOW}Skipped adding fastfetch to shell config${RC}"
+    fi
+}
+
 checkEnv
 checkEscalationTool
 installFastfetch
 setupFastfetchConfig
+setupFastfetchShell
