@@ -13,8 +13,8 @@ body:
     attributes:
       label: Is your feature request related to a problem? Please describe.
       description: |
-        Provide a clear and concise description of the problem, if applicable. For example, "I'm always frustrated when [...]".
-      placeholder: Describe the problem or frustration you want to address.
+        Provide a clear and concise description of the problem, if applicable.
+      placeholder: I'm always frustrated when ...
   - type: textarea
     id: proposed-solution
     attributes:

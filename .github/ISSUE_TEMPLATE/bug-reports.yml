@@ -21,8 +21,8 @@ body:
     id: reproduce-steps
     attributes:
       label: Steps to reproduce
-      description: |
-        Steps to reproduce the behavior:
+      description: Steps to reproduce the behavior.
+      placeholder: |
         1. Go to '...'
         2. Click on '...'
         3. Scroll down to '...'
