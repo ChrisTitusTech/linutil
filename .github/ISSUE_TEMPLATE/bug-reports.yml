@@ -17,19 +17,33 @@ body:
       placeholder: Describe the issue in detail.
     validations:
       required: true
-  - type: textarea
-    id: reproduce-steps
+  - type: markdown
     attributes:
-      label: Steps to reproduce
-      description: |
-        Steps to reproduce the behavior:
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll down to '...'
-        4. See error
-      placeholder: List the steps or actions needed to reproduce the issue.
+      value: |
+        ### Steps to Reproduce
+        Please provide a clear sequence of actions to reproduce the issue.
+  - type: textarea
+    id: step1
+    attributes:
+      label: Step 1
+      placeholder: E.g., Go to '...'
+      description: Describe the first action you took.
     validations:
       required: true
+  - type: textarea
+    id: step2
+    attributes:
+      label: Step 2
+      placeholder: E.g., Click on '...'
+      description: Describe the next action you took.
+    validations:
+      required: true
+  - type: textarea
+    id: step3
+    attributes:
+      label: Step 3 (Optional)
+      placeholder: E.g., Scroll down to '...'
+      description: Describe any additional steps.
   - type: textarea
     id: expected-behavior
     attributes:
@@ -62,3 +76,4 @@ body:
         - label: This issue is not included in the roadmap.
         - label: This issue is present on both stable and development branches.
           required: true
+
