@@ -26,6 +26,9 @@ checkFlatpak() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add flatpak
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy flatpak
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
