@@ -31,7 +31,7 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$COMPILEDEPS"
             "$ESCALATION_TOOL" "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
-      zypper)
+        zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             "$ESCALATION_TOOL" "$PACKAGER" refresh 
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$COMPILEDEPS"
