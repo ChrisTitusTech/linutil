@@ -59,8 +59,7 @@ body:
   - type: dropdown
     id: branch
     attributes:
-      label: Branch
-      description: Specify the branch of the project you are using.
+      label: Specify the branch of the project you are using.
       multiple: false
       options:
         - stable
