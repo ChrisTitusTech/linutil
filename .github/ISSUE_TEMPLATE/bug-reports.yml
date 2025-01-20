@@ -60,8 +60,8 @@ body:
     id: branch
     attributes:
       label: Branch
-      multiple: false
       description: Specify the branch of the project you are using.
+      multiple: false
       options:
         - stable
         - prerelease
