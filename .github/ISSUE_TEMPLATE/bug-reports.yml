@@ -8,6 +8,68 @@ body:
     attributes:
       value: |
         Thank you for helping us improve! Please provide as much detail as possible to ensure we can address the issue effectively.
+  - type: dropdown
+    id: distribution
+    attributes:
+      label: Distribution
+      description: Select the Linux distribution you are using.
+      options:
+        - Arch
+        - Ubuntu
+        - Fedora
+        - Debian
+        - Other
+      placeholder: Select your distribution
+    validations:
+      required: true
+  - type: dropdown
+    id: de-wm
+    attributes:
+      label: Desktop Environment / Window Manager
+      description: Select your desktop environment or window manager.
+      options:
+        - GNOME
+        - KDE Plasma
+        - XFCE
+        - Hyprland
+        - i3
+        - Other
+      placeholder: Select your DE/WM
+    validations:
+      required: true
+  - type: dropdown
+    id: windowing-system
+    attributes:
+      label: Windowing System
+      description: Specify whether you are using X11 or Wayland.
+      options:
+        - X11
+        - Wayland
+        - Other
+      placeholder: Select your windowing system
+    validations:
+      required: true
+  - type: input
+    id: linutil-version
+    attributes:
+      label: Linutil Version
+      description: Provide the version of Linutil (found at the top of the list in the application or by running `linutil --version`).
+      placeholder: e.g., 1.2.3
+    validations:
+      required: true
+  - type: dropdown
+    id: branch
+    attributes:
+      label: Branch
+      description: Specify the branch of the project you are using.
+      options:
+        - stable
+        - prerelease
+        - master
+        - other
+      placeholder: Select your branch
+    validations:
+      required: true
   - type: textarea
     id: describe-bug
     attributes:
