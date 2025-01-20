@@ -60,7 +60,7 @@ setupLibvirt() {
         fi
     done
 
-    "$ESCALATION_TOOL" systemctl enable --now libvirtd.service
+    "$ESCALATION_TOOL" systemctl start libvirtd.service
     "$ESCALATION_TOOL" virsh net-autostart default
 
     checkKVM
