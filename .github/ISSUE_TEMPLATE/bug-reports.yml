@@ -12,6 +12,7 @@ body:
     id: distribution
     attributes:
       label: Distribution
+      multiple: false
       description: Select the Linux distribution you are using.
       options:
         - Arch
@@ -25,6 +26,7 @@ body:
     id: de-wm
     attributes:
       label: Desktop Environment / Window Manager
+      multiple: false
       description: Select your desktop environment or window manager.
       options:
         - GNOME
@@ -39,6 +41,7 @@ body:
     id: windowing-system
     attributes:
       label: Windowing System
+      multiple: false
       description: Specify whether you are using X11 or Wayland.
       options:
         - X11
@@ -57,6 +60,7 @@ body:
     id: branch
     attributes:
       label: Branch
+      multiple: false
       description: Specify the branch of the project you are using.
       options:
         - stable
