@@ -19,7 +19,6 @@ body:
         - Fedora
         - Debian
         - Other
-      placeholder: Select your distribution
     validations:
       required: true
   - type: dropdown
@@ -34,7 +33,6 @@ body:
         - Hyprland
         - i3
         - Other
-      placeholder: Select your DE/WM
     validations:
       required: true
   - type: dropdown
@@ -46,15 +44,13 @@ body:
         - X11
         - Wayland
         - Other
-      placeholder: Select your windowing system
     validations:
       required: true
   - type: input
     id: linutil-version
     attributes:
       label: Linutil Version
-      description: Provide the version of Linutil (found at the top of the list in the application or by running `linutil --version`).
-      placeholder: e.g., 1.2.3
+      description: Linutil version (found above the list within linutil):.
     validations:
       required: true
   - type: dropdown
@@ -67,7 +63,6 @@ body:
         - prerelease
         - master
         - other
-      placeholder: Select your branch
     validations:
       required: true
   - type: textarea
