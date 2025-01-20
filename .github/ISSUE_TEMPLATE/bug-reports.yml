@@ -59,8 +59,9 @@ body:
   - type: dropdown
     id: branch
     attributes:
-      label: Specify the branch of the project you are using.
+      label: Branch
       multiple: false
+      description: Specify the branch of the project you are using.
       options:
         - stable
         - prerelease
