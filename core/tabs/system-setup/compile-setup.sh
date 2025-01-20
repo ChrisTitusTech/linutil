@@ -31,11 +31,11 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$COMPILEDEPS"
             "$ESCALATION_TOOL" "$PACKAGER" install -y glibc-devel.i686 libgcc.i686
             ;;
-        zypper)
+      zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             "$ESCALATION_TOOL" "$PACKAGER" refresh 
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$DEPENDENCIES" "$COMPILEDEPS"
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$COMPILEDEPS"
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$DEPENDENCIES libgcc_s1-gcc7-32bit glibc-devel-32bit"
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add build-base multitail tar tree trash-cli unzip cmake jq
