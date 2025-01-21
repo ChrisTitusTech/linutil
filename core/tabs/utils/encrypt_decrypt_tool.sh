@@ -22,6 +22,9 @@ if ! command_exists openssl; then
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add openssl
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -y openssl
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
