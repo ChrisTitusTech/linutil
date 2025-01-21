@@ -82,9 +82,9 @@ body:
       multiple: false
       description: Specify the branch of the project you are using.
       options:
-        - stable
+        - main 
         - prerelease
-        - main
+        - stable 
         - other
     validations:
       required: true
