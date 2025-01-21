@@ -19,9 +19,18 @@ body:
         - Ubuntu
         - Fedora
         - Debian
+        - openSUSE
         - Other
     validations:
       required: true
+  - type: input
+    id: specify-distribution
+    attributes:
+      label: Specify Distribution
+      description: Specify the distribution if "Other" was selected above.
+      placeholder: Enter the name of your Linux distribution.
+      renderWhen:
+        distribution: "Other"
   - type: dropdown
     id: de-wm
     attributes:
@@ -37,6 +46,14 @@ body:
         - Other
     validations:
       required: true
+  - type: input
+    id: specify-de-wm
+    attributes:
+      label: Specify Desktop Environment/Window Manager
+      description: Specify the desktop environment or window manager if "Other" was selected above.
+      placeholder: Enter the name of your DE/WM.
+      renderWhen:
+        de-wm: "Other"
   - type: dropdown
     id: windowing-system
     attributes:
@@ -49,6 +66,14 @@ body:
         - Other
     validations:
       required: true
+  - type: input
+    id: specify-windowing-system
+    attributes:
+      label: Specify Windowing System
+      description: Specify the windowing system if "Other" was selected above.
+      placeholder: Enter your windowing system.
+      renderWhen:
+        windowing-system: "Other"
   - type: input
     id: linutil-version
     attributes:
@@ -65,10 +90,18 @@ body:
       options:
         - stable
         - prerelease
-        - master
+        - main
         - other
     validations:
       required: true
+  - type: input
+    id: specify-branch
+    attributes:
+      label: Specify Branch
+      description: Specify the branch if "Other" was selected above.
+      placeholder: Enter the branch name.
+      renderWhen:
+        branch: "other"
   - type: textarea
     id: describe-bug
     attributes:
