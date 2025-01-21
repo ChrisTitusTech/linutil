@@ -37,7 +37,7 @@ view_all_services() {
         rc-service)
             "$ESCALATION_TOOL" rc-update show | more
             ;;
-        runit)
+        sv)
             ls -1 /etc/sv/ | more
             ;;
     esac
@@ -53,7 +53,7 @@ view_enabled_services() {
         rc-service)
             "$ESCALATION_TOOL" rc-update show -v | grep "\[" | more
             ;;
-        runit)
+        sv)
             ls -1 /var/service/ | more
             ;;
     esac
@@ -69,7 +69,7 @@ view_disabled_services() {
         rc-service)
             "$ESCALATION_TOOL" rc-update show -v | grep -v "\[" | more
             ;;
-        runit)
+        sv)
             ls -1 /etc/sv/ | grep -v "$(ls -1 /var/service/)" | more
             ;;
     esac
@@ -85,7 +85,7 @@ view_started_services() {
         rc-service)
             "$ESCALATION_TOOL" rc-status --servicelist | more
             ;;
-        runit)
+        sv)
             for service in /var/service/*; do
                 [ -d "$service" ] && "$ESCALATION_TOOL" sv status "$(basename "$service")" | grep "^run:" >/dev/null && basename "$service"
             done | more
@@ -185,7 +185,7 @@ remove_service() {
                 printf "%b\n" "Service $SERVICE_NAME does not exist."
             fi
             ;;
-        runit)
+        sv)
             SERVICE_DIR="/etc/sv/$SERVICE_NAME"
             if [ -d "$SERVICE_DIR" ]; then
                 "$ESCALATION_TOOL" rm -rf "$SERVICE_DIR"
