@@ -26,11 +26,9 @@ body:
   - type: input
     id: specify-distribution
     attributes:
-      label: Specify Distribution
-      description: Specify the distribution if "Other" was selected above.
-      placeholder: Enter the name of your Linux distribution.
-      renderWhen:
-        distribution: "Other"
+      label: Specify Distribution (if "Other" selected)
+      description: Enter the name of your Linux distribution.
+      placeholder: e.g., Manjaro, Pop!_OS
   - type: dropdown
     id: de-wm
     attributes:
@@ -49,11 +47,9 @@ body:
   - type: input
     id: specify-de-wm
     attributes:
-      label: Specify Desktop Environment/Window Manager
-      description: Specify the desktop environment or window manager if "Other" was selected above.
-      placeholder: Enter the name of your DE/WM.
-      renderWhen:
-        de-wm: "Other"
+      label: Specify Desktop Environment/Window Manager (if "Other" selected)
+      description: Enter the name of your desktop environment or window manager.
+      placeholder: e.g., LXQt, Openbox
   - type: dropdown
     id: windowing-system
     attributes:
@@ -69,16 +65,14 @@ body:
   - type: input
     id: specify-windowing-system
     attributes:
-      label: Specify Windowing System
-      description: Specify the windowing system if "Other" was selected above.
-      placeholder: Enter your windowing system.
-      renderWhen:
-        windowing-system: "Other"
+      label: Specify Windowing System (if "Other" selected)
+      description: Enter your windowing system.
+      placeholder: e.g., Mir
   - type: input
     id: linutil-version
     attributes:
       label: Linutil Version
-      description: Linutil version (found above the list within linutil):.
+      description: Linutil version (found above the list within linutil).
     validations:
       required: true
   - type: dropdown
@@ -97,11 +91,9 @@ body:
   - type: input
     id: specify-branch
     attributes:
-      label: Specify Branch
-      description: Specify the branch if "Other" was selected above.
-      placeholder: Enter the branch name.
-      renderWhen:
-        branch: "other"
+      label: Specify Branch (if "Other" selected)
+      description: Enter the branch name.
+      placeholder: e.g., feature/new-feature
   - type: textarea
     id: describe-bug
     attributes:
