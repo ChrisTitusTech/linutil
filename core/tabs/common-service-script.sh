@@ -53,6 +53,8 @@ enableService() {
             ;;
         sv)
             "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
+            printf "%b\n" "${YELLOW}Waiting 5 seconds...${RC}"
+            sleep 5
             ;;
     esac
 }
