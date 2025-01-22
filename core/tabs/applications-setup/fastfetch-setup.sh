@@ -61,7 +61,6 @@ setupFastfetchShell() {
             printf "%b\n" "${YELLOW}Fastfetch is already configured in $rc_file${RC}"
             return 0
         else
-            # Ask for confirmation
             printf "%b" "${GREEN}Would you like to add fastfetch to $rc_file? [y/N] ${RC}"
             read -r response
 
