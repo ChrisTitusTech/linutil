@@ -38,7 +38,6 @@ setupFastfetchConfig() {
 setupFastfetchShell() {
     printf "%b\n" "${YELLOW}Configuring shell integration...${RC}"
 
-    # Get current shell and RC file path
     current_shell=$(basename "$SHELL")
     rc_file=""
 
