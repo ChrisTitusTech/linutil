@@ -54,11 +54,9 @@ setupFastfetchShell() {
         ;;
     esac
 
-    # Check if RC file exists
-    if [ ! -f "$rc_file" ] || [ "$other_shell" != "True" ]; then
-        printf "%b\n" "${RED}Shell config file $rc_file${RC} not found" 
+    if [ ! -f "$rc_file" ]; then
+        printf "%b\n" "${RED}Shell config file $rc_file not found${RC}"
     else
-        # Check if fastfetch is already in RC file
         if grep -q "fastfetch" "$rc_file"; then
             printf "%b\n" "${YELLOW}Fastfetch is already configured in $rc_file${RC}"
             return 0
