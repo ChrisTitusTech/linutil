@@ -50,8 +50,7 @@ setupFastfetchShell() {
         rc_file="$HOME/.zshrc"
         ;;
     *)
-        printf "%b\n" "${RED}You sre using shell other than zsh and bash, your shell is: $current_shell${RC}, therefore you have to manually update your rc file."
-        other_shell=True
+        printf "%b\n" "${RED}$current_shell is not supported. Update your shell configuration manually.${RC}"
         ;;
     esac
 
