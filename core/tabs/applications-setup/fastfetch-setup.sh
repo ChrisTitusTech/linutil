@@ -66,7 +66,7 @@ setupFastfetchShell() {
             read -r response
 
             if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
-                printf "\n# Run fastfetch on terminal start\nfastfetch\n" >>"$rc_file"
+                printf "\n# Run fastfetch on shell initialization\nfastfetch\n" >>"$rc_file"
                 printf "%b\n" "${GREEN}Added fastfetch to $rc_file${RC}"
             else
                 printf "%b\n" "${YELLOW}Skipped adding fastfetch to shell config${RC}"
