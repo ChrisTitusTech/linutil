@@ -48,6 +48,12 @@ setupFastfetchShell() {
     "zsh")
         rc_file="$HOME/.zshrc"
         ;;
+    "fish")
+        rc_file="$HOME/.config/fish/config.fish"
+        ;;
+    "nu")
+        rc_file="$HOME/.config/nushell/config.nu"
+        ;;
     *)
         printf "%b\n" "${RED}$current_shell is not supported. Update your shell configuration manually.${RC}"
         ;;
@@ -62,7 +68,6 @@ setupFastfetchShell() {
         else
             printf "%b" "${GREEN}Would you like to add fastfetch to $rc_file? [y/N] ${RC}"
             read -r response
-
             if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
                 printf "\n# Run fastfetch on shell initialization\nfastfetch\n" >>"$rc_file"
                 printf "%b\n" "${GREEN}Added fastfetch to $rc_file${RC}"
