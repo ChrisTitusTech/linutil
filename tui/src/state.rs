@@ -597,7 +597,10 @@ impl AppState {
 
     fn scroll_down(&mut self) {
         if let Some(selected) = self.selection.selected() {
-            if selected == self.filter.item_list().len() - 1 {
+            let len = self.filter.item_list().len();
+            let max_index = if self.at_root() { len - 1 } else { len };
+
+            if selected == max_index {
                 self.selection.select_first();
             } else {
                 self.selection.select_next();
