@@ -70,20 +70,24 @@ Sleep 1s
 
 Type "linutil" Sleep 1s  Enter
 
-Sleep 5s
+Sleep 2s
 
-Left Sleep 2s
+Left Sleep 1s
 Down Sleep 1s
 Down Sleep 1s
 Down Sleep 1s
-Down Sleep 2s
-Right Sleep 3s
+Down Sleep 1s
+Right Sleep 1s
 
 Type "/" Sleep 1s
-Type@200ms "System Cleanup" Sleep 1s  Enter
+Type@200ms "Full System Cleanup" Sleep 1s Enter
 
+Sleep 1s
+Enter Sleep 2s
+Type "y"  # CONFIRMATION PROMPT
+Sleep 15s
+Type "y" # SYSTEM CLEANUP PROMPT
+Enter
+Sleep 4s
+Enter
 Sleep 2s
-Enter Sleep 3s
-Type "y" Sleep 15s    # CONFIRMATION PROMPT
-
-Escape

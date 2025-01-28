@@ -40,6 +40,12 @@ script = "communication-apps/thunderbird-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ZapZap"
+description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
+script = "communication-apps/zapzap-setup.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Zoom"
 description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
 script = "communication-apps/zoom-setup.sh"
@@ -83,17 +89,6 @@ name = "Sublime Text"
 description = "Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages."
 script = "Developer-tools/sublime-setup.sh"
 task_list = "I"
-
-[[data.entries]]
-name = "ZapZap"
-description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
-script = "communication-apps/zapzap-setup.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Zoom"
-description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
-script = "communication-apps/zoom-setup.sh"
 
 [[data.entries]]
 name = "VS Code"
@@ -226,6 +221,12 @@ name = "Android Debloater"
 description = "Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience."
 script = "android-debloat.sh"
 task_list = "I"
+
+[[data]]
+name = "Auto CPU Frequency"
+description = "Automatic CPU speed & power optimizer.\nhttps://github.com/AdnanHodzic/auto-cpufreq"
+script = "auto-cpufreq.sh"
+task_list = "I SS"
 
 [[data]]
 name = "Bash Prompt"

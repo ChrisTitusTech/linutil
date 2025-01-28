@@ -2,11 +2,9 @@ use crate::{state::ListEntry, theme::Theme};
 use linutil_core::{ego_tree::NodeId, Tab};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
-    layout::{Position, Rect},
-    style::{Color, Style},
-    text::Span,
-    widgets::{Block, Borders, Paragraph},
-    Frame,
+    prelude::*,
+    symbols::border,
+    widgets::{Block, Paragraph},
 };
 use unicode_width::UnicodeWidthChar;
 
@@ -17,10 +15,12 @@ pub enum SearchAction {
 }
 
 pub struct Filter {
+    // Use Vec<char> to handle multi-byte characters like emojis
     search_input: Vec<char>,
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
+    // No complex string manipulation is done with completion_preview so we can use String unlike search_input
     completion_preview: Option<String>,
 }
 
@@ -62,13 +62,11 @@ impl Filter {
                 .collect();
         } else {
             self.items.clear();
-
             let query_lower = self.search_input.iter().collect::<String>().to_lowercase();
-            for tab in tabs.iter() {
+            for tab in tabs {
                 let mut stack = vec![tab.tree.root().id()];
                 while let Some(node_id) = stack.pop() {
                     let node = tab.tree.get(node_id).unwrap();
-
                     if node.value().name.to_lowercase().contains(&query_lower)
                         && !node.has_children()
                     {
@@ -78,31 +76,26 @@ impl Filter {
                             has_children: false,
                         });
                     }
-
                     stack.extend(node.children().map(|child| child.id()));
                 }
             }
-            self.items.sort_by(|a, b| a.node.name.cmp(&b.node.name));
+            self.items
+                .sort_unstable_by(|a, b| a.node.name.cmp(&b.node.name));
         }
-
         self.update_completion_preview();
     }
 
     fn update_completion_preview(&mut self) {
-        if self.search_input.is_empty() {
-            self.completion_preview = None;
-            return;
+        self.completion_preview = if self.items.is_empty() || self.search_input.is_empty() {
+            None
+        } else {
+            let input = self.search_input.iter().collect::<String>().to_lowercase();
+            self.items.iter().find_map(|item| {
+                let item_name_lower = item.node.name.to_lowercase();
+                (item_name_lower.starts_with(&input))
+                    .then_some(item_name_lower[input.len()..].to_string())
+            })
         }
-
-        let input = self.search_input.iter().collect::<String>().to_lowercase();
-        self.completion_preview = self.items.iter().find_map(|item| {
-            let item_name_lower = item.node.name.to_lowercase();
-            if item_name_lower.starts_with(&input) {
-                Some(item_name_lower[input.len()..].to_string())
-            } else {
-                None
-            }
-        });
     }
 
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
@@ -123,9 +116,8 @@ impl Filter {
         //Create the search bar widget
         let search_bar = Paragraph::new(display_text)
             .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_set(ratatui::symbols::border::ROUNDED)
+                Block::bordered()
+                    .border_set(border::ROUNDED)
                     .title(" Search "),
             )
             .style(Style::default().fg(search_color));
@@ -135,24 +127,32 @@ impl Filter {
 
         // Render cursor in search bar
         if self.in_search_mode {
-            let cursor_position: usize = self.search_input[..self.input_position]
+            // Calculate the visual width of search input so that completion preview can be displayed after the search input
+            let search_input_size: u16 = self
+                .search_input
                 .iter()
-                .map(|c| c.width().unwrap_or(1))
+                .map(|c| c.width().unwrap_or(1) as u16)
                 .sum();
-            let x = area.x + cursor_position as u16 + 1;
+
+            let cursor_position: u16 = self.search_input[..self.input_position]
+                .iter()
+                .map(|c| c.width().unwrap_or(1) as u16)
+                .sum();
+            let x = area.x + cursor_position + 1;
             let y = area.y + 1;
             frame.set_cursor_position(Position::new(x, y));
 
             if let Some(preview) = &self.completion_preview {
-                let preview_span = Span::styled(preview, Style::default().fg(Color::DarkGray));
-                let preview_paragraph = Paragraph::new(preview_span).style(Style::default());
+                let preview_x = area.x + search_input_size + 1;
+                let preview_span =
+                    Span::styled(preview, Style::default().fg(theme.search_preview_color()));
                 let preview_area = Rect::new(
-                    x,
+                    preview_x,
                     y,
-                    (preview.len() as u16).min(area.width - cursor_position as u16 - 1),
+                    (preview.len() as u16).min(area.width - search_input_size - 1), // Ensure the completion preview stays within the search bar bounds
                     1,
                 );
-                frame.render_widget(preview_paragraph, preview_area);
+                frame.render_widget(Paragraph::new(preview_span), preview_area);
             }
         }
     }
@@ -220,10 +220,18 @@ impl Filter {
     }
 
     fn complete_search(&mut self) -> SearchAction {
-        if let Some(completion) = self.completion_preview.take() {
-            self.search_input.extend(completion.chars());
+        if self.completion_preview.is_some() {
+            let input = &self.search_input.iter().collect::<String>().to_lowercase();
+            if let Some(search_completion) = self
+                .items
+                .iter()
+                .find(|item| item.node.name.to_lowercase().starts_with(input))
+            {
+                self.search_input = search_completion.node.name.chars().collect();
+            }
+
             self.input_position = self.search_input.len();
-            self.update_completion_preview();
+            self.completion_preview = None;
             SearchAction::Update
         } else {
             SearchAction::None

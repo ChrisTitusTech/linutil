@@ -1,13 +1,12 @@
-use std::borrow::Cow;
-
-use crate::{float::FloatContent, hint::Shortcut};
-
+use crate::{float::FloatContent, hint::Shortcut, theme};
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent},
+    crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     layout::Alignment,
     prelude::*,
-    widgets::{Block, Borders, Clear, List},
+    symbols::border,
+    widgets::{Block, Clear, List},
 };
+use std::borrow::Cow;
 
 pub enum ConfirmStatus {
     Confirm,
@@ -16,9 +15,10 @@ pub enum ConfirmStatus {
 }
 
 pub struct ConfirmPrompt {
-    pub names: Box<[String]>,
-    pub status: ConfirmStatus,
+    inner_area_height: usize,
+    names: Box<[String]>,
     scroll: usize,
+    pub status: ConfirmStatus,
 }
 
 impl ConfirmPrompt {
@@ -37,14 +37,15 @@ impl ConfirmPrompt {
             .collect();
 
         Self {
+            inner_area_height: 0,
             names,
-            status: ConfirmStatus::None,
             scroll: 0,
+            status: ConfirmStatus::None,
         }
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll < self.names.len() - 1 {
+        if self.scroll + self.inner_area_height < self.names.len() - 1 {
             self.scroll += 1;
         }
     }
@@ -57,19 +58,26 @@ impl ConfirmPrompt {
 }
 
 impl FloatContent for ConfirmPrompt {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED)
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
+        let block = Block::bordered()
+            .border_set(border::ROUNDED)
             .title(" Confirm selections ")
-            .title_bottom(" [y] to continue, [n] to abort ")
+            .title_bottom(Line::from(vec![
+                Span::raw(" ["),
+                Span::styled("y", Style::default().fg(theme.success_color())),
+                Span::raw("] to continue ["),
+                Span::styled("n", Style::default().fg(theme.fail_color())),
+                Span::raw("] to abort "),
+            ]))
             .title_alignment(Alignment::Center)
             .title_style(Style::default().bold())
             .style(Style::default());
 
-        frame.render_widget(block.clone(), area);
-
         let inner_area = block.inner(area);
+        self.inner_area_height = inner_area.height as usize;
+
+        frame.render_widget(Clear, area);
+        frame.render_widget(block, area);
 
         let paths_text = self
             .names
@@ -81,26 +89,38 @@ impl FloatContent for ConfirmPrompt {
             })
             .collect::<Text>();
 
-        frame.render_widget(Clear, inner_area);
         frame.render_widget(List::new(paths_text), inner_area);
     }
 
-    fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        use KeyCode::*;
-        self.status = match key.code {
-            Char('y') | Char('Y') => ConfirmStatus::Confirm,
-            Char('n') | Char('N') | Esc | Char('q') => ConfirmStatus::Abort,
-            Char('j') => {
+    fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
+        match event.kind {
+            MouseEventKind::ScrollDown => {
                 self.scroll_down();
-                ConfirmStatus::None
             }
-            Char('k') => {
+            MouseEventKind::ScrollUp => {
                 self.scroll_up();
-                ConfirmStatus::None
             }
-            _ => ConfirmStatus::None,
-        };
+            _ => {}
+        }
+        false
+    }
 
+    fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        use ConfirmStatus::*;
+        use KeyCode::{Char, Down, Esc, Up};
+        self.status = match key.code {
+            Char('y') | Char('Y') => Confirm,
+            Char('n') | Char('N') | Esc | Char('q') => Abort,
+            Char('j') | Char('J') | Down => {
+                self.scroll_down();
+                None
+            }
+            Char('k') | Char('K') | Up => {
+                self.scroll_up();
+                None
+            }
+            _ => None,
+        };
         false
     }
 
@@ -118,8 +138,8 @@ impl FloatContent for ConfirmPrompt {
             Box::new([
                 Shortcut::new("Continue", ["Y", "y"]),
                 Shortcut::new("Abort", ["N", "n", "q", "Esc"]),
-                Shortcut::new("Scroll up", ["k"]),
-                Shortcut::new("Scroll down", ["j"]),
+                Shortcut::new("Scroll up", ["k", "Up"]),
+                Shortcut::new("Scroll down", ["j", "Down"]),
                 Shortcut::new("Close linutil", ["CTRL-c"]),
             ]),
         )

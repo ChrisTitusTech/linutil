@@ -1,3 +1,7 @@
+use crate::{Command, ListNode, Tab};
+use ego_tree::{NodeMut, Tree};
+use include_dir::{include_dir, Dir};
+use serde::Deserialize;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Read},
@@ -6,11 +10,6 @@ use std::{
     path::{Path, PathBuf},
     rc::Rc,
 };
-
-use crate::{Command, ListNode, Tab};
-use ego_tree::{NodeMut, Tree};
-use include_dir::{include_dir, Dir};
-use serde::Deserialize;
 use temp_dir::TempDir;
 
 const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
@@ -132,13 +131,10 @@ impl Entry {
                  }| {
                     match data {
                         SystemDataType::Environment(var_name) => std::env::var(var_name)
-                            .map_or(false, |var| values.contains(&var) == *matches),
+                            .is_ok_and(|var| values.contains(&var) == *matches),
                         SystemDataType::File(path) => {
-                            std::fs::read_to_string(path).map_or(false, |data| {
-                                values
-                                    .iter()
-                                    .any(|matching_value| data.contains(matching_value))
-                                    == *matches
+                            std::fs::read_to_string(path).is_ok_and(|data| {
+                                values.iter().all(|matching| data.contains(matching)) == *matches
                             })
                         }
                         SystemDataType::CommandExists => values

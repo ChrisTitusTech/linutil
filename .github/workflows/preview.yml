@@ -34,15 +34,14 @@ jobs:
               repo: context.repo.repo,
               per_page: 1
             });
-            core.setOutput('result', releases.data[0].tag_name);
-          result-encoding: string
+            return releases.data[0].tag_name;
 
       - name: Set tag name ( Workflow Run )
         if: github.event_name == 'workflow_run'
         run: echo "tag_name=${{ steps.latest_tag.outputs.result }}" >> $GITHUB_ENV
 
       - name: Set tag name ( Workflow Dispatch )
-        if: ${{ github.event_name }} == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch'
         run: echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
 
       - name: Download binary
@@ -59,20 +58,20 @@ jobs:
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
         with:
-          path: "docs/assets/preview.tape"
+          path: ".github/preview.tape"
 
       - name: Move preview
-        run: mv preview.gif docs/assets/preview.gif
+        run: mv preview.gif .github/preview.gif
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v7.0.5
         with:
           commit-message: Preview for ${{ env.tag_name }}
-          file-pattern: "docs/assets/preview.gif"
-          add-options: "--force"
-          token: ${{ secrets.PAT_TOKEN }}
           branch: feature/preview-${{ env.tag_name }}
           title: "Update preview for ${{ env.tag_name }}"
+          labels: |
+            documentation
           body: |
             Automated PR to update preview gif for version ${{ env.tag_name }}
+            ![preview](https://raw.githubusercontent.com/${{ github.repository }}/feature/preview-${{ env.tag_name }}/.github/preview.gif)
         if: success()

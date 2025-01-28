@@ -1,48 +1,21 @@
-use std::{
-    borrow::Cow,
-    collections::VecDeque,
-    io::{Cursor, Read as _, Seek, SeekFrom, Write as _},
-};
-
-use crate::{float::FloatContent, hint::Shortcut};
-
+use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
 use linutil_core::Command;
-
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent},
-    layout::Rect,
-    style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Borders, Clear, List},
-    Frame,
+    crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
+    prelude::*,
+    symbols::border,
+    widgets::{Block, Borders, Clear, Paragraph, Wrap},
 };
-
-use ansi_to_tui::IntoText;
-
-use textwrap::wrap;
 use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
-use zips::zip_result;
-
-pub struct FloatingText {
-    pub src: String,
-    wrapped_lines: Vec<String>,
-    max_line_width: usize,
-    v_scroll: usize,
-    h_scroll: usize,
-    mode_title: String,
-    wrap_words: bool,
-    frame_height: usize,
-}
 
 macro_rules! style {
     ($r:literal, $g:literal, $b:literal) => {{
-        use anstyle::{Color, RgbColor, Style};
-        Style::new().fg_color(Some(Color::Rgb(RgbColor($r, $g, $b))))
+        Style::new().fg(Color::Rgb($r, $g, $b))
     }};
 }
 
-const SYNTAX_HIGHLIGHT_STYLES: [(&str, anstyle::Style); 8] = [
+const SYNTAX_HIGHLIGHT_STYLES: [(&str, Style); 8] = [
     ("function", style!(220, 220, 170)), // yellow
     ("string", style!(206, 145, 120)),   // brown
     ("property", style!(156, 220, 254)), // light blue
@@ -53,243 +26,196 @@ const SYNTAX_HIGHLIGHT_STYLES: [(&str, anstyle::Style); 8] = [
     ("number", style!(181, 206, 168)),   // light green
 ];
 
-fn get_highlighted_string(s: &str) -> Option<String> {
-    let mut hl_conf = hl::HighlightConfiguration::new(
-        hl_bash::LANGUAGE.into(),
-        "bash",
-        hl_bash::HIGHLIGHT_QUERY,
-        "",
-        "",
-    )
-    .ok()?;
-
-    let matched_tokens = &SYNTAX_HIGHLIGHT_STYLES
-        .iter()
-        .map(|hl| hl.0)
-        .collect::<Vec<_>>();
-
-    hl_conf.configure(matched_tokens);
-
-    let mut hl = hl::Highlighter::new();
-
-    let mut style_stack = vec![anstyle::Style::new()];
-    let src = s.as_bytes();
-
-    let events = hl.highlight(&hl_conf, src, None, |_| None).ok()?;
-
-    let mut buf = Cursor::new(vec![]);
-
-    for event in events {
-        match event.unwrap() {
-            HighlightEvent::HighlightStart(h) => {
-                style_stack.push(SYNTAX_HIGHLIGHT_STYLES.get(h.0)?.1);
-            }
-
-            HighlightEvent::HighlightEnd => {
-                style_stack.pop();
-            }
-
-            HighlightEvent::Source { start, end } => {
-                let style = style_stack.last()?;
-                zip_result!(
-                    write!(&mut buf, "{}", style),
-                    buf.write_all(&src[start..end]),
-                    write!(&mut buf, "{style:#}"),
-                )?;
-            }
-        }
-    }
-
-    let mut output = String::new();
-
-    zip_result!(
-        buf.seek(SeekFrom::Start(0)),
-        buf.read_to_string(&mut output),
-    )?;
-
-    Some(output)
+pub struct FloatingText<'a> {
+    // Width, Height
+    inner_area_size: (usize, usize),
+    mode_title: String,
+    // Cache the text to avoid reprocessing it every frame
+    processed_text: Text<'a>,
+    // Vertical, Horizontal
+    scroll: (u16, u16),
+    wrap_words: bool,
 }
 
-#[inline]
-fn get_lines(s: &str) -> Vec<&str> {
-    s.lines().collect::<Vec<_>>()
-}
-
-#[inline]
-fn get_lines_owned(s: &str) -> Vec<String> {
-    get_lines(s).iter().map(|s| s.to_string()).collect()
-}
-
-impl FloatingText {
+impl<'a> FloatingText<'a> {
     pub fn new(text: String, title: &str, wrap_words: bool) -> Self {
-        let max_line_width = 80;
-        let wrapped_lines = if wrap_words {
-            wrap(&text, max_line_width)
-                .into_iter()
-                .map(|cow| cow.into_owned())
-                .collect()
-        } else {
-            get_lines_owned(&text)
-        };
+        let processed_text = Text::from(text);
 
         Self {
-            src: text,
-            wrapped_lines,
+            inner_area_size: (0, 0),
             mode_title: title.to_string(),
-            max_line_width,
-            v_scroll: 0,
-            h_scroll: 0,
+            processed_text,
+            scroll: (0, 0),
             wrap_words,
-            frame_height: 0,
         }
     }
 
-    pub fn from_command(command: &Command, title: String) -> Option<Self> {
+    pub fn from_command(command: &Command, title: &str, wrap_words: bool) -> Self {
         let src = match command {
             Command::Raw(cmd) => Some(cmd.clone()),
             Command::LocalFile { file, .. } => std::fs::read_to_string(file)
                 .map_err(|_| format!("File not found: {:?}", file))
                 .ok(),
             Command::None => None,
-        }?;
+        }
+        .unwrap();
 
-        let max_line_width = 80;
-        let wrapped_lines = get_lines_owned(&get_highlighted_string(&src)?);
+        let processed_text = Self::get_highlighted_string(&src).unwrap_or_else(|| Text::from(src));
 
-        Some(Self {
-            src,
-            wrapped_lines,
-            mode_title: title,
-            max_line_width,
-            h_scroll: 0,
-            v_scroll: 0,
-            wrap_words: false,
-            frame_height: 0,
-        })
+        Self {
+            inner_area_size: (0, 0),
+            mode_title: title.to_string(),
+            processed_text,
+            scroll: (0, 0),
+            wrap_words,
+        }
+    }
+
+    fn get_highlighted_string(s: &str) -> Option<Text<'a>> {
+        let matched_tokens = SYNTAX_HIGHLIGHT_STYLES
+            .iter()
+            .map(|hl| hl.0)
+            .collect::<Vec<_>>();
+
+        let mut lines = Vec::with_capacity(s.lines().count());
+        let mut current_line = Vec::new();
+        let mut style_stack = vec![Style::default()];
+
+        let mut hl_conf = hl::HighlightConfiguration::new(
+            hl_bash::LANGUAGE.into(),
+            "bash",
+            hl_bash::HIGHLIGHT_QUERY,
+            "",
+            "",
+        )
+        .ok()?;
+
+        hl_conf.configure(&matched_tokens);
+
+        let mut hl = hl::Highlighter::new();
+        let events = hl.highlight(&hl_conf, s.as_bytes(), None, |_| None).ok()?;
+
+        for event in events {
+            match event.ok()? {
+                HighlightEvent::HighlightStart(h) => {
+                    style_stack.push(SYNTAX_HIGHLIGHT_STYLES.get(h.0)?.1);
+                }
+
+                HighlightEvent::HighlightEnd => {
+                    style_stack.pop();
+                }
+
+                HighlightEvent::Source { start, end } => {
+                    let style = *style_stack.last()?;
+                    let content = &s[start..end];
+
+                    for part in content.split_inclusive('\n') {
+                        if let Some(stripped) = part.strip_suffix('\n') {
+                            // Push the text that is before '\n' and then start a new line
+                            // After a new line clear the current line to start a new one
+                            current_line.push(Span::styled(stripped.to_owned(), style));
+                            lines.push(Line::from(current_line.to_owned()));
+                            current_line.clear();
+                        } else {
+                            current_line.push(Span::styled(part.to_owned(), style));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Makes sure last line of the file is pushed
+        // If no newline at the end of the file we need to push the last line
+        if !current_line.is_empty() {
+            lines.push(Line::from(current_line));
+        }
+
+        if lines.is_empty() {
+            return None;
+        }
+
+        Some(Text::from(lines))
     }
 
     fn scroll_down(&mut self) {
-        let visible_lines = self.frame_height.saturating_sub(2);
-        if self.v_scroll + visible_lines < self.wrapped_lines.len() {
-            self.v_scroll += 1;
-        }
+        let max_scroll = self
+            .processed_text
+            .lines
+            .len()
+            .saturating_sub(self.inner_area_size.1) as u16;
+        self.scroll.0 = (self.scroll.0 + 1).min(max_scroll);
     }
 
     fn scroll_up(&mut self) {
-        if self.v_scroll > 0 {
-            self.v_scroll -= 1;
-        }
+        self.scroll.0 = self.scroll.0.saturating_sub(1);
     }
 
     fn scroll_left(&mut self) {
-        if self.h_scroll > 0 {
-            self.h_scroll -= 1;
-        }
+        self.scroll.1 = self.scroll.1.saturating_sub(1);
     }
 
     fn scroll_right(&mut self) {
-        if self.h_scroll + 1 < self.max_line_width {
-            self.h_scroll += 1;
-        }
-    }
-
-    fn update_wrapping(&mut self, width: usize) {
-        if self.max_line_width != width {
-            self.max_line_width = width;
-            self.wrapped_lines = if self.wrap_words {
-                wrap(&self.src, width)
-                    .into_iter()
-                    .map(|cow| cow.into_owned())
-                    .collect()
-            } else {
-                get_lines_owned(&get_highlighted_string(&self.src).unwrap_or(self.src.clone()))
-            };
-        }
+        let visible_length = self.inner_area_size.0.saturating_sub(1);
+        let max_scroll = if self.wrap_words {
+            0
+        } else {
+            self.processed_text
+                .lines
+                .iter()
+                .map(|line| line.width())
+                .max()
+                .unwrap_or(0)
+                .saturating_sub(visible_length) as u16
+        };
+        self.scroll.1 = (self.scroll.1 + 1).min(max_scroll);
     }
 }
 
-impl FloatContent for FloatingText {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        self.frame_height = area.height as usize;
-
-        // Define the Block with a border and background color
+impl FloatContent for FloatingText<'_> {
+    fn draw(&mut self, frame: &mut Frame, area: Rect, _theme: &Theme) {
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED)
-            .title(self.mode_title.clone())
-            .title_alignment(ratatui::layout::Alignment::Center)
+            .border_set(border::ROUNDED)
+            .title(self.mode_title.as_str())
+            .title_alignment(Alignment::Center)
             .title_style(Style::default().reversed())
             .style(Style::default());
 
-        frame.render_widget(Clear, area);
-
-        frame.render_widget(block.clone(), area);
-
-        // Calculate the inner area to ensure text is not drawn over the border
         let inner_area = block.inner(area);
-        let Rect { width, height, .. } = inner_area;
+        self.inner_area_size = (inner_area.width as usize, inner_area.height as usize);
 
-        self.update_wrapping(width as usize);
+        frame.render_widget(Clear, area);
+        frame.render_widget(block, area);
 
-        let lines = self
-            .wrapped_lines
-            .iter()
-            .skip(self.v_scroll)
-            .take(height as usize)
-            .flat_map(|l| {
-                if self.wrap_words {
-                    vec![Line::raw(l.clone())]
-                } else {
-                    l.into_text().unwrap().lines
-                }
-            })
-            .map(|line| {
-                let mut skipped = 0;
-                let mut spans = line
-                    .into_iter()
-                    .skip_while(|span| {
-                        let skip = (skipped + span.content.len()) <= self.h_scroll;
-                        if skip {
-                            skipped += span.content.len();
-                            true
-                        } else {
-                            false
-                        }
-                    })
-                    .collect::<VecDeque<_>>();
+        let paragraph = if self.wrap_words {
+            Paragraph::new(self.processed_text.clone())
+                .scroll(self.scroll)
+                .wrap(Wrap { trim: false })
+        } else {
+            Paragraph::new(self.processed_text.clone()).scroll(self.scroll)
+        };
 
-                if spans.is_empty() {
-                    Line::raw(Cow::Owned(String::new()))
-                } else {
-                    if skipped < self.h_scroll {
-                        let to_split = spans.pop_front().unwrap();
-                        let new_content = to_split.content.clone().into_owned()
-                            [self.h_scroll - skipped..]
-                            .to_owned();
-                        spans.push_front(to_split.content(Cow::Owned(new_content)));
-                    }
+        frame.render_widget(paragraph, inner_area);
+    }
 
-                    Line::from(Vec::from(spans))
-                }
-            })
-            .collect::<Vec<_>>();
-
-        // Create list widget
-        let list = List::new(lines)
-            .block(Block::default())
-            .highlight_style(Style::default().reversed());
-
-        // Render the list inside the bordered area
-        frame.render_widget(list, inner_area);
+    fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
+        match event.kind {
+            MouseEventKind::ScrollDown => self.scroll_down(),
+            MouseEventKind::ScrollUp => self.scroll_up(),
+            MouseEventKind::ScrollLeft => self.scroll_left(),
+            MouseEventKind::ScrollRight => self.scroll_right(),
+            _ => {}
+        }
+        false
     }
 
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        use KeyCode::*;
+        use KeyCode::{Char, Down, Left, Right, Up};
         match key.code {
-            Down | Char('j') => self.scroll_down(),
-            Up | Char('k') => self.scroll_up(),
-            Left | Char('h') => self.scroll_left(),
-            Right | Char('l') => self.scroll_right(),
+            Down | Char('j') | Char('J') => self.scroll_down(),
+            Up | Char('k') | Char('K') => self.scroll_up(),
+            Left | Char('h') | Char('H') => self.scroll_left(),
+            Right | Char('l') | Char('L') => self.scroll_right(),
             _ => {}
         }
         false

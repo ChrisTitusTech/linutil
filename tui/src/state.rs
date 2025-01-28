@@ -4,26 +4,25 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
+    root::check_root_status,
     running_command::RunningCommand,
     theme::Theme,
+    Args,
 };
-
-use linutil_core::{ego_tree::NodeId, Config, ListNode, TabList};
-#[cfg(feature = "tips")]
-use rand::Rng;
+use linutil_core::{ego_tree::NodeId, Command, Config, ConfigValues, ListNode, TabList};
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
-    layout::{Alignment, Constraint, Direction, Flex, Layout},
-    style::{Style, Stylize},
-    text::{Line, Span, Text},
-    widgets::{Block, Borders, List, ListState, Paragraph},
-    Frame,
+    crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
+    layout::Flex,
+    prelude::*,
+    symbols::border,
+    widgets::{Block, List, ListState, Paragraph},
 };
-use std::path::PathBuf;
 use std::rc::Rc;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
+const FLOAT_SIZE: u16 = 80;
+const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
@@ -41,14 +40,17 @@ P* - privileged *
 ";
 
 pub struct AppState {
+    /// Areas of tabs
+    areas: Option<Areas>,
     /// Selected theme
     theme: Theme,
     /// Currently focused area
-    pub focus: Focus,
+    focus: Focus,
     /// List of tabs
     tabs: TabList,
     /// Current tab
     current_tab: ListState,
+    longest_tab_display_len: u16,
     /// This stack keeps track of our "current directory". You can think of it as `pwd`. but not
     /// just the current directory, all paths that took us here, so we can "cd .."
     visit_stack: Vec<(NodeId, usize)>,
@@ -60,7 +62,7 @@ pub struct AppState {
     selected_commands: Vec<Rc<ListNode>>,
     drawable: bool,
     #[cfg(feature = "tips")]
-    tip: String,
+    tip: &'static str,
     size_bypass: bool,
     skip_confirmation: bool,
 }
@@ -79,6 +81,11 @@ pub struct ListEntry {
     pub has_children: bool,
 }
 
+struct Areas {
+    tab_list: Rect,
+    list: Rect,
+}
+
 enum SelectedItem {
     UpDir,
     Directory,
@@ -87,23 +94,23 @@ enum SelectedItem {
 }
 
 impl AppState {
-    pub fn new(
-        config_path: Option<PathBuf>,
-        theme: Theme,
-        override_validation: bool,
-        size_bypass: bool,
-        skip_confirmation: bool,
-    ) -> Self {
-        let tabs = linutil_core::get_tabs(!override_validation);
+    pub fn new(args: Args) -> Self {
+        let tabs = linutil_core::get_tabs(!args.override_validation);
         let root_id = tabs[0].tree.root().id();
 
-        let auto_execute_commands = config_path.map(|path| Config::from_file(&path).auto_execute);
+        let longest_tab_display_len = tabs
+            .iter()
+            .map(|tab| tab.name.len() + args.theme.tab_icon().len())
+            .max()
+            .unwrap_or(22) as u16; // 22 is the length of "Linutil by Chris Titus" title
 
         let mut state = Self {
-            theme,
+            areas: None,
+            theme: args.theme,
             focus: Focus::List,
             tabs,
             current_tab: ListState::default().with_selected(Some(0)),
+            longest_tab_display_len,
             visit_stack: vec![(root_id, 0usize)],
             selection: ListState::default().with_selected(Some(0)),
             filter: Filter::new(),
@@ -111,35 +118,55 @@ impl AppState {
             selected_commands: Vec::new(),
             drawable: false,
             #[cfg(feature = "tips")]
-            tip: get_random_tip(),
-            size_bypass,
-            skip_confirmation,
+            tip: crate::tips::get_random_tip(),
+            size_bypass: args.size_bypass,
+            skip_confirmation: args.skip_confirmation,
         };
 
+        #[cfg(unix)]
+        if let Some(root_warning) = check_root_status() {
+            state.spawn_float(root_warning, FLOAT_SIZE, FLOAT_SIZE);
+        }
+
         state.update_items();
-        if let Some(auto_execute_commands) = auto_execute_commands {
-            state.handle_initial_auto_execute(&auto_execute_commands);
+
+        if let Some(config_path) = args.config {
+            let config = Config::read_config(&config_path, &state.tabs);
+            state.apply_config(config);
         }
 
         state
     }
 
-    fn handle_initial_auto_execute(&mut self, auto_execute_commands: &[String]) {
-        self.selected_commands = auto_execute_commands
+    fn apply_config(&mut self, config_values: ConfigValues) {
+        self.skip_confirmation = self.skip_confirmation || config_values.skip_confirmation;
+        self.size_bypass = self.size_bypass || config_values.size_bypass;
+
+        if !config_values.auto_execute_commands.is_empty() {
+            self.selected_commands = config_values.auto_execute_commands;
+            self.handle_initial_auto_execute();
+        }
+    }
+
+    fn handle_initial_auto_execute(&mut self) {
+        if !self.selected_commands.is_empty() {
+            self.spawn_confirmprompt();
+        }
+    }
+
+    fn spawn_confirmprompt(&mut self) {
+        let cmd_names: Vec<_> = self
+            .selected_commands
             .iter()
-            .filter_map(|name| self.tabs.iter().find_map(|tab| tab.find_command(name)))
+            .map(|node| node.name.as_str())
             .collect();
 
-        if !self.selected_commands.is_empty() {
-            let cmd_names: Vec<_> = self
-                .selected_commands
-                .iter()
-                .map(|node| node.name.as_str())
-                .collect();
-
-            let prompt = ConfirmPrompt::new(&cmd_names);
-            self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
-        }
+        let prompt = ConfirmPrompt::new(&cmd_names);
+        self.focus = Focus::ConfirmationPrompt(Float::new(
+            Box::new(prompt),
+            CONFIRM_PROMPT_FLOAT_SIZE,
+            CONFIRM_PROMPT_FLOAT_SIZE,
+        ));
     }
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
@@ -207,6 +234,8 @@ impl AppState {
                     Shortcut::new("Previous theme", ["T"]),
                     Shortcut::new("Next tab", ["Tab"]),
                     Shortcut::new("Previous tab", ["Shift-Tab"]),
+                    Shortcut::new("Important actions guide", ["g"]),
+                    Shortcut::new("Multi-selection mode", ["v"]),
                 ]),
             ),
 
@@ -215,21 +244,24 @@ impl AppState {
         }
     }
 
-    pub fn draw(&mut self, frame: &mut Frame) {
-        let terminal_size = frame.area();
-
-        if !self.size_bypass
+    fn is_terminal_drawable(&mut self, terminal_size: Rect) -> bool {
+        !(self.size_bypass || matches!(self.focus, Focus::FloatingWindow(_)))
             && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
-        {
+    }
+
+    pub fn draw(&mut self, frame: &mut Frame) {
+        let area = frame.area();
+        self.drawable = !self.is_terminal_drawable(area);
+        if !self.drawable {
             let warning = Paragraph::new(format!(
                 "Terminal size too small:\nWidth = {} Height = {}\n\nMinimum size:\nWidth = {}  Height = {}",
-                terminal_size.width,
-                terminal_size.height,
+                area.width,
+                area.height,
                 MIN_WIDTH,
                 MIN_HEIGHT,
             ))
                 .alignment(Alignment::Center)
-                .style(Style::default().fg(ratatui::style::Color::Red).bold())
+                .style(Style::default().fg(self.theme.fail_color()).bold())
                 .wrap(ratatui::widgets::Wrap { trim: true });
 
             let centered_layout = Layout::default()
@@ -239,81 +271,59 @@ impl AppState {
                     Constraint::Length(5),
                     Constraint::Fill(1),
                 ])
-                .split(terminal_size);
+                .split(area);
 
-            self.drawable = false;
             return frame.render_widget(warning, centered_layout[1]);
-        } else {
-            self.drawable = true;
         }
 
-        let label_block = Block::default()
-            .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED)
-            .border_set(ratatui::symbols::border::Set {
-                top_left: " ",
-                top_right: " ",
-                bottom_left: " ",
-                bottom_right: " ",
-                vertical_left: " ",
-                vertical_right: " ",
-                horizontal_top: "*",
-                horizontal_bottom: "*",
-            });
-        let str1 = "Linutil ";
-        let str2 = "by Chris Titus";
+        let label_block = Block::bordered().border_set(border::Set {
+            top_left: " ",
+            top_right: " ",
+            bottom_left: " ",
+            bottom_right: " ",
+            vertical_left: " ",
+            vertical_right: " ",
+            horizontal_top: "*",
+            horizontal_bottom: "*",
+        });
+
         let label = Paragraph::new(Line::from(vec![
-            Span::styled(str1, Style::default().bold()),
-            Span::styled(str2, Style::default().italic()),
+            Span::styled("Linutil ", Style::default().bold()),
+            Span::styled("by Chris Titus", Style::default().italic()),
         ]))
         .block(label_block)
-        .alignment(Alignment::Center);
-
-        let longest_tab_display_len = self
-            .tabs
-            .iter()
-            .map(|tab| tab.name.len() + self.theme.tab_icon().len())
-            .max()
-            .unwrap_or(0)
-            .max(str1.len() + str2.len());
+        .centered();
 
         let (keybind_scope, shortcuts) = self.get_keybinds();
 
-        let keybind_render_width = terminal_size.width - 2;
-
-        let keybinds_block = Block::default()
+        let keybinds_block = Block::bordered()
             .title(format!(" {} ", keybind_scope))
-            .borders(Borders::ALL)
-            .border_set(ratatui::symbols::border::ROUNDED);
+            .border_set(border::ROUNDED);
 
+        let keybind_render_width = keybinds_block.inner(area).width;
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
-        let n_lines = keybinds.len() as u16;
-
+        let keybind_len = keybinds.len() as u16;
         let keybind_para = Paragraph::new(Text::from_iter(keybinds)).block(keybinds_block);
 
-        let vertical = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Percentage(0),
-                Constraint::Max(n_lines as u16 + 2),
-            ])
-            .flex(Flex::Legacy)
-            .margin(0)
-            .split(frame.area());
+        let vertical =
+            Layout::vertical([Constraint::Percentage(0), Constraint::Max(keybind_len + 2)])
+                .flex(Flex::Legacy)
+                .split(area);
 
-        let horizontal = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([
-                Constraint::Min(longest_tab_display_len as u16 + 5),
-                Constraint::Percentage(100),
-            ])
-            .split(vertical[0]);
+        let horizontal = Layout::horizontal([
+            Constraint::Min(self.longest_tab_display_len + 5),
+            Constraint::Percentage(100),
+        ])
+        .split(vertical[0]);
 
-        let left_chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)])
-            .split(horizontal[0]);
+        let left_chunks =
+            Layout::vertical([Constraint::Length(3), Constraint::Min(1)]).split(horizontal[0]);
         frame.render_widget(label, left_chunks[0]);
+
+        self.areas = Some(Areas {
+            tab_list: left_chunks[1],
+            list: horizontal[1],
+        });
 
         let tabs = self
             .tabs
@@ -327,36 +337,23 @@ impl AppState {
             Style::new().fg(self.theme.tab_color())
         };
 
-        let list = List::new(tabs)
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_set(ratatui::symbols::border::ROUNDED),
-            )
+        let tab_list = List::new(tabs)
+            .block(Block::bordered().border_set(border::ROUNDED))
             .highlight_style(tab_hl_style)
             .highlight_symbol(self.theme.tab_icon());
-        frame.render_stateful_widget(list, left_chunks[1], &mut self.current_tab);
+        frame.render_stateful_widget(tab_list, left_chunks[1], &mut self.current_tab);
 
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
-            .split(horizontal[1]);
-
-        let list_chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(70), Constraint::Percentage(30)].as_ref())
-            .split(chunks[1]);
+        let chunks =
+            Layout::vertical([Constraint::Length(3), Constraint::Min(1)]).split(horizontal[1]);
 
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
 
-        let mut items: Vec<Line> = Vec::new();
-        let mut task_items: Vec<Line> = Vec::new();
+        let mut items: Vec<Line> = Vec::with_capacity(self.filter.item_list().len());
 
         if !self.at_root() {
             items.push(
                 Line::from(format!("{}  ..", self.theme.dir_icon())).style(self.theme.dir_color()),
             );
-            task_items.push(Line::from(" ").style(self.theme.dir_color()));
         }
 
         items.extend(self.filter.item_list().iter().map(
@@ -365,56 +362,33 @@ impl AppState {
              }| {
                 let is_selected = self.selected_commands.contains(node);
                 let (indicator, style) = if is_selected {
-                    (self.theme.multi_select_icon(), Style::default().bold())
+                    (self.theme.multi_select_icon(), Style::new().bold())
                 } else {
                     let ms_style = if self.multi_select && !node.multi_select {
-                        Style::default().fg(self.theme.multi_select_disabled_color())
+                        Style::new().fg(self.theme.multi_select_disabled_color())
                     } else {
                         Style::new()
                     };
                     ("", ms_style)
                 };
                 if *has_children {
-                    Line::from(format!(
-                        "{}  {} {}",
-                        self.theme.dir_icon(),
-                        node.name,
-                        indicator
-                    ))
-                    .style(self.theme.dir_color())
+                    Line::styled(
+                        format!("{}  {}", self.theme.dir_icon(), node.name,),
+                        self.theme.dir_color(),
+                    )
                     .patch_style(style)
                 } else {
-                    Line::from(format!(
-                        "{}  {} {}",
-                        self.theme.cmd_icon(),
-                        node.name,
-                        indicator
-                    ))
-                    .style(self.theme.cmd_color())
+                    let left_content =
+                        format!("{}  {} {}", self.theme.cmd_icon(), node.name, indicator);
+                    let right_content = format!("{} ", node.task_list);
+                    let center_space = " ".repeat(
+                        chunks[1].width as usize - left_content.len() - right_content.len(),
+                    );
+                    Line::styled(
+                        format!("{}{}{}", left_content, center_space, right_content),
+                        self.theme.cmd_color(),
+                    )
                     .patch_style(style)
-                }
-            },
-        ));
-
-        task_items.extend(self.filter.item_list().iter().map(
-            |ListEntry {
-                 node, has_children, ..
-             }| {
-                let ms_style = if self.multi_select && !node.multi_select {
-                    Style::default().fg(self.theme.multi_select_disabled_color())
-                } else {
-                    Style::new()
-                };
-                if *has_children {
-                    Line::from(" ")
-                        .style(self.theme.dir_color())
-                        .patch_style(ms_style)
-                } else {
-                    Line::from(format!("{} ", node.task_list))
-                        .alignment(Alignment::Right)
-                        .style(self.theme.cmd_color())
-                        .bold()
-                        .patch_style(ms_style)
                 }
             },
         ));
@@ -432,7 +406,10 @@ impl AppState {
         };
 
         #[cfg(feature = "tips")]
-        let bottom_title = Line::from(self.tip.as_str().bold().blue()).right_aligned();
+        let bottom_title = Line::from(format!(" {} ", self.tip))
+            .bold()
+            .blue()
+            .centered();
         #[cfg(not(feature = "tips"))]
         let bottom_title = "";
 
@@ -442,31 +419,75 @@ impl AppState {
         let list = List::new(items)
             .highlight_style(style)
             .block(
-                Block::default()
-                    .borders(Borders::ALL & !Borders::RIGHT)
-                    .border_set(ratatui::symbols::border::ROUNDED)
+                Block::bordered()
+                    .border_set(border::ROUNDED)
                     .title(title)
+                    .title(task_list_title)
                     .title_bottom(bottom_title),
             )
             .scroll_padding(1);
-        frame.render_stateful_widget(list, list_chunks[0], &mut self.selection);
-
-        let disclaimer_list = List::new(task_items).highlight_style(style).block(
-            Block::default()
-                .borders(Borders::ALL & !Borders::LEFT)
-                .border_set(ratatui::symbols::border::ROUNDED)
-                .title(task_list_title),
-        );
-
-        frame.render_stateful_widget(disclaimer_list, list_chunks[1], &mut self.selection);
+        frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
         match &mut self.focus {
-            Focus::FloatingWindow(float) => float.draw(frame, chunks[1]),
-            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1]),
+            Focus::FloatingWindow(float) => float.draw(frame, chunks[1], &self.theme),
+            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1], &self.theme),
             _ => {}
         }
 
         frame.render_widget(keybind_para, vertical[1]);
+    }
+
+    pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
+        if !self.drawable {
+            return true;
+        }
+
+        if matches!(self.focus, Focus::TabList | Focus::List) {
+            let position = Position::new(event.column, event.row);
+            let mouse_in_tab_list = self.areas.as_ref().unwrap().tab_list.contains(position);
+            let mouse_in_list = self.areas.as_ref().unwrap().list.contains(position);
+
+            match event.kind {
+                MouseEventKind::Moved => {
+                    if mouse_in_list {
+                        self.focus = Focus::List
+                    } else if mouse_in_tab_list {
+                        self.focus = Focus::TabList
+                    }
+                }
+                MouseEventKind::ScrollDown => {
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != self.tabs.len() - 1 {
+                            self.current_tab.select_next();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_next()
+                    }
+                }
+                MouseEventKind::ScrollUp => {
+                    if mouse_in_tab_list {
+                        if self.current_tab.selected().unwrap() != 0 {
+                            self.current_tab.select_previous();
+                        }
+                        self.refresh_tab();
+                    } else if mouse_in_list {
+                        self.selection.select_previous()
+                    }
+                }
+                _ => {}
+            }
+        }
+        match &mut self.focus {
+            Focus::FloatingWindow(float) => {
+                float.handle_mouse_event(event);
+            }
+            Focus::ConfirmationPrompt(confirm) => {
+                confirm.content.handle_mouse_event(event);
+            }
+            _ => {}
+        }
+        true
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {
@@ -494,26 +515,10 @@ impl AppState {
         // Handle key only when Tablist or List is focused
         // Prevents exiting the application even when a command is running
         // Add keys here which should work on both TabList and List
-        if matches!(self.focus, Focus::TabList | Focus::List) {
-            match key.code {
-                KeyCode::Tab => {
-                    if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
-                        self.current_tab.select_first();
-                    } else {
-                        self.current_tab.select_next();
-                    }
-                    self.refresh_tab();
-                }
-                KeyCode::BackTab => {
-                    if self.current_tab.selected().unwrap() == 0 {
-                        self.current_tab.select(Some(self.tabs.len() - 1));
-                    } else {
-                        self.current_tab.select_previous();
-                    }
-                    self.refresh_tab();
-                }
-                _ => {}
-            }
+        if matches!(self.focus, Focus::TabList | Focus::List)
+            && self.handle_tablist_and_list_keys(key)
+        {
+            return true;
         }
 
         match &mut self.focus {
@@ -554,15 +559,9 @@ impl AppState {
 
             Focus::TabList => match key.code {
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.focus = Focus::List,
-
                 KeyCode::Char('j') | KeyCode::Down => self.scroll_tab_down(),
-
                 KeyCode::Char('k') | KeyCode::Up => self.scroll_tab_up(),
 
-                KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Char('t') => self.theme.next(),
-                KeyCode::Char('T') => self.theme.prev(),
-                KeyCode::Char('g') => self.toggle_task_list_guide(),
                 _ => {}
             },
 
@@ -573,11 +572,6 @@ impl AppState {
                 KeyCode::Char('d') | KeyCode::Char('D') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Char('l') | KeyCode::Right => self.handle_enter(),
                 KeyCode::Char('h') | KeyCode::Left => self.go_back(),
-                KeyCode::Char('/') => self.enter_search(),
-                KeyCode::Char('t') => self.theme.next(),
-                KeyCode::Char('T') => self.theme.prev(),
-                KeyCode::Char('g') => self.toggle_task_list_guide(),
-                KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
@@ -587,32 +581,38 @@ impl AppState {
         true
     }
 
-    fn scroll_down(&mut self) {
-        let len = self.filter.item_list().len();
-        if len == 0 {
-            return;
+    fn handle_tablist_and_list_keys(&mut self, key: &KeyEvent) -> bool {
+        match key.code {
+            KeyCode::Tab => self.scroll_tab_down(),
+            KeyCode::BackTab => self.scroll_tab_up(),
+            KeyCode::Char('/') => self.enter_search(),
+            KeyCode::Char('g') | KeyCode::Char('G') => self.enable_task_list_guide(),
+            KeyCode::Char('v') | KeyCode::Char('V') => self.toggle_multi_select(),
+            KeyCode::Char('t') => self.theme.next(),
+            KeyCode::Char('T') => self.theme.prev(),
+            _ => return false,
         }
-        let current = self.selection.selected().unwrap_or(0);
-        let max_index = if self.at_root() { len - 1 } else { len };
-        let next = if current + 1 > max_index {
-            0
-        } else {
-            current + 1
-        };
+        true
+    }
 
-        self.selection.select(Some(next));
+    fn scroll_down(&mut self) {
+        if let Some(selected) = self.selection.selected() {
+            if selected == self.filter.item_list().len() - 1 {
+                self.selection.select_first();
+            } else {
+                self.selection.select_next();
+            }
+        }
     }
 
     fn scroll_up(&mut self) {
-        let len = self.filter.item_list().len();
-        if len == 0 {
-            return;
+        if let Some(selected) = self.selection.selected() {
+            if selected == 0 {
+                self.selection.select_last();
+            } else {
+                self.selection.select_previous();
+            }
         }
-        let current = self.selection.selected().unwrap_or(0);
-        let max_index = if self.at_root() { len - 1 } else { len };
-        let next = if current == 0 { max_index } else { current - 1 };
-
-        self.selection.select(Some(next));
     }
 
     fn toggle_multi_select(&mut self) {
@@ -675,11 +675,12 @@ impl AppState {
     fn get_selected_node(&self) -> Option<Rc<ListNode>> {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
-        if !self.at_root() && selected_index == 0 {
-            return None;
-        }
         if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
+            if selected_index == 0 {
+                return None;
+            } else {
+                selected_index = selected_index.saturating_sub(1);
+            }
         }
 
         if let Some(item) = self.filter.item_list().get(selected_index) {
@@ -721,18 +722,18 @@ impl AppState {
     pub fn selected_item_is_dir(&self) -> bool {
         let mut selected_index = self.selection.selected().unwrap_or(0);
 
-        if !self.at_root() && selected_index == 0 {
-            return false;
-        }
-
         if !self.at_root() {
-            selected_index = selected_index.saturating_sub(1);
+            if selected_index == 0 {
+                return false;
+            } else {
+                selected_index = selected_index.saturating_sub(1);
+            }
         }
 
         self.filter
             .item_list()
             .get(selected_index)
-            .map_or(false, |item| item.has_children)
+            .is_some_and(|i| i.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
@@ -748,11 +749,9 @@ impl AppState {
 
     fn enable_preview(&mut self) {
         if let Some(list_node) = self.get_selected_node() {
-            let mut preview_title = "[Preview] - ".to_string();
-            preview_title.push_str(list_node.name.as_str());
-            if let Some(preview) = FloatingText::from_command(&list_node.command, preview_title) {
-                self.spawn_float(preview, 80, 80);
-            }
+            let preview_title = format!("[Preview] - {}", list_node.name.as_str());
+            let preview = FloatingText::from_command(&list_node.command, &preview_title, false);
+            self.spawn_float(preview, FLOAT_SIZE, FLOAT_SIZE);
         }
     }
 
@@ -761,9 +760,17 @@ impl AppState {
             if !command_description.is_empty() {
                 let description =
                     FloatingText::new(command_description, "Command Description", true);
-                self.spawn_float(description, 80, 80);
+                self.spawn_float(description, FLOAT_SIZE, FLOAT_SIZE);
             }
         }
+    }
+
+    fn enable_task_list_guide(&mut self) {
+        self.spawn_float(
+            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
+            FLOAT_SIZE,
+            FLOAT_SIZE,
+        );
     }
 
     fn get_selected_item_type(&self) -> SelectedItem {
@@ -792,14 +799,7 @@ impl AppState {
                 if self.skip_confirmation {
                     self.handle_confirm_command();
                 } else {
-                    let cmd_names = self
-                        .selected_commands
-                        .iter()
-                        .map(|node| node.name.as_str())
-                        .collect::<Vec<_>>();
-
-                    let prompt = ConfirmPrompt::new(&cmd_names[..]);
-                    self.focus = Focus::ConfirmationPrompt(Float::new(Box::new(prompt), 40, 40));
+                    self.spawn_confirmprompt();
                 }
             }
             SelectedItem::None => {}
@@ -807,14 +807,14 @@ impl AppState {
     }
 
     fn handle_confirm_command(&mut self) {
-        let commands = self
+        let commands: Vec<&Command> = self
             .selected_commands
             .iter()
-            .map(|node| node.command.clone())
+            .map(|node| &node.command)
             .collect();
 
-        let command = RunningCommand::new(commands);
-        self.spawn_float(command, 80, 80);
+        let command = RunningCommand::new(&commands);
+        self.spawn_float(command, FLOAT_SIZE, FLOAT_SIZE);
         self.selected_commands.clear();
     }
 
@@ -848,44 +848,21 @@ impl AppState {
         self.update_items();
     }
 
-    fn toggle_task_list_guide(&mut self) {
-        self.spawn_float(
-            FloatingText::new(ACTIONS_GUIDE.to_string(), "Important Actions Guide", true),
-            80,
-            80,
-        );
-    }
-
     fn scroll_tab_down(&mut self) {
-        let len = self.tabs.len();
-        let current = self.current_tab.selected().unwrap_or(0);
-        let next = if current + 1 >= len { 0 } else { current + 1 };
-
-        self.current_tab.select(Some(next));
+        if self.current_tab.selected().unwrap() == self.tabs.len() - 1 {
+            self.current_tab.select_first();
+        } else {
+            self.current_tab.select_next();
+        }
         self.refresh_tab();
     }
 
     fn scroll_tab_up(&mut self) {
-        let len = self.tabs.len();
-        let current = self.current_tab.selected().unwrap_or(0);
-        let next = if current == 0 { len - 1 } else { current - 1 };
-
-        self.current_tab.select(Some(next));
+        if self.current_tab.selected().unwrap() == 0 {
+            self.current_tab.select(Some(self.tabs.len() - 1));
+        } else {
+            self.current_tab.select_previous();
+        }
         self.refresh_tab();
     }
-}
-
-#[cfg(feature = "tips")]
-const TIPS: &str = include_str!("../cool_tips.txt");
-
-#[cfg(feature = "tips")]
-fn get_random_tip() -> String {
-    let tips: Vec<&str> = TIPS.lines().collect();
-    if tips.is_empty() {
-        return "".to_string();
-    }
-
-    let mut rng = rand::thread_rng();
-    let random_index = rng.gen_range(0..tips.len());
-    format!(" {} ", tips[random_index])
 }

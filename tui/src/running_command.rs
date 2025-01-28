@@ -1,26 +1,24 @@
-use crate::{float::FloatContent, hint::Shortcut};
+use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
-    layout::{Rect, Size},
-    style::{Color, Style, Stylize},
-    text::{Line, Span},
-    widgets::{Block, Borders},
-    Frame,
+    crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
+    prelude::*,
+    symbols::border,
+    widgets::Block,
 };
 use std::{
-    io::Write,
+    fs::File,
+    io::{Result, Write},
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
-use tui_term::{
-    vt100::{self, Screen},
-    widget::PseudoTerminal,
-};
+use time::{macros::format_description, OffsetDateTime};
+use tui_term::widget::PseudoTerminal;
+use vt100_ctt::{Parser, Screen};
 
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
@@ -37,54 +35,48 @@ pub struct RunningCommand {
     writer: Box<dyn Write + Send>,
     /// Only set after the process has ended
     status: Option<ExitStatus>,
+    log_path: Option<String>,
     scroll_offset: usize,
 }
 
 impl FloatContent for RunningCommand {
-    fn draw(&mut self, frame: &mut Frame, area: Rect) {
-        // Calculate the inner size of the terminal area, considering borders
-        let inner_size = Size {
-            width: area.width - 2, // Adjust for border width
-            height: area.height - 2,
-        };
-
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
         // Define the block for the terminal display
         let block = if !self.is_finished() {
             // Display a block indicating the command is running
-            Block::default()
-                .borders(Borders::ALL)
-                .border_set(ratatui::symbols::border::ROUNDED)
+            Block::bordered()
+                .border_set(border::ROUNDED)
                 .title_top(Line::from("Running the command....").centered())
                 .title_style(Style::default().reversed())
                 .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
         } else {
             // Display a block with the command's exit status
-            let mut title_line = if self.get_exit_status().success() {
-                Line::from(
-                    Span::default()
-                        .content("SUCCESS!")
-                        .style(Style::default().fg(Color::Green).reversed()),
+            let title_line = if self.get_exit_status().success() {
+                Line::styled(
+                    "SUCCESS! Press <ENTER> to close this window",
+                    Style::default().fg(theme.success_color()).reversed(),
                 )
             } else {
-                Line::from(
-                    Span::default()
-                        .content("FAILED!")
-                        .style(Style::default().fg(Color::Red).reversed()),
+                Line::styled(
+                    "FAILED! Press <ENTER> to close this window",
+                    Style::default().fg(theme.fail_color()).reversed(),
                 )
             };
 
-            title_line.push_span(
-                Span::default()
-                    .content(" Press <ENTER> to close this window ")
-                    .style(Style::default()),
-            );
+            let log_path = if let Some(log_path) = &self.log_path {
+                Line::from(format!(" Log saved: {} ", log_path))
+            } else {
+                Line::from(" Press 'l' to save command log ")
+            };
 
-            Block::default()
-                .borders(Borders::ALL)
-                .border_set(ratatui::symbols::border::ROUNDED)
+            Block::bordered()
+                .border_set(border::ROUNDED)
                 .title_top(title_line.centered())
+                .title_bottom(log_path.centered())
         };
 
+        // Calculate the inner size of the terminal area, considering borders
+        let inner_size = block.inner(area).as_size();
         // Process the buffer and create the pseudo-terminal widget
         let screen = self.screen(inner_size);
         let pseudo_term = PseudoTerminal::new(&screen).block(block);
@@ -93,6 +85,18 @@ impl FloatContent for RunningCommand {
         frame.render_widget(pseudo_term, area);
     }
 
+    fn handle_mouse_event(&mut self, event: &MouseEvent) -> bool {
+        match event.kind {
+            MouseEventKind::ScrollUp => {
+                self.scroll_offset = self.scroll_offset.saturating_add(1);
+            }
+            MouseEventKind::ScrollDown => {
+                self.scroll_offset = self.scroll_offset.saturating_sub(1);
+            }
+            _ => {}
+        }
+        true
+    }
     /// Handle key events of the running command "window". Returns true when the "window" should be
     /// closed
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
@@ -110,6 +114,11 @@ impl FloatContent for RunningCommand {
             }
             KeyCode::PageDown => {
                 self.scroll_offset = self.scroll_offset.saturating_sub(10);
+            }
+            KeyCode::Char('l') if self.is_finished() => {
+                if let Ok(log_path) = self.save_log() {
+                    self.log_path = Some(log_path);
+                }
             }
             // Pass other key events to the terminal
             _ => self.handle_passthrough_key_event(key),
@@ -134,6 +143,7 @@ impl FloatContent for RunningCommand {
                     Shortcut::new("Close window", ["Enter", "q"]),
                     Shortcut::new("Scroll up", ["Page up"]),
                     Shortcut::new("Scroll down", ["Page down"]),
+                    Shortcut::new("Save log", ["l"]),
                 ]),
             )
         } else {
@@ -150,7 +160,7 @@ impl FloatContent for RunningCommand {
 }
 
 impl RunningCommand {
-    pub fn new(commands: Vec<Command>) -> Self {
+    pub fn new(commands: &[&Command]) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -170,10 +180,10 @@ impl RunningCommand {
                     if let Some(parent_directory) = file.parent() {
                         script.push_str(&format!("cd {}\n", parent_directory.display()));
                     }
-                    script.push_str(&executable);
+                    script.push_str(executable);
                     for arg in args {
                         script.push(' ');
-                        script.push_str(&arg);
+                        script.push_str(arg);
                     }
                     script.push('\n'); // Ensures that each command is properly separated for execution preventing directory errors
                 }
@@ -237,6 +247,7 @@ impl RunningCommand {
             pty_master: pair.master,
             writer,
             status: None,
+            log_path: None,
             scroll_offset: 0,
         }
     }
@@ -255,7 +266,7 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = vt100::Parser::new(size.height, size.width, 1000);
+        let mut parser = Parser::new(size.height, size.width, 1000);
         let mutex = self.buffer.lock();
         let buffer = mutex.as_ref().unwrap();
         parser.process(buffer);
@@ -282,6 +293,24 @@ impl RunningCommand {
             let mut killer = self.child_killer.take().unwrap().recv().unwrap();
             killer.kill().unwrap();
         }
+    }
+
+    fn save_log(&self) -> Result<String> {
+        let mut log_path = std::env::temp_dir();
+        let date_format = format_description!("[year]-[month]-[day]-[hour]-[minute]-[second]");
+        log_path.push(format!(
+            "linutil_log_{}.log",
+            OffsetDateTime::now_local()
+                .unwrap_or(OffsetDateTime::now_utc())
+                .format(&date_format)
+                .unwrap()
+        ));
+
+        let mut file = File::create(&log_path)?;
+        let buffer = self.buffer.lock().unwrap();
+        file.write_all(&buffer)?;
+
+        Ok(log_path.to_string_lossy().into_owned())
     }
 
     /// Convert the KeyEvent to pty key codes, and send them to the virtual terminal

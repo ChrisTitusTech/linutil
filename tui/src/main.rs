@@ -3,23 +3,20 @@ mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod root;
 mod running_command;
-pub mod state;
+mod state;
 mod theme;
 
-use std::{
-    io::{self, stdout},
-    path::PathBuf,
-    time::Duration,
-};
+#[cfg(feature = "tips")]
+mod tips;
 
 use crate::theme::Theme;
 use clap::Parser;
-
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
-        event::{self, DisableMouseCapture, Event, KeyEventKind},
+        event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyEventKind},
         style::ResetColor,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
@@ -27,10 +24,15 @@ use ratatui::{
     Terminal,
 };
 use state::AppState;
+use std::{
+    io::{stdout, Result, Stdout},
+    path::PathBuf,
+    time::Duration,
+};
 
 // Linux utility toolbox
 #[derive(Debug, Parser)]
-struct Args {
+pub struct Args {
     #[arg(short, long, help = "Path to the configuration file")]
     config: Option<PathBuf>,
     #[arg(short, long, value_enum)]
@@ -51,18 +53,14 @@ struct Args {
     size_bypass: bool,
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
-    let mut state = AppState::new(
-        args.config,
-        args.theme,
-        args.override_validation,
-        args.size_bypass,
-        args.skip_confirmation,
-    );
+    let mut state = AppState::new(args);
 
     stdout().execute(EnterAlternateScreen)?;
+    stdout().execute(EnableMouseCapture)?;
+
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
@@ -79,10 +77,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn run(
-    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
-    state: &mut AppState,
-) -> io::Result<()> {
+fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
     loop {
         terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
@@ -92,15 +87,22 @@ fn run(
 
         // It's guaranteed that the `read()` won't block when the `poll()`
         // function returns `true`
-        if let Event::Key(key) = event::read()? {
-            // We are only interested in Press and Repeat events
-            if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
-                continue;
-            }
+        match event::read()? {
+            Event::Key(key) => {
+                if key.kind != KeyEventKind::Press && key.kind != KeyEventKind::Repeat {
+                    continue;
+                }
 
-            if !state.handle_key(&key) {
-                return Ok(());
+                if !state.handle_key(&key) {
+                    return Ok(());
+                }
             }
+            Event::Mouse(mouse_event) => {
+                if !state.handle_mouse(&mouse_event) {
+                    return Ok(());
+                }
+            }
+            _ => {}
         }
     }
 }
