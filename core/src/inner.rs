@@ -166,10 +166,7 @@ enum SystemDataType {
     #[serde(rename = "command_exists")]
     CommandExists,
     #[serde(untagged)]
-    FileContains {
-        file: PathBuf,
-        contains: String,
-    },
+    FileContains { file: PathBuf, contains: String },
 }
 
 fn filter_entries(entries: &mut Vec<Entry>) {
