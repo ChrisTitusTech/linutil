@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Check if base-devel is installed, install if not
+echo "Hyprland JaKooLit"
+
 if ! pacman -Q base-devel &>/dev/null; then
     echo "Installing base-devel..."
     sudo pacman -S --noconfirm base-devel
