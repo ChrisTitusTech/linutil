@@ -66,8 +66,8 @@ data = { file = "/etc/os-release", contains = "ID=debian" }
 values = []
 
 [[data.entries]]
-name = "Hyprland Kool"
-description = "This script is designed to handle the installation and configuration of Hyprland Kool"
+name = "Hyprland JaKooLit"
+description = "Install JaKooLit's Hyprland configuration"
 script = "debian/hyprland-kool-deb.sh"
 task_list = "I MP"
 
