@@ -7,11 +7,7 @@ installZenBrowser() {
         printf "%b\n" "${YELLOW}Installing Zen Browser...${RC}"
         case "$PACKAGER" in
         pacman)
-            if grep -q avx2 /proc/cpuinfo; then
-                "$AUR_HELPER" -S --needed --noconfirm zen-browser-avx2-bin
-            else
-                "$AUR_HELPER" -S --needed --noconfirm zen-browser-bin
-            fi
+            "$AUR_HELPER" -S --needed --noconfirm zen-browser-bin
             ;;
         *)
             checkFlatpak
