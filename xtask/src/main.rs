@@ -6,9 +6,10 @@ use std::{env, error::Error};
 type DynError = Box<dyn Error>;
 
 pub mod tasks {
-    use crate::docgen::USER_GUIDE;
-    use crate::docgen::{userguide, write};
-    use crate::DynError;
+    use crate::{
+        docgen::{userguide, write, USER_GUIDE},
+        DynError,
+    };
 
     pub fn docgen() -> Result<(), DynError> {
         write(USER_GUIDE, &userguide()?);
