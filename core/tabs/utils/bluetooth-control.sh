@@ -83,7 +83,7 @@ prompt_for_mac() {
 
         # Display devices with numbers
         i=1
-        echo "$devices" | while IFS= read -r device; do
+        for device in $device_list; do
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
@@ -97,7 +97,7 @@ prompt_for_mac() {
         if echo "$choice" | grep -qE '^[0-9]+$' && [ -n "$choice" ] && [ "$choice" -le "$count" ] && [ "$choice" -gt 0 ]; then
             device=$(echo "$devices" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
-            if bluetoothctl info "$mac" >/dev/null 2>&1; then
+            if bluetoothctl info "$mac" > /dev/null 2>&1; then
                 if bluetoothctl "$command" "$mac"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                     break

@@ -40,6 +40,12 @@ script = "communication-apps/thunderbird-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ZapZap"
+description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
+script = "communication-apps/zapzap-setup.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Zoom"
 description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
 script = "communication-apps/zoom-setup.sh"
@@ -51,60 +57,55 @@ name = "Developer Tools"
 [[data.entries]]
 name = "Github Desktop"
 description = "GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes."
-script = "Developer-tools/githubdesktop-setup.sh"
+script = "developer-tools/githubdesktop.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "JetBrains Toolbox"
 description = "JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products."
-script = "Developer-tools/jetbrains-toolbox.sh"
+script = "developer-tools/jetbrains-toolbox.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Meld"
 description = "Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects."
-script = "Developer-tools/meld-setup.sh"
+script = "developer-tools/meld.sh"
 task_list = "I FI"
 
 [[data.entries]]
 name = "Neovim"
 description = "Neovim is a refactor, and sometimes redactor, in the tradition of Vim.\nIt is not a rewrite but a continuation and extension of Vim.\nThis command configures neovim from CTT's neovim configuration.\nhttps://github.com/ChrisTitusTech/neovim"
-script = "Developer-tools/neovim-setup.sh"
+script = "developer-tools/neovim.sh"
 task_list = "I FM"
 
 [[data.entries]]
 name = "Ngrok"
 description = "Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development."
-script = "Developer-tools/ngrok-setup.sh"
+script = "developer-tools/ngrok.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Sublime Text"
 description = "Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages."
-script = "Developer-tools/sublime-setup.sh"
+script = "developer-tools/sublime.sh"
 task_list = "I"
-
-[[data.entries]]
-name = "ZapZap"
-description = "ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta."
-script = "communication-apps/zapzap-setup.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Zoom"
-description = "Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording."
-script = "communication-apps/zoom-setup.sh"
 
 [[data.entries]]
 name = "VS Code"
 description = "Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks."
-script = "Developer-tools/vscode-setup.sh"
+script = "developer-tools/vscode.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "VS Codium"
 description = "VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding."
-script = "Developer-tools/vscodium-setup.sh"
+script = "developer-tools/vscodium.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Zed"
+description = "Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI."
+script = "developer-tools/zed.sh"
 task_list = "I"
 
 [[data]]
@@ -189,6 +190,12 @@ task_list = "I"
 name = "Mozilla Firefox"
 description = "Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation."
 script = "browsers/firefox.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Zen Browser"
+description = "Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience."
+script = "browsers/zen-browser.sh"
 task_list = "I"
 
 [[data.entries]]

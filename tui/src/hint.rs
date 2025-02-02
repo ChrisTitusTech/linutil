@@ -36,7 +36,7 @@ pub fn create_shortcut_list(
         .unwrap_or(0);
 
     let columns = (render_width as usize / (max_shortcut_width + 4)).max(1);
-    let rows = (shortcut_spans.len() + columns - 1) / columns;
+    let rows = shortcut_spans.len().div_ceil(columns);
 
     let mut lines: Vec<Line<'static>> = Vec::with_capacity(rows);
 
@@ -77,4 +77,15 @@ impl Shortcut {
             .chain(std::iter::once(description))
             .collect()
     }
+}
+
+#[macro_export]
+macro_rules! shortcuts {
+    ($(($name:literal,[$($key:literal),+ $(,)?])),* $(,)?) => {
+        vec![
+            $(
+                Shortcut::new($name, [$($key),*])
+            ),*
+        ].into_boxed_slice()
+    };
 }

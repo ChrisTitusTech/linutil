@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
+use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -139,21 +139,21 @@ impl FloatContent for RunningCommand {
         if self.is_finished() {
             (
                 "Finished command",
-                Box::new([
-                    Shortcut::new("Close window", ["Enter", "q"]),
-                    Shortcut::new("Scroll up", ["Page up"]),
-                    Shortcut::new("Scroll down", ["Page down"]),
-                    Shortcut::new("Save log", ["l"]),
-                ]),
+                shortcuts!(
+                    ("Close window", ["Enter", "q"]),
+                    ("Scroll up", ["Page up"]),
+                    ("Scroll down", ["Page down"]),
+                    ("Save log", ["l"]),
+                ),
             )
         } else {
             (
                 "Running command",
-                Box::new([
-                    Shortcut::new("Kill the command", ["CTRL-c"]),
-                    Shortcut::new("Scroll up", ["Page up"]),
-                    Shortcut::new("Scroll down", ["Page down"]),
-                ]),
+                shortcuts!(
+                    ("Kill the command", ["CTRL-c"]),
+                    ("Scroll up", ["Page up"]),
+                    ("Scroll down", ["Page down"]),
+                ),
             )
         }
     }
