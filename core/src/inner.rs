@@ -132,14 +132,15 @@ impl Entry {
                     match data {
                         SystemDataType::Environment(var_name) => std::env::var(var_name)
                             .is_ok_and(|var| values.contains(&var) == *matches),
-                        SystemDataType::File(path) => {
-                            std::fs::read_to_string(path).is_ok_and(|data| {
-                                values.iter().all(|matching| data.contains(matching)) == *matches
-                            })
-                        }
+                        SystemDataType::File(path) => path.exists() == *matches,
                         SystemDataType::CommandExists => values
                             .iter()
                             .all(|command| which::which(command).is_ok() == *matches),
+                        SystemDataType::FileContains { file, contains } => {
+                            std::fs::read_to_string(file)
+                                .map(|content| content.contains(contains) == *matches)
+                                .unwrap_or(false)
+                        }
                     }
                 },
             )
@@ -164,6 +165,11 @@ enum SystemDataType {
     File(PathBuf),
     #[serde(rename = "command_exists")]
     CommandExists,
+    #[serde(untagged)]
+    FileContains {
+        file: PathBuf,
+        contains: String,
+    },
 }
 
 fn filter_entries(entries: &mut Vec<Entry>) {

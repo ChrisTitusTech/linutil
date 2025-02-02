@@ -16,6 +16,13 @@ task_list = "SI D"
 multi_select = false
 
 [[data.entries]]
+name = "Hyprland Kool"
+description = "This script is designed to handle the installation and configuration of Hyprland Kool"
+script = "arch/hyprland-kool.sh"
+task_list = "I MP"
+multi_select = false
+
+[[data.entries]]
 name ="Linux Neptune for SteamDeck"
 description = "Valve's fork of Linux Kernel for the SteamDeck"
 script = "arch/linux-neptune.sh"
@@ -51,6 +58,20 @@ script = "arch/yay-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Debian"
+
+[[data.preconditions]]
+matches = true
+data = { file = "/etc/os-release", contains = "ID=debian" }
+values = []
+
+[[data.entries]]
+name = "Hyprland Kool"
+description = "This script is designed to handle the installation and configuration of Hyprland Kool"
+script = "debian/hyprland-kool-deb.sh"
+task_list = "I MP"
+
+[[data]]
 name = "Fedora"
 
 [[data.preconditions]]
@@ -63,6 +84,12 @@ name = "Configure DNF"
 description = "Optimizes DNF for parallel downloads"
 script = "fedora/configure-dnf.sh"
 task_list = "PFM"
+
+[[data.entries]]
+name = "Hyprland Kool"
+description = "This script is designed to handle the installation and configuration of Hyprland Kool"
+script = "fedora/hyprland-kool-fed.sh"
+task_list = "I MP"
 
 [[data.entries]]
 name = "Multimedia Codecs"
@@ -104,6 +131,25 @@ task_list = "I PFM SS"
 matches = true
 data = "command_exists"
 values = [ "btrfs" ]
+
+[[data]]
+name = "Ubuntu"
+
+[[data.preconditions]]
+matches = true
+data = { file = "/etc/os-release", contains = "ID=ubuntu" }
+values = []
+
+[[data.entries]]
+name = "Hyprland Kool"
+description = "This script is designed to handle the installation and configuration of Hyprland Kool"
+script = "ubuntu/hyprland-kool-ubuntu24.sh"
+task_list = "I MP"
+
+[[data.preconditions]]
+matches = true
+data = { file = "/etc/os-release", contains = 'VERSION_ID="24.04"' }
+values = []
 
 [[data]]
 name = "Build Prerequisites"
