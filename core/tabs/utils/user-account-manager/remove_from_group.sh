@@ -38,7 +38,7 @@ removeFromGroup() {
     read -r confirm
     confirmAction "$confirm"
 
-    #shellcheck disable=SC2086
+    # shellcheck disable=SC2086
     $ESCALATION_TOOL usermod -rG $groups_to_remove "$username"
 
     printf "%b\n" "${GREEN}User successfully removed from $groups_to_remove${RC}"

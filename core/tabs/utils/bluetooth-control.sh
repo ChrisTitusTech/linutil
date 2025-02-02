@@ -65,12 +65,11 @@ scan_devices() {
         printf "%b\n" "$devices"
     fi
     printf "%b" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
 # Function to prompt for MAC address using numbers
 prompt_for_mac() {
-    action=$1
     command=$2
     prompt_msg=$3
     success_msg=$4
@@ -82,14 +81,14 @@ prompt_for_mac() {
         if [ -z "$devices" ]; then
             printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"
             printf "%b" "Press any key to return to the main menu..."
-            read -r dummy
+            read -r _
             return
         fi
 
         # Display devices with numbers
         device_list=$(echo "$devices" | tr '\n' '\n')
         i=1
-        echo "$device_list" | while IFS= read -r device; do
+        for device in $device_list; do
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
@@ -102,12 +101,12 @@ prompt_for_mac() {
             device=$(echo "$device_list" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
             if bluetoothctl info "$mac" > /dev/null 2>&1; then
-                bluetoothctl "$command" "$mac" && {
+                if bluetoothctl "$command" "$mac"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                     break
-                } || {
+                else
                     printf "%b\n" "${RED}$failure_msg${RC}"
-                }
+                fi
             else
                 printf "%b\n" "${RED}Invalid MAC address. Please try again.${RC}"
             fi
@@ -118,7 +117,7 @@ prompt_for_mac() {
         fi
     done
     printf "%b" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
 # Function to pair with a device

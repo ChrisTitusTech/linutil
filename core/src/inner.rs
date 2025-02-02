@@ -131,13 +131,10 @@ impl Entry {
                  }| {
                     match data {
                         SystemDataType::Environment(var_name) => std::env::var(var_name)
-                            .map_or(false, |var| values.contains(&var) == *matches),
+                            .is_ok_and(|var| values.contains(&var) == *matches),
                         SystemDataType::File(path) => {
-                            std::fs::read_to_string(path).map_or(false, |data| {
-                                values
-                                    .iter()
-                                    .any(|matching_value| data.contains(matching_value))
-                                    == *matches
+                            std::fs::read_to_string(path).is_ok_and(|data| {
+                                values.iter().all(|matching| data.contains(matching)) == *matches
                             })
                         }
                         SystemDataType::CommandExists => values
