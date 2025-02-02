@@ -6,6 +6,7 @@ use crate::{
     hint::{create_shortcut_list, Shortcut},
     root::check_root_status,
     running_command::RunningCommand,
+    shortcuts,
     theme::Theme,
     Args,
 };
@@ -171,13 +172,13 @@ impl AppState {
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
         if self.selected_item_is_dir() {
-            Box::new([Shortcut::new("Go to selected dir", ["l", "Right", "Enter"])])
+            shortcuts!(("Go to selected dir", ["l", "Right", "Enter"]))
         } else {
-            Box::new([
-                Shortcut::new("Run selected command", ["l", "Right", "Enter"]),
-                Shortcut::new("Enable preview", ["p"]),
-                Shortcut::new("Command Description", ["d"]),
-            ])
+            shortcuts!(
+                ("Run selected command", ["l", "Right", "Enter"]),
+                ("Enable preview", ["p"]),
+                ("Command Description", ["d"])
+            )
         }
     }
 
@@ -185,10 +186,7 @@ impl AppState {
         match self.focus {
             Focus::Search => (
                 "Search bar",
-                Box::new([
-                    Shortcut::new("Abort search", ["Esc", "CTRL-c"]),
-                    Shortcut::new("Search", ["Enter"]),
-                ]),
+                shortcuts!(("Abort search", ["Esc", "CTRL-c"]), ("Search", ["Enter"])),
             ),
 
             Focus::List => {
@@ -208,35 +206,39 @@ impl AppState {
                     hints.extend(self.get_list_item_shortcut());
                 }
 
-                hints.push(Shortcut::new("Select item above", ["k", "Up"]));
-                hints.push(Shortcut::new("Select item below", ["j", "Down"]));
-                hints.push(Shortcut::new("Next theme", ["t"]));
-                hints.push(Shortcut::new("Previous theme", ["T"]));
-                hints.push(Shortcut::new("Multi-selection mode", ["v"]));
+                hints.extend(shortcuts!(
+                    ("Select item above", ["k", "Up"]),
+                    ("Select item below", ["j", "Down"]),
+                    ("Next theme", ["t"]),
+                    ("Previous theme", ["T"]),
+                    ("Multi-selection mode", ["v"]),
+                ));
                 if self.multi_select {
                     hints.push(Shortcut::new("Select multiple commands", ["Space"]));
                 }
-                hints.push(Shortcut::new("Next tab", ["Tab"]));
-                hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
-                hints.push(Shortcut::new("Important actions guide", ["g"]));
+                hints.extend(shortcuts!(
+                    ("Next tab", ["Tab"]),
+                    ("Previous tab", ["Shift-Tab"]),
+                    ("Important actions guide", ["g"])
+                ));
 
                 ("Command list", hints.into_boxed_slice())
             }
 
             Focus::TabList => (
                 "Tab list",
-                Box::new([
-                    Shortcut::new("Exit linutil", ["q", "CTRL-c"]),
-                    Shortcut::new("Focus action list", ["l", "Right", "Enter"]),
-                    Shortcut::new("Select item above", ["k", "Up"]),
-                    Shortcut::new("Select item below", ["j", "Down"]),
-                    Shortcut::new("Next theme", ["t"]),
-                    Shortcut::new("Previous theme", ["T"]),
-                    Shortcut::new("Next tab", ["Tab"]),
-                    Shortcut::new("Previous tab", ["Shift-Tab"]),
-                    Shortcut::new("Important actions guide", ["g"]),
-                    Shortcut::new("Multi-selection mode", ["v"]),
-                ]),
+                shortcuts!(
+                    ("Exit linutil", ["q", "CTRL-c"]),
+                    ("Focus action list", ["l", "Right", "Enter"]),
+                    ("Select item above", ["k", "Up"]),
+                    ("Select item below", ["j", "Down"]),
+                    ("Next theme", ["t"]),
+                    ("Previous theme", ["T"]),
+                    ("Next tab", ["Tab"]),
+                    ("Previous tab", ["Shift-Tab"]),
+                    ("Important actions guide", ["g"]),
+                    ("Multi-selection mode", ["v"]),
+                ),
             ),
 
             Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
@@ -480,7 +482,7 @@ impl AppState {
         }
         match &mut self.focus {
             Focus::FloatingWindow(float) => {
-                float.content.handle_mouse_event(event);
+                float.handle_mouse_event(event);
             }
             Focus::ConfirmationPrompt(confirm) => {
                 confirm.content.handle_mouse_event(event);
@@ -733,7 +735,7 @@ impl AppState {
         self.filter
             .item_list()
             .get(selected_index)
-            .map_or(false, |item| item.has_children)
+            .is_some_and(|i| i.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
