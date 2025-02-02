@@ -2,8 +2,7 @@ use std::fs;
 
 use linutil_core::Command;
 
-use crate::path;
-use crate::DynError;
+use crate::{path, DynError};
 
 pub const USER_GUIDE: &str = "userguide.md";
 
