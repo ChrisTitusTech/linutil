@@ -83,7 +83,7 @@ prompt_for_mac() {
 
         # Display devices with numbers
         i=1
-        for device in $device_list; do
+        echo "$devices" | while IFS= read -r device; do
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
