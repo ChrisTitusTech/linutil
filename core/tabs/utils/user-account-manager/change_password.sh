@@ -17,7 +17,7 @@ changePassword() {
         read -r password
 
         printf "%b" "${YELLOW}Are you sure you want to change password for ""$username""? [Y/n]: ${RC}"
-        read -r confirm
+        read -r _
         confirmAction || exit 1
 
         echo "$username:$password" | "$ESCALATION_TOOL" chpasswd
