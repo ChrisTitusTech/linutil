@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ../../common-script.sh
+
 echo "Hyprland JaKooLit"
 
 if ! pacman -Q base-devel &>/dev/null; then
