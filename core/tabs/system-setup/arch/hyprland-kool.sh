@@ -2,7 +2,7 @@
 
 . ../../common-script.sh
 
-echo "Hyprland JaKooLit"
+printf "%b\n" "${YELLOW}Starting Hyprland JaKooLit installation${RC}"
 
 if ! pacman -Q base-devel &>/dev/null; then
     printf "%b\n" "${YELLOW}Installing base-devel...${RC}"
