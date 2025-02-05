@@ -8,6 +8,6 @@ if ! pacman -Q base-devel &>/dev/null; then
 fi
 
 git clone --depth=1 https://github.com/JaKooLit/Arch-Hyprland.git ~/Arch-Hyprland
-cd ~/Arch-Hyprland
+cd "$HOME/Arch-Hyprland"
 chmod +x install.sh
 ./install.sh
