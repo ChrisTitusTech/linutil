@@ -3,7 +3,7 @@
 echo "Hyprland JaKooLit"
 
 if ! pacman -Q base-devel &>/dev/null; then
-    echo "Installing base-devel..."
+    printf "%b\n" "${YELLOW}Installing base-devel...${RC}"
     sudo pacman -S --noconfirm base-devel
 fi
 
