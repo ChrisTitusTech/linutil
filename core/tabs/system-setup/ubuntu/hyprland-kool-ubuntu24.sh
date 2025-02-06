@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo "Hyprland JaKooLit"
+. ../../common-script.sh
 
-git clone -b 24.04 --depth=1  https://github.com/JaKooLit/Ubuntu-Hyprland.git ~/Ubuntu-Hyprland-24.04
-cd ~/Ubuntu-Hyprland-24.04
+printf "%b\n" "${YELLOW}Starting Hyprland JaKooLit installation${RC}"
+
+git clone -b 24.04 --depth=1  https://github.com/JaKooLit/Ubuntu-Hyprland.git "$HOME/Ubuntu-Hyprland-24.04" || { printf "%b\n" "${RED}Failed to clone Jakoolits Ubuntu-Hyprland repo${RC}"; exit 1; }
+cd "$HOME/Ubuntu-Hyprland-24.04"
 chmod +x install.sh
 ./install.sh
