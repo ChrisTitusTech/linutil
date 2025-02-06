@@ -13,7 +13,10 @@ use ratatui::{
 use std::{
     fs::File,
     io::{Result, Write},
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     thread::JoinHandle,
 };
 use time::{macros::format_description, OffsetDateTime};
@@ -158,6 +161,7 @@ impl FloatContent for RunningCommand {
         }
     }
 }
+pub static TERMINAL_UPDATED: AtomicBool = AtomicBool::new(true);
 
 impl RunningCommand {
     pub fn new(commands: &[&Command]) -> Self {
@@ -217,6 +221,7 @@ impl RunningCommand {
         // A buffer, shared between the thread that reads the command output, and the main tread.
         // The main thread only reads the contents
         let command_buffer: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
+        TERMINAL_UPDATED.store(true, Ordering::Release);
         let reader_handle = {
             // Arc is just a reference, so we can create an owned copy without any problem
             let command_buffer = command_buffer.clone();
@@ -233,8 +238,10 @@ impl RunningCommand {
                                                            // done, to minimise the time it is opened
                     let command_buffer = mutex.as_mut().unwrap();
                     command_buffer.extend_from_slice(&buf[0..size]);
+                    TERMINAL_UPDATED.store(true, Ordering::Release);
                     // The mutex is closed here automatically
                 }
+                TERMINAL_UPDATED.store(true, Ordering::Release);
             })
         };
 
