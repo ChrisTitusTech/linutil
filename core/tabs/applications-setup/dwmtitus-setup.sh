@@ -30,67 +30,24 @@ makeDWM() {
 }
 
 install_nerd_font() {
-    FONT_DIR="$HOME/.local/share/fonts"
-    FONT_ZIP="$FONT_DIR/Meslo.zip"
-    FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
-    FONT_INSTALLED=$(fc-list | grep -i "Meslo")
-
-    # Check if Meslo Nerd-font is already installed
-    if [ -n "$FONT_INSTALLED" ]; then
-        printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
-        return 0
-    fi
-
-    printf "%b\n" "${YELLOW}Installing Meslo Nerd-fonts${RC}"
-
-    # Create the fonts directory if it doesn't exist
-    if [ ! -d "$FONT_DIR" ]; then
-        mkdir -p "$FONT_DIR" || {
-            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR${RC}"
-            return 1
-        }
+    # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
+    FONT_NAME="MesloLGS Nerd Font Mono"
+    if fc-list :family | grep -iq "$FONT_NAME"; then
+        printf "%b\n" "${GREEN}Font '$FONT_NAME' is installed.${RC}"
     else
-        printf "%b\n" "${GREEN}$FONT_DIR exists, skipping creation.${RC}"
+        printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
+        # Change this URL to correspond with the correct font
+        FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
+        FONT_DIR="$HOME/.local/share/fonts"
+        TEMP_DIR=$(mktemp -d)
+        curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
+        unzip "$TEMP_DIR"/"${FONT_NAME}".zip -d "$TEMP_DIR"
+        mkdir -p "$FONT_DIR"/"$FONT_NAME"
+        mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
+        fc-cache -fv
+        rm -rf "${TEMP_DIR}"
+        printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
     fi
-
-    # Check if the font zip file already exists
-    if [ ! -f "$FONT_ZIP" ]; then
-        # Download the font zip file
-        curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
-            printf "%b\n" "${RED}Failed to download Meslo Nerd-fonts from $FONT_URL${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo.zip already exists in $FONT_DIR, skipping download.${RC}"
-    fi
-
-    # Unzip the font file if it hasn't been unzipped yet
-    if [ ! -d "$FONT_DIR/Meslo" ]; then
-        mkdir -p "$FONT_DIR/Meslo" || {
-            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR/Meslo${RC}"
-            return 1
-        }
-        unzip "$FONT_ZIP" -d "$FONT_DIR" || {
-            printf "%b\n" "${RED}Failed to unzip $FONT_ZIP${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo font files already unzipped in $FONT_DIR, skipping unzip.${RC}"
-    fi
-
-    # Remove the zip file
-    rm "$FONT_ZIP" || {
-        printf "%b\n" "${RED}Failed to remove $FONT_ZIP${RC}"
-        return 1
-    }
-
-    # Rebuild the font cache
-    fc-cache -fv || {
-        printf "%b\n" "${RED}Failed to rebuild font cache${RC}"
-        return 1
-    }
-
-    printf "%b\n" "${GREEN}Meslo Nerd-fonts installed successfully${RC}"
 }
 
 picom_animations() {
