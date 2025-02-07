@@ -107,7 +107,9 @@ Note that crates installed using `cargo install` require manual updating with `c
 Linutil supports configuration through a TOML config file. Path to the file can be specified with `--config` (or `-c`).
 
 Available options:
-- `auto_execute` - a list of commands to execute automatically (can be combined with `--skip-confirmation`)
+- `auto_execute` - A list of commands to execute automatically (can be combined with `--skip-confirmation`)
+- `skip_confirmation` - Boolean ( Equal to `--skip-confirmation`)
+- `size_bypass` - Boolean ( Equal to `--size-bypass` )
 
 Example config:
 ```toml
@@ -118,6 +120,9 @@ auto_execute = [
     "Alacritty",
     "Kitty"
 ]
+
+skip_confirmation = true
+size_bypass = true
 ```
 
 ```bash
