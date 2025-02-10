@@ -66,6 +66,7 @@ pub struct AppState {
     tip: &'static str,
     size_bypass: bool,
     skip_confirmation: bool,
+    mouse_enabled: bool,
 }
 
 pub enum Focus {
@@ -94,8 +95,18 @@ enum SelectedItem {
     None,
 }
 
+enum ScrollDir {
+    Up,
+    Down,
+}
+
 impl AppState {
     pub fn new(args: Args) -> Self {
+        #[cfg(unix)]
+        let root_warning = check_root_status(args.bypass_root);
+        #[cfg(not(unix))]
+        let root_warning = None;
+
         let tabs = linutil_core::get_tabs(!args.override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -122,10 +133,11 @@ impl AppState {
             tip: crate::tips::get_random_tip(),
             size_bypass: args.size_bypass,
             skip_confirmation: args.skip_confirmation,
+            mouse_enabled: args.mouse,
         };
 
         #[cfg(unix)]
-        if let Some(root_warning) = check_root_status() {
+        if let Some(root_warning) = root_warning {
             state.spawn_float(root_warning, FLOAT_SIZE, FLOAT_SIZE);
         }
 
@@ -440,6 +452,10 @@ impl AppState {
     }
 
     pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
+        if !self.mouse_enabled {
+            return true;
+        }
+
         if !self.drawable {
             return true;
         }
@@ -597,24 +613,35 @@ impl AppState {
         true
     }
 
-    fn scroll_down(&mut self) {
-        if let Some(selected) = self.selection.selected() {
-            if selected == self.filter.item_list().len() - 1 {
-                self.selection.select_first();
-            } else {
-                self.selection.select_next();
-            }
-        }
+    fn scroll(&mut self, direction: ScrollDir) {
+        let Some(selected) = self.selection.selected() else {
+            return;
+        };
+        let list_len = if !self.at_root() {
+            self.filter.item_list().len() + 1
+        } else {
+            self.filter.item_list().len()
+        };
+
+        if list_len == 0 {
+            return;
+        };
+
+        let next_selection = match direction {
+            ScrollDir::Up if selected == 0 => list_len - 1,
+            ScrollDir::Down if selected >= list_len - 1 => 0,
+            ScrollDir::Up => selected - 1,
+            ScrollDir::Down => selected + 1,
+        };
+        self.selection.select(Some(next_selection));
     }
 
     fn scroll_up(&mut self) {
-        if let Some(selected) = self.selection.selected() {
-            if selected == 0 {
-                self.selection.select_last();
-            } else {
-                self.selection.select_previous();
-            }
-        }
+        self.scroll(ScrollDir::Up)
+    }
+
+    fn scroll_down(&mut self) {
+        self.scroll(ScrollDir::Down)
     }
 
     fn toggle_multi_select(&mut self) {

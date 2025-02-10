@@ -120,7 +120,7 @@ enum EntryType {
 
 impl Entry {
     fn is_supported(&self) -> bool {
-        self.preconditions.as_deref().map_or(true, |preconditions| {
+        self.preconditions.as_deref().is_none_or(|preconditions| {
             preconditions.iter().all(
                 |Precondition {
                      matches,
