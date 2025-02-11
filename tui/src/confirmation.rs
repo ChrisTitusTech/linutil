@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, hint::Shortcut, theme};
+use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     layout::Alignment,
@@ -135,13 +135,13 @@ impl FloatContent for ConfirmPrompt {
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         (
             "Confirmation prompt",
-            Box::new([
-                Shortcut::new("Continue", ["Y", "y"]),
-                Shortcut::new("Abort", ["N", "n", "q", "Esc"]),
-                Shortcut::new("Scroll up", ["k", "Up"]),
-                Shortcut::new("Scroll down", ["j", "Down"]),
-                Shortcut::new("Close linutil", ["CTRL-c"]),
-            ]),
+            shortcuts!(
+                ("Continue", ["Y", "y"]),
+                ("Abort", ["N", "n", "q", "Esc"]),
+                ("Scroll up", ["k", "Up"]),
+                ("Scroll down", ["j", "Down"]),
+                ("Close linutil", ["CTRL-c"]),
+            ),
         )
     }
 }

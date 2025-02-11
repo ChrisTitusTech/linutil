@@ -27,23 +27,16 @@ curl -fsSL https://christitus.com/linuxdev | sh
 
 ### CLI arguments
 
-Linutil supports various command-line arguments to customize its behavior. Here are some common arguments you can use:
-
-- `-c, --config <CONFIG>` : Path to the configuration file.
-- `--override-validation` : Show all available options, disregarding compatibility checks (UNSAFE).
-- `--size-bypass` : Bypass the terminal size limit.
-- `-y, --skip-confirmation` : Skip confirmation prompt before executing commands.
-- `-t, --theme <THEME>` : Set the theme to use in the application [default: `default`] [possible values: `default`, `compatible`].
-- `-h, --help` : Print help.
-
-For more detailed usage, run:
-
-```bash
-curl -fsSL https://christitus.com/linux | sh -s -- --help
-```
+View available options by running:
 
 ```bash
 linutil --help
+```
+
+For installer options:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
 ```
 
 ## ⬇️ Installation
@@ -142,7 +135,7 @@ Docs are now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
 
 ## 🏅 Thanks to All Contributors
 
-Thank you to everyone who has contributed to the development of Linutil. Your efforts are greatly appreciated, and you’re helping make this tool better for everyone!
+Thank you to everyone who has contributed to the development of Linutil. Your efforts are greatly appreciated, and you're helping make this tool better for everyone!
 
 [![Contributors](https://contrib.rocks/image?repo=ChrisTitusTech/linutil)](https://github.com/ChrisTitusTech/linutil/graphs/contributors)
 
