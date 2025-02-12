@@ -1,6 +1,6 @@
 use crate::{Command, ListNode, Tab};
 use ego_tree::{NodeMut, Tree};
-use include_dir::{include_dir, Dir};
+use include_dir::{Dir, include_dir};
 use serde::Deserialize;
 use std::{
     fs::File,

@@ -10,9 +10,7 @@ use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
 
 macro_rules! style {
-    ($r:literal, $g:literal, $b:literal) => {{
-        Style::new().fg(Color::Rgb($r, $g, $b))
-    }};
+    ($r:literal, $g:literal, $b:literal) => {{ Style::new().fg(Color::Rgb($r, $g, $b)) }};
 }
 
 const SYNTAX_HIGHLIGHT_STYLES: [(&str, Style); 8] = [

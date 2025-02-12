@@ -2,7 +2,7 @@ use std::fs;
 
 use linutil_core::Command;
 
-use crate::{path, DynError};
+use crate::{DynError, path};
 
 pub const USER_GUIDE: &str = "userguide.md";
 
@@ -43,8 +43,8 @@ pub fn userguide() -> Result<String, DynError> {
 
                 md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
             } /* else {
-                  md.push_str(&format!("- **{}**\n", entry.name));
-              } */ // https://github.com/ChrisTitusTech/linutil/pull/753
+            md.push_str(&format!("- **{}**\n", entry.name));
+            } */ // https://github.com/ChrisTitusTech/linutil/pull/753
         }
     }
 

@@ -1,16 +1,16 @@
 use crate::{
+    Args,
     confirmation::{ConfirmPrompt, ConfirmStatus},
     filter::{Filter, SearchAction},
     float::{Float, FloatContent},
     floating_text::FloatingText,
-    hint::{create_shortcut_list, Shortcut},
+    hint::{Shortcut, create_shortcut_list},
     root::check_root_status,
     running_command::RunningCommand,
     shortcuts,
     theme::Theme,
-    Args,
 };
-use linutil_core::{ego_tree::NodeId, Command, Config, ConfigValues, ListNode, TabList};
+use linutil_core::{Command, Config, ConfigValues, ListNode, TabList, ego_tree::NodeId};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent, MouseEventKind},
     layout::Flex,
@@ -209,10 +209,9 @@ impl AppState {
                     hints.push(Shortcut::new("Focus tab list", ["h", "Left"]));
                     hints.extend(self.get_list_item_shortcut());
                 } else if self.selected_item_is_up_dir() {
-                    hints.push(Shortcut::new(
-                        "Go to parent directory",
-                        ["l", "Right", "Enter", "h", "Left"],
-                    ));
+                    hints.push(Shortcut::new("Go to parent directory", [
+                        "l", "Right", "Enter", "h", "Left",
+                    ]));
                 } else {
                     hints.push(Shortcut::new("Go to parent directory", ["h", "Left"]));
                     hints.extend(self.get_list_item_shortcut());

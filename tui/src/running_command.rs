@@ -1,6 +1,6 @@
 use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
 use linutil_core::Command;
-use oneshot::{channel, Receiver};
+use oneshot::{Receiver, channel};
 use portable_pty::{
     ChildKiller, CommandBuilder, ExitStatus, MasterPty, NativePtySystem, PtySize, PtySystem,
 };
@@ -16,7 +16,7 @@ use std::{
     sync::{Arc, Mutex},
     thread::JoinHandle,
 };
-use time::{macros::format_description, OffsetDateTime};
+use time::{OffsetDateTime, macros::format_description};
 use tui_term::widget::PseudoTerminal;
 use vt100_ctt::{Parser, Screen};
 
@@ -230,7 +230,7 @@ impl RunningCommand {
                         break; // EOF
                     }
                     let mut mutex = command_buffer.lock(); // Only lock the mutex after the read is
-                                                           // done, to minimise the time it is opened
+                    // done, to minimise the time it is opened
                     let command_buffer = mutex.as_mut().unwrap();
                     command_buffer.extend_from_slice(&buf[0..size]);
                     // The mutex is closed here automatically
