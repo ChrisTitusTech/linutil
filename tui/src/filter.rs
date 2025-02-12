@@ -92,8 +92,16 @@ impl Filter {
             let input = self.search_input.iter().collect::<String>().to_lowercase();
             self.items.iter().find_map(|item| {
                 let item_name_lower = item.node.name.to_lowercase();
-                (item_name_lower.starts_with(&input))
-                    .then_some(item_name_lower[input.len()..].to_string())
+                item_name_lower
+                    .starts_with(&input)
+                    .then(|| {
+                        if input.len() <= item_name_lower.len() {
+                            Some(item_name_lower[input.len()..].to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .flatten()
             })
         }
     }
