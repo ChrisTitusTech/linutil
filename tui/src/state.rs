@@ -345,16 +345,24 @@ impl AppState {
             .map(|tab| tab.name.as_str())
             .collect::<Vec<_>>();
 
-        let tab_hl_style = if let Focus::TabList = self.focus {
-            Style::default().reversed().fg(self.theme.tab_color())
+        let (tab_hl_style, highlight_symbol) = if let Focus::TabList = self.focus {
+            (
+                Style::default().reversed().fg(self.theme.tab_color()),
+                self.theme.tab_icon(),
+            )
+        } else if let Focus::Search = self.focus {
+            (Style::reset(), "   ")
         } else {
-            Style::new().fg(self.theme.tab_color())
+            (
+                Style::new().fg(self.theme.tab_color()),
+                self.theme.tab_icon(),
+            )
         };
 
         let tab_list = List::new(tabs)
             .block(Block::bordered().border_set(border::ROUNDED))
             .highlight_style(tab_hl_style)
-            .highlight_symbol(self.theme.tab_icon());
+            .highlight_symbol(highlight_symbol);
         frame.render_stateful_widget(tab_list, left_chunks[1], &mut self.current_tab);
 
         let chunks =
