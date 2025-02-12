@@ -86,24 +86,23 @@ impl Filter {
     }
 
     fn update_completion_preview(&mut self) {
-        self.completion_preview = if self.items.is_empty() || self.search_input.is_empty() {
-            None
-        } else {
-            let input = self.search_input.iter().collect::<String>().to_lowercase();
-            self.items.iter().find_map(|item| {
-                let item_name_lower = item.node.name.to_lowercase();
-                item_name_lower
-                    .starts_with(&input)
-                    .then(|| {
-                        if input.len() <= item_name_lower.len() {
-                            Some(item_name_lower[input.len()..].to_string())
-                        } else {
-                            None
-                        }
-                    })
-                    .flatten()
-            })
+        if self.items.is_empty() || self.search_input.is_empty() {
+            self.completion_preview = None;
+            return;
         }
+
+        let input = self.search_input.iter().collect::<String>().to_lowercase();
+
+        let completion = self
+            .items
+            .iter()
+            .find(|item| item.node.name.to_lowercase().starts_with(&input))
+            .and_then(|item| {
+                let name = item.node.name.to_lowercase();
+                (input.len() <= name.len()).then(|| name[input.len()..].to_string())
+            });
+
+        self.completion_preview = completion;
     }
 
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
