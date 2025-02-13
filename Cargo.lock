@@ -399,7 +399,7 @@ checksum = "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a"
 
 [[package]]
 name = "linutil_core"
-version = "25.1.10"
+version = "25.2.13"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -411,7 +411,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "25.1.10"
+version = "25.2.13"
 dependencies = [
  "clap",
  "linutil_core",
@@ -1299,7 +1299,7 @@ checksum = "d135d17ab770252ad95e9a872d365cf3090e3be864a34ab46f48555993efc904"
 
 [[package]]
 name = "xtask"
-version = "25.1.10"
+version = "25.2.13"
 dependencies = [
  "linutil_core",
 ]
