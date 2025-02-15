@@ -63,7 +63,6 @@ install_nerd_font() {
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
-    # Check if Meslo Nerd-font is already installed
     if [ -n "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
