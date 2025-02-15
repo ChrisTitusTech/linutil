@@ -25,13 +25,15 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$COMPILEDEPS"
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            if ! "$ESCALATION_TOOL" "$PACKAGER" -y config-manager --set-enabled powertools; then
-                if ! "$ESCALATION_TOOL" "$PACKAGER" -y config-manager --set-enabled crb; then
-                    : # Do nothing if both fail (equivalent to true)
+            "$ESCALATION_TOOL" "$PACKAGER" update -y
+            if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable powertools; then
+                if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable crb; then
+                    : # Do nothing if both fail
                 fi
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -y install "$DEPENDENCIES"
+            if ! "$ESCALATION_TOOL" "$PACKAGER" -y install $DEPENDENCIES; then
+                : # Continue if package install fails
+            fi
             if ! "$ESCALATION_TOOL" "$PACKAGER" -y group install "Development Tools"; then
                 "$ESCALATION_TOOL" "$PACKAGER" -y group install development-tools
             fi
