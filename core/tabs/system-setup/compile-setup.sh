@@ -25,20 +25,14 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES" "$COMPILEDEPS"
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" update -y
-            if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable powertools; then
-                if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable crb; then
-                    : # Do nothing if both fail
-                fi
-            fi
-            if ! "$ESCALATION_TOOL" "$PACKAGER" -y install $DEPENDENCIES; then
-                : # Continue if package install fails
-            fi
-            if ! "$ESCALATION_TOOL" "$PACKAGER" -y group install "Development Tools"; then
-                "$ESCALATION_TOOL" "$PACKAGER" -y group install development-tools
-            fi
+            # shellcheck disable=SC1073
+            "$ESCALATION_TOOL" "$PACKAGER" update
+            "$ESCALATION_TOOL" "$PACKAGER" -y config-manager --set-enabled powertools 2>/dev/null || \
+            "$ESCALATION_TOOL" "$PACKAGER" -y config-manager --set-enabled crb 2>/dev/null || true
+            "$ESCALATION_TOOL" "$PACKAGER" -y install $DEPENDENCIES
+            "$ESCALATION_TOOL" "$PACKAGER" -y group install Development\ Tools 2>/dev/null || \
+            "$ESCALATION_TOOL" "$PACKAGER" -y group install development-tools
             "$ESCALATION_TOOL" "$PACKAGER" -y install glibc-devel.i686 libgcc.i686
-            ;;
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             "$ESCALATION_TOOL" "$PACKAGER" refresh 
