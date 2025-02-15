@@ -54,7 +54,7 @@ install_nerd_font() {
     fi
 
     # Check if the font zip file already exists
-    if [ ! -f "$FONT_ZIP" ]; then
+    if [ -n "$FONT_ZIP" ]; then
         # Download the font zip file
         curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
             printf "%b\n" "${RED}Failed to download Meslo Nerd-fonts from $FONT_URL${RC}"
