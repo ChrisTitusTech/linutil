@@ -13,13 +13,38 @@ setupDWM() {
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "@development-tools" || "$ESCALATION_TOOL" "$PACKAGER" group install -y "Development Tools"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit meson # no need to include git here as it should be already installed via "Development Tools"
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
+}
+
+setupPicomDependencies() {
+    printf "%b\n" "${YELLOW}Installing Picom dependencies if not already installed${RC}"
+    
+    case "$PACKAGER" in
+        pacman)
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libxcb meson libev uthash libconfig
+            ;;
+        apt-get|nala)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb1-dev libxcb-res0-dev libconfig-dev libdbus-1-dev libegl-dev libev-dev libgl-dev libepoxy-dev libpcre2-dev libpixman-1-dev libx11-xcb-dev libxcb1-dev libxcb-composite0-dev libxcb-damage0-dev libxcb-dpms0-dev libxcb-glx0-dev libxcb-image0-dev libxcb-present-dev libxcb-randr0-dev libxcb-render0-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-util-dev libxcb-xfixes0-dev libxext-dev meson ninja-build uthash-dev
+            ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel dbus-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb libXext-devel libxcb-devel libGL-devel libEGL-devel libepoxy-devel meson pcre2-devel pixman-devel uthash-devel xcb-util-image-devel xcb-util-renderutil-devel xorg-x11-proto-devel xcb-util-devel
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxcb-devel dbus-1-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb1 libXext-devel libxcb-devel Mesa-libGL-devel Mesa-libEGL-devel libepoxy-devel meson pcre2-devel uthash-devel xcb-util-image-devel libpixman-1-0-devel xcb-util-renderutil-devel xcb-util-devel
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+            exit 1
+            ;;
+    esac
+
+    printf "%b\n" "${GREEN}Picom dependencies installed successfully${RC}"
 }
 
 makeDWM() {
@@ -35,7 +60,7 @@ install_nerd_font() {
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
-    # Replace -n test with standard test
+    # Check if Meslo Nerd-font is already installed
     if [ -n "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
@@ -207,37 +232,29 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        while : ; do
-            printf "%b\n" "${YELLOW}--------------------------${RC}" 
-            printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
-            printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
-            printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
-            printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-            printf "%b\n" "${YELLOW}4. None ${RC}" 
-            printf "%b" "${YELLOW}Please select one: ${RC}"
-            read -r choice
-            case "$choice" in
-                1)
-                    DM="sddm"
-                    break
-                    ;;
-                2)
-                    DM="lightdm"
-                    break
-                    ;;
-                3)
-                    DM="gdm"
-                    break
-                    ;;
-                4)
-                    printf "%b\n" "${GREEN}No display manager will be installed${RC}"
-                    return 0
-                    ;;
-                *)
-                    printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
-                    ;;
-            esac
-        done
+        printf "%b\n" "${YELLOW}--------------------------${RC}" 
+        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
+        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
+        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
+        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
+        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b" "${YELLOW}Please select one: ${RC}"
+        read -r choice
+        case "$choice" in
+        1)
+            DM="sddm"
+            ;;
+        2)
+            DM="lightdm"
+            ;;
+        3)
+            DM="gdm"
+            ;;
+        *)
+            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
+            exit 1
+            ;;
+        esac
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
@@ -284,6 +301,7 @@ checkEnv
 checkEscalationTool
 setupDisplayManager
 setupDWM
+setupPicomDependencies
 makeDWM
 install_slstatus
 install_nerd_font
