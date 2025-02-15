@@ -243,23 +243,27 @@ setupDisplayManager() {
         printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
         printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
         printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b\n" "${YELLOW}4. None ${RC}" 
         printf "%b" "${YELLOW}Please select one: ${RC}"
         read -r choice
         case "$choice" in
-        1)
-            DM="sddm"
-            ;;
-        2)
-            DM="lightdm"
-            ;;
-        3)
-            DM="gdm"
-            ;;
-        *)
-            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
-            exit 1
-            ;;
+            1)
+                DM="sddm"
+                ;;
+            2)
+                DM="lightdm"
+                ;;
+            3)
+                DM="gdm"
+                ;;
+            4)
+                printf "%b\n" "${GREEN}No display manager will be installed${RC}"
+                return 0
+                ;;
+            *)
+                printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
+                exit 1
+                ;;
         esac
         case "$PACKAGER" in
             pacman)
