@@ -36,7 +36,7 @@ install_nerd_font() {
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
     # Replace -n test with standard test
-    if [ ! -z "$FONT_INSTALLED" ]; then
+    if [ -n "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
     fi
