@@ -28,9 +28,7 @@ installDepend() {
             # shellcheck disable=SC1073
             "$ESCALATION_TOOL" "$PACKAGER" update -y
             if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable powertools 2>/dev/null; then
-                if ! "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable crb 2>/dev/null; then
-                    : # Do nothing if both fail
-                fi
+                "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable crb 2>/dev/null || true
             fi
             "$ESCALATION_TOOL" "$PACKAGER" -y install "$DEPENDENCIES"
             if ! "$ESCALATION_TOOL" "$PACKAGER" -y group install "Development Tools" 2>/dev/null; then
