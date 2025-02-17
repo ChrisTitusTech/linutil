@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 . ../common-script.sh
 . ../common-service-script.sh
