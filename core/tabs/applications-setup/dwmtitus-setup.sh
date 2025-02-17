@@ -230,7 +230,7 @@ setupDisplayManager() {
     printf "%b\n" "${YELLOW}Setting up Display Manager${RC}"
     currentdm="none"
     for dm in gdm sddm lightdm; do
-        if command -v "$dm" >/dev/null 2>&1 || systemctl list-unit-files | grep -q "$dm"; then
+        if command -v "$dm" >/dev/null 2>&1 || isServiceActive "$dm"; then
             currentdm="$dm"
             break
         fi
@@ -286,7 +286,7 @@ setupDisplayManager() {
                 ;;
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
-        systemctl enable "$DM"
+        enableService "$DM
         
     fi
 }
