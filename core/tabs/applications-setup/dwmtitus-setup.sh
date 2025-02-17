@@ -249,12 +249,15 @@ setupDisplayManager() {
         case "$choice" in
             1)
                 DM="sddm"
+                break
                 ;;
             2)
                 DM="lightdm"
+                break
                 ;;
             3)
                 DM="gdm"
+                break
                 ;;
             4)
                 printf "%b\n" "${GREEN}No display manager will be installed${RC}"
@@ -262,7 +265,6 @@ setupDisplayManager() {
                 ;;
             *)
                 printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
-                exit 1
                 ;;
         esac
         case "$PACKAGER" in
