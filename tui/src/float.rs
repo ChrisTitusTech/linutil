@@ -1,8 +1,8 @@
 use crate::{hint::Shortcut, theme::Theme};
 use ratatui::{
+    Frame,
     crossterm::event::{KeyCode, KeyEvent, MouseEvent},
     layout::{Constraint, Layout, Rect},
-    Frame,
 };
 
 pub trait FloatContent {

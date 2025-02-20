@@ -7,8 +7,8 @@ type DynError = Box<dyn Error>;
 
 pub mod tasks {
     use crate::{
-        docgen::{userguide, write, USER_GUIDE},
         DynError,
+        docgen::{USER_GUIDE, userguide, write},
     };
 
     pub fn docgen() -> Result<(), DynError> {

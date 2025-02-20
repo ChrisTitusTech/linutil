@@ -1,7 +1,7 @@
 [workspace.package]
 license = "MIT"
 version = "25.2.13"
-edition = "2021"
+edition = "2024"
 
 [workspace]
 members = ["tui", "core", "xtask"]

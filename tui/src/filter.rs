@@ -1,5 +1,5 @@
 use crate::{state::ListEntry, theme::Theme};
-use linutil_core::{ego_tree::NodeId, Tab};
+use linutil_core::{Tab, ego_tree::NodeId};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     prelude::*,
@@ -160,7 +160,7 @@ impl Filter {
     pub fn handle_key(&mut self, event: &KeyEvent) -> SearchAction {
         match event.code {
             KeyCode::Char('c') if event.modifiers.contains(KeyModifiers::CONTROL) => {
-                return self.exit_search()
+                return self.exit_search();
             }
             KeyCode::Char(c) => self.insert_char(c),
             KeyCode::Backspace => self.remove_previous(),

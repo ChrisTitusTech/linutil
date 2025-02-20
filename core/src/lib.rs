@@ -8,7 +8,7 @@ use ego_tree::Tree;
 use std::path::PathBuf;
 
 pub use config::{Config, ConfigValues};
-pub use inner::{get_tabs, TabList};
+pub use inner::{TabList, get_tabs};
 
 #[derive(Clone, Hash, Eq, PartialEq)]
 pub enum Command {
