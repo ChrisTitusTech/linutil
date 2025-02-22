@@ -67,6 +67,7 @@ create_snapshot() {
         "$ESCALATION_TOOL" timeshift --create --comments "$COMMENT" --tags "$TAG"
     fi
 
+    # shellcheck disable=SC2181
     if [ $? -eq 0 ]; then
         printf "%b\n" "${GREEN}Snapshot created successfully.${RC}"
     else
@@ -93,6 +94,7 @@ restore_snapshot() {
         "$ESCALATION_TOOL" timeshift --restore --snapshot "$SNAPSHOT" --target-device "$TARGET_DEVICE" --grub-device "$GRUB_DEVICE" --yes
     fi
 
+    # shellcheck disable=SC2181
     if [ $? -eq 0 ]; then
         printf "%b\n" "${GREEN}Snapshot restored successfully.${RC}"
     else
@@ -110,6 +112,7 @@ delete_snapshot() {
     printf "%b\n" "${YELLOW}Deleting snapshot $SNAPSHOT...${RC}"
     "$ESCALATION_TOOL" timeshift --delete --snapshot "$SNAPSHOT" --yes
 
+    # shellcheck disable=SC2181
     if [ $? -eq 0 ]; then
         printf "%b\n" "${GREEN}Snapshot deleted successfully.${RC}"
     else
@@ -126,6 +129,7 @@ delete_all_snapshots() {
     if [ "$CONFIRMATION" = "y" ] || [ "$CONFIRMATION" = "Y" ]; then
         printf "%b\n" "${CYAN}Deleting all snapshots...${RC}"
         "$ESCALATION_TOOL" timeshift --delete-all --yes
+        # shellcheck disable=SC2181
         if [ $? -eq 0 ]; then
             printf "%b\n" "${GREEN}All snapshots deleted successfully.${RC}"
         else
@@ -153,7 +157,7 @@ main_menu() {
             *) printf "%b\n" "${RED}Invalid option. Please try again.${RC}" ;;
         esac
         printf "%b\n" "${CYAN}Press Enter to continue...${RC}"
-        read -r dummy
+        read -r _
     done
 }
 

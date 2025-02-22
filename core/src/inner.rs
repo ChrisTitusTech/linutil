@@ -111,18 +111,16 @@ fn default_true() -> bool {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "snake_case")]
 enum EntryType {
-    #[serde(rename = "entries")]
     Entries(Vec<Entry>),
-    #[serde(rename = "command")]
     Command(String),
-    #[serde(rename = "script")]
     Script(PathBuf),
 }
 
 impl Entry {
     fn is_supported(&self) -> bool {
-        self.preconditions.as_deref().map_or(true, |preconditions| {
+        self.preconditions.as_deref().is_none_or(|preconditions| {
             preconditions.iter().all(
                 |Precondition {
                      matches,
@@ -131,18 +129,17 @@ impl Entry {
                  }| {
                     match data {
                         SystemDataType::Environment(var_name) => std::env::var(var_name)
-                            .map_or(false, |var| values.contains(&var) == *matches),
-                        SystemDataType::File(path) => {
-                            std::fs::read_to_string(path).map_or(false, |data| {
+                            .is_ok_and(|var| values.contains(&var) == *matches),
+                        SystemDataType::ContainingFile(file) => std::fs::read_to_string(file)
+                            .is_ok_and(|data| {
                                 values
                                     .iter()
-                                    .any(|matching_value| data.contains(matching_value))
-                                    == *matches
-                            })
-                        }
+                                    .all(|matching| data.contains(matching) == *matches)
+                            }),
                         SystemDataType::CommandExists => values
                             .iter()
                             .all(|command| which::which(command).is_ok() == *matches),
+                        SystemDataType::FileExists => values.iter().all(|p| Path::new(p).is_file()),
                     }
                 },
             )
@@ -160,12 +157,11 @@ struct Precondition {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "snake_case")]
 enum SystemDataType {
-    #[serde(rename = "environment")]
     Environment(String),
-    #[serde(rename = "file")]
-    File(PathBuf),
-    #[serde(rename = "command_exists")]
+    ContainingFile(PathBuf),
+    FileExists,
     CommandExists,
 }
 

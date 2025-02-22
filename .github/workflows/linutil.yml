@@ -39,18 +39,6 @@ jobs:
         with:
           targets: x86_64-unknown-linux-musl
 
-      - name: Update package version
-        run: |
-          prev_version=$(grep 'version' Cargo.toml | head -n +1 | cut -d'"' -f2)
-          if ! echo " ${prev_version} " | grep -q -E ' [0-9]{2}\.[0-9]{2}\.[0-9]{2} '; then
-            echo "Could not accurately determine the previous version"
-            exit 1
-          fi
-          new_version=$(date +"%y.%m.%d")
-          # The TUI depends upon linutil_core, which has its version updated
-          sed -i "s/version = \"${prev_version}\"/version = \"${new_version}\"/g" Cargo.toml tui/Cargo.toml
-        shell: bash
-
       - name: Install cross-rs for cross-compilation
         run: cargo install cross
 

@@ -35,8 +35,8 @@ install_nerd_font() {
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
-    # Check if Meslo Nerd-font is already installed
-    if [ -n "$FONT_INSTALLED" ]; then
+    # Replace -n test with standard test
+    if [ ! -z "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
     fi
@@ -192,7 +192,7 @@ setupDisplayManager() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
@@ -207,29 +207,37 @@ setupDisplayManager() {
     done
     printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
-        printf "%b\n" "${YELLOW}--------------------------${RC}" 
-        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
-        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
-        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
-        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-        printf "%b\n" "${YELLOW} ${RC}" 
-        printf "%b" "${YELLOW}Please select one: ${RC}"
-        read -r choice
-        case "$choice" in
-        1)
-            DM="sddm"
-            ;;
-        2)
-            DM="lightdm"
-            ;;
-        3)
-            DM="gdm"
-            ;;
-        *)
-            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
-            exit 1
-            ;;
-        esac
+        while : ; do
+            printf "%b\n" "${YELLOW}--------------------------${RC}" 
+            printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
+            printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
+            printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
+            printf "%b\n" "${YELLOW}3. GDM ${RC}" 
+            printf "%b\n" "${YELLOW}4. None ${RC}" 
+            printf "%b" "${YELLOW}Please select one: ${RC}"
+            read -r choice
+            case "$choice" in
+                1)
+                    DM="sddm"
+                    break
+                    ;;
+                2)
+                    DM="lightdm"
+                    break
+                    ;;
+                3)
+                    DM="gdm"
+                    break
+                    ;;
+                4)
+                    printf "%b\n" "${GREEN}No display manager will be installed${RC}"
+                    return 0
+                    ;;
+                *)
+                    printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
+                    ;;
+            esac
+        done
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
@@ -244,7 +252,7 @@ setupDisplayManager() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
                 exit 1
                 ;;
         esac

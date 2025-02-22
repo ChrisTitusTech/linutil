@@ -6,6 +6,7 @@ use crate::{
     hint::{create_shortcut_list, Shortcut},
     root::check_root_status,
     running_command::RunningCommand,
+    shortcuts,
     theme::Theme,
     Args,
 };
@@ -65,6 +66,7 @@ pub struct AppState {
     tip: &'static str,
     size_bypass: bool,
     skip_confirmation: bool,
+    mouse_enabled: bool,
 }
 
 pub enum Focus {
@@ -93,8 +95,18 @@ enum SelectedItem {
     None,
 }
 
+enum ScrollDir {
+    Up,
+    Down,
+}
+
 impl AppState {
     pub fn new(args: Args) -> Self {
+        #[cfg(unix)]
+        let root_warning = check_root_status(args.bypass_root);
+        #[cfg(not(unix))]
+        let root_warning = None;
+
         let tabs = linutil_core::get_tabs(!args.override_validation);
         let root_id = tabs[0].tree.root().id();
 
@@ -121,10 +133,11 @@ impl AppState {
             tip: crate::tips::get_random_tip(),
             size_bypass: args.size_bypass,
             skip_confirmation: args.skip_confirmation,
+            mouse_enabled: args.mouse,
         };
 
         #[cfg(unix)]
-        if let Some(root_warning) = check_root_status() {
+        if let Some(root_warning) = root_warning {
             state.spawn_float(root_warning, FLOAT_SIZE, FLOAT_SIZE);
         }
 
@@ -171,13 +184,13 @@ impl AppState {
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
         if self.selected_item_is_dir() {
-            Box::new([Shortcut::new("Go to selected dir", ["l", "Right", "Enter"])])
+            shortcuts!(("Go to selected dir", ["l", "Right", "Enter"]))
         } else {
-            Box::new([
-                Shortcut::new("Run selected command", ["l", "Right", "Enter"]),
-                Shortcut::new("Enable preview", ["p"]),
-                Shortcut::new("Command Description", ["d"]),
-            ])
+            shortcuts!(
+                ("Run selected command", ["l", "Right", "Enter"]),
+                ("Enable preview", ["p"]),
+                ("Command Description", ["d"])
+            )
         }
     }
 
@@ -185,10 +198,7 @@ impl AppState {
         match self.focus {
             Focus::Search => (
                 "Search bar",
-                Box::new([
-                    Shortcut::new("Abort search", ["Esc", "CTRL-c"]),
-                    Shortcut::new("Search", ["Enter"]),
-                ]),
+                shortcuts!(("Abort search", ["Esc", "CTRL-c"]), ("Search", ["Enter"])),
             ),
 
             Focus::List => {
@@ -208,35 +218,39 @@ impl AppState {
                     hints.extend(self.get_list_item_shortcut());
                 }
 
-                hints.push(Shortcut::new("Select item above", ["k", "Up"]));
-                hints.push(Shortcut::new("Select item below", ["j", "Down"]));
-                hints.push(Shortcut::new("Next theme", ["t"]));
-                hints.push(Shortcut::new("Previous theme", ["T"]));
-                hints.push(Shortcut::new("Multi-selection mode", ["v"]));
+                hints.extend(shortcuts!(
+                    ("Select item above", ["k", "Up"]),
+                    ("Select item below", ["j", "Down"]),
+                    ("Next theme", ["t"]),
+                    ("Previous theme", ["T"]),
+                    ("Multi-selection mode", ["v"]),
+                ));
                 if self.multi_select {
                     hints.push(Shortcut::new("Select multiple commands", ["Space"]));
                 }
-                hints.push(Shortcut::new("Next tab", ["Tab"]));
-                hints.push(Shortcut::new("Previous tab", ["Shift-Tab"]));
-                hints.push(Shortcut::new("Important actions guide", ["g"]));
+                hints.extend(shortcuts!(
+                    ("Next tab", ["Tab"]),
+                    ("Previous tab", ["Shift-Tab"]),
+                    ("Important actions guide", ["g"])
+                ));
 
                 ("Command list", hints.into_boxed_slice())
             }
 
             Focus::TabList => (
                 "Tab list",
-                Box::new([
-                    Shortcut::new("Exit linutil", ["q", "CTRL-c"]),
-                    Shortcut::new("Focus action list", ["l", "Right", "Enter"]),
-                    Shortcut::new("Select item above", ["k", "Up"]),
-                    Shortcut::new("Select item below", ["j", "Down"]),
-                    Shortcut::new("Next theme", ["t"]),
-                    Shortcut::new("Previous theme", ["T"]),
-                    Shortcut::new("Next tab", ["Tab"]),
-                    Shortcut::new("Previous tab", ["Shift-Tab"]),
-                    Shortcut::new("Important actions guide", ["g"]),
-                    Shortcut::new("Multi-selection mode", ["v"]),
-                ]),
+                shortcuts!(
+                    ("Exit linutil", ["q", "CTRL-c"]),
+                    ("Focus action list", ["l", "Right", "Enter"]),
+                    ("Select item above", ["k", "Up"]),
+                    ("Select item below", ["j", "Down"]),
+                    ("Next theme", ["t"]),
+                    ("Previous theme", ["T"]),
+                    ("Next tab", ["Tab"]),
+                    ("Previous tab", ["Shift-Tab"]),
+                    ("Important actions guide", ["g"]),
+                    ("Multi-selection mode", ["v"]),
+                ),
             ),
 
             Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
@@ -438,6 +452,10 @@ impl AppState {
     }
 
     pub fn handle_mouse(&mut self, event: &MouseEvent) -> bool {
+        if !self.mouse_enabled {
+            return true;
+        }
+
         if !self.drawable {
             return true;
         }
@@ -480,7 +498,7 @@ impl AppState {
         }
         match &mut self.focus {
             Focus::FloatingWindow(float) => {
-                float.content.handle_mouse_event(event);
+                float.handle_mouse_event(event);
             }
             Focus::ConfirmationPrompt(confirm) => {
                 confirm.content.handle_mouse_event(event);
@@ -595,24 +613,35 @@ impl AppState {
         true
     }
 
-    fn scroll_down(&mut self) {
-        if let Some(selected) = self.selection.selected() {
-            if selected == self.filter.item_list().len() - 1 {
-                self.selection.select_first();
-            } else {
-                self.selection.select_next();
-            }
-        }
+    fn scroll(&mut self, direction: ScrollDir) {
+        let Some(selected) = self.selection.selected() else {
+            return;
+        };
+        let list_len = if !self.at_root() {
+            self.filter.item_list().len() + 1
+        } else {
+            self.filter.item_list().len()
+        };
+
+        if list_len == 0 {
+            return;
+        };
+
+        let next_selection = match direction {
+            ScrollDir::Up if selected == 0 => list_len - 1,
+            ScrollDir::Down if selected >= list_len - 1 => 0,
+            ScrollDir::Up => selected - 1,
+            ScrollDir::Down => selected + 1,
+        };
+        self.selection.select(Some(next_selection));
     }
 
     fn scroll_up(&mut self) {
-        if let Some(selected) = self.selection.selected() {
-            if selected == 0 {
-                self.selection.select_last();
-            } else {
-                self.selection.select_previous();
-            }
-        }
+        self.scroll(ScrollDir::Up)
+    }
+
+    fn scroll_down(&mut self) {
+        self.scroll(ScrollDir::Down)
     }
 
     fn toggle_multi_select(&mut self) {
@@ -733,7 +762,7 @@ impl AppState {
         self.filter
             .item_list()
             .get(selected_index)
-            .map_or(false, |item| item.has_children)
+            .is_some_and(|i| i.has_children)
     }
 
     pub fn selected_item_is_cmd(&self) -> bool {
