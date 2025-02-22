@@ -258,15 +258,12 @@ setupDisplayManager() {
         case "$choice" in
             1)
                 DM="sddm"
-                break
                 ;;
             2)
                 DM="lightdm"
-                break
                 ;;
             3)
                 DM="gdm"
-                break
                 ;;
             4)
                 printf "%b\n" "${GREEN}No display manager will be installed${RC}"
@@ -274,6 +271,7 @@ setupDisplayManager() {
                 ;;
             *)
                 printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
+                return 1
                 ;;
         esac
         case "$PACKAGER" in
@@ -304,17 +302,20 @@ setupDisplayManager() {
                 ;;
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
-        enableService "$DM
+        enableService "$DM"
         
     fi
 }
 
 install_slstatus() {
-    printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
-    read -r response # -r flag to prevent backslashes from being interpreted
+    printf "Do you want to install slstatus? (y/N): "
+    read -r response
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
-        cd "$HOME/dwm-titus/slstatus" || { printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"; return 1; }
+        cd "$HOME/dwm-titus/slstatus" || { 
+            printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"
+            return 1
+        }
         if "$ESCALATION_TOOL" make clean install; then
             printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else
