@@ -14,31 +14,6 @@
 > [!NOTE]
 > Since the project is still in active development, you may encounter some issues. Please consider [submitting feedback](https://github.com/ChrisTitusTech/linutil/issues) if you do.
 
-## 💡 Usage
-To get started, pick which branch you would like to use, then run the command in your terminal:
-### Stable Branch (Recommended)
-```bash
-curl -fsSL https://christitus.com/linux | sh
-```
-### Dev branch
-```bash
-curl -fsSL https://christitus.com/linuxdev | sh
-```
-
-### CLI arguments
-
-View available options by running:
-
-```bash
-linutil --help
-```
-
-For installer options:
-
-```bash
-curl -fsSL https://christitus.com/linux | sh -s -- --help
-```
-
 ## ⬇️ Installation
 
 Linutil is also available as a package in various repositories:
@@ -94,6 +69,31 @@ cargo install linutil_tui
 Note that crates installed using `cargo install` require manual updating with `cargo install --force` (update functionality is [included in LinUtil](https://christitustech.github.io/linutil/userguide/#applications-setup))
 
 </details>
+
+## 💡 Usage
+To get started, pick which branch you would like to use, then run the command in your terminal:
+### Stable Branch (Recommended)
+```bash
+curl -fsSL https://christitus.com/linux | sh
+```
+### Dev branch
+```bash
+curl -fsSL https://christitus.com/linuxdev | sh
+```
+
+### CLI arguments
+
+View available options by running:
+
+```bash
+linutil --help
+```
+
+For installer options:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --help
+```
 
 ## Configuration
 
