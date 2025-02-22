@@ -9,7 +9,7 @@ task_list = "I SS"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "firewalld" ]
+values = [ "firewall-cmd" ]
 
 [[data]]
 name = "FirewallD Firewall Baselines (CTT)"
@@ -20,4 +20,4 @@ task_list = "I SS"
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = [ "firewalld" ]
+values = [ "firewall-cmd" ]
