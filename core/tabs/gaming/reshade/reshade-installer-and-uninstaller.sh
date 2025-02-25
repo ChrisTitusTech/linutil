@@ -234,11 +234,13 @@ if [[ $FORCE_RESHADE_UPDATE_CHECK -eq 1 ]] || [[ $UPDATE_RESHADE -eq 1 ]] || [[ 
     echo -e "Checking for Reshade updates.\n$SEPARATOR"
     RHTML=$(curl --max-time 10 -sL "$RESHADE_URL")
     ALT_URL=0
-    if [[ $? != 0 || $RHTML =~ '<h2>Something went wrong.</h2>' ]]; then
+    if  RHTML=$("<h2>Something went wrong.</h2>"); then
         ALT_URL=1
         echo "Error: Failed to connect to '$RESHADE_URL' after 10 seconds. Trying to connect to '$RESHADE_URL_ALT'."
         RHTML=$(curl -sL "$RESHADE_URL_ALT")
-        [[ $? != 0 ]] && echo "Error: Failed to connect to '$RESHADE_URL_ALT'."
+        if ! curl_success; then
+            echo "Error: Failed to connect to '$RESHADE_URL_ALT'."
+        fi
     fi
     [[ $RESHADE_ADDON_SUPPORT -eq 1 ]] && VREGEX="[0-9][0-9.]*[0-9]_Addon" || VREGEX="[0-9][0-9.]*[0-9]"
     RLINK="$(echo "$RHTML" | grep -o "/downloads/ReShade_Setup_${VREGEX}\.exe" | head -n1)"
