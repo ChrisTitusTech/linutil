@@ -1,27 +1,24 @@
 #!/bin/bash
 
-if ! which 7z &> /dev/null; then
-    echo "7z is not installed. Installing 7z..."
-    if [[ -f /etc/debian_version ]]; then
-        sudo apt update
-        sudo apt install -y p7zip-full
-    elif [[ -f /etc/redhat-release ]]; then
-        sudo yum install -y p7zip
-    elif [[ -f /etc/arch-release ]]; then
-        sudo pacman -S --noconfirm p7zip
-    else
-        echo "Unsupported OS. Please install 7zip manually."
+. ../../common-script.sh
+
+for cmd in find 7z curl git grep; do
+    if ! command_exists "$cmd"; then
+        printf "%b\n" "${RED}$cmd is not installed.${RC}"
         exit 1
     fi
-fi
+done
 
-function printErr() {
+printErr() {
     removeTempDir
     echo -e "\e[40m\e[31mError: $1\nExiting.\e[0m"
     [[ -z $2 ]] && exit 1 || exit "$2"
 }
 
-function checkStdin() {
+# Check user input
+# $1 is valid values to display to user
+# $2 is regex
+checkStdin() {
     while true; do
         read -rp "$1" userInput
         if [[ $userInput =~ $2 ]]; then
@@ -31,7 +28,8 @@ function checkStdin() {
     echo "$userInput"
 }
 
-function getGamePath() {
+# Try to get game directory from user.
+getGamePath() {
     echo 'Supply the folder path where the main executable (exe file) for the game is.'
     echo '(Control+c to exit)'
     while true; do
@@ -53,21 +51,23 @@ function getGamePath() {
     done
 }
 
-function createTempDir() {
+# Remove / create temporary directory.
+createTempDir() {
     tmpDir=$(mktemp -d)
     cd "$tmpDir" || printErr "Failed to create temp directory."
 }
-
-function removeTempDir() {
+removeTempDir() {
     cd "$MAIN_PATH" || exit
     [[ -d $tmpDir ]] && rm -rf "$tmpDir"
 }
 
-function downloadD3dcompiler_47() {
+# Downloads d3dcompiler_47.dll files.
+downloadD3dcompiler_47() {
     ! [[ $1 =~ ^(32|64)$ ]] && printErr "(downloadD3dcompiler_47): Wrong system architecture."
     [[ -f $MAIN_PATH/d3dcompiler_47.dll.$1 ]] && return
     echo "Downloading d3dcompiler_47.dll for $1 bits."
     createTempDir
+    # Based on https://github.com/Winetricks/winetricks/commit/bc5c57d0d6d2c30642efaa7fee66b60f6af3e133
     curl -sLO "https://download-installer.cdn.mozilla.net/pub/firefox/releases/62.0.3/win$1/ach/Firefox%20Setup%2062.0.3.exe" \
         || echo "Could not download Firefox setup file (which contains d3dcompiler_47.dll)"
     [[ $1 -eq 32 ]] && hash="d6edb4ff0a713f417ebd19baedfe07527c6e45e84a6c73ed8c66a33377cc0aca" || hash="721977f36c008af2b637aedd3f1b529f3cfed6feb10f68ebe17469acb1934986"
@@ -78,7 +78,10 @@ function downloadD3dcompiler_47() {
     removeTempDir
 }
 
-function downloadReshade() {
+# Download / extract ReShade from specified link.
+# $1 => Version of ReShade
+# $2 -> Full URL of ReShade exe, ex.: https://reshade.me/downloads/ReShade_Setup_5.0.2.exe
+downloadReshade() {
     createTempDir
     curl -sLO "$2" || printErr "Could not download version $1 of ReShade."
     exeFile="$(find . -name "*.exe")"
@@ -118,20 +121,41 @@ for REQUIRED_EXECUTABLE in $REQUIRED_EXECUTABLES; do
     fi
 done
 
+# Z0000 Create MAIN_PATH
+# Z0005 Check if update enabled.
+# Z0010 Download / update shaders.
+# Z0015 Download / update latest ReShade version.
+# Z0016 Download version of ReShade specified by user.
+# Z0020 Process GLOBAL_INI.
+# Z0025 Vulkan install / uninstall.
+# Z0030 DirectX / OpenGL uninstall.
+# Z0035 DirectX / OpenGL find correct ReShade DLL.
+# Z0040 Download d3dcompiler_47.dll.
+# Z0045 DirectX / OpenGL link files to game directory.
+
+# Z0000
 mkdir -p "$MAIN_PATH" || printErr "Unable to create directory '$MAIN_PATH'."
 cd "$MAIN_PATH" || exit
+# Z0000
 
 mkdir -p "$RESHADE_PATH"
 mkdir -p "$MAIN_PATH/ReShade_shaders"
 mkdir -p "$MAIN_PATH/External_shaders"
 
+# Z0005
+# Skip updating shaders / reshade if recently done (4 hours).
 [[ -f LASTUPDATED ]] && LASTUPDATED=$(cat LASTUPDATED) || LASTUPDATED=0
 [[ ! $LASTUPDATED =~ ^[0-9]+$ ]] && LASTUPDATED=0
 [[ $LASTUPDATED -gt 0 && $(($(date +%s)-LASTUPDATED)) -lt 14400 ]] && UPDATE_RESHADE=0
 [[ $UPDATE_RESHADE == 1 ]] && date +%s > LASTUPDATED
+# Z0005
 
 echo -e "$SEPARATOR\nReShade installer/updater for Linux games using wine or proton.\n$SEPARATOR\n"
 
+# Z0010
+# Link Shader / Texture files from an input directory to an output directory if the link doesn't already exist.
+# $1 is the input directory (full path).
+# $2 is the output directory name (Textures / Shaders), with optional subdirectory.
 function linkShaderFiles() {
     [[ ! -d $1 ]] && return
     cd "$1" || return
@@ -145,7 +169,9 @@ function linkShaderFiles() {
         ln -s "$INFILE" "$OUTDIR"
     done
 }
-
+# Check ReShade_shaders or External_shaders directories for directories to link to the Merged folder.
+# $1 ReShade_shaders | External_shaders
+# $2 Optional: Repo name
 function mergeShaderDirs() {
     [[ $1 != ReShade_shaders && $1 != External_shaders ]] && return
     for dirName in Shaders Textures; do
@@ -181,6 +207,7 @@ if [[ -n $SHADER_REPOS ]]; then
     if [[ $MERGE_SHADERS == 1 ]] && [[ -d "$MAIN_PATH/External_shaders" ]]; then
         echo "Checking for External Shader updates."
         mergeShaderDirs "External_shaders"
+        # Link loose files.
         cd "$MAIN_PATH/External_shaders" || exit 1
         for file in *; do
             [[ ! -f $file || -L "$MAIN_PATH/ReShade_shaders/Merged/Shaders/$file" ]] && continue
@@ -192,11 +219,15 @@ if [[ -n $SHADER_REPOS ]]; then
     fi
 fi
 echo "$SEPARATOR"
+# Z0010
 
+# Z0015
 cd "$MAIN_PATH" || exit
 [[ -f LVERS ]] && LVERS=$(cat LVERS) || LVERS=0
 if [[ $RESHADE_VERSION == latest ]]; then
+    # Check if user wants reshade without addon support and we're currently using reshade with addon support.
     [[ $LVERS =~ Addon && $RESHADE_ADDON_SUPPORT -eq 0 ]] && UPDATE_RESHADE=1
+    # Check if user wants reshade with addon support and we're not currently using reshade with addon support.
     [[ ! $LVERS =~ Addon ]] && [[ $RESHADE_ADDON_SUPPORT -eq 1 ]] && UPDATE_RESHADE=1
 fi
 if [[ $FORCE_RESHADE_UPDATE_CHECK -eq 1 ]] || [[ $UPDATE_RESHADE -eq 1 ]] || [[ ! -e reshade/latest/ReShade64.dll ]] || [[ ! -e reshade/latest/ReShade32.dll ]]; then
@@ -224,7 +255,9 @@ if [[ $FORCE_RESHADE_UPDATE_CHECK -eq 1 ]] || [[ $UPDATE_RESHADE -eq 1 ]] || [[ 
         echo "Updated ReShade to version $RVERS."
     fi
 fi
+# Z0015
 
+# Z0016
 cd "$MAIN_PATH" || exit
 if [[ $RESHADE_VERSION != latest ]]; then
     [[ $RESHADE_ADDON_SUPPORT -eq 1 ]] && RESHADE_VERSION="${RESHADE_VERSION}_Addon"
@@ -237,7 +270,9 @@ if [[ $RESHADE_VERSION != latest ]]; then
 else
     echo -e "Using the latest version of ReShade ($LVERS).\n"
 fi
+# Z0016
 
+# Z0020
 if [[ $GLOBAL_INI != 0 ]] && [[ $GLOBAL_INI == ReShade.ini ]] && [[ ! -f $MAIN_PATH/$GLOBAL_INI ]]; then
     cd "$MAIN_PATH" || exit
     curl -sLO https://github.com/kevinlekiller/reshade-steam-proton/raw/ini/ReShade.ini
@@ -249,7 +284,11 @@ if [[ $GLOBAL_INI != 0 ]] && [[ $GLOBAL_INI == ReShade.ini ]] && [[ ! -f $MAIN_P
         fi
     fi
 fi
+# Z0020
 
+# Z0025
+# TODO Requires changes for ReShade 5.0 ; paths and json files are different.
+# See https://github.com/kevinlekiller/reshade-steam-proton/issues/6#issuecomment-1027230967
 if [[ $VULKAN_SUPPORT == 1 ]]; then
     echo "Does the game use the Vulkan API?"
     if [[ $(checkStdin "(y/n): " "^(y|n)$") == "y" ]]; then
@@ -269,7 +308,7 @@ if [[ $VULKAN_SUPPORT == 1 ]]; then
         echo "Specify if the game's EXE file architecture is 32 or 64 bits:"
         [[ $(checkStdin "(32/64) " "^(32|64)$") == 64 ]] && exeArch=64 || exeArch=32
         export WINEPREFIX="$WINEPREFIX"
-        echo "Do you want to install or uninstall ReShade?"
+        echo "Do you want to (i)nstall or (u)ninstall ReShade?"
         if [[ $(checkStdin "(i/u): " "^(i|u)$") == "i" ]]; then
             wine reg ADD HKLM\\SOFTWARE\\Khronos\\Vulkan\\ImplicitLayers /d 0 /t REG_DWORD /v "Z:\\home\\$USER\\$WINE_MAIN_PATH\\reshade\\$RESHADE_VERSION\\ReShade$exeArch.json" -f /reg:"$exeArch"
         else
@@ -279,8 +318,10 @@ if [[ $VULKAN_SUPPORT == 1 ]]; then
         exit 0
     fi
 fi
+# Z0025
 
-echo "Do you want to install or uninstall ReShade for a DirectX or OpenGL game?"
+# Z0030
+echo "Do you want to (i)nstall or (u)ninstall ReShade for a DirectX or OpenGL game?"
 if [[ $(checkStdin "(i/u): " "^(i|u)$") == "u" ]]; then
     getGamePath
     echo "Unlinking ReShade files."
@@ -299,7 +340,9 @@ if [[ $(checkStdin "(i/u): " "^(i|u)$") == "u" ]]; then
     echo -e "\e[40m\e[32mMake sure to remove or change the \e[34mWINEDLLOVERRIDES\e[32m environment variable.\e[0m"
     exit 0
 fi
+# Z0030
 
+# Z0035
 getGamePath
 echo "Do you want $0 to attempt to automatically detect the right dll files to use for ReShade?"
 [[ $(checkStdin "(y/n) " "^(y|n)$") == "y" ]] && wantedDll="auto" || wantedDll="manual"
@@ -328,9 +371,13 @@ if [[ $wantedDll == "manual" ]]; then
         [[ $ynCheck =~ ^(y|Y|yes|YES)$ ]] && break
     done
 fi
+# Z0035
 
+# Z0040
 downloadD3dcompiler_47 "$exeArch"
+# Z0040
 
+# Z0045
 echo "Linking ReShade files to game directory."
 [[ -L $gamePath/$wantedDll.dll ]] && unlink "$gamePath/$wantedDll.dll"
 if [[ $exeArch == 32 ]]; then
@@ -353,6 +400,7 @@ if [[ -f $MAIN_PATH/$LINK_PRESET ]]; then
     [[ -L $gamePath/$LINK_PRESET ]] && unlink "$gamePath/$LINK_PRESET"
     ln -is "$(realpath "$MAIN_PATH/$LINK_PRESET")" "$gamePath/$LINK_PRESET"
 fi
+# Z0045
 
 echo -e "$SEPARATOR\nDone."
 gameEnvVar="WINEDLLOVERRIDES=\"d3dcompiler_47=n;$wantedDll=n,b\""
