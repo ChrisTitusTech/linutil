@@ -5,7 +5,7 @@ name = "Reshade"
 
 [[data.entries]]
 name = "Reshade Installer And Uninstaller"
-description = "Reshade overlay Software To Make Games Look Better For more information visit: https://github.com/reshade-me/reshade"
+description = "Reshade overlay Software for proton and Wine Games To Make The Games Look Better For more information visit: https://github.com/reshade-me/reshade"
 script = "reshade/reshade-installer-and-uninstaller.sh"
 task_list = "I"
 
