@@ -28,7 +28,6 @@ use running_command::TERMINAL_UPDATED;
 use state::AppState;
 use std::{
     io::{stdout, Result, Stdout},
-    path::PathBuf,
     sync::atomic::Ordering,
     time::Duration,
 };
