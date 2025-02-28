@@ -24,9 +24,11 @@ use ratatui::{
     },
     Terminal,
 };
+use running_command::TERMINAL_UPDATED;
 use state::AppState;
 use std::{
     io::{stdout, Result, Stdout},
+    sync::atomic::Ordering,
     time::Duration,
 };
 
@@ -59,9 +61,14 @@ fn main() -> Result<()> {
 
 fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
     loop {
-        terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
         if !event::poll(Duration::from_millis(10))? {
+            if TERMINAL_UPDATED
+                .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
+                .is_ok()
+            {
+                terminal.draw(|frame| state.draw(frame)).unwrap();
+            }
             continue;
         }
 
@@ -84,5 +91,6 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
             }
             _ => {}
         }
+        terminal.draw(|frame| state.draw(frame)).unwrap();
     }
 }
