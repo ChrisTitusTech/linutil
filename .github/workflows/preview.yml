@@ -54,6 +54,7 @@ jobs:
           mkdir -p build
           mv linutil build/linutil
           echo "${{ github.workspace }}/build" >> $GITHUB_PATH
+          echo "branch_name=${{ env.tag_name }}" | tr . - >> $GITHUB_ENV
 
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
@@ -67,11 +68,11 @@ jobs:
         uses: peter-evans/create-pull-request@v7.0.5
         with:
           commit-message: Preview for ${{ env.tag_name }}
-          branch: feature/preview-${{ env.tag_name }}
+          branch: preview-${{ env.branch_name }}
           title: "Update preview for ${{ env.tag_name }}"
           labels: |
             documentation
           body: |
             Automated PR to update preview gif for version ${{ env.tag_name }}
-            ![preview](https://raw.githubusercontent.com/${{ github.repository }}/feature/preview-${{ env.tag_name }}/.github/preview.gif)
+            ![preview](https://raw.githubusercontent.com/${{ github.repository }}/preview-${{ env.branch_name }}/.github/preview.gif)
         if: success()
