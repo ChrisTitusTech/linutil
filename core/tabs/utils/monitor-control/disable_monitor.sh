@@ -1,8 +1,7 @@
 #!/bin/sh -e
 
-. ../utility_functions.sh
-
-. ../../common-script.sh
+# shellcheck disable=SC1091
+. ./monitor-control-functions.sh
 
 # Function to disable a monitor
 disable_monitor() {
@@ -31,7 +30,7 @@ disable_monitor() {
     monitor_name=$(echo "$monitor_array" | cut -d' ' -f"$monitor_choice")
 
     printf "%b\n" "${RED}Warning: Disabling the monitor will turn it off and may affect your display setup.${RC}"
-    
+
     if confirm_action "Do you really want to disable ${GREEN}$monitor_name${RC}?"; then
         printf "%b\n" "${GREEN}Disabling $monitor_name${RC}"
         execute_command "xrandr --output $monitor_name --off"
