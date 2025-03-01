@@ -316,7 +316,11 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c "$iso" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -c "$iso" --score 5 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then #check if there are less than 5 mirrors
+    cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+fi
+
 if [ ! -d "/mnt" ]; then
     mkdir /mnt
 fi
