@@ -14,7 +14,7 @@ installGithubDesktop() {
                 ;;
             zypper)
                 "$ESCALATION_TOOL" rpm --import https://packagecloud.io/shiftkey/desktop/gpgkey
-                "$ESCALATION_TOOL" sh -c "echo -e \"[shiftkey]\nname=GitHub Desktop\nbaseurl=https://packagecloud.io/shiftkey/desktop/el/7/\$basearch\nenabled=1\ngpgcheck=0\nrepo_gpgcheck=1\ngpgkey=https://packagecloud.io/shiftkey/desktop/gpgkey\" > /etc/zypp/repos.d/github-desktop.repo"
+                printf "[shiftkey]\\nname=GitHub Desktop\\nbaseurl=https://packagecloud.io/shiftkey/desktop/el/7/\$basearch\\nenabled=1\\ngpgcheck=0\\nrepo_gpgcheck=1\\ngpgkey=https://packagecloud.io/shiftkey/desktop/gpgkey\\n" | "$ESCALATION_TOOL" tee /etc/zypp/repos.d/github-desktop.repo > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" refresh
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install github-desktop
                 ;;
