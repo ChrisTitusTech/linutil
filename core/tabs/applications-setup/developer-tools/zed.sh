@@ -10,7 +10,7 @@ installZed() {
                 "$ESCALATION_TOOL" "$PACKAGER" add zed
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S zed
+                "$ESCALATION_TOOL" "$PACKAGER" -S zed --needed --noconfirm
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://download.opensuse.org/repositories/editors/openSUSE_Tumbleweed/editors.repo
