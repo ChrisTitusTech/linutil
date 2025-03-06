@@ -38,7 +38,7 @@ view_all_services() {
             "$ESCALATION_TOOL" rc-update show | more
             ;;
         sv)
-            ls -1 /etc/sv/ | more
+            find /etc/sv/ -type d -maxdepth 1 -printf "%f\n" | grep -v "^$" | more
             ;;
     esac
 }
@@ -54,7 +54,7 @@ view_enabled_services() {
             "$ESCALATION_TOOL" rc-update show -v | grep "\[" | more
             ;;
         sv)
-            ls -1 /var/service/ | more
+            find /var/service/ -type d -maxdepth 1 -printf "%f\n" | grep -v "^$" | more
             ;;
     esac
 }
@@ -70,7 +70,7 @@ view_disabled_services() {
             "$ESCALATION_TOOL" rc-update show -v | grep -v "\[" | more
             ;;
         sv)
-            ls -1 /etc/sv/ | grep -v "$(ls -1 /var/service/)" | more
+            comm -23 <(find /etc/sv/ -type d -maxdepth 1 -printf "%f\n" | grep -v "^$" | sort) <(find /var/service/ -type d -maxdepth 1 -printf "%f\n" | grep -v "^$" | sort) | more
             ;;
     esac
 }
