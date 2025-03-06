@@ -21,6 +21,7 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
+            # shellcheck disable=2046
             "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null || true
             ;;
         apk)
