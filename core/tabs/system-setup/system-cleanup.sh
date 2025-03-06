@@ -27,6 +27,9 @@ cleanup_system() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" cache clean
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" xbps-remove -Oo
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
             ;;
