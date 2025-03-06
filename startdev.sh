@@ -8,8 +8,9 @@ RED='\033[0;31m'
 # Function to fetch the latest release tag from the GitHub API
 get_latest_release() {
   latest_release=$(curl -s https://api.github.com/repos/ChrisTitusTech/linutil/releases | 
-    grep -oP '"tag_name": "\K[^"]*' | 
-    head -n 1)
+    grep "tag_name" | 
+    head -n 1 | 
+    sed -E 's/.*"tag_name": "([^"]+)".*/\1/')
   if [ -z "$latest_release" ]; then
     printf "%b\n" "Error fetching release data" >&2
     return 1
