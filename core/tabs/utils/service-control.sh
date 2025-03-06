@@ -38,6 +38,7 @@ view_all_services() {
             "$ESCALATION_TOOL" rc-update show | more
             ;;
         sv)
+            # shellcheck disable=SC2012
             ls -1 /etc/sv/ | more
             ;;
     esac
@@ -54,6 +55,7 @@ view_enabled_services() {
             "$ESCALATION_TOOL" rc-update show -v | grep "\[" | more
             ;;
         sv)
+            # shellcheck disable=SC2012
             ls -1 /var/service/ | more
             ;;
     esac
@@ -70,6 +72,7 @@ view_disabled_services() {
             "$ESCALATION_TOOL" rc-update show -v | grep -v "\[" | more
             ;;
         sv)
+            # shellcheck disable=SC2010
             ls -1 /etc/sv/ | grep -v "$(ls -1 /var/service/)" | more
             ;;
     esac
