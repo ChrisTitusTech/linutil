@@ -22,7 +22,7 @@ install_adb() {
                 "$ESCALATION_TOOL" "$PACKAGER" -y android-tools
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
                 exit 1
                 ;;
         esac

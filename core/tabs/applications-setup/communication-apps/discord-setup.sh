@@ -17,7 +17,7 @@ installDiscord() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord 
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
                 ;;
             apk | xbps-install)

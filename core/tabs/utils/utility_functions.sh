@@ -33,6 +33,7 @@ execute_command() {
     command="$1"
     printf "Executing: %s\n" "$command"
     eval "$command" 2>&1 | tee /tmp/xrandr.log | tail -n 20
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         printf "%b\n" "${RED}An error occurred while executing the command. Check /tmp/xrandr.log for details.${RC}"
     fi

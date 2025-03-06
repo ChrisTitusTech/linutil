@@ -78,33 +78,33 @@ scan_networks() {
         echo "$networks" | awk -F: '{printf("%d. SSID: %-25s \n", NR, $1)}'
     fi
     printf "%b\n" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
 # Function to turn WiFi on
 wifi_on() {
     clear
     printf "%b\n" "${YELLOW}Turning WiFi on...${RC}"
-    nmcli radio wifi on && {
+    if "$(nmcli radio wifi on)"; then
         printf "%b\n" "${GREEN}WiFi is now turned on.${RC}"
-    } || {
+    else
         printf "%b\n" "${RED}Failed to turn on WiFi.${RC}"
-    }
+    fi
     printf "%b\n" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
 # Function to turn WiFi off
 wifi_off() {
     clear
     printf "%b\n" "${YELLOW}Turning WiFi off...${RC}"
-    nmcli radio wifi off && {
+    if "$(nmcli radio wifi off)"; then
         printf "%b\n" "${GREEN}WiFi is now turned off.${RC}"
-    } || {
+    else
         printf "%b\n" "${RED}Failed to turn off WiFi.${RC}"
-    }
+    fi
     printf "%b\n" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
 # Function to prompt for WiFi network selection
@@ -121,7 +121,7 @@ prompt_for_network() {
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
             printf "%b\n" "Press any key to return to the main menu..."
-            read -r dummy
+            read -r _
             rm -f "$temp_file"
             return
         fi
@@ -145,18 +145,18 @@ prompt_for_network() {
                 printf "%b" "Enter password for SSID: " "$ssid"
                 read -r password
                 printf "\n"
-                nmcli dev wifi connect "$ssid" password "$password" && {
+                if "$(nmcli dev wifi connect "$ssid" password "$password")"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
-                } || {
+                else
                     printf "%b\n" "${RED}$failure_msg${RC}"
-                }
+                fi
             fi
         else
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
         fi
 
         printf "%b\n" "Press any key to return to the selection menu..."
-        read -r dummy
+        read -r _
     done
 
     rm -f "$temp_file"

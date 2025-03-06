@@ -329,7 +329,7 @@ main() {
         esac
 
         printf "%b\n" "Press [Enter] to continue..."
-        read -r dummy
+        read -r _
     done
 }
 
