@@ -31,6 +31,10 @@ installJetBrainsToolBox() {
             dnf)
                 manualInstall
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy fuse3
+                manualInstall
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y libfuse2
                 manualInstall
