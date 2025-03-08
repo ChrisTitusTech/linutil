@@ -15,7 +15,7 @@ installFirefox() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm firefox
                 ;;
-            dnf)
+            dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
                 ;;
             apk)

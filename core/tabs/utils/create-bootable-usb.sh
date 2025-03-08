@@ -20,7 +20,7 @@ installDependencies() {
         case "${PACKAGER}" in
             apt-get|nala)
                 "${ESCALATION_TOOL}" "${PACKAGER}" install -y xz-utils gzip bzip2 jq;;
-            dnf|zypper)
+            dnf|zypper|eopkg)
                 "${ESCALATION_TOOL}" "${PACKAGER}" install -y ${DEPENDENCIES};;
             pacman)
                 "${ESCALATION_TOOL}" "${PACKAGER}" -S --noconfirm --needed ${DEPENDENCIES};;

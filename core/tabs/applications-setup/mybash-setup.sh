@@ -57,10 +57,18 @@ installStarshipAndFzf() {
         return
     fi
 
-    if ! curl -sSL https://starship.rs/install.sh | "$ESCALATION_TOOL" sh; then
-        printf "%b\n" "${RED}Something went wrong during starship install!${RC}"
-        exit 1
+    if [ "$PACKAGER" = "eopkg" ]; then
+        "$ESCALATION_TOOL" "$PACKAGER" install -y starship || {
+            printf "%b\n" "${RED}Failed to install starship with Solus!${RC}"
+            exit 1
+        }
+    else
+        curl -sSL https://starship.rs/install.sh | "$ESCALATION_TOOL" sh || {
+            printf "%b\n" "${RED}Failed to install starship!${RC}"
+            exit 1
+        }
     fi
+
     if command_exists fzf; then
         printf "%b\n" "${GREEN}Fzf already installed${RC}"
     else

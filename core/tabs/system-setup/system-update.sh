@@ -56,6 +56,9 @@ fastUpdate() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" update
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" -y update-repo
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
             exit 1
@@ -66,10 +69,7 @@ fastUpdate() {
 updateSystem() {
     printf "%b\n" "${YELLOW}Updating system packages.${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
-            ;;
-        dnf)
+        apt-get|nala|dnf|eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" upgrade -y
             ;;
         pacman)

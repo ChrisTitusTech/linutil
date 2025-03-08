@@ -13,6 +13,9 @@ setup_xrandr() {
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y x11-xserver-utils
                 ;;
+            dnf|eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y xrandr
+                ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add xrandr
                 ;;

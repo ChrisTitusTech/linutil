@@ -27,6 +27,9 @@ cleanup_system() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" cache clean
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" -y remove-orphans
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
             ;;
