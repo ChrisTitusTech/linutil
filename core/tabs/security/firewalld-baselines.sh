@@ -5,8 +5,8 @@
 configureFirewallD() {
     printf "%b\n" "${YELLOW}Configuring FirewallD with recommended rules${RC}"
 
-    printf "%b\n" "${YELLOW}Setting default zone to drop (FirewallD)${RC}"
-    "$ESCALATION_TOOL" firewall-cmd --set-default-zone=drop
+    printf "%b\n" "${YELLOW}Setting default zone to public (FirewallD)${RC}"
+    "$ESCALATION_TOOL" firewall-cmd --set-default-zone=public
 
     printf "%b\n" "${YELLOW}Allowing SSH service (FirewallD)${RC}"
     "$ESCALATION_TOOL" firewall-cmd --permanent --add-service=ssh
