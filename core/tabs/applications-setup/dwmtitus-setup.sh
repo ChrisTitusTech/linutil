@@ -22,6 +22,9 @@ setupDWM() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER"  install -y make libX11-devel libXinerama-devel libXft-devel imlib2-devel gcc
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy base-devel freetype-devel fontconfig-devel imlib2-devel libXft-devel libXinerama-devel git unzip flameshot lxappearance feh mate-polkit
+            ;; 
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -47,6 +50,9 @@ setupPicomDependencies() {
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxcb-devel dbus-1-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb1 libXext-devel libxcb-devel Mesa-libGL-devel Mesa-libEGL-devel libepoxy-devel meson pcre2-devel uthash-devel xcb-util-image-devel libpixman-1-0-devel xcb-util-renderutil-devel xcb-util-devel
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy meson libev-devel uthash libconfig-devel pixman-devel xcb-util-image-devel xcb-util-renderutil-devel pcre2-devel libepoxy-devel dbus-devel
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
@@ -231,6 +237,9 @@ setupDisplayManager() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xinit xorg-x11-server
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy xorg-minimal
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
@@ -295,6 +304,12 @@ setupDisplayManager() {
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
+                ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" -Sy lightdm-gtk-greeter
+                fi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"

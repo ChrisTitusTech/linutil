@@ -14,6 +14,9 @@ setupBluetooth() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bluez
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy bluez
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
                 ;;
@@ -22,7 +25,12 @@ setupBluetooth() {
         printf "%b\n" "${GREEN}Bluez is already installed.${RC}"
     fi
 
-    startService bluetooth
+    SERVICE_NAME="bluetooth"
+    if [ "$INIT_MANAGER" = "sv" ]; then 
+        SERVICE_NAME="bluetoothd"
+    fi
+    
+    startAndEnableService "$SERVICE_NAME"
 }
 
 # Function to display the main menu

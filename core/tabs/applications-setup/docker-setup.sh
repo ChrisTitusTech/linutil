@@ -46,6 +46,9 @@ install_docker() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -79,6 +82,9 @@ install_docker_compose() {
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker-cli-compose
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker-compose
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

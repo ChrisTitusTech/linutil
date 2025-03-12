@@ -16,6 +16,9 @@ setup_xrandr() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add xrandr
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy xrandr
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-server-utils
                 ;;
