@@ -13,7 +13,7 @@ installLynx() {
                 "$ESCALATION_TOOL" "$PACKAGER" add lynx
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y lynx
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy lynx
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y lynx

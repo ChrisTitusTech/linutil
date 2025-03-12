@@ -13,7 +13,7 @@ installEvince() {
                 "$ESCALATION_TOOL" "$PACKAGER" add evince
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y evince
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy evince
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y evince

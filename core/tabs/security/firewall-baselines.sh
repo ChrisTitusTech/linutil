@@ -13,7 +13,7 @@ installPkg() {
                 "$ESCALATION_TOOL" "$PACKAGER" add ufw
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y ufw
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy ufw
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ufw

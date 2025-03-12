@@ -19,7 +19,7 @@ installPodman() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y podman
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy podman
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"

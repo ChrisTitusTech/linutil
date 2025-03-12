@@ -17,7 +17,7 @@ InstallTermiusFonts() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-fonts-console
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y terminus-font
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy terminus-font
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

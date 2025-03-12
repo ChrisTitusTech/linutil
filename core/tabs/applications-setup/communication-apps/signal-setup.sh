@@ -24,7 +24,7 @@ installSignal() {
                 flatpak install -y flathub org.signal.Signal
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y Signal-Desktop
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy Signal-Desktop
                 ;;   
             apk)
                 checkFlatpak

@@ -19,7 +19,7 @@ installPodmanCompose() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y podman-compose
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy podman-compose
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"

@@ -13,7 +13,7 @@ installAlacritty() {
                 "$ESCALATION_TOOL" "$PACKAGER" add alacritty
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y alacritty
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy alacritty
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y alacritty

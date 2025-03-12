@@ -15,7 +15,7 @@ install_package() {
                 "$ESCALATION_TOOL" "$PACKAGER" add "$PACKAGE"
                 ;;
             xbps-install)
-                "$ESCALATION_TOOL" "$PACKAGER" -y "$PACKAGE"
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy "$PACKAGE"
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
