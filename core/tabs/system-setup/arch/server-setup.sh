@@ -387,7 +387,7 @@ subvolumesetup () {
     mountallsubvol
 }
 
-if [[ "${DISK}" =~ "nvme" ]]; then
+if [[ "${DISK}" =~ "nvme"|"mmcblk" ]]; then
     partition2=${DISK}p2
     partition3=${DISK}p3
 else
