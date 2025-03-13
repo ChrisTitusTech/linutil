@@ -481,8 +481,8 @@ echo -ne "
                     Network Setup
 -------------------------------------------------------------------------
 "
-pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable --now NetworkManager
+pacman -S --noconfirm --needed networkmanager dhcpcd
+systemctl enable NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up mirrors for optimal download
@@ -492,7 +492,7 @@ pacman -S --noconfirm --needed pacman-contrib curl
 pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-nc=$(grep -c ^processor /proc/cpuinfo)
+nc=$(grep -c ^"cpu cores" /proc/cpuinfo)
 echo -ne "
 -------------------------------------------------------------------------
                     You have " $nc" cores. And
@@ -660,10 +660,10 @@ systemctl enable ntpd.service
 echo "  NTP enabled"
 systemctl disable dhcpcd.service
 echo "  DHCP disabled"
-systemctl stop dhcpcd.service
-echo "  DHCP stopped"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
+systemctl enable reflector.timer
+echo "  Reflector enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
