@@ -385,16 +385,16 @@ else
 fi
 
 if [[ "${FS}" == "btrfs" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.btrfs -f "${partition3}"
     mount -t btrfs "${partition3}" /mnt
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.ext4 "${partition3}"
     mount -t ext4 "${partition3}" /mnt
 elif [[ "${FS}" == "luks" ]]; then
-    mkfs.vfat -F32 "${partition2}"
+    mkfs.fat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
     echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder
@@ -414,8 +414,8 @@ if ! mountpoint -q /mnt; then
     echo "ERROR! Failed to mount ${partition3} to /mnt after multiple attempts."
     exit 1
 fi
-mkdir -p /mnt/boot/efi
-mount -t vfat -U "${BOOT_UUID}" /mnt/boot/
+mkdir -p /mnt/boot
+mount -U "${BOOT_UUID}" /mnt/boot/
 
 if ! grep -qs '/mnt' /proc/mounts; then
     echo "Drive is not mounted can not continue"
