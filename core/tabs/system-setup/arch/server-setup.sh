@@ -302,7 +302,7 @@ logo
 keymap
 
 echo "Setting up mirrors for optimal download"
-iso=$(curl -4 ifconfig.co/country-iso)
+iso=$(curl -4 ifconfig.io/country_code)
 timedatectl set-ntp true
 pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
