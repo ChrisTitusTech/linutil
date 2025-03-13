@@ -225,12 +225,21 @@ echo -ne "
 
 "
 
-    PS3='
-    Select the disk to install on: '
-    options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
+    #Loop through selection if non-viable device (mmcblkXbootY, mmcblkXrpbm, etc) is selected
+	   while true
+	   do
+       PS3='
+       Select the disk to install on: '
+       options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
 
-    select_option "${options[@]}"
-    disk=${options[$?]%|*}
+       select_option "${options[@]}"
+       disk=${options[$?]%|*}
+       if [[ ! "${disk%|*}" =~  ^/dev/mmcblk[0-9]+[a-z]+[0-9]? ]]
+    	  then
+    		    break
+    	  fi
+    	  echo -e "\n${disk%|*} is not a viable install drive \n"
+    done
 
     echo -e "\n${disk%|*} selected \n"
         export DISK=${disk%|*}
