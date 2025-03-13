@@ -195,18 +195,20 @@ keymap () {
 # @description Choose whether drive is SSD or not.
 drivessd () {
     echo -ne "
-    Is this an ssd? yes/no:
+    Is this an ssd, flash storage, or hard drive?
     "
 
-    options=("Yes" "No")
+    options=("SSD" "MMC" "HDD")
     select_option "${options[@]}"
 
-    case ${options[$?]} in
-        y|Y|yes|Yes|YES)
+    case $? in
+        0)
         export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-        n|N|no|NO|No)
+        1)
+        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120";;
+        2)
         export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-        *) echo "Wrong option. Try again";drivessd;;
+        *) echo "Wrong option.  Try again";drivessd;;
     esac
 }
 
