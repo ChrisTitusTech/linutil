@@ -53,11 +53,6 @@ install_docker() {
     esac
 
     startAndEnableService docker
-
-    printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
-    "$ESCALATION_TOOL" usermod -aG docker "$USER"
-    newgrp docker
-    printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
 }
 
 install_docker_compose() {
@@ -112,6 +107,14 @@ install_components() {
     fi
 }
 
+docker_permission() {
+    printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
+    "$ESCALATION_TOOL" usermod -aG docker "$USER"
+    newgrp docker
+    printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
+    }
+
 checkEnv
 checkEscalationTool
 install_components
+docker_permission
