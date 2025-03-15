@@ -28,7 +28,7 @@ cleanup_system() {
             "$ESCALATION_TOOL" "$PACKAGER" cache clean
             ;;
         xbps-install)
-            "$ESCALATION_TOOL" xbps-remove -Oo
+            "$ESCALATION_TOOL" xbps-remove -Ooy
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
