@@ -2,6 +2,7 @@
 
 # Load common script functions
 . ../common-script.sh  
+. ../common-service-script.sh
 
 # Function to install packages based on the package manager
 install_package() {
