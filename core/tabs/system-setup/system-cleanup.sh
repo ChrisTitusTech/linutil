@@ -58,7 +58,7 @@ clean_data() {
                 find "$HOME/.cache/" -type f -atime +5 -delete
             fi
             if [ -d "$HOME/.local/share/Trash" ]; then
-                find "$HOME/.local/share/Trash" -mindepth 1 -delete
+                "$ESCALATION_TOOL" find "$HOME/.local/share/Trash" -mindepth 1 -delete
             fi
             printf "%b\n" "${GREEN}Cache and trash cleanup completed.${RC}"
             ;;
