@@ -15,14 +15,14 @@ installDeps() {
         printf "%b\n" "${CYAN}Installing headers for $kernel...${RC}"
         
         if ! "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$header" ; then
-            printf "%b\n" "${RED}Failed to install headers. ${RC}"
+            printf "%b\n" "${RED}Failed to install headers.${RC}"
             printf "%b" "${YELLOW}Do you want to continue anyway? [y/N]: ${RC}"
             read -r continue_anyway
             if ! [ "$continue_anyway" = "y" ] && ! [ "$continue_anyway" = "Y" ]; then
-                printf "%b\n" "${RED}Aborting installation. ${RC}"
+                printf "%b\n" "${RED}Aborting installation.${RC}"
                 exit 1
             fi
-            printf "%b\n" "${YELLOW}Warning: Continuing. ${RC}"
+            printf "%b\n" "${YELLOW}Continuing...${RC}"
         fi    
     done
 }
