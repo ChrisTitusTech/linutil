@@ -77,6 +77,7 @@ startAndEnableService() {
         rc-service)
             enableService "$1"
             startService "$1"
+            ;;
         sv)
             enableService "$1"
             ;;
