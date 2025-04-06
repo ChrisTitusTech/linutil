@@ -46,9 +46,11 @@ enableService() {
             "$ESCALATION_TOOL" rc-update add "$1"
             ;;
         sv)
-            "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
-            printf "%b\n" "${YELLOW}Waiting 5 seconds...${RC}"
-            sleep 5
+            if [ -d "/etc/service" ]; then
+                "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/etc/service/"
+            else
+                "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
+            fi
             ;;
     esac
 }
@@ -62,7 +64,7 @@ disableService() {
             "$ESCALATION_TOOL" rc-update del "$1"
             ;;
         sv)
-            "$ESCALATION_TOOL" rm -f "/var/service/$1"
+            "$ESCALATION_TOOL" rm -f "/etc/service/$1" "/var/service/$1"
             ;;
     esac
 }
@@ -72,9 +74,11 @@ startAndEnableService() {
         systemctl)
             "$ESCALATION_TOOL" "$INIT_MANAGER" enable --now "$1"
             ;;
-        rc-service | sv)
+        rc-service)
             enableService "$1"
             startService "$1"
+        sv)
+            enableService "$1"
             ;;
     esac
 }
