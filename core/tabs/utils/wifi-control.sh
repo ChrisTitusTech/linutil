@@ -31,7 +31,7 @@ setupNetworkManager() {
     # Check if NetworkManager service is running
     if ! isServiceActive NetworkManager; then
         printf "%b\n" "${YELLOW}NetworkManager service is not running. Starting it now...${RC}"
-        startService NetworkManager
+        startAndEnableService NetworkManager
     else 
         printf "%b\n" "${GREEN}NetworkManager service started successfully.${RC}"
     fi
