@@ -12,6 +12,7 @@
 - **Slack**: Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools.
 - **Telegram**: Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls.
 - **Thunderbird**: Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality.
+- **ZapZap**: ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta.
 - **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
 
 ### Developer Tools
@@ -48,6 +49,8 @@ https://github.com/ChrisTitusTech/neovim
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
+- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
+https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
@@ -109,6 +112,12 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
+### Desktop Environment Setup
+
+- **Install Desktop Environment**: This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically.
+- **Uninstall Desktop Environment**: This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically.
+- **Compile Setup**: This script is designed to install the necessary packages for compiling software on your system.
+
 ## Utilities
 
 
@@ -140,4 +149,3 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **WiFi Manager**: This utility is designed to manage wifi in your system
-
