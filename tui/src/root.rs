@@ -8,8 +8,12 @@ This means you have full system access and commands can potentially damage your 
 Please proceed with caution and make sure you understand what each script does before executing it.";
 
 #[cfg(unix)]
-pub fn check_root_status<'a>() -> Option<FloatingText<'a>> {
-    (Uid::effective().is_root()).then_some(FloatingText::new(
+pub fn check_root_status(bypass_root: bool) -> Option<FloatingText<'static>> {
+    if bypass_root {
+        return None;
+    }
+
+    Uid::effective().is_root().then_some(FloatingText::new(
         ROOT_WARNING.into(),
         "Root User Warning",
         true,

@@ -17,7 +17,7 @@ updateLinutil() {
                 zypper)
                     "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
                     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-                    . $HOME/.cargo/env
+                    . "$HOME/.cargo/env"
                     ;;
                 apk)
                     "$ESCALATION_TOOL" "$PACKAGER" add build-base

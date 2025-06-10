@@ -33,7 +33,7 @@ addToGroup() {
     groups_to_add=$(echo "$groups" | tr ' ' ',')
 
     printf "%b" "${YELLOW}Are you sure you want to add user $username to $groups_to_add? [Y/n]: ${RC}"
-    read -r confirm
+    read -r _
     confirmAction || exit 1
 
     "$ESCALATION_TOOL" usermod -aG "$groups_to_add" "$username"

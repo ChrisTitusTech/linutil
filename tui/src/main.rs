@@ -1,3 +1,4 @@
+mod cli;
 mod confirmation;
 mod filter;
 mod float;
@@ -11,7 +12,7 @@ mod theme;
 #[cfg(feature = "tips")]
 mod tips;
 
-use crate::theme::Theme;
+use crate::cli::Args;
 use clap::Parser;
 use ratatui::{
     backend::CrosstermBackend,
@@ -23,43 +24,22 @@ use ratatui::{
     },
     Terminal,
 };
+use running_command::TERMINAL_UPDATED;
 use state::AppState;
 use std::{
     io::{stdout, Result, Stdout},
-    path::PathBuf,
+    sync::atomic::Ordering,
     time::Duration,
 };
 
-// Linux utility toolbox
-#[derive(Debug, Parser)]
-pub struct Args {
-    #[arg(short, long, help = "Path to the configuration file")]
-    config: Option<PathBuf>,
-    #[arg(short, long, value_enum)]
-    #[arg(default_value_t = Theme::Default)]
-    #[arg(help = "Set the theme to use in the application")]
-    theme: Theme,
-    #[arg(
-        short = 'y',
-        long,
-        help = "Skip confirmation prompt before executing commands"
-    )]
-    skip_confirmation: bool,
-    #[arg(long, default_value_t = false)]
-    #[clap(help = "Show all available options, disregarding compatibility checks (UNSAFE)")]
-    override_validation: bool,
-    #[arg(long, default_value_t = false)]
-    #[clap(help = "Bypass the terminal size limit")]
-    size_bypass: bool,
-}
-
 fn main() -> Result<()> {
     let args = Args::parse();
-
-    let mut state = AppState::new(args);
+    let mut state = AppState::new(args.clone());
 
     stdout().execute(EnterAlternateScreen)?;
-    stdout().execute(EnableMouseCapture)?;
+    if args.mouse {
+        stdout().execute(EnableMouseCapture)?;
+    }
 
     enable_raw_mode()?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
@@ -70,7 +50,9 @@ fn main() -> Result<()> {
     // restore terminal
     disable_raw_mode()?;
     terminal.backend_mut().execute(LeaveAlternateScreen)?;
-    terminal.backend_mut().execute(DisableMouseCapture)?;
+    if args.mouse {
+        terminal.backend_mut().execute(DisableMouseCapture)?;
+    }
     terminal.backend_mut().execute(ResetColor)?;
     terminal.show_cursor()?;
 
@@ -79,9 +61,14 @@ fn main() -> Result<()> {
 
 fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
     loop {
-        terminal.draw(|frame| state.draw(frame)).unwrap();
         // Wait for an event
         if !event::poll(Duration::from_millis(10))? {
+            if TERMINAL_UPDATED
+                .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
+                .is_ok()
+            {
+                terminal.draw(|frame| state.draw(frame)).unwrap();
+            }
             continue;
         }
 
@@ -104,5 +91,6 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
             }
             _ => {}
         }
+        terminal.draw(|frame| state.draw(frame)).unwrap();
     }
 }

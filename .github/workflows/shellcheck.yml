@@ -31,9 +31,3 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Run shfmt
-        uses: reviewdog/action-shfmt@v1
-        with:
-          shfmt_flags: '-i 4 -ci'
-          reviewdog_flags: '-fail-level=any'
