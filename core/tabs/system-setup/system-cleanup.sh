@@ -12,9 +12,8 @@ cleanup_system() {
             "$ESCALATION_TOOL" du -h /var/cache/apt
             ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" clean -a
-            "$ESCALATION_TOOL" "$PACKAGER" tidy
-            "$ESCALATION_TOOL" "$PACKAGER" cc -a
+            "$ESCALATION_TOOL" "$PACKAGER" clean --all
+            "$ESCALATION_TOOL" "$PACKAGER" packages --unneeded
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" clean all
@@ -22,10 +21,14 @@ cleanup_system() {
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -Sc --noconfirm
-            "$ESCALATION_TOOL" "$PACKAGER" -Rns "$(pacman -Qtdq)" --noconfirm > /dev/null || true
+            # shellcheck disable=2046
+            "$ESCALATION_TOOL" "$PACKAGER" -Rns $(pacman -Qtdq) --noconfirm > /dev/null || true
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" cache clean
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" xbps-remove -Ooy
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"

@@ -17,7 +17,7 @@ checkInitManager() {
 
 startService() {
     case "$INIT_MANAGER" in
-        systemctl)
+        systemctl | sv)
             "$ESCALATION_TOOL" "$INIT_MANAGER" start "$1"
             ;;
         rc-service)
@@ -28,7 +28,7 @@ startService() {
 
 stopService() {
     case "$INIT_MANAGER" in
-        systemctl)
+        systemctl | sv)
             "$ESCALATION_TOOL" "$INIT_MANAGER" stop "$1"
             ;;
         rc-service)
@@ -45,6 +45,13 @@ enableService() {
         rc-service)
             "$ESCALATION_TOOL" rc-update add "$1"
             ;;
+        sv)
+            if [ -d "/etc/service" ]; then
+                "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/etc/service/"
+            else
+                "$ESCALATION_TOOL" ln -sf "/etc/sv/$1" "/var/service/"
+            fi
+            ;;
     esac
 }
 
@@ -55,6 +62,9 @@ disableService() {
             ;;
         rc-service)
             "$ESCALATION_TOOL" rc-update del "$1"
+            ;;
+        sv)
+            "$ESCALATION_TOOL" rm -f "/etc/service/$1" "/var/service/$1"
             ;;
     esac
 }
@@ -68,6 +78,9 @@ startAndEnableService() {
             enableService "$1"
             startService "$1"
             ;;
+        sv)
+            enableService "$1"
+            ;;
     esac
 }
 
@@ -79,7 +92,10 @@ isServiceActive() {
         rc-service)
             "$ESCALATION_TOOL" "$INIT_MANAGER" "$1" status --quiet
             ;;
+        sv)
+            "$ESCALATION_TOOL" "$INIT_MANAGER" status "$1" >/dev/null 2>&1
+            ;;
     esac
 }
 
-checkInitManager 'systemctl rc-service'
+checkInitManager 'systemctl rc-service sv'

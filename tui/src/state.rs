@@ -168,18 +168,22 @@ impl AppState {
     }
 
     fn spawn_confirmprompt(&mut self) {
-        let cmd_names: Vec<_> = self
-            .selected_commands
-            .iter()
-            .map(|node| node.name.as_str())
-            .collect();
+        if self.skip_confirmation {
+            self.handle_confirm_command();
+        } else {
+            let cmd_names: Vec<_> = self
+                .selected_commands
+                .iter()
+                .map(|node| node.name.as_str())
+                .collect();
 
-        let prompt = ConfirmPrompt::new(&cmd_names);
-        self.focus = Focus::ConfirmationPrompt(Float::new(
-            Box::new(prompt),
-            CONFIRM_PROMPT_FLOAT_SIZE,
-            CONFIRM_PROMPT_FLOAT_SIZE,
-        ));
+            let prompt = ConfirmPrompt::new(&cmd_names);
+            self.focus = Focus::ConfirmationPrompt(Float::new(
+                Box::new(prompt),
+                CONFIRM_PROMPT_FLOAT_SIZE,
+                CONFIRM_PROMPT_FLOAT_SIZE,
+            ));
+        }
     }
 
     fn get_list_item_shortcut(&self) -> Box<[Shortcut]> {
@@ -345,16 +349,24 @@ impl AppState {
             .map(|tab| tab.name.as_str())
             .collect::<Vec<_>>();
 
-        let tab_hl_style = if let Focus::TabList = self.focus {
-            Style::default().reversed().fg(self.theme.tab_color())
+        let (tab_hl_style, highlight_symbol) = if let Focus::TabList = self.focus {
+            (
+                Style::default().reversed().fg(self.theme.tab_color()),
+                self.theme.tab_icon(),
+            )
+        } else if let Focus::Search = self.focus {
+            (Style::reset(), "   ")
         } else {
-            Style::new().fg(self.theme.tab_color())
+            (
+                Style::new().fg(self.theme.tab_color()),
+                self.theme.tab_icon(),
+            )
         };
 
         let tab_list = List::new(tabs)
             .block(Block::bordered().border_set(border::ROUNDED))
             .highlight_style(tab_hl_style)
-            .highlight_symbol(self.theme.tab_icon());
+            .highlight_symbol(highlight_symbol);
         frame.render_stateful_widget(tab_list, left_chunks[1], &mut self.current_tab);
 
         let chunks =
@@ -824,12 +836,7 @@ impl AppState {
                         self.selected_commands.push(node);
                     }
                 }
-
-                if self.skip_confirmation {
-                    self.handle_confirm_command();
-                } else {
-                    self.spawn_confirmprompt();
-                }
+                self.spawn_confirmprompt();
             }
             SelectedItem::None => {}
         }

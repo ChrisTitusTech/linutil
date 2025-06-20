@@ -46,6 +46,9 @@ install_docker() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -80,6 +83,9 @@ install_docker_compose() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker-cli-compose
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker-compose
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -107,6 +113,15 @@ install_components() {
     fi
 }
 
+docker_permission() {
+    printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
+    "$ESCALATION_TOOL" usermod -aG docker "$USER"
+    printf "%b\n" "${YELLOW}To use Docker without sudo:${RC}"
+    printf "%b\n" "${GREEN}Log out and back in, run 'newgrp docker', or restart your terminal.${RC}"
+    printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
+    }
+
 checkEnv
 checkEscalationTool
 install_components
+docker_permission
