@@ -14,7 +14,7 @@ deleteUser() {
 
     if id "$username" > /dev/null 2>&1; then
         printf "%b" "${YELLOW}Are you sure you want to delete user ""$username""? [Y/n]: ${RC}"
-        read -r confirm
+        read -r _
         confirmAction || exit 1
 
         $ESCALATION_TOOL userdel --remove "$username" 2>/dev/null

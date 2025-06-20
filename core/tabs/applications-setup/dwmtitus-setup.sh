@@ -1,25 +1,60 @@
-#!/bin/sh -e
+#!/bin/sh
 
 . ../common-script.sh
+. ../common-service-script.sh
 
 setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot lxappearance feh mate-polkit meson libev uthash libconfig
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 git unzip flameshot lxappearance feh mate-polkit
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add build-base libxinerama-dev libxft-dev imlib2-dev font-dejavu dbus-x11 git unzip flameshot feh polkit
             ;;
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" groupinstall -y "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y "@development-tools" || "$ESCALATION_TOOL" "$PACKAGER" group install -y "Development Tools"
             "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER"  install -y make libX11-devel libXinerama-devel libXft-devel imlib2-devel gcc
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
             ;;
     esac
+}
+
+setupPicomDependencies() {
+    printf "%b\n" "${YELLOW}Installing Picom dependencies if not already installed${RC}"
+    
+    case "$PACKAGER" in
+        pacman)
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libxcb meson libev uthash libconfig
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" add libxcb-dev meson libev-dev uthash-dev libconfig-dev pixman-dev xcb-util-image-dev xcb-util-renderutil-dev pcre2-dev libepoxy-dev dbus-dev xcb-util-dev
+            ;;
+        apt-get|nala)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb1-dev libxcb-res0-dev libconfig-dev libdbus-1-dev libegl-dev libev-dev libgl-dev libepoxy-dev libpcre2-dev libpixman-1-dev libx11-xcb-dev libxcb1-dev libxcb-composite0-dev libxcb-damage0-dev libxcb-dpms0-dev libxcb-glx0-dev libxcb-image0-dev libxcb-present-dev libxcb-randr0-dev libxcb-render0-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-util-dev libxcb-xfixes0-dev libxext-dev meson ninja-build uthash-dev
+            ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel dbus-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb libXext-devel libxcb-devel libGL-devel libEGL-devel libepoxy-devel meson pcre2-devel pixman-devel uthash-devel xcb-util-image-devel xcb-util-renderutil-devel xorg-x11-proto-devel xcb-util-devel
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxcb-devel dbus-1-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb1 libXext-devel libxcb-devel Mesa-libGL-devel Mesa-libEGL-devel libepoxy-devel meson pcre2-devel uthash-devel xcb-util-image-devel libpixman-1-0-devel xcb-util-renderutil-devel xcb-util-devel
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
+            exit 1
+            ;;
+    esac
+
+    printf "%b\n" "${GREEN}Picom dependencies installed successfully${RC}"
 }
 
 makeDWM() {
@@ -30,12 +65,13 @@ makeDWM() {
 }
 
 install_nerd_font() {
+    # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
+    FONT_NAME="MesloLGS Nerd Font Mono"
     FONT_DIR="$HOME/.local/share/fonts"
     FONT_ZIP="$FONT_DIR/Meslo.zip"
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
-    # Check if Meslo Nerd-font is already installed
     if [ -n "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
         return 0
@@ -50,47 +86,19 @@ install_nerd_font() {
             return 1
         }
     else
-        printf "%b\n" "${GREEN}$FONT_DIR exists, skipping creation.${RC}"
+        printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
+        # Change this URL to correspond with the correct font
+        FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
+        FONT_DIR="$HOME/.local/share/fonts"
+        TEMP_DIR=$(mktemp -d)
+        curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
+        unzip "$TEMP_DIR"/"${FONT_NAME}".zip -d "$TEMP_DIR"
+        mkdir -p "$FONT_DIR"/"$FONT_NAME"
+        mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
+        fc-cache -fv
+        rm -rf "${TEMP_DIR}"
+        printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
     fi
-
-    # Check if the font zip file already exists
-    if [ ! -f "$FONT_ZIP" ]; then
-        # Download the font zip file
-        curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
-            printf "%b\n" "${RED}Failed to download Meslo Nerd-fonts from $FONT_URL${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo.zip already exists in $FONT_DIR, skipping download.${RC}"
-    fi
-
-    # Unzip the font file if it hasn't been unzipped yet
-    if [ ! -d "$FONT_DIR/Meslo" ]; then
-        mkdir -p "$FONT_DIR/Meslo" || {
-            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR/Meslo${RC}"
-            return 1
-        }
-        unzip "$FONT_ZIP" -d "$FONT_DIR" || {
-            printf "%b\n" "${RED}Failed to unzip $FONT_ZIP${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo font files already unzipped in $FONT_DIR, skipping unzip.${RC}"
-    fi
-
-    # Remove the zip file
-    rm "$FONT_ZIP" || {
-        printf "%b\n" "${RED}Failed to remove $FONT_ZIP${RC}"
-        return 1
-    }
-
-    # Rebuild the font cache
-    fc-cache -fv || {
-        printf "%b\n" "${RED}Failed to rebuild font cache${RC}"
-        return 1
-    }
-
-    printf "%b\n" "${GREEN}Meslo Nerd-fonts installed successfully${RC}"
 }
 
 picom_animations() {
@@ -185,14 +193,20 @@ setupDisplayManager() {
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-xinit xorg-server
             ;;
+        apk)
+            "$ESCALATION_TOOL" setup-xorg-base
+            ;;
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg xinit
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-x11-xinit xorg-x11-server-Xorg
             ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xinit xorg-x11-server
+            ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
             ;;
     esac
@@ -200,7 +214,7 @@ setupDisplayManager() {
     printf "%b\n" "${YELLOW}Setting up Display Manager${RC}"
     currentdm="none"
     for dm in gdm sddm lightdm; do
-        if systemctl is-active --quiet "$dm.service"; then
+        if command -v "$dm" >/dev/null 2>&1 || isServiceActive "$dm"; then
             currentdm="$dm"
             break
         fi
@@ -212,23 +226,27 @@ setupDisplayManager() {
         printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
         printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
         printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-        printf "%b\n" "${YELLOW} ${RC}" 
+        printf "%b\n" "${YELLOW}4. None ${RC}" 
         printf "%b" "${YELLOW}Please select one: ${RC}"
         read -r choice
         case "$choice" in
-        1)
-            DM="sddm"
-            ;;
-        2)
-            DM="lightdm"
-            ;;
-        3)
-            DM="gdm"
-            ;;
-        *)
-            printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, or 3.${RC}"
-            exit 1
-            ;;
+            1)
+                DM="sddm"
+                ;;
+            2)
+                DM="lightdm"
+                ;;
+            3)
+                DM="gdm"
+                ;;
+            4)
+                printf "%b\n" "${GREEN}No display manager will be installed${RC}"
+                return 0
+                ;;
+            *)
+                printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
+                return 1
+                ;;
         esac
         case "$PACKAGER" in
             pacman)
@@ -237,29 +255,41 @@ setupDisplayManager() {
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
                 fi
                 ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" add lightdm-gtk-greeter
+                fi
+                ;;    
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
+                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: "$PACKAGER"${RC}"
+                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
                 exit 1
                 ;;
         esac
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
-        systemctl enable "$DM"
+        enableService "$DM"
         
     fi
 }
 
 install_slstatus() {
-    printf "Do you want to install slstatus? (y/N): " # using printf instead of 'echo' to avoid newline, -n flag for 'echo' is not supported in POSIX
-    read -r response # -r flag to prevent backslashes from being interpreted
+    printf "Do you want to install slstatus? (y/N): "
+    read -r response
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
-        cd "$HOME/dwm-titus/slstatus" || { printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"; return 1; }
+        cd "$HOME/dwm-titus/slstatus" || { 
+            printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"
+            return 1
+        }
         if "$ESCALATION_TOOL" make clean install; then
             printf "%b\n" "${GREEN}slstatus installed successfully${RC}"
         else
@@ -276,6 +306,7 @@ checkEnv
 checkEscalationTool
 setupDisplayManager
 setupDWM
+setupPicomDependencies
 makeDWM
 install_slstatus
 install_nerd_font

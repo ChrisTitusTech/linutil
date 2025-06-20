@@ -34,36 +34,33 @@ installLinutil() {
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
             read -r choice
             case $choice in
-                y|Y)
+                y | Y)
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
-                            pacman)
-                                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm curl rustup man-db
-                                ;;
                             dnf)
                                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl rustup man-pages man-db man
+                                rustup-init -y
                                 ;;
                             apk)
-                                "$ESCALATION_TOOL" "$PACKAGER" add build-base
-                                "$ESCALATION_TOOL" "$PACKAGER" add rustup
-                                rustup-init
-                                # shellcheck disable=SC1091
-                                . "$HOME/.cargo/env"
+                                "$ESCALATION_TOOL" "$PACKAGER" add build-base rustup
+                                rustup-init -y
                                 ;;
                             *)
                                 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-                                . $HOME/.cargo/env
                                 ;;
                         esac
                     fi
                     rustup default stable
+                    # shellcheck disable=SC1091
+                    . "$HOME/.cargo/env"
                     cargo install --force linutil_tui
                     printf "%b\n" "${GREEN}Installed successfully.${RC}"
                     installExtra
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;
             esac
+            ;;
     esac
 }
 

@@ -1,4 +1,4 @@
-use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
+use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -13,7 +13,10 @@ use ratatui::{
 use std::{
     fs::File,
     io::{Result, Write},
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     thread::JoinHandle,
 };
 use time::{macros::format_description, OffsetDateTime};
@@ -139,25 +142,26 @@ impl FloatContent for RunningCommand {
         if self.is_finished() {
             (
                 "Finished command",
-                Box::new([
-                    Shortcut::new("Close window", ["Enter", "q"]),
-                    Shortcut::new("Scroll up", ["Page up"]),
-                    Shortcut::new("Scroll down", ["Page down"]),
-                    Shortcut::new("Save log", ["l"]),
-                ]),
+                shortcuts!(
+                    ("Close window", ["Enter", "q"]),
+                    ("Scroll up", ["Page up"]),
+                    ("Scroll down", ["Page down"]),
+                    ("Save log", ["l"]),
+                ),
             )
         } else {
             (
                 "Running command",
-                Box::new([
-                    Shortcut::new("Kill the command", ["CTRL-c"]),
-                    Shortcut::new("Scroll up", ["Page up"]),
-                    Shortcut::new("Scroll down", ["Page down"]),
-                ]),
+                shortcuts!(
+                    ("Kill the command", ["CTRL-c"]),
+                    ("Scroll up", ["Page up"]),
+                    ("Scroll down", ["Page down"]),
+                ),
             )
         }
     }
 }
+pub static TERMINAL_UPDATED: AtomicBool = AtomicBool::new(true);
 
 impl RunningCommand {
     pub fn new(commands: &[&Command]) -> Self {
@@ -217,6 +221,7 @@ impl RunningCommand {
         // A buffer, shared between the thread that reads the command output, and the main tread.
         // The main thread only reads the contents
         let command_buffer: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
+        TERMINAL_UPDATED.store(true, Ordering::Release);
         let reader_handle = {
             // Arc is just a reference, so we can create an owned copy without any problem
             let command_buffer = command_buffer.clone();
@@ -233,8 +238,10 @@ impl RunningCommand {
                                                            // done, to minimise the time it is opened
                     let command_buffer = mutex.as_mut().unwrap();
                     command_buffer.extend_from_slice(&buf[0..size]);
+                    TERMINAL_UPDATED.store(true, Ordering::Release);
                     // The mutex is closed here automatically
                 }
+                TERMINAL_UPDATED.store(true, Ordering::Release);
             })
         };
 

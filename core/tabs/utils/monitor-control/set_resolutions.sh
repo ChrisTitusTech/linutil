@@ -33,7 +33,7 @@ set_resolutions() {
         if ! echo "$monitor_choice" | grep -qE '^[0-9]+$' || [ "$monitor_choice" -lt 1 ] || [ "$monitor_choice" -gt "$((i - 1))" ]; then
             printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
             printf "%b\n" "Press [Enter] to continue..."
-            read -r dummy
+            read -r _
             continue
         fi
 

@@ -3,13 +3,12 @@
 . ../common-script.sh
 . ../common-service-script.sh
 
-# Function to check Bluez is installed
 setupBluetooth() {
     printf "%b\n" "${YELLOW}Installing Bluez...${RC}"
     if ! command_exists bluetoothctl; then
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez-utils
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm bluez bluez-utils
                 ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bluez
@@ -25,7 +24,6 @@ setupBluetooth() {
     startService bluetooth
 }
 
-# Function to display the main menu
 main_menu() {
     while true; do
         clear
@@ -52,7 +50,6 @@ main_menu() {
     done
 }
 
-# Function to scan for devices
 scan_devices() {
     clear
     printf "%b\n" "${YELLOW}Scanning for devices...${RC}"
@@ -65,16 +62,14 @@ scan_devices() {
         printf "%b\n" "$devices"
     fi
     printf "%b" "Press any key to return to the main menu..."
-    read -r dummy
+    read -r _
 }
 
-# Function to prompt for MAC address using numbers
 prompt_for_mac() {
-    action=$1
-    command=$2
-    prompt_msg=$3
-    success_msg=$4
-    failure_msg=$5
+    command=$1
+    prompt_msg=$2
+    success_msg=$3
+    failure_msg=$4
 
     while true; do
         clear
@@ -82,66 +77,63 @@ prompt_for_mac() {
         if [ -z "$devices" ]; then
             printf "%b\n" "${RED}No devices available. Please scan for devices first.${RC}"
             printf "%b" "Press any key to return to the main menu..."
-            read -r dummy
+            read -r _
             return
         fi
 
         # Display devices with numbers
-        device_list=$(echo "$devices" | tr '\n' '\n')
         i=1
-        echo "$device_list" | while IFS= read -r device; do
+        echo "$devices" | while IFS= read -r device; do
             printf "%d. %s\n" "$i" "$device"
             i=$((i + 1))
         done
         printf "%b\n" "0. Exit to main menu"
-        printf "%b\n" "$prompt_msg"
+        printf "%b" "$prompt_msg"
         read -r choice
 
-        # Validate the choice
-        if echo "$choice" | grep -qE '^[0-9]+$' && [ "$choice" -le "$((i - 1))" ] && [ "$choice" -gt 0 ]; then
-            device=$(echo "$device_list" | sed -n "${choice}p")
+        count=$(printf "%b" "$devices" | wc -l)
+        count=$((count + 1))
+
+        if echo "$choice" | grep -qE '^[0-9]+$' && [ -n "$choice" ] && [ "$choice" -le "$count" ] && [ "$choice" -gt 0 ]; then
+            device=$(echo "$devices" | sed -n "${choice}p")
             mac=$(echo "$device" | awk '{print $2}')
             if bluetoothctl info "$mac" > /dev/null 2>&1; then
-                bluetoothctl "$command" "$mac" && {
+                if bluetoothctl "$command" "$mac"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                     break
-                } || {
+                else
                     printf "%b\n" "${RED}$failure_msg${RC}"
-                }
+                    read -r _
+                fi
             else
                 printf "%b\n" "${RED}Invalid MAC address. Please try again.${RC}"
+                read -r _
             fi
         elif [ "$choice" -eq 0 ]; then
             return
         else
             printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
+            read -r _
         fi
     done
-    printf "%b" "Press any key to return to the main menu..."
-    read -r dummy
 }
 
-# Function to pair with a device
 pair_device() {
-    prompt_for_mac "pair" "pair" "Enter the number of the device to pair: " "Pairing with device completed." "Failed to pair with device."
+    prompt_for_mac "pair" "Enter the number of the device to pair: " "Pairing with device completed." "Failed to pair with device."
 }
 
-# Function to connect to a device
 connect_device() {
-    prompt_for_mac "connect" "connect" "Enter the number of the device to connect: " "Connecting to device completed." "Failed to connect to device."
+    prompt_for_mac "connect" "Enter the number of the device to connect: " "Connecting to device completed." "Failed to connect to device."
 }
 
-# Function to disconnect from a device
 disconnect_device() {
-    prompt_for_mac "disconnect" "disconnect" "Enter the number of the device to disconnect: " "Disconnecting from device completed." "Failed to disconnect from device."
+    prompt_for_mac "disconnect" "Enter the number of the device to disconnect: " "Disconnecting from device completed." "Failed to disconnect from device."
 }
 
-# Function to remove a device
 remove_device() {
-    prompt_for_mac "remove" "remove" "Enter the number of the device to remove: " "Removing device completed." "Failed to remove device."
+    prompt_for_mac "remove" "Enter the number of the device to remove: " "Removing device completed." "Failed to remove device."
 }
 
-# Initialize
 checkEnv
 checkEscalationTool
 setupBluetooth
