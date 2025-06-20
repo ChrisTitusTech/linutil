@@ -52,6 +52,12 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -Sy void-repo-multilib
             "$ESCALATION_TOOL" "$PACKAGER" -Sy glibc-32bit gcc-multilib
             ;;
+        eopkg)
+            SOLUS_DEPENDENCIES='tar tree unzip cmake make jq'
+            COMPILEDEPS='-c system.devel'
+            "$ESCALATION_TOOL" "$PACKAGER" update-repo
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $SOLUS_DEPENDENCIES $COMPILEDEPS
+            ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
             ;;

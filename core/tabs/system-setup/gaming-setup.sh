@@ -53,6 +53,11 @@ installDepend() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
             ;;
+        eopkg)
+            DISTRO_DEPS="libgnutls libgtk-2 libgtk-3 pulseaudio alsa-lib alsa-plugins giflib libpng openal-soft libxcomposite libxinerama ncurses vulkan ocl-icd libva gst-plugins-base sdl2 v4l-utils sqlite3"
+
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
             exit 1
@@ -97,6 +102,10 @@ installAdditionalDepend() {
         zypper)
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
+            ;;
+        eopkg)
+            DISTRO_DEPS='steam lutris'
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"

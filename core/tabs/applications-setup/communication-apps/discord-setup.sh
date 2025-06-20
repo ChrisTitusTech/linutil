@@ -10,8 +10,8 @@ installDiscord() {
                 curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
                 ;;
-            zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install discord
+            zypper|eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y discord
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord 

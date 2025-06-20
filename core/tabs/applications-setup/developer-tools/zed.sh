@@ -16,6 +16,9 @@ installZed() {
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://download.opensuse.org/repositories/editors/openSUSE_Tumbleweed/editors.repo
                 "$ESCALATION_TOOL" "$PACKAGER" install -y zed
                 ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y zed
+                ;;
             *)
                 printf "%b\n" "${YELLOW}No official package found for package manager $PACKAGER. Do you want to install flathub package or from source?${RC}"
                 printf "%b\n" "1) Flathub package"
