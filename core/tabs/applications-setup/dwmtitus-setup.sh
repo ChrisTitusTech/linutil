@@ -81,7 +81,6 @@ install_nerd_font() {
     # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
     FONT_NAME="MesloLGS Nerd Font Mono"
     FONT_DIR="$HOME/.local/share/fonts"
-    FONT_ZIP="$FONT_DIR/Meslo.zip"
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
