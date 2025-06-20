@@ -30,6 +30,9 @@ cleanup_system() {
         xbps-install)
             "$ESCALATION_TOOL" xbps-remove -Ooy
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" -y remove-orphans
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}. Skipping.${RC}"
             ;;

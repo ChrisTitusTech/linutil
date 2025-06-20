@@ -28,7 +28,7 @@ installJetBrainsToolBox() {
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm jetbrains-toolbox
                 ;;
-            dnf)
+            dnf|eopkg)
                 manualInstall
                 ;;
             xbps-install)

@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+
 InstallTermiusFonts() {
     if [ ! -f "/usr/share/kbd/consolefonts/ter-c18b.psf.gz" ] && 
        [ ! -f "/usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz" ] && 
@@ -15,9 +16,18 @@ InstallTermiusFonts() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-fonts-console
-                ;;
+                ;;            
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy terminus-font
+                ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y font-terminus-console
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y terminus-bitmap-fonts
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add font-terminus
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -31,7 +41,7 @@ InstallTermiusFonts() {
 
 SetTermiusFonts() {
         case "$DTYPE" in
-            arch|fedora|void)
+            arch|fedora|void|solus|opensuse-*)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v32b/' /etc/vconsole.conf
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
@@ -39,8 +49,16 @@ SetTermiusFonts() {
                 fi
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
                 ;;
+            alpine)
+                printf "%b\n" "${YELLOW}Updating console font configuration for Alpine...${RC}"
+                if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+                    "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/ter-v32b.psf.gz
+                fi
+                echo 'consolefont="/usr/share/consolefonts/ter-v32b.psf.gz"' | "$ESCALATION_TOOL" tee /etc/conf.d/consolefont > /dev/null
+                "$ESCALATION_TOOL" rc-update add consolefont boot
+                printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
+                ;;
             debian)
-                
                 printf "%b\n" "${YELLOW}Updating console-setup configuration...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^CODESET=.*/CODESET="guess"/' /etc/default/console-setup
                 "$ESCALATION_TOOL" sed -i 's/^FONTFACE=.*/FONTFACE="TerminusBold"/' /etc/default/console-setup

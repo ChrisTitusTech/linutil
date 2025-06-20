@@ -9,7 +9,7 @@ installCUPS() {
     pacman)
         "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm cups
         ;;
-    apt-get|nala|dnf)
+    apt-get|nala|dnf|eopkg)
         "$ESCALATION_TOOL" "$PACKAGER" install -y cups
         ;;
     xbps-install)

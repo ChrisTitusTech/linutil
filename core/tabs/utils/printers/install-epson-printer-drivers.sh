@@ -13,7 +13,7 @@ installEpsonPrinterDriver() {
     apt-get|nala)
         "$ESCALATION_TOOL" "$PACKAGER" install -y printer-driver-escpr
         ;;
-    dnf)
+    dnf|eopkg)
         "$ESCALATION_TOOL" "$PACKAGER" install -y epson-inkjet-printer-escpr
         ;;
     xbps-install) 

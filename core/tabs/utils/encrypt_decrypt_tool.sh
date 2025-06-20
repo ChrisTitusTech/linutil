@@ -10,10 +10,7 @@ if ! command_exists openssl; then
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed openssl
             ;;
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
-            ;;
-        dnf)
+        apt-get|nala|dnf|eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         zypper)

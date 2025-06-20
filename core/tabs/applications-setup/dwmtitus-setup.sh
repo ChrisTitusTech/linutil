@@ -25,6 +25,10 @@ setupDWM() {
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy base-devel freetype-devel fontconfig-devel imlib2-devel libXft-devel libXinerama-devel git unzip flameshot lxappearance feh mate-polkit
             ;; 
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y -c system.devel
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxinerama-devel libxft-devel imlib2-devel git unzip flameshot lxappearance feh mate-polkit xcb-util-devel
+            ;;   
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -54,6 +58,9 @@ setupPicomDependencies() {
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy meson libev-devel uthash libconfig-devel pixman-devel xcb-util-image-devel xcb-util-renderutil-devel pcre2-devel libepoxy-devel dbus-devel
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel meson libev-devel uthash-devel libconfig-devel pixman-devel xcb-util-image-devel xcb-util-renderutil-devel pcre2-devel libepoxy-devel dbus-devel xcb-util-devel
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
@@ -74,7 +81,6 @@ install_nerd_font() {
     # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
     FONT_NAME="MesloLGS Nerd Font Mono"
     FONT_DIR="$HOME/.local/share/fonts"
-    FONT_ZIP="$FONT_DIR/Meslo.zip"
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
     FONT_INSTALLED=$(fc-list | grep -i "Meslo")
 
@@ -214,6 +220,9 @@ setupDisplayManager() {
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy xorg-minimal
             ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y xorg-server xinit
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
@@ -284,6 +293,9 @@ setupDisplayManager() {
                 if [ "$DM" = "lightdm" ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" -Sy lightdm-gtk-greeter
                 fi
+                ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"

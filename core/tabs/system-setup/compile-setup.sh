@@ -52,6 +52,13 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -Sy void-repo-multilib
             "$ESCALATION_TOOL" "$PACKAGER" -Sy glibc-32bit gcc-multilib
             ;;
+        eopkg)
+            # shellcheck disable=SC2086
+            COMPILEDEPS='-c system.devel'
+            "$ESCALATION_TOOL" "$PACKAGER" update-repo
+            "$ESCALATION_TOOL" "$PACKAGER" install -y tar tree unzip cmake make jq
+            ""$ESCALATION_TOOL" "$PACKAGER" "$COMPILEDEPS"
+            ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
             ;;
