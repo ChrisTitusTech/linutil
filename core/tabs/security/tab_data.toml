@@ -1,12 +1,23 @@
 name = "Security"
 
 [[data]]
-name = "Firewall Baselines (CTT)"
+name = "UFW Firewall Baselines (CTT)"
 description = "Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes"
-script = "firewall-baselines.sh"
+script = "ufw-baselines.sh"
 task_list = "I SS"
 
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "firewalld" ]
+values = [ "firewall-cmd" ]
+
+[[data]]
+name = "FirewallD Firewall Baselines (CTT)"
+description = "Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes"
+script = "firewalld-baselines.sh"
+task_list = "I SS"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "firewall-cmd" ]

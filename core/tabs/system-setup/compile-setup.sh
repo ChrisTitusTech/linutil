@@ -39,11 +39,25 @@ installDepend() {
         zypper)
             COMPILEDEPS='patterns-devel-base-devel_basis'
             "$ESCALATION_TOOL" "$PACKAGER" refresh 
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install "$DEPENDENCIES" "$COMPILEDEPS"
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install libgcc_s1-gcc7-32bit glibc-devel-32bit
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install $COMPILEDEPS
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install tar tree multitail unzip cmake make jq libgcc_s1-gcc7-32bit glibc-devel-32bit
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add build-base multitail tar tree trash-cli unzip cmake jq
+            ;;
+        xbps-install)
+            COMPILEDEPS='base-devel'
+            # shellcheck disable=SC2086
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy $DEPENDENCIES $COMPILEDEPS
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy void-repo-multilib
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy glibc-32bit gcc-multilib
+            ;;
+        eopkg)
+            # shellcheck disable=SC2086
+            COMPILEDEPS='-c system.devel'
+            "$ESCALATION_TOOL" "$PACKAGER" update-repo
+            "$ESCALATION_TOOL" "$PACKAGER" install -y tar tree unzip cmake make jq
+            ""$ESCALATION_TOOL" "$PACKAGER" "$COMPILEDEPS"
             ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"

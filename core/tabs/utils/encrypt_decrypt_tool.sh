@@ -10,10 +10,7 @@ if ! command_exists openssl; then
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed openssl
             ;;
-        apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
-            ;;
-        dnf)
+        apt-get|nala|dnf|eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" install -y openssl
             ;;
         zypper)
@@ -21,6 +18,9 @@ if ! command_exists openssl; then
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add openssl
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy openssl
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

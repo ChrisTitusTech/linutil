@@ -2,6 +2,7 @@
 
 # Load common script functions
 . ../common-script.sh  
+. ../common-service-script.sh
 
 # Function to install packages based on the package manager
 install_package() {
@@ -13,6 +14,9 @@ install_package() {
                 ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add "$PACKAGE"
+                ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy "$PACKAGE"
                 ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$PACKAGE"
@@ -38,6 +42,10 @@ setup_ssh() {
         SSH_SERVICE="sshd"
         ;;
     apk)
+        install_package openssh
+        SSH_SERVICE="sshd"
+        ;;
+    xbps-install)
         install_package openssh
         SSH_SERVICE="sshd"
         ;;

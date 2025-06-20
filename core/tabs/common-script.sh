@@ -26,6 +26,9 @@ checkFlatpak() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add flatpak
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy flatpak
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y flatpak
                 ;;
@@ -182,7 +185,7 @@ checkEnv() {
     checkArch
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
-    checkPackageManager 'nala apt-get dnf pacman zypper apk'
+    checkPackageManager 'nala apt-get dnf pacman zypper apk xbps-install eopkg'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
