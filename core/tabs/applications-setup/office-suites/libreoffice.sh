@@ -19,6 +19,9 @@ installLibreOffice() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add libreoffice
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy libreoffice
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1

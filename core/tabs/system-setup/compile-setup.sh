@@ -45,6 +45,13 @@ installDepend() {
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add build-base multitail tar tree trash-cli unzip cmake jq
             ;;
+        xbps-install)
+            COMPILEDEPS='base-devel'
+            # shellcheck disable=SC2086
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy $DEPENDENCIES $COMPILEDEPS
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy void-repo-multilib
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy glibc-32bit gcc-multilib
+            ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "$DEPENDENCIES"
             ;;

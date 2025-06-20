@@ -13,6 +13,9 @@ setupBluetooth() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bluez
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy bluez
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y bluez
                 ;;
@@ -21,7 +24,13 @@ setupBluetooth() {
         printf "%b\n" "${GREEN}Bluez is already installed.${RC}"
     fi
 
-    startService bluetooth
+    # Set service name based on distribution
+    SERVICE_NAME="bluetooth"
+    if [ "$PACKAGER" = "xbps-install" ]; then
+        SERVICE_NAME="bluetoothd"
+    fi
+    
+    startAndEnableService "$SERVICE_NAME"
 }
 
 main_menu() {

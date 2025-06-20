@@ -18,6 +18,9 @@ installFirefox() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y firefox
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy firefox
+                ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add firefox
                 ;;
