@@ -26,11 +26,17 @@ installNeovim() {
             chmod u+x /tmp/nvim.appimage
             "$ESCALATION_TOOL" mv /tmp/nvim.appimage /usr/local/bin/nvim
             ;;
-        dnf|zypper)
+        dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv lua53-luarocks golang ShellCheck git
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add neovim ripgrep fzf py3-virtualenv luarocks go shellcheck git
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy neovim ripgrep fzf python3-virtualenv luarocks go shellcheck git
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

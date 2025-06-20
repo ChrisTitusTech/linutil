@@ -10,27 +10,30 @@ updateLinutil() {
 
     if ! command_exists cargo; then
         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
-            case "$PACKAGER" in
-                pacman)
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
-                    ;;
-                zypper)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make
-                    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-                    . "$HOME/.cargo/env"
-                    ;;
-                apk)
-                    "$ESCALATION_TOOL" "$PACKAGER" add build-base
-                    "$ESCALATION_TOOL" "$PACKAGER" add rustup
-                    rustup-init
-                    # shellcheck disable=SC1091
-                    . "$HOME/.cargo/env"
-                    ;;
-                *)
-                    "$ESCALATION_TOOL" "$PACKAGER" install -y rustup
-                    ;;
-            esac
+        case "$PACKAGER" in
+            pacman)
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm rustup
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y curl rustup man-pages man-db man
+                rustup-init -y
+                ;;
+            zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -n curl gcc make rustup
+                ;;
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add build-base rustup
+                rustup-init -y
+                ;;
+            *)
+                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+                ;;
+        esac
     fi
+
+    # shellcheck disable=SC1091
+    . "$HOME/.cargo/env"
+    rustup default stable
 
     INSTALLED_VERSION=$(cargo install --list | grep "linutil_tui" | awk '{print $2}' | tr -d 'v:')
     LATEST_VERSION=$(curl -s https://crates.io/api/v1/crates/linutil_tui | grep -oP '"max_version":\s*"\K[^"]+')
@@ -41,7 +44,6 @@ updateLinutil() {
     fi
 
     printf "%b\n" "${YELLOW}Updating linutil_tui...${RC}"
-    rustup default stable
     cargo install --force linutil_tui
     printf "%b\n" "${GREEN}Updated successfully.${RC}"
 }

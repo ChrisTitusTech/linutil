@@ -22,6 +22,9 @@ setupDWM() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER"  install -y make libX11-devel libXinerama-devel libXft-devel imlib2-devel gcc
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy base-devel freetype-devel fontconfig-devel imlib2-devel libXft-devel libXinerama-devel git unzip flameshot lxappearance feh mate-polkit
+            ;; 
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             exit 1
@@ -48,6 +51,9 @@ setupPicomDependencies() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxcb-devel dbus-1-devel gcc git libconfig-devel libdrm-devel libev-devel libX11-devel libX11-xcb1 libXext-devel libxcb-devel Mesa-libGL-devel Mesa-libEGL-devel libepoxy-devel meson pcre2-devel uthash-devel xcb-util-image-devel libpixman-1-0-devel xcb-util-renderutil-devel xcb-util-devel
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy meson libev-devel uthash libconfig-devel pixman-devel xcb-util-image-devel xcb-util-renderutil-devel pcre2-devel libepoxy-devel dbus-devel
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
@@ -65,6 +71,8 @@ makeDWM() {
 }
 
 install_nerd_font() {
+    # Check to see if the MesloLGS Nerd Font is installed (Change this to whatever font you would like)
+    FONT_NAME="MesloLGS Nerd Font Mono"
     FONT_DIR="$HOME/.local/share/fonts"
     FONT_ZIP="$FONT_DIR/Meslo.zip"
     FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
@@ -84,47 +92,19 @@ install_nerd_font() {
             return 1
         }
     else
-        printf "%b\n" "${GREEN}$FONT_DIR exists, skipping creation.${RC}"
+        printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
+        # Change this URL to correspond with the correct font
+        FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
+        FONT_DIR="$HOME/.local/share/fonts"
+        TEMP_DIR=$(mktemp -d)
+        curl -sSLo "$TEMP_DIR"/"${FONT_NAME}".zip "$FONT_URL"
+        unzip "$TEMP_DIR"/"${FONT_NAME}".zip -d "$TEMP_DIR"
+        mkdir -p "$FONT_DIR"/"$FONT_NAME"
+        mv "${TEMP_DIR}"/*.ttf "$FONT_DIR"/"$FONT_NAME"
+        fc-cache -fv
+        rm -rf "${TEMP_DIR}"
+        printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
     fi
-
-    # Check if the font zip file already exists
-    if [ ! -f "$FONT_ZIP" ]; then
-        # Download the font zip file
-        curl -sSLo "$FONT_ZIP" "$FONT_URL" || {
-            printf "%b\n" "${RED}Failed to download Meslo Nerd-fonts from $FONT_URL${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo.zip already exists in $FONT_DIR, skipping download.${RC}"
-    fi
-
-    # Unzip the font file if it hasn't been unzipped yet
-    if [ ! -d "$FONT_DIR/Meslo" ]; then
-        mkdir -p "$FONT_DIR/Meslo" || {
-            printf "%b\n" "${RED}Failed to create directory: $FONT_DIR/Meslo${RC}"
-            return 1
-        }
-        unzip "$FONT_ZIP" -d "$FONT_DIR" || {
-            printf "%b\n" "${RED}Failed to unzip $FONT_ZIP${RC}"
-            return 1
-        }
-    else
-        printf "%b\n" "${GREEN}Meslo font files already unzipped in $FONT_DIR, skipping unzip.${RC}"
-    fi
-
-    # Remove the zip file
-    rm "$FONT_ZIP" || {
-        printf "%b\n" "${RED}Failed to remove $FONT_ZIP${RC}"
-        return 1
-    }
-
-    # Rebuild the font cache
-    fc-cache -fv || {
-        printf "%b\n" "${RED}Failed to rebuild font cache${RC}"
-        return 1
-    }
-
-    printf "%b\n" "${GREEN}Meslo Nerd-fonts installed successfully${RC}"
 }
 
 picom_animations() {
@@ -231,6 +211,9 @@ setupDisplayManager() {
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install -y xinit xorg-x11-server
             ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy xorg-minimal
+            ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
             exit 1
@@ -295,6 +278,12 @@ setupDisplayManager() {
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$DM"
+                ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy "$DM"
+                if [ "$DM" = "lightdm" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" -Sy lightdm-gtk-greeter
+                fi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
