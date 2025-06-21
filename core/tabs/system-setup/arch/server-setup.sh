@@ -183,6 +183,7 @@ keymap () {
     echo -ne "
     Please select key board layout from this list"
     # These are default key maps as presented in official arch repo archinstall
+    # shellcheck disable=SC1010
     options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg ua uk)
 
     select_option "${options[@]}"
@@ -302,7 +303,7 @@ logo
 keymap
 
 echo "Setting up mirrors for optimal download"
-iso=$(curl -4 ifconfig.co/country-iso)
+iso=$(curl -4 ifconfig.io/country_code)
 timedatectl set-ntp true
 pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
@@ -316,7 +317,11 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c "$iso" -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -c "$iso" --score 5 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then #check if there are less than 5 mirrors
+    cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+fi
+
 if [ ! -d "/mnt" ]; then
     mkdir /mnt
 fi
@@ -385,16 +390,16 @@ else
 fi
 
 if [[ "${FS}" == "btrfs" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.btrfs -f "${partition3}"
     mount -t btrfs "${partition3}" /mnt
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
-    mkfs.vfat -F32 -n "EFIBOOT" "${partition2}"
+    mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.ext4 "${partition3}"
     mount -t ext4 "${partition3}" /mnt
 elif [[ "${FS}" == "luks" ]]; then
-    mkfs.vfat -F32 "${partition2}"
+    mkfs.fat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
     echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder
@@ -414,8 +419,8 @@ if ! mountpoint -q /mnt; then
     echo "ERROR! Failed to mount ${partition3} to /mnt after multiple attempts."
     exit 1
 fi
-mkdir -p /mnt/boot/efi
-mount -t vfat -U "${BOOT_UUID}" /mnt/boot/
+mkdir -p /mnt/boot
+mount -U "${BOOT_UUID}" /mnt/boot/
 
 if ! grep -qs '/mnt' /proc/mounts; then
     echo "Drive is not mounted can not continue"
@@ -481,8 +486,8 @@ echo -ne "
                     Network Setup
 -------------------------------------------------------------------------
 "
-pacman -S --noconfirm --needed networkmanager dhclient
-systemctl enable --now NetworkManager
+pacman -S --noconfirm --needed networkmanager dhcpcd
+systemctl enable NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up mirrors for optimal download
@@ -492,7 +497,7 @@ pacman -S --noconfirm --needed pacman-contrib curl
 pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-nc=$(grep -c ^processor /proc/cpuinfo)
+nc=$(grep -c ^"cpu cores" /proc/cpuinfo)
 echo -ne "
 -------------------------------------------------------------------------
                     You have " $nc" cores. And
@@ -660,10 +665,10 @@ systemctl enable ntpd.service
 echo "  NTP enabled"
 systemctl disable dhcpcd.service
 echo "  DHCP disabled"
-systemctl stop dhcpcd.service
-echo "  DHCP stopped"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
+systemctl enable reflector.timer
+echo "  Reflector enabled"
 
 echo -ne "
 -------------------------------------------------------------------------

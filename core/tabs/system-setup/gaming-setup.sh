@@ -40,18 +40,19 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
         dnf)
-            if [ "$(rpm -E %fedora)" -le 41 ]; then
-                "$ESCALATION_TOOL" "$PACKAGER" install ffmpeg ffmpeg-libs -y
-                "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
-            else
-                printf "%b\n" "${CYAN}Fedora < 41 detected. Installing rpmfusion repos.${RC}"
-                "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora)".noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora)".noarch.rpm -y
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264 -y
-                "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
-            fi
+            printf "%b\n" "${CYAN}Installing rpmfusion repos.${RC}"
+            "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora)".noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora)".noarch.rpm -y
+            "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt --repo fedora-cisco-openh264 enabled=1
+    
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
+            ;;
+        eopkg)
+            DISTRO_DEPS="libgnutls libgtk-2 libgtk-3 pulseaudio alsa-lib alsa-plugins giflib libpng openal-soft libxcomposite libxinerama ncurses vulkan ocl-icd libva gst-plugins-base sdl2 v4l-utils sqlite3"
+
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
@@ -97,6 +98,10 @@ installAdditionalDepend() {
         zypper)
             DISTRO_DEPS='lutris'
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
+            ;;
+        eopkg)
+            DISTRO_DEPS='steam lutris'
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"

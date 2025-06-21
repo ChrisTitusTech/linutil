@@ -12,6 +12,12 @@ installTelegram() {
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add telegram-desktop
                 ;;
+            xbps-install)
+                "$ESCALATION_TOOL" "$PACKAGER" -Sy telegram-desktop
+                ;;
+            eopkg)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y telegram
+                ;;
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram-desktop 
                 ;;

@@ -37,14 +37,17 @@ install_docker() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
             "$ESCALATION_TOOL" systemctl enable --now docker
             ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install docker
+        zypper|eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y docker
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm docker
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -71,14 +74,17 @@ install_docker_compose() {
             fi
             "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose-plugin
             ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install docker-compose
+        zypper|eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y docker-compose
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm docker-compose
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add docker-cli-compose
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy docker-compose
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -107,6 +113,15 @@ install_components() {
     fi
 }
 
+docker_permission() {
+    printf "%b\n" "${YELLOW}Adding current user to the docker group...${RC}"
+    "$ESCALATION_TOOL" usermod -aG docker "$USER"
+    printf "%b\n" "${YELLOW}To use Docker without sudo:${RC}"
+    printf "%b\n" "${GREEN}Log out and back in, run 'newgrp docker', or restart your terminal.${RC}"
+    printf "%b\n" "${GREEN}Current user added to the docker group successfully.${RC}"
+    }
+
 checkEnv
 checkEscalationTool
 install_components
+docker_permission

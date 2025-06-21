@@ -1,7 +1,22 @@
 name = "System Setup"
 
 [[data]]
-name = "Arch Linux"
+name = "Alpine"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["apk"]
+
+[[data.entries]]
+name = "Alpine Update"
+description = "Upgrades Alpine Linux to either latest stable or edge repositories"
+script = "alpine/alpine-upgrade.sh"
+task_list = "P MP"
+multi_select = false
+
+[[data]]
+name = "Arch"
 
 [[data.preconditions]]
 matches = true

@@ -10,12 +10,23 @@ installFastfetch() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm fastfetch
             ;;
         apt-get | nala)
-            curl -sSLo /tmp/fastfetch.deb https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb
+            case "$ARCH" in
+                x86_64)
+                    DEB_FILE="fastfetch-linux-amd64.deb"
+                    ;;
+                aarch64)
+                    DEB_FILE="fastfetch-linux-aarch64.deb"
+                    ;;
+            esac
+            curl -sSLo "/tmp/fastfetch.deb" "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/$DEB_FILE"
             "$ESCALATION_TOOL" "$PACKAGER" install -y /tmp/fastfetch.deb
             rm /tmp/fastfetch.deb
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add fastfetch
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy fastfetch
             ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y fastfetch
