@@ -1,42 +1,29 @@
-#!/bin/bash
+#!/bin/sh -e
 
-# Function to detect package manager
-detect_package_manager() {
-    if command -v apt-get &> /dev/null; then
-        echo "apt"
-    elif command -v pacman &> /dev/null; then
-        echo "pacman"
-    elif command -v dnf &> /dev/null; then
-        echo "dnf"
-    elif command -v zypper &> /dev/null; then
-        echo "zypper"
-    else
-        echo "unsupported"
-    fi
-}
+. ../common-script.sh
 
-# Function to check if a DE/WM is installed
+# Check if WM/DE is installed
 is_installed() {
-    local pkg_manager=$1
-    local check_type=$2
-    local value=$3
+    pkg_manager=$1
+    check_type=$2
+    value=$3
     case $check_type in
         bin)
-            command -v "$value" &>/dev/null && return 0 || return 1
+            command -v "$value" >/dev/null 2>&1 && return 0 || return 1
             ;;
         pkg)
             case $pkg_manager in
-                apt)
+                apt-get|nala)
                     dpkg -l | grep -qw "$value" && return 0 || return 1
                     ;;
                 pacman)
-                    pacman -Qs "$value" &>/dev/null && return 0 || return 1
+                    pacman -Qs "$value" >/dev/null 2>&1 && return 0 || return 1
                     ;;
                 dnf)
-                    rpm -q "$value" &>/dev/null && return 0 || return 1
+                    rpm -q "$value" >/dev/null 2>&1 && return 0 || return 1
                     ;;
                 zypper)
-                    rpm -q "$value" &>/dev/null && return 0 || return 1
+                    rpm -q "$value" >/dev/null 2>&1 && return 0 || return 1
                     ;;
             esac
             ;;
@@ -44,39 +31,39 @@ is_installed() {
     return 1
 }
 
-# Function to uninstall packages
+# Uninstal packages
 uninstall_packages() {
-    local pkg_manager=$1
+    pkg_manager=$1
     shift
-    local packages=("$@")
+    # shellcheck disable=SC2086
     case $pkg_manager in
-        "apt")
-            sudo apt-get remove --purge "${packages[@]}" -y || true
-            sudo apt-get autoremove -y || true
+        pacman)
+            $ESCALATION_TOOL $AUR_HELPER -Rns "$@" --noconfirm || true
             ;;
-        "pacman")
-            sudo pacman -Rns "${packages[@]}" --noconfirm || true
+        apt-get|nala)
+            $ESCALATION_TOOL $pkg_manager remove --purge "$@" -y || true
+            $ESCALATION_TOOL $pkg_manager autoremove -y || true
             ;;
-        "dnf")
-            sudo dnf remove "${packages[@]}" -y || true
+        dnf)
+            $ESCALATION_TOOL $pkg_manager remove "$@" -y || true
             ;;
-        "zypper")
-            sudo zypper remove "${packages[@]}" -y || true
+        zypper)
+            $ESCALATION_TOOL $pkg_manager remove "$@" -y || true
             ;;
     esac
 }
 
-# Function to uninstall desktop environment
+# Uninstall DEs
 uninstall_desktop() {
-    local pkg_manager=$1
-    local desktop=$2
-    local packages=()
-    local config_dirs=()
+    pkg_manager=$1
+    desktop=$2
+    packages=()
+    config_dirs=()
 
     case $desktop in
         "GNOME")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "ubuntu-gnome-desktop"
                         "gnome-shell"
@@ -120,7 +107,7 @@ uninstall_desktop() {
             ;;
         "KDE")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "kubuntu-desktop"
                         "plasma-desktop"
@@ -154,7 +141,7 @@ uninstall_desktop() {
             ;;
         "XFCE")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "xfce4"
                         "xfce4-goodies"
@@ -185,7 +172,7 @@ uninstall_desktop() {
             ;;
         "Cinnamon")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "cinnamon-desktop-environment"
                     )
@@ -214,7 +201,7 @@ uninstall_desktop() {
             ;;
         "MATE")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "ubuntu-mate-desktop"
                     )
@@ -243,7 +230,7 @@ uninstall_desktop() {
             ;;
         "Budgie")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "ubuntu-budgie-desktop"
                     )
@@ -271,7 +258,7 @@ uninstall_desktop() {
             ;;
         "LXQt")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "lxqt"
                     )
@@ -299,7 +286,7 @@ uninstall_desktop() {
             ;;
         "LXDE")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "lxde"
                     )
@@ -327,7 +314,7 @@ uninstall_desktop() {
             ;;
         "i3")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "i3"
                         "i3-wm"
@@ -364,7 +351,7 @@ uninstall_desktop() {
             ;;
         "Sway")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "sway"
                         "swaylock"
@@ -399,7 +386,7 @@ uninstall_desktop() {
             ;;
         "DWM")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "dwm"
                     )
@@ -426,7 +413,7 @@ uninstall_desktop() {
             ;;
         "Awesome")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "awesome"
                     )
@@ -453,7 +440,7 @@ uninstall_desktop() {
             ;;
         "BSPWM")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "bspwm"
                         "sxhkd"
@@ -485,7 +472,7 @@ uninstall_desktop() {
             ;;
         "Openbox")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "openbox"
                     )
@@ -512,7 +499,7 @@ uninstall_desktop() {
             ;;
         "Fluxbox")
             case $pkg_manager in
-                "apt")
+                "apt-get"|"nala")
                     packages=(
                         "fluxbox"
                     )
@@ -560,7 +547,7 @@ uninstall_desktop() {
 
     # Additional cleanup for specific package managers
     case $pkg_manager in
-        "apt")
+        "apt-get"|"nala")
             sudo apt-get autoremove -y || true
             sudo apt-get clean || true
             ;;
@@ -579,70 +566,72 @@ uninstall_desktop() {
     echo "Uninstallation of $desktop completed."
 }
 
+
+
 # Main script
-echo "Desktop Environment Uninstaller"
-echo "=============================="
 
-# Detect package manager
-pkg_manager=$(detect_package_manager)
-if [ "$pkg_manager" = "unsupported" ]; then
-    echo "Error: Unsupported package manager"
-    exit 1
-fi
+main() {
+    echo "Desktop Environment Uninstaller"
+    echo "=============================="
 
-# List of DEs/WMs and their detection methods
-# Format: NAME|TYPE|VALUE
-DE_LIST=(
-    "GNOME|bin|gnome-shell"
-    "KDE|bin|startplasma-x11"
-    "XFCE|bin|xfce4-session"
-    "Cinnamon|bin|cinnamon-session"
-    "MATE|bin|mate-session"
-    "Budgie|bin|budgie-desktop"
-    "LXQt|bin|lxqt-session"
-    "LXDE|bin|lxsession"
-    "i3|bin|i3"
-    "Sway|bin|sway"
-    "DWM|bin|dwm"
-    "Awesome|bin|awesome"
-    "BSPWM|bin|bspwm"
-    "Openbox|bin|openbox"
-    "Fluxbox|bin|fluxbox"
-)
+    # List of DEs/WMs and their detection methods
+    # Format: NAME|TYPE|VALUE
+    DE_LIST=(
+        "GNOME|bin|gnome-shell"
+        "KDE|bin|startplasma-x11"
+        "XFCE|bin|xfce4-session"
+        "Cinnamon|bin|cinnamon-session"
+        "MATE|bin|mate-session"
+        "Budgie|bin|budgie-desktop"
+        "LXQt|bin|lxqt-session"
+        "LXDE|bin|lxsession"
+        "i3|bin|i3"
+        "Sway|bin|sway"
+        "DWM|bin|dwm"
+        "Awesome|bin|awesome"
+        "BSPWM|bin|bspwm"
+        "Openbox|bin|openbox"
+        "Fluxbox|bin|fluxbox"
+    )
 
-INSTALLED_DESKTOPS=()
-for entry in "${DE_LIST[@]}"; do
-    IFS='|' read -r name type value <<< "$entry"
-    if is_installed "$pkg_manager" "$type" "$value"; then
-        INSTALLED_DESKTOPS+=("$name")
+    INSTALLED_DESKTOPS=()
+    for entry in "${DE_LIST[@]}"; do
+        IFS='|' read -r name type value <<< "$entry"
+        if is_installed "$PACKAGER" "$type" "$value"; then
+            INSTALLED_DESKTOPS+=("$name")
+        fi
+        unset IFS
+    done
+
+    if [ ${#INSTALLED_DESKTOPS[@]} -eq 0 ]; then
+        echo "No supported desktop environments or window managers detected as installed."
+        exit 0
     fi
-    unset IFS
-done
 
-if [ ${#INSTALLED_DESKTOPS[@]} -eq 0 ]; then
-    echo "No supported desktop environments or window managers detected as installed."
-    exit 0
-fi
+    # Show menu
+    echo "Select the desktop environment or window manager to uninstall:"
+    for i in "${!INSTALLED_DESKTOPS[@]}"; do
+        idx=$((i+1))
+        echo "$idx) ${INSTALLED_DESKTOPS[$i]}"
+    done
+    echo "q) Quit"
 
-# Display menu
-echo "Select the desktop environment or window manager to uninstall:"
-for i in "${!INSTALLED_DESKTOPS[@]}"; do
-    idx=$((i+1))
-    echo "$idx) ${INSTALLED_DESKTOPS[$i]}"
-done
-echo "q) Quit"
+    read -p "Enter your choice: " choice
 
-read -p "Enter your choice: " choice
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le ${#INSTALLED_DESKTOPS[@]} ]; then
+        selected_de="${INSTALLED_DESKTOPS[$((choice-1))]}"
+        uninstall_desktop "$PACKAGER" "$selected_de"
+        echo "Uninstallation complete. You may need to reboot your system."
+        exit 0
+    elif [[ "$choice" =~ ^[qQ]$ ]]; then
+        echo "Exiting..."
+        exit 0
+    else
+        echo "Invalid choice"
+        exit 1
+    fi
+}
 
-if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le ${#INSTALLED_DESKTOPS[@]} ]; then
-    selected_de="${INSTALLED_DESKTOPS[$((choice-1))]}"
-    uninstall_desktop "$pkg_manager" "$selected_de"
-    echo "Uninstallation complete. You may need to reboot your system."
-    exit 0
-elif [[ "$choice" =~ ^[qQ]$ ]]; then
-    echo "Exiting..."
-    exit 0
-else
-    echo "Invalid choice"
-    exit 1
-fi 
+
+checkEnv
+main
