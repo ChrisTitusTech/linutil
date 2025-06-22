@@ -337,18 +337,18 @@ uninstall_desktop() {
     # Additional cleanup for specific package managers
     case $pkg_manager in
         "apt-get"|"nala")
-            $ESCALATION_TOOL $pkg_manager autoremove -y || true
-            $ESCALATION_TOOL $pkg_manager clean || true
+            $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
+            $ESCALATION_TOOL "$pkg_manager" clean || true
             ;;
         "pacman")
             $ESCALATION_TOOL $AUR_HELPER -Scc --noconfirm || true
             ;;
         "dnf")
-            $ESCALATION_TOOL $pkg_manager autoremove -y || true
-            $ESCALATION_TOOL $pkg_manager clean all || true
+            $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
+            $ESCALATION_TOOL "$pkg_manager" clean all || true
             ;;
         "zypper")
-            $ESCALATION_TOOL $pkg_manager clean || true
+            $ESCALATION_TOOL "$pkg_manager" clean || true
             ;;
     esac
 
@@ -407,7 +407,7 @@ main() {
             ;;
         *)
             set -- $INSTALLED_DESKTOPS
-            selected_de=$(eval echo \${$choice})
+            selected_de=$(printf "%s\n" "$@" | sed -n "${choice}p")
             if [ -n "$selected_de" ]; then
                 uninstall_desktop "$PACKAGER" "$selected_de"
                 echo "Uninstallation complete. You may need to reboot your system."
