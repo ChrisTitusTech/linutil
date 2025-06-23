@@ -55,7 +55,7 @@ installDepend() {
             COMPILEDEPS='-c system.devel'
             "$ESCALATION_TOOL" "$PACKAGER" update-repo
             "$ESCALATION_TOOL" "$PACKAGER" install -y tar tree unzip cmake make jq
-            "$ESCALATION_TOOL" "$PACKAGER" $COMPILEDEPS
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $COMPILEDEPS
             ;;
         *)
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
