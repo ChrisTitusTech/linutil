@@ -21,7 +21,7 @@ install_packages() {
 }
 
 installDesktopEnvironment() {
-    printf "%s\n" "$YELLOW Installing Desktop Environment... $RC"
+    printf "%s\n" " Installing Desktop Environment... "
     case "$PACKAGER" in
         pacman)
             case "$1" in
@@ -33,7 +33,7 @@ installDesktopEnvironment() {
                 budgie)     install_packages "$AUR_HELPER" budgie-desktop ;;
                 lxqt)       install_packages "$AUR_HELPER" lxqt ;;
                 lxde)       install_packages "$AUR_HELPER" lxde ;;
-                *) printf "%s\n" "$RED Unsupported desktop environment: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported desktop environment: $1 "; exit 1 ;;
             esac
             ;;
         apt-get|nala)
@@ -46,7 +46,7 @@ installDesktopEnvironment() {
                 budgie)     install_packages "$PACKAGER" ubuntu-budgie-desktop ;;
                 lxqt)       install_packages "$PACKAGER" lubuntu-desktop ;;
                 lxde)       install_packages "$PACKAGER" lxde ;;
-                *) printf "%s\n" "$RED Unsupported desktop environment: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported desktop environment: $1 "; exit 1 ;;
             esac
             ;;
         dnf)
@@ -59,7 +59,7 @@ installDesktopEnvironment() {
                 budgie)     install_packages "$PACKAGER" @budgie-desktop-environment ;;
                 lxqt)       install_packages "$PACKAGER" @lxqt-desktop-environment ;;
                 lxde)       install_packages "$PACKAGER" @lxde-desktop-environment ;;
-                *) printf "%s\n" "$RED Unsupported desktop environment: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported desktop environment: $1 "; exit 1 ;;
             esac
             ;;
         zypper)
@@ -72,18 +72,18 @@ installDesktopEnvironment() {
                 budgie)     install_packages "$PACKAGER" patterns-budgie-budgie ;;
                 lxqt)       install_packages "$PACKAGER" patterns-lxqt-lxqt ;;
                 lxde)       install_packages "$PACKAGER" patterns-lxde-lxde ;;
-                *) printf "%s\n" "$RED Unsupported desktop environment: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported desktop environment: $1 "; exit 1 ;;
             esac
             ;;
         *)
-            printf "%s\n" "$RED Unsupported package manager: $PACKAGER $RC"
+            printf "%s\n" "$RED Unsupported package manager: $PACKAGER "
             exit 1
             ;;
     esac
 }
 
 installWindowManager() {
-    printf "%s\n" "$YELLOW Installing Window Manager... $RC"
+    printf "%s\n" " Installing Window Manager... "
     case "$PACKAGER" in
         pacman)
             case "$1" in
@@ -94,7 +94,7 @@ installWindowManager() {
                 bspwm)      install_packages "$AUR_HELPER" bspwm sxhkd ;;
                 openbox)    install_packages "$AUR_HELPER" openbox ;;
                 fluxbox)    install_packages "$AUR_HELPER" fluxbox ;;
-                *) printf "%s\n" "$RED Unsupported window manager: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported window manager: $1 "; exit 1 ;;
             esac
             ;;
         apt-get|nala|dnf|zypper)
@@ -106,37 +106,37 @@ installWindowManager() {
                 bspwm)      install_packages "$PACKAGER" bspwm sxhkd ;;
                 openbox)    install_packages "$PACKAGER" openbox ;;
                 fluxbox)    install_packages "$PACKAGER" fluxbox ;;
-                *) printf "%s\n" "$RED Unsupported window manager: $1 $RC"; exit 1 ;;
+                *) printf "%s\n" "$RED Unsupported window manager: $1 "; exit 1 ;;
             esac
             ;;
         *)
-            printf "%s\n" "$RED Unsupported package manager: $PACKAGER $RC"
+            printf "%s\n" "$RED Unsupported package manager: $PACKAGER "
             exit 1
             ;;
     esac
 }
 
 main() {
-    printf "%s\n" "$YELLOW Desktop Environment and Window Manager Installation $RC"
-    printf "%s\n" "$YELLOW ============================================= $RC"
-    printf "%s\n" "$YELLOW 1. Install Desktop Environment $RC"
-    printf "%s\n" "$YELLOW 2. Install Window Manager $RC"
-    printf "%s\n" "$YELLOW 3. Exit $RC"
-    printf "%s" "$YELLOW Please select an option (1-3): $RC"
+    printf "%s\n" " Desktop Environment and Window Manager Installation "
+    printf "%s\n" " ============================================= "
+    printf "%s\n" " 1. Install Desktop Environment "
+    printf "%s\n" " 2. Install Window Manager "
+    printf "%s\n" " 3. Exit "
+    printf "%s" " Please select an option (1-3): "
     read choice
 
     case "$choice" in
         1)
-            printf "%s\n" "$YELLOW Available Desktop Environments: $RC"
-            printf "%s\n" "$YELLOW 1. GNOME $RC"
-            printf "%s\n" "$YELLOW 2. KDE Plasma $RC"
-            printf "%s\n" "$YELLOW 3. XFCE $RC"
-            printf "%s\n" "$YELLOW 4. Cinnamon $RC"
-            printf "%s\n" "$YELLOW 5. MATE $RC"
-            printf "%s\n" "$YELLOW 6. Budgie $RC"
-            printf "%s\n" "$YELLOW 7. LXQt $RC"
-            printf "%s\n" "$YELLOW 8. LXDE $RC"
-            printf "%s" "$YELLOW Please select a desktop environment (1-8): $RC"
+            printf "%s\n" " Available Desktop Environments: "
+            printf "%s\n" " 1. GNOME "
+            printf "%s\n" " 2. KDE Plasma "
+            printf "%s\n" " 3. XFCE "
+            printf "%s\n" " 4. Cinnamon "
+            printf "%s\n" " 5. MATE "
+            printf "%s\n" " 6. Budgie "
+            printf "%s\n" " 7. LXQt "
+            printf "%s\n" " 8. LXDE "
+            printf "%s" " Please select a desktop environment (1-8): "
             read de_choice
             case "$de_choice" in
                 1) installDesktopEnvironment gnome ;;
@@ -147,19 +147,19 @@ main() {
                 6) installDesktopEnvironment budgie ;;
                 7) installDesktopEnvironment lxqt ;;
                 8) installDesktopEnvironment lxde ;;
-                *) printf "%s\n" "$RED Invalid selection $RC" ;;
+                *) printf "%s\n" "$RED Invalid selection " ;;
             esac
             ;;
         2)
-            printf "%s\n" "$YELLOW Available Window Managers: $RC"
-            printf "%s\n" "$YELLOW 1. i3 $RC"
-            printf "%s\n" "$YELLOW 2. Sway $RC"
-            printf "%s\n" "$YELLOW 3. DWM $RC"
-            printf "%s\n" "$YELLOW 4. Awesome $RC"
-            printf "%s\n" "$YELLOW 5. BSPWM $RC"
-            printf "%s\n" "$YELLOW 6. Openbox $RC"
-            printf "%s\n" "$YELLOW 7. Fluxbox $RC"
-            printf "%s" "$YELLOW Please select a window manager (1-7): $RC"
+            printf "%s\n" " Available Window Managers: "
+            printf "%s\n" " 1. i3 "
+            printf "%s\n" " 2. Sway "
+            printf "%s\n" " 3. DWM "
+            printf "%s\n" " 4. Awesome "
+            printf "%s\n" " 5. BSPWM "
+            printf "%s\n" " 6. Openbox "
+            printf "%s\n" " 7. Fluxbox "
+            printf "%s" " Please select a window manager (1-7): "
             read wm_choice
             case "$wm_choice" in
                 1) installWindowManager i3 ;;
@@ -169,14 +169,14 @@ main() {
                 5) installWindowManager bspwm ;;
                 6) installWindowManager openbox ;;
                 7) installWindowManager fluxbox ;;
-                *) printf "%s\n" "$RED Invalid selection $RC" ;;
+                *) printf "%s\n" "$RED Invalid selection " ;;
             esac
             ;;
         3)
             exit 0
             ;;
         *)
-            printf "%s\n" "$RED Invalid selection $RC"
+            printf "%s\n" "$RED Invalid selection "
             ;;
     esac
 }
