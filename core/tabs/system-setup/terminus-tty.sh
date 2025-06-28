@@ -40,8 +40,8 @@ InstallTermiusFonts() {
 }
 
 SetTermiusFonts() {
-        case "$DTYPE" in
-            arch|fedora|void|solus|opensuse-*)
+        case "$PACKAGER" in
+            pacman|xbps-install|dnf|eopkg|zypper)
                 printf "%b\n" "${YELLOW}Updating FONT= line in /etc/vconsole.conf...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^FONT=.*/FONT=ter-v18b/' /etc/vconsole.conf
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
@@ -49,7 +49,7 @@ SetTermiusFonts() {
                 fi
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
                 ;;
-            alpine)
+            apk)
                 printf "%b\n" "${YELLOW}Updating console font configuration for Alpine...${RC}"
                 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
                     "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/ter-v18b.psf.gz
@@ -58,7 +58,7 @@ SetTermiusFonts() {
                 "$ESCALATION_TOOL" rc-update add consolefont boot
                 printf "%b\n" "${GREEN}Terminus font set for TTY.${RC}"
                 ;;
-            debian)
+            apt-get|nala)
                 printf "%b\n" "${YELLOW}Updating console-setup configuration...${RC}"
                 "$ESCALATION_TOOL" sed -i 's/^CODESET=.*/CODESET="guess"/' /etc/default/console-setup
                 "$ESCALATION_TOOL" sed -i 's/^FONTFACE=.*/FONTFACE="TerminusBold"/' /etc/default/console-setup
@@ -70,6 +70,10 @@ SetTermiusFonts() {
                    "$ESCALATION_TOOL" setfont -C /dev/tty1 /usr/share/consolefonts/Uni3-TerminusBold18x10.psf.gz
                 fi
                 printf "%b\n" "${GREEN}Terminus font has been set for TTY.${RC}"
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager for font configuration: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
 }
