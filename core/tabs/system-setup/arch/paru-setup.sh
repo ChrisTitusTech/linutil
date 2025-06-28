@@ -2,6 +2,8 @@
 
 . ../../common-script.sh
 
+AUR_HELPER_CHECKED=true
+
 installDepend() {
     case "$PACKAGER" in
         pacman)
