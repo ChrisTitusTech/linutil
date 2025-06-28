@@ -90,11 +90,10 @@ impl Filter {
             None
         } else {
             let input = self.search_input.iter().collect::<String>().to_lowercase();
-            self.items.iter().find_map(|item| {
-                let item_name_lower = item.node.name.to_lowercase();
-                (item_name_lower.starts_with(&input))
-                    .then_some(item_name_lower[input.len()..].to_string())
-            })
+            self.items
+                .iter()
+                .find(|item| item.node.name.to_lowercase().starts_with(&input))
+                .and_then(|item| Some(item.node.name[input.len()..].to_string()))
         }
     }
 
