@@ -7,7 +7,7 @@ installHpPrinterDriver() {
     clear
 
     case "$PACKAGER" in
-    apt-get|dnf|eopkg|nala)
+    apt-get|nala|dnf|zypper|eopkg)
         "$ESCALATION_TOOL" "$PACKAGER" install -y hplip
         ;;
     pacman)
