@@ -7,14 +7,11 @@ installHpPrinterDriver() {
     clear
 
     case "$PACKAGER" in
-    apt-get|nala)
-        "$ESCALATION_TOOL" "$PACKAGER" install -y hplip
-        ;;
-    dnf|eopkg)
+    apt-get|dnf|eopkg|nala)
         "$ESCALATION_TOOL" "$PACKAGER" install -y hplip
         ;;
     pacman)
-        "$ESCALATION_TOOL" -S --noconfirm hplip-lite
+        "$ESCALATION_TOOL" -S --noconfirm --needed hplip-lite
         ;;
     xbps-install) 
         "$ESCALATION_TOOL" "$PACKAGER" -Sy hplip
