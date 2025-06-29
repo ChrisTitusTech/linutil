@@ -91,6 +91,12 @@ script = "printers/install-epson-printer-drivers.sh"
 description = "This script will install the Epson printer drivers."
 task_list = "I"
 
+[[data.entries]]
+name = "HP printer drivers"
+script = "printers/install-hp-printer-drivers.sh"
+description = "This script will install HP printer drivers."
+task_list = "I"
+
 [[data]]
 name = "User Account Manager"
 multi_select = false
