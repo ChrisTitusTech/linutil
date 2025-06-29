@@ -11,7 +11,7 @@ installHpPrinterDriver() {
         "$ESCALATION_TOOL" "$PACKAGER" install -y hplip
         ;;
     pacman)
-        "$ESCALATION_TOOL" -S --noconfirm --needed hplip-lite
+        "$ESCALATION_TOOL" -S --noconfirm --needed hplip
         ;;
     xbps-install) 
         "$ESCALATION_TOOL" "$PACKAGER" -Sy hplip
