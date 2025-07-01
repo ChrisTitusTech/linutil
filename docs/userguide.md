@@ -131,6 +131,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
 - **Epson printer drivers**: This script will install the Epson printer drivers.
+- **HP printer drivers**: This script will install HP printer drivers.
 
 ### User Account Manager
 
