@@ -93,7 +93,7 @@ impl Filter {
             self.items
                 .iter()
                 .find(|item| item.node.name.to_lowercase().starts_with(&input))
-                .and_then(|item| Some(item.node.name[input.len()..].to_string()))
+                .map(|item| item.node.name[input.len()..].to_string())
         }
     }
 
