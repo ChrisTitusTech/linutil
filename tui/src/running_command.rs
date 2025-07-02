@@ -67,7 +67,7 @@ impl FloatContent for RunningCommand {
             };
 
             let log_path = if let Some(log_path) = &self.log_path {
-                Line::from(format!(" Log saved: {} ", log_path))
+                Line::from(format!(" Log saved: {log_path} "))
             } else {
                 Line::from(" Press 'l' to save command log ")
             };
@@ -175,7 +175,7 @@ impl RunningCommand {
         let mut script = String::new();
         for command in commands {
             match command {
-                Command::Raw(prompt) => script.push_str(&format!("{}\n", prompt)),
+                Command::Raw(prompt) => script.push_str(&format!("{prompt}\n")),
                 Command::LocalFile {
                     executable,
                     args,

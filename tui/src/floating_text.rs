@@ -54,7 +54,7 @@ impl<'a> FloatingText<'a> {
         let src = match command {
             Command::Raw(cmd) => Some(cmd.clone()),
             Command::LocalFile { file, .. } => std::fs::read_to_string(file)
-                .map_err(|_| format!("File not found: {:?}", file))
+                .map_err(|_| format!("File not found: {file:?}"))
                 .ok(),
             Command::None => None,
         }
