@@ -6,17 +6,14 @@ installPodmanCompose() {
     if ! command_exists podman-compose; then
         printf "%b\n" "${YELLOW}Installing Podman Compose...${RC}"
         case "$PACKAGER" in
-            apt-get|nala)
+            apt-get|nala|zypper|dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
-                ;;
-            zypper)
-                "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install podman-compose
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm --needed podman-compose
                 ;;
-            dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
+            apk)
+                "$ESCALATION_TOOL" "$PACKAGER" add podman-compose
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy podman-compose
