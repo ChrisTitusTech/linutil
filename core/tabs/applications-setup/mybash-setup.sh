@@ -107,6 +107,8 @@ linkConfig() {
         printf "%b\n" "${RED}Failed to create symbolic link for .bashrc${RC}"
         exit 1
     }
+
+    mkdir -p "$HOME/.config"
     ln -svf "$gitpath/starship.toml" "$HOME/.config/starship.toml" || {
         printf "%b\n" "${RED}Failed to create symbolic link for starship.toml${RC}"
         exit 1
