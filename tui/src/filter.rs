@@ -95,9 +95,11 @@ impl Filter {
                     let mut item_chars = item.chars();
                     let mut search_chars = self.search_input.iter();
                     loop {
+                        // Take the next character from search input first, since we don't want to remove an extra character from the item
                         let Some(search_char) = search_chars.next() else {
                             break;
                         };
+                        // If the item is shorter than the search input, or a character doesn't match, skip this item
                         let Some(item_char) = item_chars.next() else {
                             return None;
                         };
