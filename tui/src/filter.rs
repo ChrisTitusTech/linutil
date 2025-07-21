@@ -20,8 +20,8 @@ pub struct Filter {
     in_search_mode: bool,
     input_position: usize,
     items: Vec<ListEntry>,
-    // No complex string manipulation is done with completion_preview so we can use String unlike search_input
-    completion_preview: Option<String>,
+    // No complex string manipulation is done with completion so we can use String unlike search_input
+    completion: Option<String>,
 }
 
 impl Filter {
@@ -31,7 +31,7 @@ impl Filter {
             in_search_mode: false,
             input_position: 0,
             items: vec![],
-            completion_preview: None,
+            completion: None,
         }
     }
 
@@ -45,7 +45,7 @@ impl Filter {
 
     pub fn deactivate_search(&mut self) {
         self.in_search_mode = false;
-        self.completion_preview = None;
+        self.completion = None;
     }
 
     pub fn update_items(&mut self, tabs: &[Tab], current_tab: usize, node: NodeId) {
@@ -82,19 +82,31 @@ impl Filter {
             self.items
                 .sort_unstable_by(|a, b| a.node.name.cmp(&b.node.name));
         }
-        self.update_completion_preview();
+        self.update_completion();
     }
 
-    fn update_completion_preview(&mut self) {
-        self.completion_preview = if self.items.is_empty() || self.search_input.is_empty() {
+    fn update_completion(&mut self) {
+        self.completion = if self.items.is_empty() || self.search_input.is_empty() {
             None
         } else {
-            let input = self.search_input.iter().collect::<String>().to_lowercase();
-            self.items.iter().find_map(|item| {
-                let item_name_lower = item.node.name.to_lowercase();
-                (item_name_lower.starts_with(&input))
-                    .then_some(item_name_lower[input.len()..].to_string())
-            })
+            self.items.iter()
+                .map(|item| item.node.name.to_lowercase())
+                .find_map(|item| {
+                    let mut item_chars = item.chars();
+                    let mut search_chars = self.search_input.iter();
+                    loop {
+                        let Some(search_char) = search_chars.next() else {
+                            break;
+                        };
+                        let Some(item_char) = item_chars.next() else {
+                            return None;
+                        };
+                        if !item_char.eq_ignore_ascii_case(&search_char) {
+                            return None;
+                        }
+                    }
+                    Some(item_chars.collect::<String>())
+                })
         }
     }
 
@@ -142,7 +154,7 @@ impl Filter {
             let y = area.y + 1;
             frame.set_cursor_position(Position::new(x, y));
 
-            if let Some(preview) = &self.completion_preview {
+            if let Some(preview) = &self.completion {
                 let preview_x = area.x + search_input_size + 1;
                 let preview_span =
                     Span::styled(preview, Style::default().fg(theme.search_preview_color()));
@@ -171,13 +183,13 @@ impl Filter {
             KeyCode::Esc => {
                 self.input_position = 0;
                 self.search_input.clear();
-                self.completion_preview = None;
+                self.completion = None;
                 return SearchAction::Exit;
             }
             KeyCode::Enter => return SearchAction::Exit,
             _ => return SearchAction::None,
         };
-        self.update_completion_preview();
+        self.update_completion();
         SearchAction::Update
     }
 
@@ -220,18 +232,10 @@ impl Filter {
     }
 
     fn complete_search(&mut self) -> SearchAction {
-        if self.completion_preview.is_some() {
-            let input = &self.search_input.iter().collect::<String>().to_lowercase();
-            if let Some(search_completion) = self
-                .items
-                .iter()
-                .find(|item| item.node.name.to_lowercase().starts_with(input))
-            {
-                self.search_input = search_completion.node.name.chars().collect();
-            }
-
+        if let Some(completion) = &self.completion {
+            self.search_input.extend(completion.chars());
             self.input_position = self.search_input.len();
-            self.completion_preview = None;
+            self.completion = None;
             SearchAction::Update
         } else {
             SearchAction::None
