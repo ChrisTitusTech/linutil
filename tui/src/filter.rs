@@ -89,7 +89,8 @@ impl Filter {
         self.completion = if self.items.is_empty() || self.search_input.is_empty() {
             None
         } else {
-            self.items.iter()
+            self.items
+                .iter()
                 .map(|item| item.node.name.to_lowercase())
                 .find_map(|item| {
                     let mut item_chars = item.chars();
@@ -99,11 +100,10 @@ impl Filter {
                         let Some(search_char) = search_chars.next() else {
                             break;
                         };
+
                         // If the item is shorter than the search input, or a character doesn't match, skip this item
-                        let Some(item_char) = item_chars.next() else {
-                            return None;
-                        };
-                        if !item_char.eq_ignore_ascii_case(&search_char) {
+                        let item_char = item_chars.next()?;
+                        if !item_char.eq_ignore_ascii_case(search_char) {
                             return None;
                         }
                     }
