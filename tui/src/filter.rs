@@ -89,25 +89,27 @@ impl Filter {
         self.completion = if self.items.is_empty() || self.search_input.is_empty() {
             None
         } else {
-            self.items
-                .iter()
-                .find_map(|item| {
-                    let mut item_chars = item.node.name.chars();
-                    let mut search_chars = self.search_input.iter();
-                    loop {
-                        // Take the next character from search input first, since we don't want to remove an extra character from the item
-                        let Some(search_char) = search_chars.next() else {
-                            break;
-                        };
+            self.items.iter().find_map(|item| {
+                let mut item_chars = item.node.name.chars();
+                let mut search_chars = self.search_input.iter();
+                loop {
+                    // Take the next character from search input first, since we don't want to remove an extra character from the item
+                    let Some(search_char) = search_chars.next() else {
+                        break;
+                    };
 
-                        // If the item is shorter than the search input, or a character doesn't match, skip this item
-                        let item_char = item_chars.next()?;
-                        if !item_char.eq_ignore_ascii_case(search_char) {
-                            return None;
-                        }
+                    // If the item is shorter than the search input, or a character doesn't match, skip this item
+                    let item_char = item_chars.next()?;
+                    if !item_char.eq_ignore_ascii_case(search_char) {
+                        return None;
                     }
-                    Some(item_chars.map(|c| c.to_ascii_lowercase()).collect::<String>())
-                })
+                }
+                Some(
+                    item_chars
+                        .map(|c| c.to_ascii_lowercase())
+                        .collect::<String>(),
+                )
+            })
         }
     }
 
