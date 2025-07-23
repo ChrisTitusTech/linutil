@@ -91,9 +91,8 @@ impl Filter {
         } else {
             self.items
                 .iter()
-                .map(|item| item.node.name.to_lowercase())
                 .find_map(|item| {
-                    let mut item_chars = item.chars();
+                    let mut item_chars = item.node.name.chars();
                     let mut search_chars = self.search_input.iter();
                     loop {
                         // Take the next character from search input first, since we don't want to remove an extra character from the item
@@ -107,7 +106,7 @@ impl Filter {
                             return None;
                         }
                     }
-                    Some(item_chars.collect::<String>())
+                    Some(item_chars.map(|c| c.to_ascii_lowercase()).collect::<String>())
                 })
         }
     }
