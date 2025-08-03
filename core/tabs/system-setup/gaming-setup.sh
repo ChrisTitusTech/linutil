@@ -27,14 +27,9 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
-            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32"
+            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 software-properties-common"
 
             "$ESCALATION_TOOL" dpkg --add-architecture i386
-
-            if [ "$DTYPE" != "pop" ]; then
-                "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
-                "$ESCALATION_TOOL" apt-add-repository contrib -y
-            fi
 
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
