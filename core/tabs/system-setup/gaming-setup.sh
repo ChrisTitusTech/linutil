@@ -79,12 +79,8 @@ installAdditionalDepend() {
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
             printf "%b\n" "${YELLOW}Installing steam...${RC}"
 
-            if lsb_release -i | grep -qi Debian; then
-                "$ESCALATION_TOOL" apt-add-repository non-free -y
-                "$ESCALATION_TOOL" "$PACKAGER" install steam-installer -y
-            else
-                "$ESCALATION_TOOL" "$PACKAGER" install -y steam
-            fi
+    
+            "$ESCALATION_TOOL" "$PACKAGER" install -y steam
             ;;
         dnf)
             DISTRO_DEPS='steam lutris'
