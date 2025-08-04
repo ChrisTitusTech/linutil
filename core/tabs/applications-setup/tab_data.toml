@@ -227,25 +227,25 @@ name = "Virtual Machines"
 
 [[data.entries]]
 name = "Gnome Boxes"
-description = "Gnome Boxes is a free type 2 hypervisor avialble on most Linux distributions"
+description = "GNOME Boxes is a virtualization application for the GNOME Desktop Environment (works on KDE and others) that allows users to create and manage virtual machines easily."
 script = "virtual-machines/gnome-boxes.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "VirtualBox"
-description = "VirtualBox is a type 2 hypervisor for creating virtual machines"
+description = "Oracle VirtualBox is an open source, cross-platform, virtualization software, enables users to run multiple operating systems on a single device."
 script = "virtual-machines/virtualbox.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Virt Manager"
-description = ""
+description = "Virt Manager is a Graphical tool to manage libvirt Virtual Machines"
 script = "virtual-machines/virt-manager.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "QEMU"
-description = ""
+description = "QEMU is a generic and open source machine emulator and virtualizer."
 script = "virtual-machines/qemu-install.sh"
 task_list = "I"
 

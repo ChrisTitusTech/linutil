@@ -85,7 +85,7 @@ main() {
     printf "%b" "Enter your choice [1-5]: "
     read -r CHOICE
     case "$CHOICE" in
-        1) installQ#EMUDesktop ;;
+        1) installQEMUDesktop ;;
         2) installQEMUEmulators ;;
         3) installLibvirt ;;
         #4) installVirtManager ;;
