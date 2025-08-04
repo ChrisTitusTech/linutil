@@ -21,14 +21,14 @@ installQEMUEmulators() {
     fi
 }
 
-installVirtManager() {
-    if ! command_exists virt-manager; then
-        printf "%b\n" "${YELLOW}Installing Virt-Manager.${RC}"
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm virt-manager
-    else
-        printf "%b\n" "${GREEN}Virt-Manager already installed.${RC}"
-    fi
-}
+# installVirtManager() {
+#     if ! command_exists virt-manager; then
+#         printf "%b\n" "${YELLOW}Installing Virt-Manager.${RC}"
+#         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm virt-manager
+#     else
+#         printf "%b\n" "${GREEN}Virt-Manager already installed.${RC}"
+#     fi
+# }
 
 checkKVM() {
     if [ ! -e "/dev/kvm" ]; then
@@ -88,7 +88,7 @@ main() {
         1) installQEMUDesktop ;;
         2) installQEMUEmulators ;;
         3) installLibvirt ;;
-        4) installVirtManager ;;
+        #4) installVirtManager ;;
         5)
             installQEMUDesktop
             installQEMUEmulators

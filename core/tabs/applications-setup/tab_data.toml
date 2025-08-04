@@ -223,6 +223,33 @@ script = "browsers/waterfox.sh"
 task_list = "FI"
 
 [[data]]
+name = "Virtual Machines"
+
+[[data.entries]]
+name = "Gnome Boxes"
+description = "Gnome Boxes is a free type 2 hypervisor avialble on most Linux distributions"
+script = "virtual-machines/gnome-boxes.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "VirtualBox"
+description = "VirtualBox is a type 2 hypervisor for creating virtual machines"
+script = "virtual-machines/virtualbox.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Virt Manager"
+description = ""
+script = "virtual-machines/virt-manager.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "QEMU"
+description = ""
+script = "virtual-machines/qemu-install.sh"
+task_list = "I"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"
