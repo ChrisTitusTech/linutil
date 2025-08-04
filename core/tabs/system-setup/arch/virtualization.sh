@@ -80,16 +80,16 @@ main() {
     printf "%b\n" "1. ${YELLOW}QEMU${RC}"
     printf "%b\n" "2. ${YELLOW}QEMU-Emulators ( Extended architectures )${RC}"
     printf "%b\n" "3. ${YELLOW}Libvirt${RC}"
-    printf "%b\n" "4. ${YELLOW}Virtual-Manager${RC}"
-    printf "%b\n" "5. ${YELLOW}All${RC}"
+    #printf "%b\n" "4. ${YELLOW}Virtual-Manager${RC}"
+    printf "%b\n" "4. ${YELLOW}All${RC}"
     printf "%b" "Enter your choice [1-5]: "
     read -r CHOICE
     case "$CHOICE" in
-        1) installQEMUDesktop ;;
+        1) installQ#EMUDesktop ;;
         2) installQEMUEmulators ;;
         3) installLibvirt ;;
         #4) installVirtManager ;;
-        5)
+        4)
             installQEMUDesktop
             installQEMUEmulators
             installLibvirt
