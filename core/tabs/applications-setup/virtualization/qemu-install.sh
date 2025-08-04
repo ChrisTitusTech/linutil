@@ -36,7 +36,7 @@ installQEMUDesktop() {
         #     ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            exit 1
+            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
             ;;
     esac
 }

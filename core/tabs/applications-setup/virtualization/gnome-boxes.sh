@@ -9,9 +9,6 @@ installBoxes() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
-            dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
-
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
             ;;
         zypper)
@@ -23,7 +20,6 @@ installBoxes() {
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER" Installing Flatpak version"${RC}"
             "$ESCALATION_TOOL" flatpak install --noninteractive org.gnome.Boxes
-            exit 1
             ;;
     esac
 }
