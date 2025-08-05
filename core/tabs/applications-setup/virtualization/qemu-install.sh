@@ -12,13 +12,6 @@ installQEMUDesktop() {
 		        printf "%b\n" "${GREEN}QEMU already installed.${RC}"
 		    fi
             ;;
-        # dnf)
-        #     if ! command_exists qemu-img; then
-        #         "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
-        #     else
-        #         printf "%b\n" "${GREEN}QEMU already installed.${RC}"
-        #     fi
-        #     ;;
         zypper)
             if ! command_exists qemu-img; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
@@ -26,14 +19,6 @@ installQEMUDesktop() {
                 printf "%b\n" "${GREEN}QEMU already installed.${RC}"
             fi
             ;;
-        # pacman)
-        # 	if ! command_exists qemu-img; then
-        #         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
-        #     else
-        #         printf "%b\n" "${GREEN}QEMU is already installed.${RC}"
-        #     fi
-        #     checkKVM
-        #     ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu

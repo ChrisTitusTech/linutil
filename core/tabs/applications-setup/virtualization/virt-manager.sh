@@ -38,6 +38,7 @@ installVirtManager() {
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt-manager
             exit 1
             ;;
     esac
