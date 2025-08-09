@@ -9,15 +9,25 @@ installDepend() {
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
-            #Check for multilib
-            if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
-                echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                "$ESCALATION_TOOL" "$PACKAGER" -Syu
+            if grep -qi "Artix" /etc/os-release; then # Detect Artix Linux
+                # Check for lib32
+                if ! grep -q "^\s*\[lib32\]" /etc/pacman.conf; then
+                    echo "[lib32]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                else
+                    printf "%b\n" "${GREEN}lib32 is already enabled.${RC}"
+                fi
             else
-                printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
+                # Check for multilib
+                if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
+                    echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                else
+                    printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
+                fi
             fi
-
             DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk2 gtk3 lib32-gtk2 lib32-gtk3 libpulse lib32-libpulse alsa-lib lib32-alsa-lib \
                 alsa-utils alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib giflib lib32-giflib libpng lib32-libpng \
                 libldap lib32-libldap openal lib32-openal libxcomposite lib32-libxcomposite libxinerama lib32-libxinerama \
