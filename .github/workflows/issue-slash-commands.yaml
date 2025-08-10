@@ -22,7 +22,7 @@ jobs:
         run: |
           if [[ "${{ contains(github.event.comment.body, '/label') }}" == "true" ]]; then
             echo "command=true" >> $GITHUB_ENV
-            LABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/label" '/\/label/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
+            LABEL_NAME=$(echo '${{ github.event.comment.body }}' | awk -F"/label" '/\/label/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
             echo "label_command=true" >> $GITHUB_ENV
             echo "label_name=${LABEL_NAME}" >> $GITHUB_ENV
           else
@@ -34,7 +34,7 @@ jobs:
         run: |
           if [[ "${{ contains(github.event.comment.body, '/unlabel') }}" == "true" ]]; then
             echo "command=true" >> $GITHUB_ENV
-            UNLABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/unlabel" '/\/unlabel/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
+            UNLABEL_NAME=$(echo '${{ github.event.comment.body }}' | awk -F"/unlabel" '/\/unlabel/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
             echo "unlabel_command=true" >> $GITHUB_ENV
             echo "unlabel_name=${UNLABEL_NAME}" >> $GITHUB_ENV
           else

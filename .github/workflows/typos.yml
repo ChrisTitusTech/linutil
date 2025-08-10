@@ -1,5 +1,8 @@
 name: Check for typos
 
+permissions:
+  contents: read
+
 on:
   [push, pull_request, workflow_dispatch]
 
