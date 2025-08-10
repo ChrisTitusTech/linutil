@@ -34,7 +34,7 @@ impl Config {
         let config: Config = match toml::from_str(&content) {
             Ok(config) => config,
             Err(e) => {
-                eprintln!("Failed to parse config file: {}", e);
+                eprintln!("Failed to parse config file: {e}");
                 process::exit(1);
             }
         };
