@@ -22,7 +22,7 @@ use std::rc::Rc;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
-const FLOAT_SIZE: u16 = 80;
+const FLOAT_SIZE: u16 = 95;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
@@ -315,7 +315,7 @@ impl AppState {
         let (keybind_scope, shortcuts) = self.get_keybinds();
 
         let keybinds_block = Block::bordered()
-            .title(format!(" {} ", keybind_scope))
+            .title(format!(" {keybind_scope} "))
             .border_set(border::ROUNDED);
 
         let keybind_render_width = keybinds_block.inner(area).width;
@@ -411,7 +411,7 @@ impl AppState {
                         chunks[1].width as usize - left_content.len() - right_content.len(),
                     );
                     Line::styled(
-                        format!("{}{}{}", left_content, center_space, right_content),
+                        format!("{left_content}{center_space}{right_content}"),
                         self.theme.cmd_color(),
                     )
                     .patch_style(style)
@@ -426,7 +426,7 @@ impl AppState {
         };
 
         let title = if self.multi_select {
-            &format!("{}[Multi-Select] ", TITLE)
+            &format!("{TITLE}[Multi-Select] ")
         } else {
             TITLE
         };
