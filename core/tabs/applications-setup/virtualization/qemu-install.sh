@@ -12,11 +12,48 @@ installQEMUDesktop() {
 		        printf "%b\n" "${GREEN}QEMU already installed.${RC}"
 		    fi
             ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
+
+            sudo systemctl start libvirtd
+            #sets the libvirtd service to start on system start
+            sudo systemctl enable libvirtd
+
+            #add current user to virt manager group
+            sudo usermod -a -G libvirt $(whoami)
+            ;;
         zypper)
             if ! command_exists qemu-img; then
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
             else
                 printf "%b\n" "${GREEN}QEMU already installed.${RC}"
+            fi
+            ;;
+        pacman)
+            if ! command_exists qemu-img; then
+                printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
+            else
+                printf "%b\n" "${GREEN}QEMU is already installed.${RC}"
+            fi
+            checkKVM
+            ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+            ;;
+    
+}
+
+installQEMUEmulators() {
+    printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
+    case "$PACKAGER" in
+        pacman)
+            if ! "$PACKAGER" -Q | grep -q "qemu-emulators-full "; then
+                printf "%b\n" "${YELLOW}Installing QEMU-Emulators.${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-emulators-full swtpm
+            else
+                printf "%b\n" "${GREEN}QEMU-Emulators already installed.${RC}"
             fi
             ;;
         *)
@@ -26,6 +63,15 @@ installQEMUDesktop() {
     esac
 }
 
+checkKVM() {
+    if [ ! -e "/dev/kvm" ]; then
+        printf "%b\n" "${RED}KVM is not available. Make sure you have CPU virtualization support enabled in your BIOS/UEFI settings. Please refer https://wiki.archlinux.org/title/KVM for more information.${RC}"
+    else
+        "$ESCALATION_TOOL" usermod "$USER" -aG kvm
+    fi
+}
+
 checkEnv
 checkEscalationTool
 installQEMUDesktop
+installQEMUEmulators

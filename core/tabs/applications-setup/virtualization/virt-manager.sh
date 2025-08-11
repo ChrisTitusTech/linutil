@@ -12,16 +12,16 @@ installVirtManager() {
 		        printf "%b\n" "${GREEN}Virt-Manager already installed.${RC}"
 		    fi
             ;;
-        # dnf)
-        #     "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
 
-        #     sudo systemctl start libvirtd
-		# 	#sets the libvirtd service to start on system start
-		# 	sudo systemctl enable libvirtd
+            sudo systemctl start libvirtd
+			#sets the libvirtd service to start on system start
+			sudo systemctl enable libvirtd
 
-		# 	#add current user to virt manager group
-		# 	sudo usermod -a -G libvirt $(whoami)
-        #     ;;
+			#add current user to virt manager group
+			sudo usermod -a -G libvirt $(whoami)
+            ;;
         zypper)
             if ! command_exists virt-manager; then
 		        "$ESCALATION_TOOL" "$PACKAGER" install -y virt-manager
