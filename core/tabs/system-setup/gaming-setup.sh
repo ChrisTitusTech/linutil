@@ -9,15 +9,25 @@ installDepend() {
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
-            #Check for multilib
-            if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
-                echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                "$ESCALATION_TOOL" "$PACKAGER" -Syu
+            if grep -qi "Artix" /etc/os-release; then # Detect Artix Linux
+                # Check for lib32
+                if ! grep -q "^\s*\[lib32\]" /etc/pacman.conf; then
+                    echo "[lib32]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                else
+                    printf "%b\n" "${GREEN}lib32 is already enabled.${RC}"
+                fi
             else
-                printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
+                # Check for multilib
+                if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
+                    echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+                    "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                else
+                    printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
+                fi
             fi
-
             DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk2 gtk3 lib32-gtk2 lib32-gtk3 libpulse lib32-libpulse alsa-lib lib32-alsa-lib \
                 alsa-utils alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib giflib lib32-giflib libpng lib32-libpng \
                 libldap lib32-libldap openal lib32-openal libxcomposite lib32-libxcomposite libxinerama lib32-libxinerama \
@@ -27,14 +37,9 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
-            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32"
+            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 software-properties-common"
 
             "$ESCALATION_TOOL" dpkg --add-architecture i386
-
-            if [ "$DTYPE" != "pop" ]; then
-                "$ESCALATION_TOOL" "$PACKAGER" install -y software-properties-common
-                "$ESCALATION_TOOL" apt-add-repository contrib -y
-            fi
 
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
@@ -84,12 +89,8 @@ installAdditionalDepend() {
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
             printf "%b\n" "${YELLOW}Installing steam...${RC}"
 
-            if lsb_release -i | grep -qi Debian; then
-                "$ESCALATION_TOOL" apt-add-repository non-free -y
-                "$ESCALATION_TOOL" "$PACKAGER" install steam-installer -y
-            else
-                "$ESCALATION_TOOL" "$PACKAGER" install -y steam
-            fi
+    
+            "$ESCALATION_TOOL" "$PACKAGER" install -y steam
             ;;
         dnf)
             DISTRO_DEPS='steam lutris'
