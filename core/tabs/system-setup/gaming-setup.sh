@@ -69,7 +69,7 @@ installAdditionalDepend() {
             ;;
         apt-get | nala)
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
-                grep -v 'beta' |
+                grep -v 'latest' |
                 tail -n1 |
                 cut -d '/' --fields=3)
 
