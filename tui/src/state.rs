@@ -553,7 +553,13 @@ impl AppState {
 
         match &mut self.focus {
             Focus::FloatingWindow(command) => {
-                if command.handle_key_event(key) {
+                // Check if it's Enter key AND a running command that's still running
+                if key.code == KeyCode::Enter 
+                    && let Some(running_cmd) = command.content.as_any().downcast_mut::<RunningCommand>()
+                    && running_cmd.is_running() 
+                {
+                    running_cmd.send_input("\n");
+                } else if command.handle_key_event(key) {
                     self.focus = Focus::List;
                 }
             }
