@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installVirtManager() {
-    printf "%b\n" "${YELLOW}Installing VirtualBox...${RC}"
+    printf "%b\n" "${YELLOW}Installing Virtual Manager...${RC}"
     case "$PACKAGER" in
         apt-get|nala)
         	if ! command_exists virt-manager; then
