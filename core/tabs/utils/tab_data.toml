@@ -44,6 +44,7 @@ name = "Extend Displays"
 description = "This script is designed to extend display among multi-monitor setup in your system"
 script = "monitor-control/extend_displays.sh"
 
+
 [[data.entries]]
 name = "Manage Arrangement"
 description = "This script is designed to arrange monitors in multi-monitor setup in your system"
@@ -149,6 +150,12 @@ task_list = "D"
 name = "Crypto tool"
 script = "encrypt_decrypt_tool.sh"
 task_list = "I FM"
+
+[[data]]
+name = "US Locale Setup"
+description = "This fixes US UTF-8 Locale and Folder listings"
+script = "locale-us-setup.sh"
+task_list = "FM"
 
 [[data]]
 name = "Numlock on Startup"
