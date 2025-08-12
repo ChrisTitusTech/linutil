@@ -7,7 +7,7 @@ installQEMUDesktop() {
     case "$PACKAGER" in
         apt-get|nala)
         	if ! command_exists qemu-img; then
-		        "$ESCALATION_TOOL" "$PACKAGER" install -y qemu-utils qemu-system-x86 qemu-system-gui
+		        "$ESCALATION_TOOL" "$PACKAGER" install -y qemu-utils qemu-system-$ARCH qemu-system-gui
 		    else
 		        printf "%b\n" "${GREEN}QEMU already installed.${RC}"
 		    fi

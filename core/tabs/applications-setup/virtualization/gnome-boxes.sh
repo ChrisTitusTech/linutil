@@ -5,14 +5,8 @@
 installBoxes() {
 	printf "%b\n" "${YELLOW}Installing Gnome Boxes...${RC}"
     case "$PACKAGER" in
-        apt-get|nala)
+        apt-get|nala|dnf|zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
-            ;;
-        zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes 
             ;;
         pacman)
             "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm gnome-boxes 
