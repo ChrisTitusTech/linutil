@@ -249,6 +249,12 @@ description = "QEMU is a generic and open source machine emulator and virtualize
 script = "virtual-machines/qemu-install.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "LibVirt"
+description = ""
+script = "virtual-machines/libvirt.sh"
+task_list = "I"
+
 [[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."

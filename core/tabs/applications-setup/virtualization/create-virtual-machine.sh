@@ -52,7 +52,90 @@ createVBoxVM(){
 }
 
 setVMDetails() {
-	
+	mem=$(grep MemTotal /proc/meminfo | tr -s ' ' | cut -d ' ' -f2)
+	mem=$(expr $(expr $mem / 1024000) + 1)
+	memory=$(expr $mem / 4)
+	if [ "$memory" -lt "4" ]; then
+		memory=4
+	fi
+
+	cpus=$(getconf _NPROCESSORS_ONLN)
+	vcpus=$(expr $cpu / 4)
+	if [ "$vcpus" -lt "2" ]; then
+		vcpus=2
+	fi
+
+	printf "%b\n" "Please enter VM Name"
+	read name
+
+	printf "%b\n" "Please enter drive size (virtualbox in MB. virt-manage in GB)"
+	read driveSize
+
+	printf "%b\n" "Please enter full iso/drive path"
+	read isoFile
+
+	printf "%b\n" "Select Distro:"
+	printf "%b\n" "1. ArchLinux"
+	printf "%b\n" "2. Debian"
+	printf "%b\n" "3. Fedora"
+	printf "%b\n" "4. Gentoo"
+	printf "%b\n" "5. Oracle Linux"
+	printf "%b\n" "6. Red Hat"
+	printf "%b\n" "7. openSUSE"
+	printf "%b\n" "8. Ubuntu"
+	printf "%b\n" "9. Windows 11"
+	printf "%b\n" "10. Enter Distro Name"
+	printf "%b" "Enter your choice [1-10]: "
+	read -r CHOICE
+	case "$CHOICE" in
+	    1) 	distro="ArchLinux" ;;
+	    2) 	distro="Debian" ;;
+	    3) 	distro="Fedora" ;;
+	    4) 	distro="Gentoo" ;;
+	    5) 	distro="Oracle" ;;
+	    6) 	distro="Red Hat" ;;
+	    7) 	distro="openSUSE" ;;
+	    8) 	distro="Ubuntu" ;;
+		9)	distro="Windows11" ;;
+	    10) read distro ;;
+
+	    *) printf "%b\n" "Invalid choice." && exit 1 ;;
+	esac
+
+	if [[ "$distro" == "openSUSE" ]]; then
+		printf "%b\n" "Select openSUSE Version:"
+		printf "%b\n" "1. Leap"
+		printf "%b\n" "2. Tumbleweed"
+		printf "%b" "Enter your choice [1-2]: "
+		read -r CHOICE2
+		case "$CHOICE2" in
+		    1) 	distro="openSUSE_Leap" ;;
+		    2) 	distro="openSUSE_Tumbleweed" ;;
+		*) printf "%b\n" "Invalid choice." && exit 1 ;;
+		esac
+	fi
+
+	if [[ "$distro" == "Windows11" ]]; then
+		os="Windows"
+	else
+		os="Linux"
+	fi
+
+	if [[ "$(dpkg --print-architecture)" == "amd64" ]]; then
+		arch="x86"
+		subdistro="$distro""_64"
+	elif [[ "$(dpkg --print-architecture)" == "arm64" ]]; then
+		arch="arm"
+		subdistro="$distro""_arm64"
+	else
+		printf "%b" "Architecture not supported"
+	fi
+
+	if [[ $isoFile ~= *".iso" ]]; then
+		storageType=dvddrive
+	else
+		storageType=hdd
+	fi
 }
 
 checkInstalled() {
