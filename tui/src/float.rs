@@ -1,6 +1,6 @@
 use crate::{hint::Shortcut, theme::Theme};
 use ratatui::{
-    crossterm::event::{KeyCode, KeyEvent, MouseEvent},
+    crossterm::event::{KeyEvent, MouseEvent},
     layout::{Constraint, Layout, Rect},
     Frame,
 };
@@ -55,19 +55,9 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
 
     // Returns true if the floating window is finished.
     pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-        match key.code {
-            KeyCode::Enter
-            | KeyCode::Char('p')
-            | KeyCode::Char('d')
-            | KeyCode::Char('g')
-            | KeyCode::Char('q')
-            | KeyCode::Esc
-                if self.content.is_finished() =>
-            {
-                true
-            }
-            _ => self.content.handle_key_event(key),
-        }
+        // Always pass the key event to the content first
+        // Let the content (RunningCommand) decide when to close the window
+        self.content.handle_key_event(key)
     }
 
     pub fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
