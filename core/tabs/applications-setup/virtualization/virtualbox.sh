@@ -48,7 +48,7 @@ installVirtualBox() {
 
 virtualBoxPermissions() {
     printf "%b\n" "${YELLOW}Adding current user to the vboxusers group...${RC}"
-    "$ESCALATION_TOOL" usermod -aG vboxusers "$USER"
+    "$ESCALATION_TOOL" usermod -aG vboxusers $(who | awk 'NR==1{print $1}')
 }
 
 checkEnv

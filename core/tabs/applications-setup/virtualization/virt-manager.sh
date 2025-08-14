@@ -20,7 +20,7 @@ installVirtManager() {
             sudo systemctl start libvirtd
 
 			#add current user to virt manager group
-			sudo usermod -a -G libvirt $(whoami)
+			sudo usermod -a -G libvirt $(who | awk 'NR==1{print $1}')
             ;;
         pacman)
         	if ! command_exists virt-manager; then
@@ -35,6 +35,8 @@ installVirtManager() {
             exit 1
             ;;
     esac
+
+    "$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
 
 checkEnv
