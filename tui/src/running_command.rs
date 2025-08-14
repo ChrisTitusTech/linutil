@@ -12,7 +12,7 @@ use ratatui::{
 };
 use std::{
     fs::File,
-    io::{Result, Write},
+    io::{Read, Result, Write},
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc, Mutex,
@@ -111,6 +111,10 @@ impl FloatContent for RunningCommand {
             // Close the window when Enter is pressed and the command is finished
             KeyCode::Enter if self.is_finished() => {
                 return true;
+            }
+            // Pass Enter key to running command for user input
+            KeyCode::Enter if !self.is_finished() => {
+                self.handle_passthrough_key_event(key);
             }
             KeyCode::PageUp => {
                 self.scroll_offset = self.scroll_offset.saturating_add(10);
@@ -230,16 +234,23 @@ impl RunningCommand {
             std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
                 loop {
-                    let size = reader.read(&mut buf).unwrap(); // Can block here
-                    if size == 0 {
-                        break; // EOF
+                    match reader.read(&mut buf) {
+                        Ok(size) => {
+                            if size == 0 {
+                                break; // EOF
+                            }
+                            let mut mutex = command_buffer.lock(); // Only lock the mutex after the read is
+                                                                   // done, to minimise the time it is opened
+                            let command_buffer = mutex.as_mut().unwrap();
+                            command_buffer.extend_from_slice(&buf[0..size]);
+                            TERMINAL_UPDATED.store(true, Ordering::Release);
+                            // The mutex is closed here automatically
+                        }
+                        Err(e) => {
+                            eprintln!("Error reading from terminal: {}", e);
+                            break;
+                        }
                     }
-                    let mut mutex = command_buffer.lock(); // Only lock the mutex after the read is
-                                                           // done, to minimise the time it is opened
-                    let command_buffer = mutex.as_mut().unwrap();
-                    command_buffer.extend_from_slice(&buf[0..size]);
-                    TERMINAL_UPDATED.store(true, Ordering::Release);
-                    // The mutex is closed here automatically
                 }
                 TERMINAL_UPDATED.store(true, Ordering::Release);
             })
@@ -360,6 +371,12 @@ impl RunningCommand {
             _ => return,
         };
         // Send the keycodes to the virtual terminal
-        let _ = self.writer.write_all(&input_bytes);
+        if let Err(e) = self.writer.write_all(&input_bytes) {
+            eprintln!("Failed to write to terminal: {}", e);
+        }
+        // Ensure the data is flushed immediately, especially important for Enter key
+        if let Err(e) = self.writer.flush() {
+            eprintln!("Failed to flush terminal: {}", e);
+        }
     }
 }
