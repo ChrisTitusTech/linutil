@@ -7,7 +7,9 @@ installFirefox() {
         printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
+                if [ "$DTYPE" != "ubuntu" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" install -y firefox-esr
+                fi
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install MozillaFirefox
