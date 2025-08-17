@@ -94,6 +94,7 @@ createVBoxVM(){
 
 	vboxmanage modifyvm "$name" --os-type=$subdistro --memory=$memory --chipset=piix3 --graphicscontroller=vmsvga --firmware=efi --acpi=on --ioapic=on --cpus=$vcpus --cpu-profile=host --hwvirtex=on --apic=on --x86-x2apic=on --paravirt-provider=kvm --nested-paging=on --large-pages=off --x86-vtx-vpid=on --x86-vtx-ux=on --accelerate-3d=on --vram=256 --x86-long-mode=on --x86-pae=off
 	vboxmanage modifyvm "$name" --mouse=usb --keyboard=ps2 --usb-ohci=on --usb-ehci=on --audio-enabled=on --audio-driver=default --audio-controller=ac97 --audio-codec=ad1980
+	vboxmanage modifyvm "$name" --nat-pf1 "SSH,tcp,127.0.0.1,2522,10.0.2.15,22"
 
 	vboxmanage createmedium disk --filename="/media/namato/Data/Virtual Machines/$name/$name.vdi" --size=$driveSize --variant=Standard --format=VDI
 
@@ -142,12 +143,11 @@ setVMDetails() {
 		storageType=hdd
 	fi
 
-	# Variable Not Used as of 2025/08/13
-	if [[ "$distro" == "Windows11" ]]; then
-		os="Windows"
-	else
-		os="Linux"
-	fi
+	# if [[ "$distro" == "Windows11" ]]; then
+	# 	os="Windows"
+	# else
+	# 	os="Linux"
+	# fi
 }
 
 installIsoInfo(){
