@@ -175,8 +175,24 @@ impl RunningCommand {
         let mut cmd: CommandBuilder = CommandBuilder::new("sh");
         cmd.arg("-c");
 
+        // Set environment variables needed for interactive TUI tools like gum
+        cmd.env("TERM", "xterm-256color");
+        cmd.env("COLORTERM", "truecolor");
+        // Ensure that interactive tools can detect they're in a terminal
+        cmd.env("FORCE_COLOR", "1");
+        cmd.env("NO_COLOR", "");
+
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
         let mut script = String::new();
+        
+        // Add a prefix to ensure proper terminal setup for interactive tools
+        script.push_str("export TERM=xterm-256color\n");
+        script.push_str("export COLORTERM=truecolor\n");
+        script.push_str("export FORCE_COLOR=1\n");
+        script.push_str("unset NO_COLOR\n");
+        script.push_str("stty sane\n"); // Reset terminal settings
+        script.push_str("stty icanon echo\n"); // Ensure canonical mode and echo are enabled
+        
         for command in commands {
             match command {
                 Command::Raw(prompt) => script.push_str(&format!("{prompt}\n")),
@@ -355,7 +371,7 @@ impl RunningCommand {
                     _ => raw_utf8(),
                 }
             }
-            KeyCode::Enter => vec![b'\n'],
+            KeyCode::Enter => vec![b'\r', b'\n'], // Send both CR and LF for better compatibility
             KeyCode::Backspace => vec![0x7f],
             KeyCode::Left => vec![27, 91, 68],
             KeyCode::Right => vec![27, 91, 67],
