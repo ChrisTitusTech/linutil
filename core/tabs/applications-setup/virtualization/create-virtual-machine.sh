@@ -25,9 +25,14 @@ virt-manager() {
 		distro="Other Linux"
 	fi
 
-	# Need to add PCI Graphics Passthrough
+	printf "%b\n" "Please enter full folder path of for VM"
+	read path
 
-	virt-install --name "$name" --memory=$memory --vcpus=$vcpus --location $isoFile --osvariant $distro --disk size=$driveSize
+	# setup physical PCI/USB etc
+	hostDev=""
+
+	qemu-img create -f qcow2 $path/$name.qcow2 $driveSize"G"
+	virt-install --name "$name" --memory=$memory --vcpus=$vcpus --cdrom $isoFile --os-variant $distro --disk $path/$name.qcow2 $hostDev
 }
 
 qemu() {
@@ -35,7 +40,7 @@ qemu() {
 
 	# Need to add PCI Graphics Passthrough
 
-	qemu-img create -f qcow2 $name.qcow2 $driveSize
+	qemu-img create -f qcow2 $name.qcow2 $driveSize"G"
 	qemu-system-x86_64 \
 		  -m "$memory"G \
 		  -smp $vcpus \
@@ -44,16 +49,17 @@ qemu() {
 		  -drive file=$name.qcow2,format=qcow2 \
 		  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
 		  -device e1000,netdev=net0 \
-		  -display default,show-cursor=on
+		  -display default,show-cursor=on \
+		  -cpu host \
+		  -enable-kvm \
+		  -name $name
 	
-	printf "%b\n" "Run the below to launch new VM"
-	printf "%b\n" "qemu-system-x86_64 \
-		  -m "$memory"G \
-		  -smp $vcpus \
-		  -drive file=$name.qcow2,format=qcow2 \
-		  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
-		  -device e1000,netdev=net0 \
-		  -display default,show-cursor=on"
+	printf "%b\n" "To run the VM after initial exit, use the command below"
+	printf "%b\n" "qemu-system-x86_64 -m "$memory"G -smp $vcpus -drive file=$name.qcow2,format=qcow2 \
+			-netdev user,id=net0,hostfwd=tcp::2222-:22 -device e1000,netdev=net0 \
+		  	-display default,show-cursor=on -smbios -enable-kvm -name $name"
+	printf "%b\n" "To import this VM into virt-manager run the below"
+	printf "virt-install --name "$name" --memory=$memory --vcpus=$vcpus --os-variant $distro --disk $path/$name.qcow2 --network default --import" 
 }
 
 libvirt() {
@@ -110,13 +116,9 @@ virtualbox(){
 	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/$USER/VirtualBox VMs/$name/$name.vdi"
 	vboxmanage storageattach "$name" --storagectl "IDE" --port 0 --device 0 --type $storageType --medium "$isoFile"
 
-	# Graphics Passthrough not available on VirtualBox 7.0 and newer. 
+	# Graphics Passthrough not available on VirtualBox 7.0 and newer yet. 
 
-	# printf "%b\n" "${RED}Only use this option if a second graphics adapter for your host machine${RC}"
 	# printf "%b\n" "${YELLOW}Do you want to pass through a GPU?${RC}"
-	# yes_or_no
-
-	# passthtough=$?
 
 	# if $passthtough == 1; then
 
@@ -139,14 +141,7 @@ virtualbox(){
 	# 	vboxmanage modifyvm "$name" --pci-attach=$graphicsAdapter@01:05.0
 	# fi
 
-	printf "b%\n" "Do you want to start the $name"
-	yes_or_no
-
-	startvm=$?
-
-	if $startvm == 1; then
-		vboxmanage startvm $name
-	fi
+	vboxmanage startvm $name
 }
 
 setVMDetails() {
@@ -169,16 +164,15 @@ setVMDetails() {
 	do
 		printf "%b\n" "Please enter VM Name"
 		read name
-
-		vmExists=$(vboxmanage list vms | grep -i \"$name\")
-		if [[ -z $vmExists ]]; then
+		
+		if ! checkVMExists; then
 			break
 		else
 			printf "%b\n" "VM with that name already exists"
 		fi
 	done
 
-	printf "%b\n" "Please enter drive size (virtualbox in MB. virt-manage in GB)"
+	printf "%b\n" "Please enter drive size"
 	read driveSize
 
 	printf "%b\n" "Please enter full iso path"
@@ -191,8 +185,8 @@ setVMDetails() {
 			installIsoInfo	
 		fi
 
-		distroInfo=$(isoinfo -d -i $isoFile | awk 'NR==3{print $3}')
-		windows=$(isoinfo -d -i $isoFile | awk 'NR==5{print $3, $4}')
+		distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}')
+		windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}')
 	else
 		storageType=hdd
 	fi
@@ -208,6 +202,21 @@ installIsoInfo(){
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             ;;
     esac
+}
+
+checkVMExists() {
+
+	if "$hypervisor" == "virt-manager"; then
+		vmExists=$(virsh list --all | grep -i $name | awk '{print $2}')
+	elif "$hypervisor" == "virtualbox"; then
+		vmExists=$(vboxmanage list vms | grep -i \"$name\")
+	fi
+
+	if [[ -z vmExists ]]; then
+		return 1
+	else
+		return 0
+	fi
 }
 
 checkInstalled() {
