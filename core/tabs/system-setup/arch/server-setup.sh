@@ -253,18 +253,14 @@ userinfo () {
 
     while true
     do
-        # Ensure we're working with a clean terminal state
-        exec < /dev/tty
-        echo -n "Please enter password: "
-        read -rs PASSWORD1 < /dev/tty
-        echo
-        echo -n "Please re-enter password: "
-        read -rs PASSWORD2 < /dev/tty
-        echo
+        read -rs -p "Please enter password: " PASSWORD1
+        echo -ne "\n"
+        read -rs -p "Please re-enter password: " PASSWORD2
+        echo -ne "\n"
         if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
             break
         else
-            echo "ERROR! Passwords do not match."
+            echo -ne "ERROR! Passwords do not match. \n"
         fi
     done
     export PASSWORD=$PASSWORD1
