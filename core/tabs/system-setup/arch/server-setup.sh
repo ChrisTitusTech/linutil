@@ -253,13 +253,13 @@ userinfo () {
 
     while true
     do
-        # Clear any buffered input before prompting
-        while read -r -t 0.1 -n 1; do continue; done
+        # Ensure we're working with a clean terminal state
+        exec < /dev/tty
         echo -n "Please enter password: "
-        read -rs PASSWORD1
+        read -rs PASSWORD1 < /dev/tty
         echo
         echo -n "Please re-enter password: "
-        read -rs PASSWORD2
+        read -rs PASSWORD2 < /dev/tty
         echo
         if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
             break
