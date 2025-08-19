@@ -253,14 +253,18 @@ userinfo () {
 
     while true
     do
-        read -rs -p "Please enter password: " PASSWORD1
-        echo -ne "\n"
-        read -rs -p "Please re-enter password: " PASSWORD2
-        echo -ne "\n"
+        # Clear any buffered input before prompting
+        while read -r -t 0.1 -n 1; do continue; done
+        echo -n "Please enter password: "
+        read -rs PASSWORD1
+        echo
+        echo -n "Please re-enter password: "
+        read -rs PASSWORD2
+        echo
         if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
             break
         else
-            echo -ne "ERROR! Passwords do not match. \n"
+            echo "ERROR! Passwords do not match."
         fi
     done
     export PASSWORD=$PASSWORD1
