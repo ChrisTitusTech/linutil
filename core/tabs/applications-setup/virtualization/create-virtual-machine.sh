@@ -5,21 +5,21 @@
 virt-manager() {
 	setVMDetails
 
-	if [[ "$distroInfo" ~= *"ARCH"* ]]; then
+	if [[ "${distroInfo,,}" == *"ARCH"* ]] || [[ "$distroInfo" == *"ARCH"* ]]; then
 		distro="archlinux"
-	elif [[ "$distroInfo" ~= *"Debian"* ]]; then
+	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]]; then
 		distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")"
-	elif [[ "$distroInfo" ~= *"Fedora"* ]]; then
+	elif [[ "${distroInfo,,}" == *"Fedora"* ]] || [[ "$distroInfo" == *"Fedora"* ]]; then
 		distro="fedora""$(echo "${distroInfo##*-}")"
-	elif [[ "$distroInfo" ~= *"openSUSE"* ]]; then
-		if [[ "$distroInfo" ~= *"Leap"* ]]; then
+	elif [[ "${distroInfo,,}" == *"openSUSE"* ]] || [[ "$distroInfo" == *"openSUSE"* ]]; then
+		if [[ "${distroInfo,,}" == *"Leap"* ]] || [[ "$distroInfo" == *"Leap"* ]]; then
 			distro="opensuse""$(echo "${distroInfo##*-}")"
 		else
 			distro="opensusetumbleweed"
 		fi
-	elif [[ "$distroInfo" ~= *"Ubuntu"* ]]; then
+	elif [[ "${distroInfo,,}" == *"Ubuntu"* ]] || [[ "$distroInfo" == *"Ubuntu"* ]]; then
 		distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")"
-	elif [[ "$windows" ~= *"MICROSOFT"* ]]; then
+	elif [[ "${windows,,}" == *"MICROSOFT"* ]] || [[ "$windows" == *"MICROSOFT"* ]]; then
 		distro="Windows"
 	else 
 		distro="Other Linux"
@@ -70,9 +70,9 @@ libvirt() {
 virtualbox(){
 	setVMDetails
 
-	if [[ "${distroInfo,,}" == *"ARCH"* ]] || [[ "$distroInfo" == *"ARCH"* ]]  ; then
+	if [[ "${distroInfo,,}" == *"ARCH"* ]] || [[ "$distroInfo" == *"ARCH"* ]]; then
 		distro="ArchLinux"
-	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]] ; then
+	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]]; then
 		distro="Debian"
 	elif [[ "${distroInfo,,}" == *"Fedora"* ]] || [[ "$distroInfo" == *"Fedora"* ]]; then
 		distro="Fedora"
@@ -84,7 +84,7 @@ virtualbox(){
 		fi
 	elif [[ "${distroInfo,,}" == *"Ubuntu"* ]] || [[ "$distroInfo" == *"Ubuntu"* ]]; then
 		distro="Ubuntu"
-	elif [[ "$windows" == *"MICROSOFT"* ]] || [[ "$distroInfo" == *"MICROSOFT"* ]]; then
+	elif [[ "${windows,,}" == *"MICROSOFT"* ]] || [[ "$windows" == *"MICROSOFT"* ]]; then
 		distro="Windows"
 	else 
 		distro="Other Linux"
@@ -152,7 +152,7 @@ setVMDetails() {
 	if [ "$memory" -lt "2" ]; then
 		memory=2
 	fi
-	memory=$(expr $memory \* 1024)ory
+	memory=$(expr $memory \* 1024)
 
 	totalCpus=$(getconf _NPROCESSORS_ONLN)
 	vcpus=$(expr $totalCpus / 4)
@@ -178,7 +178,7 @@ setVMDetails() {
 	printf "%b\n" "Please enter full iso path"
 	read isoFile
 
-	if [[ $isoFile ~= *".iso" ]]; then
+	if [[ ${isoFile,,} == *".iso" ]] || [[ $isoFile == *".iso" ]]; then
 		storageType=dvddrive
 
 		if ! command_exists isoinfo; then
@@ -192,7 +192,7 @@ setVMDetails() {
 	fi
 }
 
-installIsoInfo(){
+installIsoInfo() {
 	printf "%b\n" "${YELLOW}Installing Gnome Boxes...${RC}"
     case "$PACKAGER" in
         apt-get|nala|dnf|zypper)
@@ -206,13 +206,13 @@ installIsoInfo(){
 
 checkVMExists() {
 
-	if "$hypervisor" == "virt-manager"; then
+	if [[ "$hypervisor" == "virt-manager" ]]; then
 		vmExists=$(virsh list --all | grep -i $name | awk '{print $2}')
-	elif "$hypervisor" == "virtualbox"; then
-		vmExists=$(vboxmanage list vms | grep -i \"$name\")
+	elif [[ "$hypervisor" == "virtualbox" ]]; then
+		vmExists=$(vboxmanage list vms | grep -i \"$name\" | cut -f1 -d" ")
 	fi
 
-	if [[ -z vmExists ]]; then
+	if [ -z $vmExists ]; then
 		return 1
 	else
 		return 0
@@ -220,7 +220,7 @@ checkVMExists() {
 }
 
 checkInstalled() {
-	$hypervisor=$1
+	hypervisor=$1
 
 	if command_exists $hypervisor; then
         $hypervisor
