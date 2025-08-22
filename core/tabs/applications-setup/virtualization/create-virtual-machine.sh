@@ -43,8 +43,6 @@ virtmanager() {
 qemu() {
 	setVMDetails
 
-	# Need to add PCI Graphics Passthrough
-
 	qemu-img create -f qcow2 "$name".qcow2 "$driveSize""G"
 	qemu-system-x86_64 \
 		  -m "$memory"G \
