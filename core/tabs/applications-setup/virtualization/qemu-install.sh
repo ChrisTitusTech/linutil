@@ -20,7 +20,7 @@ installQEMUDesktop() {
             sudo systemctl enable libvirtd
 
             #add current user to virt manager group
-            sudo usermod -a -G libvirt $(whoami)
+            sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
             ;;
         zypper)
             if ! command_exists qemu-img; then
@@ -69,7 +69,7 @@ checkKVM() {
     if [ ! -e "/dev/kvm" ]; then
         printf "%b\n" "${RED}KVM is not available. Make sure you have CPU virtualization support enabled in your BIOS/UEFI settings. Please refer https://wiki.archlinux.org/title/KVM for more information.${RC}"
     else
-        "$ESCALATION_TOOL" usermod $(who | awk 'NR==1{print $1}') -aG kvm
+        "$ESCALATION_TOOL" usermod "$(who | awk 'NR==1{print $1}')" -aG kvm
     fi
 }
 
