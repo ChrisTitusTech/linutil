@@ -9,6 +9,7 @@ installFreeOffice() {
         apt-get|nala)
             curl -O https://www.softmaker.net/down/softmaker-freeoffice-2024_1218-01_amd64.deb
             "$ESCALATION_TOOL" "$PACKAGER" install -y ./softmaker-freeoffice-2024_1218-01_amd64.deb
+            "$ESCALATION_TOOL" rm ./softmaker-freeoffice-2024_1218-01_amd64.deb
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://shop.softmaker.com/repo/rpm SoftMaker

@@ -9,6 +9,7 @@ installDiscord() {
             apt-get|nala)
                 curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
+                "$ESCALATION_TOOL" rm discord.deb
                 ;;
             zypper|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
