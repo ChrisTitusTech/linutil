@@ -2,28 +2,33 @@
 
 . ../../common-script.sh
 
-virt-manager() {
+virtmanager() {
 	setVMDetails
 
-	if [[ "$distroInfo" == *"arch"* ]]; then
-		distro="archlinux"
-	elif [[ "$distroInfo" == *"debian"* ]]; then
-		distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")"
-	elif [[ "$distroInfo" == *"fedora"* ]]; then
-		distro="fedora""$(echo "${distroInfo##*-}")"
-	elif [[ "$distroInfo" == *"opensuse"* ]]; then
-		if [[ "$distroInfo" == *"leap"* ]]; then
-			distro="opensuse""$(echo "${distroInfo##*-}")"
-		else
-			distro="opensusetumbleweed"
-		fi
-	elif [[ "$distroInfo" == *"ubuntu"* ]]; then
-		distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")"
-	elif [[ "${windows,,}" == *"microsoft"* ]]; then
-		distro="win11"
-	else 
-		distro="unknown"
-	fi
+	case $distroInfo in
+		*"arch"*)
+			distro="archlinux" ;;
+		*"debian"*)
+			distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")" ;;
+		*"fedora"*)
+			distro="fedora""$(echo "${distroInfo##*-}")" ;;
+		*"opensuse"*)
+			case $distroInfo in
+				*"leap"*)
+					distro="opensuse""$(echo "${distroInfo##*-}")" ;;
+				*)
+					distro="opensusetumbleweed" ;;
+				esac ;;
+		*"ubuntu"*)
+			distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")" ;;
+		*) 
+			case $windows in
+				*"windows"*)
+					distro="win11" ;;
+				*)
+					distro="unknown" ;;
+			esac ;;
+	esac
 
 	printf "%b\n" "Please enter full folder path of for VM"
 	read path
@@ -70,30 +75,35 @@ libvirt() {
 virtualbox(){
 	setVMDetails
 
-	if [[ "$distroInfo" == *"arch"* ]]; then
-		distro="ArchLinux"
-	elif [[ "$distroInfo" == *"debian"* ]]; then
-		distro="Debian"
-	elif [[ "$distroInfo" == *"fedora"* ]]; then
-		distro="Fedora"
-	elif [[ "$distroInfo" == *"opensuse"* ]]; then
-		if [[ "$distroInfo" == *"leap"* ]]; then
-			distro="openSUSE_Leap"
-		else
-			distro="openSUSE_Tumbleweed"
-		fi
-	elif [[ "$distroInfo" == *"ubuntu"* ]]; then
-		distro="Ubuntu"
-	elif [[ "${windows,,}" == *"microsoft"* ]]; then
-		distro="Windows"
-	else 
-		distro="Other Linux"
-	fi
+	case $distroInfo in
+		*"arch"*)
+			distro="ArchLinux" ;;
+		*"debian"*)
+			distro="Debian" ;;
+		*"fedora"*)
+			distro="Fedora" ;;
+		*"opensuse"*)
+			case $distroInfo in
+				*"leap"*)
+					distro="openSUSE_Leap" ;;
+				*)
+					distro="openSUSE_Tumbleweed" ;;
+				esac ;;
+		*"ubuntu"*)
+			distro="Ubuntu" ;;
+		*) 
+			case $windows in
+				*"windows"*)
+					distro="Windows" ;;
+				*)
+					distro="Other Linux" ;;
+			esac ;;
+	esac
 
-	if [[ "$(dpkg --print-architecture)" == "amd64" ]]; then
+	if [ "$(dpkg --print-architecture)" = "amd64" ]; then
 		arch="x86"
 		subdistro="$distro""_64"
-	elif [[ "$(dpkg --print-architecture)" == "arm64" ]]; then
+	elif [ "$(dpkg --print-architecture)" = "arm64" ]; then
 		arch="arm"
 		subdistro="$distro""_arm64"
 	else
@@ -178,19 +188,20 @@ setVMDetails() {
 	printf "%b\n" "Please enter full iso path"
 	read isoFile
 
-	if [[ ${isoFile,,} == *".iso" ]] || [[ $isoFile == *".iso" ]]; then
-		storageType=dvddrive
+	case $isoFile in
+		*".iso")
+			storageType=dvddrive
 
-		if ! command_exists isoinfo; then
-			installIsoInfo	
-		fi
+			if ! command_exists isoinfo; then
+				installIsoInfo	
+			fi
 
-		distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}')
-		distroInfo="${distroInfo,,}"
-		windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}')
-	else
-		storageType=hdd
-	fi
+			distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}')
+			distroInfo="${distroInfo,,}"
+			windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}') ;;
+		*)
+			storageType=hdd ;;
+	esac
 }
 
 installIsoInfo() {
@@ -207,9 +218,9 @@ installIsoInfo() {
 
 checkVMExists() {
 
-	if [[ "$hypervisor" == "virt-manager" ]]; then
+	if [ "$hypervisor" = "virt-manager" ]; then
 		vmExists=$(virsh list --all | grep -i $name | awk '{print $2}')
-	elif [[ "$hypervisor" == "virtualbox" ]]; then
+	elif [ "$hypervisor" = "virtualbox" ]; then
 		vmExists=$(vboxmanage list vms | grep -i \"$name\" | cut -f1 -d" ")
 	fi
 
@@ -224,7 +235,13 @@ checkInstalled() {
 	hypervisor=$1
 
 	if command_exists $hypervisor; then
-        $hypervisor
+		if [ "$hypervisor" = "virt-manager" ]; then
+			virtmanager
+		elif [ "$hypervisor" = "qemu-img" ]; then
+			qemu
+		else
+        	$hypervisor
+        fi
     else
         printf "%b\n" "${GREEN}$hypervisor is not installed.${RC}"
         exit 1
