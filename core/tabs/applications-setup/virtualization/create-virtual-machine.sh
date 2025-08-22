@@ -36,7 +36,7 @@ virtmanager() {
 	# setup physical PCI/USB etc
 	hostDev=""
 
-	qemu-img create -f qcow2 $path/$name.qcow2 $driveSize"G"
+	qemu-img create -f qcow2 "$path"/"$name".qcow2 "$driveSize""G"
 	virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2 "$hostDev"
 }
 
@@ -45,7 +45,7 @@ qemu() {
 
 	# Need to add PCI Graphics Passthrough
 
-	qemu-img create -f qcow2 $name.qcow2 $driveSize"G"
+	qemu-img create -f qcow2 "$name".qcow2 "$driveSize""G"
 	qemu-system-x86_64 \
 		  -m "$memory"G \
 		  -smp "$vcpus" \
@@ -60,11 +60,11 @@ qemu() {
 		  -name "$name"
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
-	printf "%b\n" "qemu-system-x86_64 -m "$memory"G -smp "$vcpus" -drive file="$name".qcow2,format=qcow2 \
+	printf "%b\n" "qemu-system-x86_64 -m ${memory}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
 			-netdev user,id=net0,hostfwd=tcp::2222-:22 -device e1000,netdev=net0 \
-		  	-display default,show-cursor=on -smbios -enable-kvm -name "$name""
+		  	-display default,show-cursor=on -smbios -enable-kvm -name ${name}"
 	printf "%b\n" "To import this VM into virt-manager run the below"
-	printf "virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --os-variant "$distro" --disk "$path"/"$name".qcow2 --network default --import" 
+	printf "virt-install --name ${name} --memory=${memory} --vcpus=${vcpus} --os-variant ${distro} --disk ${path}/${name}.qcow2 --network default --import" 
 }
 
 libvirt() {
@@ -118,12 +118,12 @@ virtualbox(){
 	# Create SSH port for headless access after install (ssh -p 2522 username@10.0.2.15)
 	vboxmanage modifyvm "$name" --nat-pf1 "SSH,tcp,127.0.0.1,2522,10.0.2.15,22"
 
-	vboxmanage createmedium disk --filename="/home/"$USER"/VirtualBox VMs/"$name"/"$name".vdi" --size="$driveSize" --variant=Standard --format=VDI
+	vboxmanage createmedium disk --filename="/home/"${USER}"/VirtualBox VMs/"${name}"/"${name}".vdi" --size="$driveSize" --variant=Standard --format=VDI
 
 	vboxmanage storagectl "$name" --name "IDE" --add ide --controller piix4
 	vboxmanage storagectl "$name" --name "SATA" --add sata --controller IntelAHCI
 
-	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/"$USER"/VirtualBox VMs/"$name"/"$name".vdi"
+	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/"${USER}"/VirtualBox VMs/"${name}"/"${name}".vdi"
 	vboxmanage storageattach "$name" --storagectl "IDE" --port 0 --device 0 --type "$storageType" --medium "$isoFile"
 
 	# Graphics Passthrough not available on VirtualBox 7.0 and newer yet. 
@@ -223,7 +223,7 @@ checkVMExists() {
 		vmExists=$(vboxmanage list vms | grep -i \""$name"\" | cut -f1 -d" ")
 	fi
 
-	if [ -z $vmExists ]; then
+	if [ -z "$vmExists" ]; then
 		return 1
 	else
 		return 0
@@ -233,7 +233,7 @@ checkVMExists() {
 checkInstalled() {
 	hypervisor=$1
 
-	if command_exists $hypervisor; then
+	if command_exists "$hypervisor"; then
 		if [ "$hypervisor" = "virt-manager" ]; then
 			virtmanager
 		elif [ "$hypervisor" = "qemu-img" ]; then
@@ -242,7 +242,7 @@ checkInstalled() {
         	$hypervisor
         fi
     else
-        printf "%b\n" "${GREEN}"$hypervisor" is not installed.${RC}"
+        printf "%b\n" "${GREEN}${hypervisor} is not installed.${RC}"
         exit 1
     fi
 }
