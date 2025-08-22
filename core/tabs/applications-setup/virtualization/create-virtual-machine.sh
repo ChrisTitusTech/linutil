@@ -5,24 +5,24 @@
 virt-manager() {
 	setVMDetails
 
-	if [[ "${distroInfo,[,][pat]}" == *"ARCH"* ]]; then
+	if [[ "${distroInfo,,}" == *"arch"* ]]; then
 		distro="archlinux"
-	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]]; then
+	elif [[ "${distroInfo,,}" == *"debian"* ]]; then
 		distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")"
-	elif [[ "${distroInfo,,}" == *"Fedora"* ]] || [[ "$distroInfo" == *"Fedora"* ]]; then
+	elif [[ "${distroInfo,,}" == *"fedora"* ]]; then
 		distro="fedora""$(echo "${distroInfo##*-}")"
-	elif [[ "${distroInfo,,}" == *"openSUSE"* ]] || [[ "$distroInfo" == *"openSUSE"* ]]; then
-		if [[ "${distroInfo,,}" == *"Leap"* ]] || [[ "$distroInfo" == *"Leap"* ]]; then
+	elif [[ "${distroInfo,,}" == *"opensuse"* ]]; then
+		if [[ "${distroInfo,,}" == *"leap"* ]]; then
 			distro="opensuse""$(echo "${distroInfo##*-}")"
 		else
 			distro="opensusetumbleweed"
 		fi
-	elif [[ "${distroInfo,,}" == *"Ubuntu"* ]] || [[ "$distroInfo" == *"Ubuntu"* ]]; then
+	elif [[ "${distroInfo,,}" == *"ubuntu"* ]]; then
 		distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")"
-	elif [[ "${windows,,}" == *"MICROSOFT"* ]] || [[ "$windows" == *"MICROSOFT"* ]]; then
-		distro="Windows"
+	elif [[ "${windows,,}" == *"microsoft"* ]]; then
+		distro="win11"
 	else 
-		distro="Other Linux"
+		distro="unknown"
 	fi
 
 	printf "%b\n" "Please enter full folder path of for VM"
@@ -70,21 +70,21 @@ libvirt() {
 virtualbox(){
 	setVMDetails
 
-	if [[ "${distroInfo,,}" == *"ARCH"* ]] || [[ "$distroInfo" == *"ARCH"* ]]; then
+	if [[ "${distroInfo,,}" == *"arch"* ]]; then
 		distro="ArchLinux"
-	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]]; then
+	elif [[ "${distroInfo,,}" == *"debian"* ]]; then
 		distro="Debian"
-	elif [[ "${distroInfo,,}" == *"Fedora"* ]] || [[ "$distroInfo" == *"Fedora"* ]]; then
+	elif [[ "${distroInfo,,}" == *"fedora"* ]]; then
 		distro="Fedora"
-	elif [[ "${distroInfo,,}" == *"openSUSE"* ]] || [[ "$distroInfo" == *"openSUSE"* ]]; then
-		if [[ "${distroInfo,,}" == *"Leap"* ]] || [[ "$distroInfo" == *"Leap"* ]]; then
+	elif [[ "${distroInfo,,}" == *"opensuse"* ]]; then
+		if [[ "${distroInfo,,}" == *"leap"* ]]; then
 			distro="openSUSE_Leap"
 		else
 			distro="openSUSE_Tumbleweed"
 		fi
-	elif [[ "${distroInfo,,}" == *"Ubuntu"* ]] || [[ "$distroInfo" == *"Ubuntu"* ]]; then
+	elif [[ "${distroInfo,,}" == *"ubuntu"* ]]; then
 		distro="Ubuntu"
-	elif [[ "${windows,,}" == *"MICROSOFT"* ]] || [[ "$windows" == *"MICROSOFT"* ]]; then
+	elif [[ "${windows,,}" == *"microsoft"* ]]; then
 		distro="Windows"
 	else 
 		distro="Other Linux"
