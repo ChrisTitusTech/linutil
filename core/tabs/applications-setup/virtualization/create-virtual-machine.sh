@@ -9,7 +9,7 @@ virtmanager() {
 		*"arch"*)
 			distro="archlinux" ;;
 		*"debian"*)
-			distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")" ;;
+			distro="debian""$(isoinfo -d -i "$isoFile" | awk 'NR==3{print $4}' | cut -f1 -d".")" ;;
 		*"fedora"*)
 			distro="fedora""${distroInfo##*-}" ;;
 		*"opensuse"*)
@@ -20,7 +20,7 @@ virtmanager() {
 					distro="opensusetumbleweed" ;;
 				esac ;;
 		*"ubuntu"*)
-			distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")" ;;
+			distro="Ubuntu""$(isoinfo -d -i "$isoFile" | awk 'NR==3{print $4}' | cut -f1,2 -d".")" ;;
 		*) 
 			case $windows in
 				*"windows"*)
@@ -37,7 +37,7 @@ virtmanager() {
 	hostDev=""
 
 	qemu-img create -f qcow2 $path/$name.qcow2 $driveSize"G"
-	virt-install --name "$name" --memory=$memory --vcpus=$vcpus --cdrom $isoFile --os-variant $distro --disk $path/$name.qcow2 $hostDev
+	virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2 "$hostDev"
 }
 
 qemu() {
@@ -48,23 +48,23 @@ qemu() {
 	qemu-img create -f qcow2 $name.qcow2 $driveSize"G"
 	qemu-system-x86_64 \
 		  -m "$memory"G \
-		  -smp $vcpus \
+		  -smp "$vcpus" \
 		  -boot d \
-		  -cdrom $isoFile \
-		  -drive file=$name.qcow2,format=qcow2 \
+		  -cdrom "$isoFile" \
+		  -drive file="$name".qcow2,format=qcow2 \
 		  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
 		  -device e1000,netdev=net0 \
 		  -display default,show-cursor=on \
 		  -cpu host \
 		  -enable-kvm \
-		  -name $name
+		  -name "$name"
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
-	printf "%b\n" "qemu-system-x86_64 -m "$memory"G -smp $vcpus -drive file=$name.qcow2,format=qcow2 \
+	printf "%b\n" "qemu-system-x86_64 -m "$memory"G -smp "$vcpus" -drive file="$name".qcow2,format=qcow2 \
 			-netdev user,id=net0,hostfwd=tcp::2222-:22 -device e1000,netdev=net0 \
-		  	-display default,show-cursor=on -smbios -enable-kvm -name $name"
+		  	-display default,show-cursor=on -smbios -enable-kvm -name "$name""
 	printf "%b\n" "To import this VM into virt-manager run the below"
-	printf "virt-install --name "$name" --memory=$memory --vcpus=$vcpus --os-variant $distro --disk $path/$name.qcow2 --network default --import" 
+	printf "virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --os-variant "$distro" --disk "$path"/"$name".qcow2 --network default --import" 
 }
 
 libvirt() {
@@ -110,21 +110,21 @@ virtualbox(){
 		printf "%b" "Architecture not supported"
 	fi
 
-	vboxmanage createvm --name="$name" --platform-architecture=$arch --ostype="$distro" --register
+	vboxmanage createvm --name="$name" --platform-architecture="$arch" --ostype="$distro" --register
 
-	vboxmanage modifyvm "$name" --os-type=$subdistro --memory=$memory --chipset=piix3 --graphicscontroller=vmsvga --firmware=efi --acpi=on --ioapic=on --cpus=$vcpus --cpu-profile=host --hwvirtex=on --apic=on --x86-x2apic=on --paravirt-provider=kvm --nested-paging=on --large-pages=off --x86-vtx-vpid=on --x86-vtx-ux=on --accelerate-3d=on --vram=256 --x86-long-mode=on --x86-pae=off
+	vboxmanage modifyvm "$name" --os-type="$subdistro" --memory="$memory" --chipset=piix3 --graphicscontroller=vmsvga --firmware=efi --acpi=on --ioapic=on --cpus="$vcpus" --cpu-profile=host --hwvirtex=on --apic=on --x86-x2apic=on --paravirt-provider=kvm --nested-paging=on --large-pages=off --x86-vtx-vpid=on --x86-vtx-ux=on --accelerate-3d=on --vram=256 --x86-long-mode=on --x86-pae=off
 	vboxmanage modifyvm "$name" --mouse=usb --keyboard=ps2 --usb-ohci=on --usb-ehci=on --audio-enabled=on --audio-driver=default --audio-controller=ac97 --audio-codec=ad1980
 	
 	# Create SSH port for headless access after install (ssh -p 2522 username@10.0.2.15)
 	vboxmanage modifyvm "$name" --nat-pf1 "SSH,tcp,127.0.0.1,2522,10.0.2.15,22"
 
-	vboxmanage createmedium disk --filename="/home/$USER/VirtualBox VMs/$name/$name.vdi" --size=$driveSize --variant=Standard --format=VDI
+	vboxmanage createmedium disk --filename="/home/"$USER"/VirtualBox VMs/"$name"/"$name".vdi" --size="$driveSize" --variant=Standard --format=VDI
 
 	vboxmanage storagectl "$name" --name "IDE" --add ide --controller piix4
 	vboxmanage storagectl "$name" --name "SATA" --add sata --controller IntelAHCI
 
-	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/$USER/VirtualBox VMs/$name/$name.vdi"
-	vboxmanage storageattach "$name" --storagectl "IDE" --port 0 --device 0 --type $storageType --medium "$isoFile"
+	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/"$USER"/VirtualBox VMs/"$name"/"$name".vdi"
+	vboxmanage storageattach "$name" --storagectl "IDE" --port 0 --device 0 --type "$storageType" --medium "$isoFile"
 
 	# Graphics Passthrough not available on VirtualBox 7.0 and newer yet. 
 
@@ -134,17 +134,17 @@ virtualbox(){
 
 	# 	printf "%b\n" "Please enter the Graphics Card model (ex. 5080, 4060, 9070, etc)"
 	# 	read model
-	# 	graphicsAdapters=$(lspci | grep -i vga | grep -i $model)
+	# 	graphicsAdapters=$(lspci | grep -i vga | grep -i "$model")
 
 	# 	SAVEIFS=$IFS
 	# 	IFS=$'\n' 
-	# 	graphicsAdapters=($graphicsAdapters) 
+	# 	graphicsAdapters=("$graphicsAdapters") 
 	# 	IFS=$SAVEIFS
 
 	# 	count=${#graphicsAdapters[@]}
 
 	# 	if [[ "$count" -gt 1 ]]; then
-	# 		graphicsAdapter=$($graphicsAdapters | cut -f1 -d" ")
+	# 		graphicsAdapter=$(echo "$graphicsAdapters" | cut -f1 -d" ")
 	# 	fi
 
 	# 	graphicsAdapter=$($graphicsAdapters | cut -f1 -d" ")
@@ -157,15 +157,15 @@ virtualbox(){
 setVMDetails() {
 	# Set memory to 1/4 of host memnory
 	totalMemory=$(grep MemTotal /proc/meminfo | tr -s ' ' | cut -d ' ' -f2)
-	mem=$(expr $(expr $totalMemory / 1024000) + 1)
-	memory=$(expr $mem / 4)
+	mem=$(expr $(expr "$totalMemory" / 1024000) + 1)
+	memory=$(expr "$mem" / 4)
 	if [ "$memory" -lt "2" ]; then
 		memory=2
 	fi
-	memory=$(expr $memory \* 1024)
+	memory=$(expr "$memory" \* 1024)
 
 	totalCpus=$(getconf _NPROCESSORS_ONLN)
-	vcpus=$(expr $totalCpus / 4)
+	vcpus=$(expr "$totalCpus" / 4)
 	if [ "$vcpus" -lt "2" ]; then
 		vcpus=2
 	fi
@@ -196,8 +196,8 @@ setVMDetails() {
 				installIsoInfo	
 			fi
 
-			distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}'  | tr '[:upper:]' '[:lower:]')
-			windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}') ;;
+			distroInfo=$(isoinfo -d -i "$isoFile" | grep -i "volume id:" | awk '{print $3}'  | tr '[:upper:]' '[:lower:]')
+			windows=$(isoinfo -d -i "$isoFile" | grep -i "Publisher id:" | awk '{print $3, $4}') ;;
 		*)
 			storageType=hdd ;;
 	esac
@@ -218,9 +218,9 @@ installIsoInfo() {
 checkVMExists() {
 
 	if [ "$hypervisor" = "virt-manager" ]; then
-		vmExists=$(virsh list --all | grep -i $name | awk '{print $2}')
+		vmExists=$(virsh list --all | grep -i "$name" | awk '{print $2}')
 	elif [ "$hypervisor" = "virtualbox" ]; then
-		vmExists=$(vboxmanage list vms | grep -i \"$name\" | cut -f1 -d" ")
+		vmExists=$(vboxmanage list vms | grep -i \""$name"\" | cut -f1 -d" ")
 	fi
 
 	if [ -z $vmExists ]; then
@@ -242,7 +242,7 @@ checkInstalled() {
         	$hypervisor
         fi
     else
-        printf "%b\n" "${GREEN}$hypervisor is not installed.${RC}"
+        printf "%b\n" "${GREEN}"$hypervisor" is not installed.${RC}"
         exit 1
     fi
 }
