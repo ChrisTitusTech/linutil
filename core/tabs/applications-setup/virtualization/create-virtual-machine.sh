@@ -5,19 +5,19 @@
 virt-manager() {
 	setVMDetails
 
-	if [[ "${distroInfo,,}" == *"arch"* ]]; then
+	if [[ "$distroInfo" == *"arch"* ]]; then
 		distro="archlinux"
-	elif [[ "${distroInfo,,}" == *"debian"* ]]; then
+	elif [[ "$distroInfo" == *"debian"* ]]; then
 		distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")"
-	elif [[ "${distroInfo,,}" == *"fedora"* ]]; then
+	elif [[ "$distroInfo" == *"fedora"* ]]; then
 		distro="fedora""$(echo "${distroInfo##*-}")"
-	elif [[ "${distroInfo,,}" == *"opensuse"* ]]; then
-		if [[ "${distroInfo,,}" == *"leap"* ]]; then
+	elif [[ "$distroInfo" == *"opensuse"* ]]; then
+		if [[ "$distroInfo" == *"leap"* ]]; then
 			distro="opensuse""$(echo "${distroInfo##*-}")"
 		else
 			distro="opensusetumbleweed"
 		fi
-	elif [[ "${distroInfo,,}" == *"ubuntu"* ]]; then
+	elif [[ "$distroInfo" == *"ubuntu"* ]]; then
 		distro="Ubuntu""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1,2 -d".")"
 	elif [[ "${windows,,}" == *"microsoft"* ]]; then
 		distro="win11"
@@ -70,19 +70,19 @@ libvirt() {
 virtualbox(){
 	setVMDetails
 
-	if [[ "${distroInfo,,}" == *"arch"* ]]; then
+	if [[ "$distroInfo" == *"arch"* ]]; then
 		distro="ArchLinux"
-	elif [[ "${distroInfo,,}" == *"debian"* ]]; then
+	elif [[ "$distroInfo" == *"debian"* ]]; then
 		distro="Debian"
-	elif [[ "${distroInfo,,}" == *"fedora"* ]]; then
+	elif [[ "$distroInfo" == *"fedora"* ]]; then
 		distro="Fedora"
-	elif [[ "${distroInfo,,}" == *"opensuse"* ]]; then
-		if [[ "${distroInfo,,}" == *"leap"* ]]; then
+	elif [[ "$distroInfo" == *"opensuse"* ]]; then
+		if [[ "$distroInfo" == *"leap"* ]]; then
 			distro="openSUSE_Leap"
 		else
 			distro="openSUSE_Tumbleweed"
 		fi
-	elif [[ "${distroInfo,,}" == *"ubuntu"* ]]; then
+	elif [[ "$distroInfo" == *"ubuntu"* ]]; then
 		distro="Ubuntu"
 	elif [[ "${windows,,}" == *"microsoft"* ]]; then
 		distro="Windows"
@@ -186,6 +186,7 @@ setVMDetails() {
 		fi
 
 		distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}')
+		distroInfo="${distroInfo,,}"
 		windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}')
 	else
 		storageType=hdd
