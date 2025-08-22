@@ -11,11 +11,11 @@ virtmanager() {
 		*"debian"*)
 			distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")" ;;
 		*"fedora"*)
-			distro="fedora""$(echo "${distroInfo##*-}")" ;;
+			distro="fedora""${distroInfo##*-}" ;;
 		*"opensuse"*)
 			case $distroInfo in
 				*"leap"*)
-					distro="opensuse""$(echo "${distroInfo##*-}")" ;;
+					distro="opensuse""${distroInfo##*-}" ;;
 				*)
 					distro="opensusetumbleweed" ;;
 				esac ;;
@@ -144,10 +144,10 @@ virtualbox(){
 	# 	count=${#graphicsAdapters[@]}
 
 	# 	if [[ "$count" -gt 1 ]]; then
-	# 		graphicsAdapter=$(echo graphicsAdapters | cut -f1 -d" ")
+	# 		graphicsAdapter=$($graphicsAdapters | cut -f1 -d" ")
 	# 	fi
 
-	# 	graphicsAdapter=$(echo graphicsAdapters | cut -f1 -d" ")
+	# 	graphicsAdapter=$($graphicsAdapters | cut -f1 -d" ")
 	# 	vboxmanage modifyvm "$name" --pci-attach=$graphicsAdapter@01:05.0
 	# fi
 
