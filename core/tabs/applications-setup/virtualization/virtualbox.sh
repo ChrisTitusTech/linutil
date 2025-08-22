@@ -26,7 +26,7 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions.$ARCH
             ;;
         zypper)
-            if [ "$DTYPE" == "opensuse-leap" ]; then 
+            if [ "$DTYPE" = "opensuse-leap" ]; then 
         	    wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc
                 sudo rpm --import oracle_vbox_2016.asc
                "$ESCALATION_TOOL" "$PACKAGER" addrepo -f https://download.virtualbox.org/virtualbox/rpm/opensuse/virtualbox.repo
