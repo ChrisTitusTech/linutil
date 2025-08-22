@@ -62,7 +62,7 @@ qemu() {
 			-netdev user,id=net0,hostfwd=tcp::2222-:22 -device e1000,netdev=net0 \
 		  	-display default,show-cursor=on -smbios -enable-kvm -name ${name}"
 	printf "%b\n" "To import this VM into virt-manager run the below"
-	printf "virt-install --name ""${name}"" --memory=""${memory}"" --vcpus=""${vcpus}"" --os-variant ""${distro}"" --disk ""${path}""/""${name}"".qcow2 --network default --import"
+	printf "%b\n" "virt-install --name ${name} --memory=${memory} --vcpus=${vcpus} --os-variant ${distro} --disk ${path}/${name}.qcow2 --network default --import"
 }
 
 libvirt() {
