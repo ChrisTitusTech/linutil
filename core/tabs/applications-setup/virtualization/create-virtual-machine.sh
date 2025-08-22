@@ -31,7 +31,7 @@ virtmanager() {
 	esac
 
 	printf "%b\n" "Please enter full folder path of for VM"
-	read path
+	read -r path
 
 	# setup physical PCI/USB etc
 	hostDev=""
@@ -133,7 +133,7 @@ virtualbox(){
 	# if $passthtough == 1; then
 
 	# 	printf "%b\n" "Please enter the Graphics Card model (ex. 5080, 4060, 9070, etc)"
-	# 	read model
+	# 	read -r model
 	# 	graphicsAdapters=$(lspci | grep -i vga | grep -i "$model")
 
 	# 	SAVEIFS=$IFS
@@ -173,20 +173,20 @@ setVMDetails() {
 	while true 
 	do
 		printf "%b\n" "Please enter VM Name"
-		read name
+		read -r name
 		
 		if ! checkVMExists; then
 			break
 		else
-			printf "%b\n" "VM with that name already exists"
+			printf "%b\n" "VM with that name alread -ry exists"
 		fi
 	done
 
 	printf "%b\n" "Please enter drive size"
-	read driveSize
+	read -r driveSize
 
 	printf "%b\n" "Please enter full iso path"
-	read isoFile
+	read -r isoFile
 
 	case $isoFile in
 		*".iso")
@@ -255,7 +255,7 @@ main() {
     printf "%b\n" "3. ${YELLOW}VirtualBox${RC}"
     # printf "%b\n" "4. ${YELLOW}Libvirt${RC}"
     printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
+    read -r -r CHOICE
     case "$CHOICE" in
         1) checkInstalled virt-manager ;;
         2) checkInstalled qemu-img ;;
