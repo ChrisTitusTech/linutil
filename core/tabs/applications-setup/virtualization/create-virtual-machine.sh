@@ -197,7 +197,7 @@ setVMDetails() {
 			fi
 
 			distroInfo=$(isoinfo -d -i $isoFile | grep -i "volume id:" | awk '{print $3}')
-			distroInfo="$(echo $distroInfo | tr '[:upper:]' '[:lower:]')
+			distroInfo="$(echo $distroInfo | tr '[:upper:]' '[:lower:]')"
 			windows=$(isoinfo -d -i $isoFile | grep -i "Publisher id:" | awk '{print $3, $4}') ;;
 		*)
 			storageType=hdd ;;

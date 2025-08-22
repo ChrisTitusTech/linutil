@@ -11,7 +11,8 @@ installVirtualBox() {
     		"$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-7.1
 
-            wget -P /home/$USER/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/$(vboxmanage --version | cut -f1 -d"r")/Oracle_VirtualBox_Extension_Pack-$(vboxmanage --version | cut -f1 -d"r").vbox-extpack
+            vboxVersion=$(vboxmanage --version | cut -f1 -d"r")
+            wget -P /home/$USER/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/${vboxVersion}/Oracle_VirtualBox_Extension_Pack-${vboxVersion}.vbox-extpack
             VBoxManage extpack install vbox.vbox-extpack
             ;;
         dnf)
@@ -22,8 +23,8 @@ installVirtualBox() {
             else
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.1.$ARCH
-            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions.$ARCH
+            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.1.${ARCH}
+            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions.${ARCH}
             ;;
         zypper)
             if [ "$DTYPE" = "opensuse-leap" ]; then 
