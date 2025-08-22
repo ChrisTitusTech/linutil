@@ -1,0 +1,137 @@
+{
+  "mcpServers": {
+    "rust-analyzer": {
+      "command": "rust-analyzer",
+      "args": [],
+      "cwd": "/home/titus/github/linutil",
+      "env": {
+        "RUST_LOG": "info"
+      }
+    },
+    "bash-language-server": {
+      "command": "bash-language-server",
+      "args": ["start"],
+      "cwd": "/home/titus/github/linutil",
+      "env": {}
+    },
+    "cargo-tools": {
+      "command": "cargo",
+      "args": ["--version"],
+      "cwd": "/home/titus/github/linutil",
+      "capabilities": {
+        "build": {
+          "command": "cargo",
+          "args": ["build", "--release"]
+        },
+        "test": {
+          "command": "cargo", 
+          "args": ["test"]
+        },
+        "lint": {
+          "command": "cargo",
+          "args": ["clippy", "--", "-Dwarnings"]
+        },
+        "format": {
+          "command": "cargo",
+          "args": ["fmt", "--all"]
+        },
+        "format-check": {
+          "command": "cargo",
+          "args": ["fmt", "--all", "--check"]
+        },
+        "cross-compile-aarch64": {
+          "command": "cross",
+          "args": ["build", "--target=aarch64-unknown-linux-musl", "--release"]
+        }
+      }
+    },
+    "shellcheck": {
+      "command": "shellcheck",
+      "args": ["--version"],
+      "cwd": "/home/titus/github/linutil",
+      "capabilities": {
+        "check-script": {
+          "command": "shellcheck",
+          "args": ["-f", "gcc"]
+        }
+      }
+    }
+  },
+  "workspace": {
+    "type": "rust-cargo",
+    "root": "/home/titus/github/linutil",
+    "members": ["tui", "core", "xtask"],
+    "defaultMembers": ["tui", "core"],
+    "edition": "2021",
+    "profile": {
+      "release": {
+        "opt-level": "z",
+        "lto": true,
+        "codegen-units": 1,
+        "panic": "abort",
+        "strip": true
+      }
+    }
+  },
+  "fileTypes": {
+    "rust": {
+      "extensions": [".rs"],
+      "languageServer": "rust-analyzer",
+      "formatter": "cargo-tools",
+      "linter": "cargo-tools"
+    },
+    "bash": {
+      "extensions": [".sh", ".bash"],
+      "languageServer": "bash-language-server", 
+      "linter": "shellcheck"
+    },
+    "toml": {
+      "extensions": [".toml"],
+      "languageServer": "rust-analyzer"
+    }
+  },
+  "tasks": {
+    "build": {
+      "command": "cargo build --release",
+      "description": "Build release binary"
+    },
+    "test": {
+      "command": "cargo test",
+      "description": "Run all tests"
+    },
+    "lint": {
+      "command": "cargo clippy -- -Dwarnings",
+      "description": "Run clippy linter"
+    },
+    "format": {
+      "command": "cargo fmt --all",
+      "description": "Format all Rust code"
+    },
+    "format-check": {
+      "command": "cargo fmt --all --check", 
+      "description": "Check if code is formatted"
+    },
+    "check-scripts": {
+      "command": "find core/tabs -name '*.sh' -exec shellcheck {} +",
+      "description": "Check all shell scripts with shellcheck"
+    },
+    "cross-compile": {
+      "command": "cross build --target=aarch64-unknown-linux-musl --release",
+      "description": "Cross-compile for ARM64"
+    }
+  },
+  "settings": {
+    "rust": {
+      "edition": "2021",
+      "features": [],
+      "clippy": {
+        "deny": ["warnings"]
+      }
+    },
+    "shellcheck": {
+      "shell": "bash",
+      "exclude": [],
+      "enable": "all"
+    }
+  }
+}
