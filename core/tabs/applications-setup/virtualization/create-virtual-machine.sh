@@ -5,7 +5,7 @@
 virt-manager() {
 	setVMDetails
 
-	if [[ "${distroInfo,,}" == *"ARCH"* ]] || [[ "$distroInfo" == *"ARCH"* ]]; then
+	if [[ "${distroInfo,[,][pat]}" == *"ARCH"* ]]; then
 		distro="archlinux"
 	elif [[ "${distroInfo,,}" == *"Debian"* ]] || [[ "$distroInfo" == *"Debian"* ]]; then
 		distro="debian""$(isoinfo -d -i $isoFile | awk 'NR==3{print $4}' | cut -f1 -d".")"
