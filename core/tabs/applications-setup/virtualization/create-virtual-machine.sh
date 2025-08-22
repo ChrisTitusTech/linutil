@@ -157,17 +157,17 @@ virtualbox(){
 setVMDetails() {
 	# Set memory to 1/4 of host memnory
 	totalMemory=$(grep MemTotal /proc/meminfo | tr -s ' ' | cut -d ' ' -f2)
-	mem=$(expr $(expr "$totalMemory" / 1024000) + 1)
-	memory=$(expr "$mem" / 4)
+	mem=$(("$totalMemory" / 1024000 + 1))
+	memory=$(("$mem" / 4))
 	if [ "$memory" -lt "2" ]; then
-		memory=2
+		memory="2"
 	fi
-	memory=$(expr "$memory" \* 1024)
+	memory=$(("$memory" * 1024))
 
 	totalCpus=$(getconf _NPROCESSORS_ONLN)
-	vcpus=$(expr "$totalCpus" / 4)
+	vcpus=$(("$totalCpus" / 4))
 	if [ "$vcpus" -lt "2" ]; then
-		vcpus=2
+		vcpus="2"
 	fi
 
 	while true 
@@ -178,7 +178,7 @@ setVMDetails() {
 		if ! checkVMExists; then
 			break
 		else
-			printf "%b\n" "VM with that name alread -ry exists"
+			printf "%b\n" "VM with that name already exists"
 		fi
 	done
 
