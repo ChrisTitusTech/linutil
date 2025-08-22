@@ -118,12 +118,12 @@ virtualbox(){
 	# Create SSH port for headless access after install (ssh -p 2522 username@10.0.2.15)
 	vboxmanage modifyvm "$name" --nat-pf1 "SSH,tcp,127.0.0.1,2522,10.0.2.15,22"
 
-	vboxmanage createmedium disk --filename="/home/"${USER}"/VirtualBox VMs/"${name}"/"${name}".vdi" --size="$driveSize" --variant=Standard --format=VDI
+	vboxmanage createmedium disk --filename="/home/""$USER""/VirtualBox VMs/""$name""/""$name"".vdi" --size="$driveSize" --variant=Standard --format=VDI
 
 	vboxmanage storagectl "$name" --name "IDE" --add ide --controller piix4
 	vboxmanage storagectl "$name" --name "SATA" --add sata --controller IntelAHCI
 
-	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/"${USER}"/VirtualBox VMs/"${name}"/"${name}".vdi"
+	vboxmanage storageattach "$name" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "/home/""$USER""/VirtualBox VMs/""$name""/""$name"".vdi"
 	vboxmanage storageattach "$name" --storagectl "IDE" --port 0 --device 0 --type "$storageType" --medium "$isoFile"
 
 	# Graphics Passthrough not available on VirtualBox 7.0 and newer yet. 
@@ -151,7 +151,7 @@ virtualbox(){
 	# 	vboxmanage modifyvm "$name" --pci-attach=$graphicsAdapter@01:05.0
 	# fi
 
-	vboxmanage startvm $name
+	vboxmanage startvm "$name"
 }
 
 setVMDetails() {
