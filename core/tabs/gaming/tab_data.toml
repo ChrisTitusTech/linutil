@@ -8,3 +8,12 @@ name = "Loot Filter"
 description = "This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter"
 script = "diablo-ii/d2r-loot-filters.sh"
 task_list = "FM"
+
+[[data]]
+name = "Fallout 76"
+
+[[data.entries]]
+name = "Fallout 76 Custom INI"
+description = "This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements."
+script = "fallout-76/fallout76settings.sh"
+task_list = "FM"

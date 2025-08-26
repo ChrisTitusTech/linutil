@@ -15,6 +15,8 @@ printf "%b\n" "${YELLOW}Searching for Fallout 76 compatdata settings in document
 possible_paths=$(find "$HOME" -type d -path "*/compatdata/1151340/pfx/drive_c/users/steamuser/Documents/My Games/Fallout 76" 2>/dev/null)
 
 if [ -z "$possible_paths" ]; then
+	possible_paths=$(find "/media" -type d -path "*/compatdata/1151340/pfx/drive_c/users/steamuser/Documents/My Games/Fallout 76" 2>/dev/null)
+elif [ -z "$possible_paths" ]; then
     printf "%b\n" "${RED}No folders found.${RC}"
     exit 1
 fi
