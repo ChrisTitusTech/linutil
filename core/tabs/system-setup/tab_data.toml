@@ -79,6 +79,12 @@ description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more ab
 script = "arch/yay-setup.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "Chaotic-AUR Repository"
+description = "Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/"
+script = "arch/chaotic-aur-setup.sh"
+task_list = "I"
+
 [[data]]
 name = "Debian"
 
