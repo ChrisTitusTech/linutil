@@ -91,6 +91,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Install Chaotic-AUR**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
 
 ### Fedora
 
