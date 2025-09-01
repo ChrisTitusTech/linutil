@@ -10,7 +10,12 @@ installChaoticAUR() {
                 # Print message indicating Chaotic-AUR is being installed
                 printf "%b\n" "${YELLOW}Installing Chaotic-AUR repository...${RC}"
                 # Call Escalation Tool and install and enable Chaotic-AUR
-                curl -fsSL https://naturl.link/chaotic-aur | "$ESCALATION_TOOL" sh
+                "$ESCALATION_TOOL" "$PACKAGER"-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+                "$ESCALATION_TOOL" "$PACKAGER"-key --lsign-key 3056513887B78AEB
+                "$ESCALATION_TOOL" "$PACKAGER" -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
+                "$ESCALATION_TOOL" "$PACKAGER" -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+                echo "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | $ESCALATION_TOOL tee -a /etc/pacman.conf
+                "$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm
                 # Print message indicating Chaotic-AUR has been installed and enabled
                 printf "%b\n" "${GREEN}Chaotic-AUR repository installed and enabled${RC}"
             else
