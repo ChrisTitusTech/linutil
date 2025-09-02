@@ -325,6 +325,3 @@ install_nerd_font
 picom_animations
 clone_config_folders
 configure_backgrounds
-. mybash-setup.sh
-. rofi-setup.sh
-. ghostty-setup.sh
