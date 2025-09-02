@@ -7,27 +7,28 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 git unzip flameshot lxappearance feh mate-polkit
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst feh nwg-look 
+
             ;;
         apk)
             "$ESCALATION_TOOL" "$PACKAGER" add build-base libxinerama-dev libxft-dev imlib2-dev font-dejavu dbus-x11 git unzip flameshot feh polkit
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot lxappearance feh mate-polkit
+            "$ESCALATION_TOOL" "$PACKAGER" install -y build-essential libx11-dev libxinerama-dev libxft-dev libimlib2-dev libx11-xcb-dev libfontconfig1 libx11-6 libxft2 libxinerama1 libxcb-res0-dev git unzip flameshot nwg-look feh mate-polkit
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y "@development-tools" || "$ESCALATION_TOOL" "$PACKAGER" group install -y "Development Tools"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot lxappearance feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libX11-devel libXinerama-devel libXft-devel imlib2-devel libxcb-devel unzip flameshot nwg-look feh mate-polkit # no need to include git here as it should be already installed via "Development Tools"
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER"  install -y make libX11-devel libXinerama-devel libXft-devel imlib2-devel gcc
             ;;
         xbps-install)
-            "$ESCALATION_TOOL" "$PACKAGER" -Sy base-devel freetype-devel fontconfig-devel imlib2-devel libXft-devel libXinerama-devel git unzip flameshot lxappearance feh mate-polkit
+            "$ESCALATION_TOOL" "$PACKAGER" -Sy base-devel freetype-devel fontconfig-devel imlib2-devel libXft-devel libXinerama-devel git unzip flameshot nwg-look feh mate-polkit 
             ;; 
         eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" install -y -c system.devel
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxinerama-devel libxft-devel imlib2-devel git unzip flameshot lxappearance feh mate-polkit xcb-util-devel
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libxcb-devel libxinerama-devel libxft-devel imlib2-devel git unzip flameshot nwg-look feh mate-polkit xcb-util-devel
             ;;   
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -71,9 +72,14 @@ setupPicomDependencies() {
 }
 
 makeDWM() {
-    cd "$HOME" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus
-    # This path can be changed (e.g. to linux-toolbox directory)
-    cd dwm-titus/ # Hardcoded path, maybe not the best.
+    if [ ! -d "$HOME/.local/share/dwm-titus" ]; then
+	printf "%b\n" "${YELLOW}DWM-Titus not found, cloning repository...${RC}"
+	cd "$HOME/.local/share/" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus This path can be changed (e.g. to linux-toolbox directory)
+	cd dwm-titus/ # Hardcoded path, maybe not the best.
+    else
+	printf "%b\n" "${GREEN}DWM-Titus directory already exists, replacing..${RC}"
+	cd "$HOME/.local/share/dwm-titus" && git pull
+    fi
     "$ESCALATION_TOOL" make clean install # Run make clean install
 }
 
@@ -97,7 +103,7 @@ install_nerd_font() {
             printf "%b\n" "${RED}Failed to create directory: $FONT_DIR${RC}"
             return 1
         }
-    else
+    fi
         printf "%b\n" "${YELLOW}Installing font '$FONT_NAME'${RC}"
         # Change this URL to correspond with the correct font
         FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
@@ -110,7 +116,6 @@ install_nerd_font() {
         fc-cache -fv
         rm -rf "${TEMP_DIR}"
         printf "%b\n" "${GREEN}'$FONT_NAME' installed successfully.${RC}"
-    fi
 }
 
 picom_animations() {
@@ -150,7 +155,9 @@ picom_animations() {
 clone_config_folders() {
     # Ensure the target directory exists
     [ ! -d ~/.config ] && mkdir -p ~/.config
-
+    [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
+    # Copy scripts to local bin
+    cp -rf ~/.local/share/dwm-titus/scripts/* ~/.local/bin/
     # Iterate over all directories in config/*
     for dir in config/*/; do
         # Extract the directory name
@@ -237,40 +244,17 @@ setupDisplayManager() {
             break
         fi
     done
-    printf "%b\n" "${GREEN}Current display manager: $currentdm${RC}"
+    printf "%b\n" "${GREEN}Display Manager Setup: $currentdm${RC}"
     if [ "$currentdm" = "none" ]; then
         printf "%b\n" "${YELLOW}--------------------------${RC}" 
-        printf "%b\n" "${YELLOW}Pick your Display Manager ${RC}" 
-        printf "%b\n" "${YELLOW}1. SDDM ${RC}" 
-        printf "%b\n" "${YELLOW}2. LightDM ${RC}" 
-        printf "%b\n" "${YELLOW}3. GDM ${RC}" 
-        printf "%b\n" "${YELLOW}4. None ${RC}" 
-        printf "%b" "${YELLOW}Please select one: ${RC}"
-        read -r choice
-        case "$choice" in
-            1)
-                DM="sddm"
-                ;;
-            2)
-                DM="lightdm"
-                ;;
-            3)
-                DM="gdm"
-                ;;
-            4)
-                printf "%b\n" "${GREEN}No display manager will be installed${RC}"
-                return 0
-                ;;
-            *)
-                printf "%b\n" "${RED}Invalid selection! Please choose 1, 2, 3, or 4.${RC}"
-                return 1
-                ;;
-        esac
+        DM="sddm"
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
                 if [ "$DM" = "lightdm" ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
+                elif [ "$DM" = "sddm" ]; then
+                    sh -c "$(curl -fsSL https://raw.githubusercontent.com/keyitdev/sddm-astronaut-theme/master/setup.sh)"
                 fi
                 ;;
             apk)
@@ -313,7 +297,7 @@ install_slstatus() {
     read -r response
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         printf "%b\n" "${YELLOW}Installing slstatus${RC}"
-        cd "$HOME/dwm-titus/slstatus" || { 
+        cd "$HOME/.local/share/dwm-titus/slstatus" || { 
             printf "%b\n" "${RED}Failed to change directory to slstatus${RC}"
             return 1
         }
@@ -340,3 +324,6 @@ install_nerd_font
 picom_animations
 clone_config_folders
 configure_backgrounds
+. mybash-setup.sh
+. rofi-setup.sh
+. ghostty-setup.sh
