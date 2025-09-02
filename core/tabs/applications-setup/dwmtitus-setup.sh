@@ -72,6 +72,7 @@ setupPicomDependencies() {
 }
 
 makeDWM() {
+    [ ! -d "$HOME/.local/share" ] && mkdir -p "$HOME/.local/share/"
     if [ ! -d "$HOME/.local/share/dwm-titus" ]; then
 	printf "%b\n" "${YELLOW}DWM-Titus not found, cloning repository...${RC}"
 	cd "$HOME/.local/share/" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus This path can be changed (e.g. to linux-toolbox directory)
@@ -120,7 +121,7 @@ install_nerd_font() {
 
 picom_animations() {
     # clone the repo into .local/share & use the -p flag to avoid overwriting that dir
-    mkdir -p "$HOME/.local/share/"
+    [ ! -d "$HOME/.local/share" ] && mkdir -p "$HOME/.local/share/"
     if [ ! -d "$HOME/.local/share/ftlabs-picom" ]; then
         if ! git clone https://github.com/FT-Labs/picom.git "$HOME/.local/share/ftlabs-picom"; then
             printf "%b\n" "${RED}Failed to clone the repository${RC}"
