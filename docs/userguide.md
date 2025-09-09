@@ -12,6 +12,7 @@
 - **Slack**: Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools.
 - **Telegram**: Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls.
 - **Thunderbird**: Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality.
+- **ZapZap**: ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta.
 - **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
 
 ### Developer Tools
@@ -27,6 +28,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Sublime Text**: Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages.
 - **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
 - **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
+- **Zed**: Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI.
 
 ### Office Suites
 
@@ -42,12 +44,15 @@ https://github.com/ChrisTitusTech/neovim
 - **LibreWolf**: LibreWolf is a fork of Firefox, focused on privacy, security, and freedom.
 - **Lynx**: Lynx is a highly configurable text-based web browser for use on cursor-addressable character cell terminals.
 - **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
+- **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
 - **Thorium**: Thorium is a Chromium-based browser focused on privacy and performance.
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
+- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
+https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
@@ -76,31 +81,52 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Loot Filter**: This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter
 
+### Fallout 76
+
+- **Fallout 76 Custom INI**: This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements.
+
 ## Security
 
-- **Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
+- **UFW Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
+- **FirewallD Firewall Baselines (CTT)**: Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes
 
 ## System Setup
 
 
-### Arch Linux
+### Alpine
+
+- **Alpine Update**: Upgrades Alpine Linux to either latest stable or edge repositories
+
+### Arch
 
 - **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
+- **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
 - **Nvidia Drivers && Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Install Chaotic-AUR Repository**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
+
+### Debian
+
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 
 ### Fedora
 
 - **Configure DNF**: Optimizes DNF for parallel downloads
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Multimedia Codecs**: This script is designed to install multimedia codecs, and to ensure RPM Fusion repositories are installed.
 - **Nvidia Proprietary Drivers**: This script is designed to download the proprietary NVIDIA drivers in Fedora.
 - **RPM Fusion**: RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship. That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit. For more information visit: https://rpmfusion.org/
 - **Upgrade to a New Fedora Release**: Upgrades system to the next Fedora release
 - **Virtualization**: Enables Virtualization through dnf
 - **Btrfs Assistant, Snapper Config, grub-btrfs**: Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately.
+
+### Ubuntu
+
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
@@ -137,8 +163,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
+- **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **WiFi Manager**: This utility is designed to manage wifi in your system
-
