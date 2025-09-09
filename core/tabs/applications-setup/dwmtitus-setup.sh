@@ -69,7 +69,7 @@ clone_config_folders() {
     [ ! -d ~/.config ] && mkdir -p ~/.config
     [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
     # Copy scripts to local bin
-    cp -rf "$HOME/.local/share/dwm-titus/scripts/*" "$HOME/.local/bin/"
+    cp -rf "$HOME/.local/share/dwm-titus/scripts/." "$HOME/.local/bin/"
 
     # Iterate over all directories in config/*
     for dir in config/*/; do
