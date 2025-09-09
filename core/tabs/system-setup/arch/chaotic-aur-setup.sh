@@ -14,7 +14,7 @@ installChaoticAUR() {
 			"$ESCALATION_TOOL" pacman-key --lsign-key 3056513887B78AEB
 			"$ESCALATION_TOOL" "$PACKAGER" -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
 			"$ESCALATION_TOOL" "$PACKAGER" -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-			echo "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
+			printf "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
 			"$ESCALATION_TOOL" "$PACKAGER" -Syu --noconfirm
 			# Print message indicating Chaotic-AUR has been installed and enabled
 			printf "%b\n" "${GREEN}Chaotic-AUR repository installed and enabled${RC}"
