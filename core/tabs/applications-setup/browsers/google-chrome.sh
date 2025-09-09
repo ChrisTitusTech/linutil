@@ -9,6 +9,7 @@ installChrome() {
             apt-get|nala)
                 curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
+                "$ESCALATION_TOOL" rm ./google-chrome-stable_current_amd64.deb
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome

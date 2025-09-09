@@ -9,6 +9,7 @@ installOnlyOffice() {
             apt-get|nala)
                 curl -O https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
+                "$ESCALATION_TOOL" rm ./onlyoffice-desktopeditors_amd64.deb
                 ;;
             zypper|dnf|xbps-install|eopkg|apk)
                 checkFlatpak
