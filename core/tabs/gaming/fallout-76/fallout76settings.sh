@@ -189,10 +189,14 @@ print_numbered_menu() {
     printf "\n"
     
     i=1
-    echo "$paths_string" | tr '|' '\n' | while IFS= read -r path; do
-        printf "%b%d)%b %s\n" "${GREEN}" "$i" "${RC}" "$path"
-        i=$((i + 1))
+    IFS='|'
+    for path in $paths_string; do
+        if [ -n "$path" ] && [ -d "$path" ]; then
+            printf "%b%d)%b %s\n" "${GREEN}" "$i" "${RC}" "$path"
+            i=$((i + 1))
+        fi
     done
+    IFS=' '
     
     printf "\n%bEnter your choice (1-%d), or 'q' to quit: %b" "${YELLOW}" "$total" "${RC}"
 }
@@ -214,8 +218,27 @@ select_path_numbered() {
                 ;;
             *)
                 if [ "$choice" -ge 1 ] && [ "$choice" -le "$total" ]; then
-                    selected_path=$(echo "$paths_string" | cut -d '|' -f "$choice")
-                    break
+                    # Extract the path more safely
+                    selected_path=""
+                    current_index=1
+                    IFS='|'
+                    for path in $paths_string; do
+                        if [ -n "$path" ] && [ -d "$path" ]; then
+                            if [ $current_index -eq "$choice" ]; then
+                                selected_path="$path"
+                                break
+                            fi
+                            current_index=$((current_index + 1))
+                        fi
+                    done
+                    IFS=' '
+                    
+                    if [ -n "$selected_path" ]; then
+                        break
+                    else
+                        printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
+                        sleep 2
+                    fi
                 else
                     printf "%b\n" "${RED}Invalid choice. Please enter a number between 1 and $total.${RC}"
                     sleep 2
@@ -248,14 +271,18 @@ print_interactive_menu() {
     printf "\n"
     
     i=0
-    echo "$paths_string" | tr '|' '\n' | while IFS= read -r path; do
-        if [ $i -eq $selected ]; then
-            printf "%b> %s%b\n" "${GREEN}" "$path" "${RC}"
-        else
-            printf "  %s\n" "$path"
+    IFS='|'
+    for path in $paths_string; do
+        if [ -n "$path" ] && [ -d "$path" ]; then
+            if [ $i -eq $selected ]; then
+                printf "%b> %s%b\n" "${GREEN}" "$path" "${RC}"
+            else
+                printf "  %s\n" "$path"
+            fi
+            i=$((i + 1))
         fi
-        i=$((i + 1))
     done
+    IFS=' '
     
     printf "\n"
 }
@@ -305,8 +332,23 @@ select_path_interactive() {
                 fi
                 ;;
             "$(printf '\n')" | "$(printf '\r')")  # Enter
-                selected_path=$(echo "$paths_string" | cut -d '|' -f $((selected + 1)))
-                break
+                # Extract the selected path safely
+                current_index=0
+                IFS='|'
+                for path in $paths_string; do
+                    if [ -n "$path" ] && [ -d "$path" ]; then
+                        if [ $current_index -eq $selected ]; then
+                            selected_path="$path"
+                            break
+                        fi
+                        current_index=$((current_index + 1))
+                    fi
+                done
+                IFS=' '
+                
+                if [ -n "$selected_path" ]; then
+                    break
+                fi
                 ;;
             "q" | "Q")  # Quit option
                 printf "%b\n" "${RED}Selection cancelled by user.${RC}"
@@ -332,17 +374,37 @@ select_path() {
 prepare_path_selection() {
     input_paths="$1"
     paths_string=""
-    i=0
-    IFS='
+    total=0
+    
+    # Create a clean array of paths, filtering out any invalid entries
+    if [ -n "$input_paths" ]; then
+        IFS='
 '
-    for path in $input_paths; do
-        paths_string="$paths_string|$path"
-        i=$((i + 1))
-    done
-    IFS=' '
-    paths_string="${paths_string#|}"
-    total=$i
+        for path in $input_paths; do
+            # Clean the path and validate it
+            clean_path=$(echo "$path" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            
+            # Only include if it's a valid directory path
+            if [ -n "$clean_path" ] && [ -d "$clean_path" ]; then
+                if [ $total -eq 0 ]; then
+                    paths_string="$clean_path"
+                else
+                    paths_string="$paths_string|$clean_path"
+                fi
+                total=$((total + 1))
+            fi
+        done
+        IFS=' '
+    fi
+    
+    # Ensure we have at least one valid path
+    if [ $total -eq 0 ]; then
+        printf "%b\n" "${RED}No valid paths found for selection.${RC}"
+        return 1
+    fi
+    
     selected=0
+    return 0
 }
 
 # Main execution starts here
