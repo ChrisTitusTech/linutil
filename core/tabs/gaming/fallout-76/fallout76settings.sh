@@ -133,7 +133,7 @@ $filtered_result"
 
 # Function to search for compatdata paths in known steamapps directories
 find_compatdata_paths() {
-    printf "%b\n" "${YELLOW}Searching for Fallout 76 compatdata paths...${RC}"
+    printf "%b\n" "${YELLOW}Searching for Fallout 76 compatdata paths...${RC}" >&2
     
     if ! find_steamapps_dirs; then
         return 1
@@ -161,8 +161,8 @@ find_compatdata_paths() {
 
 # Function to search for common game paths in known steamapps directories
 find_common_paths() {
-    printf "%b\n" "${YELLOW}Searching for Fallout 76 common game paths...${RC}"
-    
+    printf "%b\n" "${YELLOW}Searching for Fallout 76 common game paths...${RC}" >&2
+
     if ! find_steamapps_dirs; then
         return 1
     fi
@@ -180,7 +180,7 @@ find_common_paths() {
     IFS=' '
     
     if [ -z "$common_paths" ]; then
-        printf "%b\n" "${RED}No common game folders found.${RC}"
+        printf "%b\n" "${RED}No common game folders found.${RC}" >&2
         return 1
     fi
     
@@ -414,15 +414,15 @@ prepare_path_selection() {
 }
 
 # Main execution starts here
-
-# Get compatdata paths
-compatdata_paths=$(find_compatdata_paths)
+find_steamapps_dirs
 if [ $? -ne 0 ]; then
+    printf "%b\n" "${RED}Cannot proceed without Steam library folders.${RC}"
     exit 1
 fi
 
-# Select compatdata path
-printf "%b\n" "${CYAN}Step 1: Select the compatdata path for Fallout 76 settings${RC}"
+
+# Get compatdata paths
+compatdata_paths=$(find_compatdata_paths)
 prepare_path_selection "$compatdata_paths"
 menu_title="Please select the compatdata path (for game settings):"
 select_path
@@ -436,12 +436,7 @@ fi
 
 # Get common game paths
 common_paths=$(find_common_paths)
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
 # Select common game path
-printf "%b\n" "${CYAN}Step 2: Select the common game installation path${RC}"
 prepare_path_selection "$common_paths"
 menu_title="Please select the common game installation path:"
 select_path
