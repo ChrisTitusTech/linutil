@@ -55,30 +55,36 @@ steamapps_dirs=""
 # Function to find and cache all steamapps directories
 find_steamapps_dirs() {
     if [ -n "$steamapps_dirs" ]; then
-        return 0  # Already found, return cached result
+        return 0
     fi
     
-    printf "%b\n" "${YELLOW}Searching for Steam library folders...${RC}"
+    printf "%b\n" "${YELLOW}Searching for Steam library folders...${RC}" >&2
+    printf "%b\n" "${YELLOW}This may take a moment...${RC}" >&2
     
-    # Create temporary file to capture clean output
+    # Show progress by searching locations sequentially
     temp_file="/tmp/steamapps_search_$$"
     
-    # Search in HOME directory (completely isolate output from errors)
+    printf "%b" "${YELLOW}Searching home directory...${RC}" >&2
     find "$HOME" -type d -name "steamapps" 2>/dev/null > "$temp_file" || true
+    printf "%b\n" " ${GREEN}✓${RC}" >&2
     home_steamapps=$(head -20 "$temp_file" 2>/dev/null)
     
     # Search in /media for external drives
     media_steamapps=""
     if [ -d "/media" ]; then
+        printf "%b" "${YELLOW}Searching /media...${RC}" >&2
         find "/media" -type d -name "steamapps" 2>/dev/null > "$temp_file" || true
         media_steamapps=$(head -10 "$temp_file" 2>/dev/null)
+        printf "%b\n" " ${GREEN}✓${RC}" >&2
     fi
     
     # Search in /mnt for additional mount points
     mnt_steamapps=""
     if [ -d "/mnt" ]; then
+        printf "%b" "${YELLOW}Searching /mnt...${RC}" >&2
         find "/mnt" -type d -name "steamapps" 2>/dev/null > "$temp_file" || true
         mnt_steamapps=$(head -10 "$temp_file" 2>/dev/null)
+        printf "%b\n" " ${GREEN}✓${RC}" >&2
     fi
     
     # Clean up temporary file
@@ -451,7 +457,10 @@ printf "%b\n" "${GREEN}Selected paths:${RC}"
 printf "%b\n" "  Compatdata path: $compatdata_path"
 printf "%b\n" "  Common game path: $common_game_path"
 
-# Clone the latest configs repository
+if [ -d "/tmp/fallout76-configs" ]; then
+    rm -rf /tmp/fallout76-configs
+fi
+
 printf "%b\n" "${YELLOW}Cloning the latest custom settings and mods...${RC}"
 if ! git clone https://github.com/ChrisTitusTech/fallout76-configs /tmp/fallout76-configs; then
     printf "%b\n" "${RED}Failed to clone repository.${RC}"
