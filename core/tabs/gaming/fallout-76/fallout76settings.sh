@@ -414,8 +414,8 @@ prepare_path_selection() {
 }
 
 # Main execution starts here
-find_steamapps_dirs
-if [ $? -ne 0 ]; then
+
+if ! find_steamapps_dirs; then
     printf "%b\n" "${RED}Cannot proceed without Steam library folders.${RC}"
     exit 1
 fi
