@@ -486,14 +486,14 @@ echo -ne "
                     Network Setup
 -------------------------------------------------------------------------
 "
-pacman -S --noconfirm --needed networkmanager dhcpcd
+pacman -S --noconfirm --needed networkmanager
 systemctl enable NetworkManager
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up mirrors for optimal download
 -------------------------------------------------------------------------
 "
-pacman -S --noconfirm --needed pacman-contrib curl
+pacman -S --noconfirm --needed pacman-contrib curl terminus-font
 pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
