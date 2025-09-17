@@ -178,6 +178,13 @@ checkDistro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         DTYPE=$ID
+        CTYPE=$VERSION_CODENAME
+        RTYPE=$VERSION_ID
+    # Use lsb-release if /etc/os-release is missing
+    elif command_exists lsb_release; then
+        DTYPE=$(lsb_release -is 2>/dev/null)
+        CTYPE=$(lsb_release -cs 2>/dev/null)
+        RTYPE=$(lsb_release -rs 2>/dev/null)
     fi
 }
 
