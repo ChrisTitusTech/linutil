@@ -259,6 +259,12 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Ghostty"
+description = "Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience."
+script = "ghostty-setup.sh"
+task_list = "I FM"
+
+[[data]]
 name = "Podman"
 description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "podman-setup.sh"
