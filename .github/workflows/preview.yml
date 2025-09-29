@@ -51,7 +51,7 @@ jobs:
           sudo apt update
           sudo apt install -y ffmpeg ttyd
           go install github.com/charmbracelet/vhs@latest
-          vhs .github/preview.tape
+          $(go env GOPATH)/bin/vhs .github/preview.tape
 
       - name: Move preview
         run: mv preview.gif .github/preview.gif
