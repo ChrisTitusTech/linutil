@@ -9,7 +9,7 @@ installVirtualBox() {
         	wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
     		"$ESCALATION_TOOL" printf "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" > /etc/apt/sources.list.d/virtualbox.sources
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-7.1
+            "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-7.2
 
             vboxVersion=$(vboxmanage --version | cut -f1 -d"r")
             wget -c -O /home/"$USER"/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/"${vboxVersion}"/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
@@ -23,7 +23,7 @@ installVirtualBox() {
             else
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.1."${ARCH}"
+            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.2."${ARCH}"
             "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions."${ARCH}"
             ;;
         zypper)
@@ -52,7 +52,28 @@ virtualBoxPermissions() {
     "$ESCALATION_TOOL" usermod -aG "vboxusers" "$(who | awk 'NR==1{print $1}')"
 }
 
+getLastestVersion() {
+    vboxGitVersion=$(wget "https://raw.githubusercontent.com/VirtualBox/virtualbox/refs/heads/main/Version.kmk" -q -O -)
+    fullVersion=$(echo "$vboxGitVersion" | sed '/^#/d' | cut -d'=' -f2 | cut -d'$' -f1 | xargs | sed 's/ /./g')
+    version=$(echo "${fullVersion:0:3}")
+}
+
+checkVirtualBox() {
+    if ! command_exists virtualbox; then
+        installVirtualBox
+    else
+        currentVersion=$(vboxmanage --version | cut -d'r' -f1)
+        getLastestVersion
+
+        if [ "$(echo "${currentVersion%.*}")" = "$fullVersion" ]; then
+            printf "%b\n" "Latest version of VirtualBox already installed"
+        else
+            installVirtualBox
+        fi
+    fi
+}
+
 checkEnv
 checkEscalationTool
-installVirtualBox
+checkVirtualBox
 virtualBoxPermissions

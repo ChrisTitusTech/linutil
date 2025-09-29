@@ -39,6 +39,23 @@ installVirtManager() {
     "$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
 
+getLatestVersion() {
+    version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/virt-manager/virt-manager | grep -v 'latest' | tail -n1 | cut -d '/' --fields=3 | cut -d '^' -f1 | cut -d 'v' -f2)
+}
+
+checkVirtManager() {
+    if ! command_exists virt-manager; then
+        installVirtManager
+    else
+        installedVersion=$(virt-manager --version)
+        if [ "$version" = "$installedVersion" ]; then
+            printf "%b\n" "Latest Version of virt-manager already installed"
+        else
+            installVirtManager
+        fi
+    fi
+}
+
 checkEnv
 checkEscalationTool
 installVirtManager

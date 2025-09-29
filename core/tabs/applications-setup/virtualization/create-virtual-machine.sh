@@ -202,7 +202,7 @@ setVMDetails() {
 }
 
 installIsoInfo() {
-	printf "%b\n" "${YELLOW}Installing Gnome Boxes...${RC}"
+	printf "%b\n" "${YELLOW}Installing IsoInfo...${RC}"
     case "$PACKAGER" in
         apt-get|nala|dnf|zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -y install genisoimage
@@ -252,6 +252,7 @@ main() {
     printf "%b\n" "2. ${YELLOW}QEMU${RC}"
     printf "%b\n" "3. ${YELLOW}VirtualBox${RC}"
     # printf "%b\n" "4. ${YELLOW}Libvirt${RC}"
+    # printf "%b\n" "5. ${YELLOW}gnome-boxes${RC}"
     printf "%b" "Enter your choice [1-3]: "
     read -r -r CHOICE
     case "$CHOICE" in
@@ -259,6 +260,7 @@ main() {
         2) checkInstalled qemu-img ;;
         3) checkInstalled virtualbox ;;
         # 4) checkInstalled libvirt ;;
+        # 5) checkInstalled gnome-boxes ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
