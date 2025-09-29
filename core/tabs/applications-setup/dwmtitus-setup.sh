@@ -161,6 +161,13 @@ setupDisplayManager() {
     fi
 }
 
+
+batteryShown() {
+    if ls /sys/class/power_supply/ 2>/dev/null | grep -q '^BAT'; then
+        sed -i '35s/^\(.\{36\}\)/\1'" battery"'/' "$HOME/.local/dwm-titus/polybar/themes/minimal/config.ini"
+    fi
+}
+
 checkEnv
 checkEscalationTool
 setupDisplayManager
