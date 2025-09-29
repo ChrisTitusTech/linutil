@@ -54,8 +54,7 @@ virtualBoxPermissions() {
 
 getLatestVersion() {
     vboxGitVersion=$(wget "https://raw.githubusercontent.com/VirtualBox/virtualbox/refs/heads/main/Version.kmk" -q -O -)
-    fullVersion=$(echo "$vboxGitVersion" | sed '/^#/d' | cut -d'=' -f2 | cut -d'$' -f1 | xargs | sed 's/ /./g')
-    version=$(sed 's/.\{2\}$//' <<< "$fullVersion")
+    version=$(echo "$vboxGitVersion" | sed '/^#/d' | cut -d'=' -f2 | cut -d'$' -f1 | xargs | sed 's/ /./g' | cut -c -3)
 }
 
 checkVirtualBox() {
@@ -65,7 +64,7 @@ checkVirtualBox() {
         currentVersion=$(vboxmanage --version | cut -d'r' -f1)
         getLatestVersion
 
-        if [ "$(echo "${currentVersion%.*}")" = "$fullVersion" ]; then
+        if [ "${currentVersion%.*}" = "$version" ]; then
             printf "%b\n" "Latest version of VirtualBox already installed"
         else
             installVirtualBox
