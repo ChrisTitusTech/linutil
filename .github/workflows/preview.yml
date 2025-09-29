@@ -47,9 +47,6 @@ jobs:
       - name: Download binary
         run: |
           curl -LO "https://github.com/${{ github.repository }}/releases/download/${{ env.tag_name }}/linutil"
-        
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Set env
         run: |
@@ -59,6 +56,9 @@ jobs:
           echo "${{ github.workspace }}/build" >> $GITHUB_PATH
           echo "branch_name=${{ env.tag_name }}" | tr . - >> $GITHUB_ENV
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        
       - name: Generate preview
         uses: charmbracelet/vhs-action@v2.1.0
         with:
