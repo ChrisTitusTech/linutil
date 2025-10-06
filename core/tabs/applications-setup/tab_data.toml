@@ -227,7 +227,7 @@ name = "Game Engines"
 
 [[data.entries]]
 name = "Redot Engine"
-description = "Redot Engine Allows You To Make 3D Games And 2D Games And Has A Really Good OpenSource Community"
+description = "Redot is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface"
 script = "game-engines/redot-engine.sh"
 task_list = "I"
 
