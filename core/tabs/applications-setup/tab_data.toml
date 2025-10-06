@@ -110,7 +110,7 @@ task_list = "I"
 
 [[data.entries]]
 name = "Redot Engine"
-description = "Redot Engine Allows You To Make 3D Games And 2D Games And Has A Really Good OpenSource Community"
+description = "Redot is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface"
 script = "developer-tools/redot-engine.sh"
 task_list = "I"
 
@@ -229,18 +229,6 @@ script = "browsers/waterfox.sh"
 task_list = "FI"
 
 [[data]]
-<<<<<<< Updated upstream
-name = "Game Engines"
-
-[[data.entries]]
-name = "Redot Engine"
-description = "Redot is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface"
-script = "game-engines/redot-engine.sh"
-task_list = "I"
-
-[[data]]
-=======
->>>>>>> Stashed changes
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"
