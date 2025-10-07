@@ -25,8 +25,7 @@ installPodman() {
 }
 
 addRegistry() {
-    printf "\n"
-    printf "%b\n" "${YELLOW}Do you want to add docker.io to the list of unqualified search registries?${RC}"
+    printf "\n%b\n" "${YELLOW}Do you want to add docker.io to the list of unqualified search registries?${RC}"
     printf "%b\n" "This allows using short names like 'postgres' instead of 'docker.io/library/postgres'. (y/n)${RC}"
     read -r answer
     if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
