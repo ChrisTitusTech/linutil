@@ -1,49 +1,50 @@
 name: Feature Request
-description: Suggest a new feature or improvement to help us enhance this project.
-title: "[Feature Request]: "
-labels: ["enhancement"]
+description: Suggest a new feature or improvement to help us enhance the project.
+title: "[Feature Request]: <title>"
+labels: ["type: enhancement", "initial review required"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting a feature or enhancement! Please provide as much detail as possible to help us understand your request. Note that submitting a feature request does not guarantee implementation.
+        Please provide as much detail as possible to help us understand your request. Note that submitting a feature request does not guarantee implementation.
   - type: textarea
     id: related-problem
     attributes:
-      label: Is your feature request related to a problem? Please describe.
+      label: Problem Description
       description: |
-        Provide a clear and concise description of the problem, if applicable.
+        Is your feature request related to a problem? If yes, please describe.
       placeholder: I'm always frustrated when ...
   - type: textarea
     id: proposed-solution
     attributes:
-      label: Describe the solution you'd like
+      label: Proposed solution
       description: |
-        Provide a clear and concise description of what you want to happen.
-      placeholder: Explain your proposed feature or enhancement in detail.
+        Provide a clear and concise description of what you would like to be changed.
+      placeholder: Explain your proposal in detail.
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Describe alternatives you've considered
+      label: Alternatives
       description: |
-        Provide a clear and concise description of any alternative solutions or features you've considered.
+        Are there other ways to solve this? List any alternatives or workarounds you’ve considered.
       placeholder: Explain any other approaches or solutions you've thought about.
   - type: textarea
     id: additional-context
     attributes:
-      label: Additional context
+      label: Additional Context
       description: |
-        Add any other context or screenshots about the feature request here.
-      placeholder: Provide additional information, screenshots, or references to explain your request further.
+        Add any other context, screenshots or references related to your request here.
   - type: checkboxes
     id: checklist
     attributes:
       label: Checklist
       options:
         - label: I checked for duplicate issues.
+          required: true
         - label: I checked already existing discussions.
+          required: true
         - label: This feature is not included in the roadmap.
           required: true
