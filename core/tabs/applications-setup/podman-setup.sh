@@ -28,7 +28,7 @@ addRegistry() {
     printf "\n%b\n" "${YELLOW}Do you want to add docker.io to the list of unqualified search registries?${RC}"
     printf "%b\n" "This allows using short names like 'postgres' instead of 'docker.io/library/postgres'. (y/n)${RC}"
     read -r answer
-    if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+    if echo "$answer" | grep -qE '^[Yy]$'; then
         printf "%b\n" "${YELLOW}Adding docker.io to registries...${RC}"
         CONF_DIR="/etc/containers/registries.conf.d"
         CONF_FILE="$CONF_DIR/10-unqualified-search-registries.conf"
