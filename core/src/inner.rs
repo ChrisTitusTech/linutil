@@ -16,7 +16,7 @@ const TAB_DATA: Dir = include_dir!("$CARGO_MANIFEST_DIR/tabs");
 
 // Allow the unused TempDir to be stored for later destructor call
 #[allow(dead_code)]
-pub struct TabList(pub Vec<Tab>, TempDir);
+pub struct TabList(pub Vec<Tab>, pub(crate) TempDir);
 
 // Implement deref to allow Vec<Tab> methods to be called on TabList
 impl Deref for TabList {
@@ -41,7 +41,8 @@ impl IntoIterator for TabList {
 }
 
 pub fn get_tabs(validate: bool) -> TabList {
-    let (temp_dir, tab_files) = TabDirectories::get_tabs();
+    let temp_dir = TempDir::with_prefix("linutil_scripts").unwrap();
+    let tab_files = TabDirectories::get_tabs(&temp_dir);
 
     let tabs: Vec<_> = tab_files
         .into_iter()
@@ -269,10 +270,9 @@ fn is_executable(path: &Path) -> bool {
 }
 
 impl TabDirectories {
-    fn get_tabs() -> (TempDir, Vec<PathBuf>) {
-        let temp_dir = TempDir::with_prefix("linutil_scripts").unwrap();
+    fn get_tabs(temp_dir: &TempDir) -> Vec<PathBuf> {
         TAB_DATA
-            .extract(&temp_dir)
+            .extract(temp_dir)
             .expect("Failed to extract the saved directory");
 
         let tab_files = std::fs::read_to_string(temp_dir.path().join("tabs.toml"))
@@ -283,6 +283,107 @@ impl TabDirectories {
             .iter()
             .map(|path| temp_dir.path().join(path).join("tab_data.toml"))
             .collect();
-        (temp_dir, tab_paths)
+
+        tab_paths
+    }
+}
+
+#[cfg(test)]
+mod tab_directories_tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn test_get_tabs() {
+        let temp_dir = crate::tests::create_temp_dir();
+        let tab_paths = TabDirectories::get_tabs(&temp_dir);
+
+        assert!(!tab_paths.is_empty());
+        for path in tab_paths {
+            assert!(fs::metadata(&path).is_ok());
+        }
+
+        drop(temp_dir);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_executable() {
+        let temp_dir = crate::tests::create_temp_dir();
+        let file_path = temp_dir.path().join("test_script.sh");
+
+        std::fs::write(
+            &file_path,
+            "#!/bin/sh\necho 'NICE cat of the week: SPOINGUS (cuddled nicely)'",
+        )
+        .unwrap();
+        assert!(!is_executable(&file_path));
+
+        let mut permissions = std::fs::metadata(&file_path).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&file_path, permissions).unwrap();
+        assert!(is_executable(&file_path));
+
+        let non_existent_path = temp_dir.path().join("non_existent.sh");
+        assert!(!is_executable(&non_existent_path));
+
+        drop(temp_dir);
+    }
+
+    #[test]
+    fn test_get_shebang() {
+        let temp_dir = crate::tests::create_temp_dir();
+        let script_path = temp_dir.path().join("test_script.sh");
+
+        std::fs::write(
+            &script_path,
+            "#!/bin/bash\necho 'NAUGHTY cat of the week: BINGUS (bit my ass)'",
+        )
+        .unwrap();
+        let result = get_shebang(&script_path, true);
+        assert_eq!(
+            result,
+            Some((
+                "/bin/bash".to_string(),
+                vec!["/path/to/test_script.sh".to_string()]
+            ))
+            .map(|(exe, args)| (
+                exe,
+                args.iter()
+                    .map(|s| s.replace("/path/to", script_path.parent().unwrap().to_str().unwrap()))
+                    .collect()
+            ))
+        );
+
+        let script_no_shebang_path = temp_dir.path().join("no_shebang.sh");
+        std::fs::write(&script_no_shebang_path, "echo 'zip zip zip ble ble ble'").unwrap();
+        let result_no_shebang = get_shebang(&script_no_shebang_path, true);
+        assert_eq!(
+            result_no_shebang,
+            Some(("/bin/sh".to_string(), vec!["-e".to_string(),]))
+        );
+
+        let script_invalid_shebang_path = temp_dir.path().join("invalid_shebang.sh");
+        std::fs::write(
+            &script_invalid_shebang_path,
+            "#!/i/love/my/cat\necho 'her name is mimi :3 (mimi will be in this codebase forever)'",
+        )
+        .unwrap();
+        let result_invalid_shebang = get_shebang(&script_invalid_shebang_path, true);
+        assert!(result_invalid_shebang.is_none());
+        let result_invalid_shebang_no_validate = get_shebang(&script_invalid_shebang_path, false);
+        assert_eq!(
+            result_invalid_shebang_no_validate,
+            Some((
+                "/i/love/my/cat".to_string(),
+                vec![script_invalid_shebang_path.to_string_lossy().to_string()]
+            ))
+        );
+
+        drop(temp_dir);
     }
 }
