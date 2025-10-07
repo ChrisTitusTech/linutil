@@ -38,7 +38,12 @@ addRegistry() {
             "$ESCALATION_TOOL" mkdir -p "$CONF_DIR"
         fi
 
-        printf "%s\n" "$REGISTRY_LINE" | "$ESCALATION_TOOL" tee -a "$CONF_FILE" > /dev/null
+        if ! grep -Fxq "$REGISTRY_LINE" "$CONF_FILE" 2>/dev/null; then
+            printf "%s\n" "$REGISTRY_LINE" | "$ESCALATION_TOOL" tee -a "$CONF_FILE" > /dev/null
+            printf "%b\n" "${GREEN}Successfully added docker.io to registries.${RC}"
+        else
+            printf "%b\n" "${YELLOW}docker.io already present in registries.${RC}"
+        fi
 
         printf "%b\n" "${GREEN}Successfully added docker.io to registries.${RC}"
     else
