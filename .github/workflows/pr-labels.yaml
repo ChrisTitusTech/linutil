@@ -1,0 +1,54 @@
+name: Label PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  labelPR:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Extract referenced issues
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+          ISSUES=$(echo "$BODY" | grep -Eio '(Fixes|Resolves|Closes):? #[0-9]+' | grep -Eo '[0-9]+' | uniq)
+
+          echo "ISSUES=$ISSUES" >> $GITHUB_ENV
+
+      - name: Get issue labels
+        if: env.ISSUES != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABELS=()
+
+          for ISSUE in ${{ env.ISSUES }}; do
+            ISSUE_LABELS=$(curl -s -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE" \
+              | jq -r '.labels[].name')
+
+            while IFS= read -r LABEL; do
+              if [[ "$LABEL" == *:* ]]; then
+                LABELS+=("$LABEL")
+              fi
+            done <<< "$ISSUE_LABELS"
+          done
+
+          UNIQUE_LABELS=$(printf "%s\n" "${LABELS[@]}" | sort -u | tr '\n' ',' | sed 's/,$//')
+          echo "LABELS=$UNIQUE_LABELS" >> $GITHUB_ENV
+
+      - name: Assign labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ -n ${{ env.LABELS }} ]]; then
+            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required,${{ env.LABELS }}"
+          else
+            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
+          fi
