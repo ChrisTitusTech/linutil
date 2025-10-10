@@ -2,10 +2,6 @@ name: LinUtil Preview
 
 on:
   workflow_dispatch:
-    inputs:
-        tag_name:
-          description: 'Tag name'
-          required: true
   workflow_run:
     workflows: ["LinUtil Release"]
     types:
@@ -23,10 +19,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Get tag name ( Workflow Run )
+      - name: Get latest tag
         id: latest_tag
         uses: actions/github-script@v7
-        if: github.event_name == 'workflow_run'
         with:
           script: |
             const releases = await github.rest.repos.listReleases({
@@ -36,13 +31,8 @@ jobs:
             });
             return releases.data[0].tag_name;
 
-      - name: Set tag name ( Workflow Run )
-        if: github.event_name == 'workflow_run'
+      - name: Set tag name
         run: echo "tag_name=${{ steps.latest_tag.outputs.result }}" >> $GITHUB_ENV
-
-      - name: Set tag name ( Workflow Dispatch )
-        if: github.event_name == 'workflow_dispatch'
-        run: echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
 
       - name: Download binary
         run: |
@@ -57,9 +47,11 @@ jobs:
           echo "branch_name=${{ env.tag_name }}" | tr . - >> $GITHUB_ENV
 
       - name: Generate preview
-        uses: charmbracelet/vhs-action@v2.1.0
-        with:
-          path: ".github/preview.tape"
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg ttyd
+          go install github.com/charmbracelet/vhs@latest
+          $(go env GOPATH)/bin/vhs .github/preview.tape
 
       - name: Move preview
         run: mv preview.gif .github/preview.gif

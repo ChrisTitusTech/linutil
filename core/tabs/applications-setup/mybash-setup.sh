@@ -9,7 +9,7 @@ installDepend() {
         printf "%b\n" "${YELLOW}Installing Bash...${RC}"
         case "$PACKAGER" in
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm bash bash-completion tar bat tree unzip fontconfig git fzf 
                 ;;
             apk)
                 "$ESCALATION_TOOL" "$PACKAGER" add bash bash-completion tar bat tree unzip fontconfig git
@@ -107,6 +107,8 @@ linkConfig() {
         printf "%b\n" "${RED}Failed to create symbolic link for .bashrc${RC}"
         exit 1
     }
+
+    mkdir -p "$HOME/.config"
     ln -svf "$gitpath/starship.toml" "$HOME/.config/starship.toml" || {
         printf "%b\n" "${RED}Failed to create symbolic link for starship.toml${RC}"
         exit 1

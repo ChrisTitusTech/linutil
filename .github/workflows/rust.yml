@@ -1,5 +1,8 @@
 name: Rust Checks
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: ["main"]
@@ -36,6 +39,9 @@ jobs:
           path: ~/.cargo/git
           key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-index-
+
+      - name: Run cargo test
+        run: cargo test --no-fail-fast --package linutil_core
 
       - name: Run cargo clippy
         run: cargo clippy -- -Dwarnings
