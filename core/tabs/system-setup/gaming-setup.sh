@@ -77,12 +77,16 @@ installAdditionalDepend() {
             ;;
         apt-get | nala)
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            if ! "$ESCALATION_TOOL" "$PACKAGER" install -y lutris; then
-                printf "%b\n" "${YELLOW}Lutris not available in repositories, downloading from GitHub...${RC}"
-                lutris_url=$(curl -s https://api.github.com/repos/lutris/lutris/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+            lutris_url=$(curl -s https://api.github.com/repos/lutris/lutris/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+            
+            if [ -n "$lutris_url" ]; then
+                printf "%b\n" "${YELLOW}Downloading latest Lutris from GitHub...${RC}"
                 curl -sSLo lutris.deb "$lutris_url"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris.deb
                 rm lutris.deb
+            else
+                printf "%b\n" "${YELLOW}GitHub release not found, installing from repository...${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y lutris
             fi
 
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
