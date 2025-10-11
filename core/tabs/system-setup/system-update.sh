@@ -53,8 +53,6 @@ fastUpdate() {
                     if [ -f "/etc/apt/sources.list.d/fetch.sources.bak" ]; then
                         "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/fetch.sources.bak /etc/apt/sources.list.d/fetch.sources
                     fi
-                elif [ ! -s "/etc/apt/sources.list.d/nala-sources.list" ] && [ ! -s "/etc/apt/sources.list.d/fetch.sources" ]; then
-                    printf "%b\n" "${RED}Nala fetch succeeded but no sources were written.${RC}"
                 fi
             fi
             ;;
