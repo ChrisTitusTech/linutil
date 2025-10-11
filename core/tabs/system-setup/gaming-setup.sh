@@ -84,8 +84,7 @@ installAdditionalDepend() {
                 curl -sSLo lutris.deb "$lutris_url"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris.deb
                 rm lutris.deb
-            else
-                printf "%b\n" "${YELLOW}GitHub release not found, installing from repository...${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y lutris
             fi
 
