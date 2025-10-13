@@ -10,7 +10,7 @@ checkKVM() {
     fi
 }
 
-setupLibvirt() {who | awk 'NR==1{print $1}'
+setupLibvirt() {
     printf "%b\n" "${YELLOW}Configuring Libvirt.${RC}"
     if "$PACKAGER" -Q | grep -q "iptables "; then
         "$ESCALATION_TOOL" "$PACKAGER" -Rdd --noconfirm iptables

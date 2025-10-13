@@ -46,17 +46,17 @@ qemu() {
 
 	qemu-img create -f qcow2 "$name".qcow2 "$driveSize""G"
 	qemu-system-x86_64 \
-		-m ${memory}G \
-		-smp ${vcpus} \
+		-m "${memory}"G \
+		-smp "${vcpus}" \
 		-boot d \
-		-cdrom ${isoFile} \
-		-drive file=${name}.qcow2,format=qcow2 \
+		-cdrom "${isoFile}" \
+		-drive file="${name}".qcow2,format=qcow2 \
 		-netdev user,id=net0,hostfwd=tcp::2222-:22 \
 		-device e1000,netdev=net0 \
 		-display default,show-cursor=on \
 		-cpu host \
 		-enable-kvm \
-		-name ${name}
+		-name "${name}"
 
 	# Start VM
 
@@ -181,7 +181,7 @@ setVMDetails() {
 		printf "%b\n" "Please enter VM Name"
 		read -r name
 		
-		if ! checkVMExists $name; then
+		if ! checkVMExists "$name"; then
 			break
 		else
 			printf "%b\n" "${RED}VM with that name already exists${RC}"
