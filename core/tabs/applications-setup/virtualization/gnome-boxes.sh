@@ -9,7 +9,11 @@ installBoxes() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
             ;;
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm gnome-boxes 
+            if command_exists yay; then
+                "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+            else
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm gnome-boxes
+            fi 
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER" Installing Flatpak version"${RC}"

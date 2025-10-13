@@ -36,8 +36,12 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
-        	"$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox-host-modules-arch
-            "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox 
+            if command_exists yay; then
+                "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+            else
+            	"$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox-host-modules-arch
+                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox
+            fi
             "$ESCALATION_TOOL" modprobe vboxdrv
             ;;
         *)

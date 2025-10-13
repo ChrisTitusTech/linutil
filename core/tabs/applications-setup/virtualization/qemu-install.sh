@@ -4,45 +4,40 @@
 
 installQEMUDesktop() {
     printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
-    case "$PACKAGER" in
-        apt-get|nala)
-        	if ! command_exists qemu-img; then
-		        "$ESCALATION_TOOL" "$PACKAGER" install -y qemu-utils qemu-system-"$ARCH" qemu-system-gui
-		    else
-		        printf "%b\n" "${GREEN}QEMU already installed.${RC}"
-		    fi
-            ;;
-        dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
+    if ! command_exists qemu-img; then
+        case "$PACKAGER" in
+            apt-get|nala)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y qemu-utils qemu-system-"$ARCH" qemu-system-gui
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
 
-            sudo systemctl start libvirtd
-            #sets the libvirtd service to start on system start
-            sudo systemctl enable libvirtd
+                sudo systemctl start libvirtd
+                #sets the libvirtd service to start on system start
+                sudo systemctl enable libvirtd
 
-            #add current user to virt manager group
-            sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
-            ;;
-        zypper)
-            if ! command_exists qemu-img; then
+                #add current user to virt manager group
+                sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
+                ;;
+            zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
-            else
-                printf "%b\n" "${GREEN}QEMU already installed.${RC}"
-            fi
-            ;;
-        pacman)
-            if ! command_exists qemu-img; then
-                printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
-            else
-                printf "%b\n" "${GREEN}QEMU is already installed.${RC}"
-            fi
-            checkKVM
-            ;;
-        *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
-            ;;
-    esac
+                ;;
+            pacman)
+                if command_exists yay; then
+                    "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
+                fi
+                checkKVM
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}QEMU already installed.${RC}"
+    fi
 
     "$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
