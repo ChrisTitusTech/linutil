@@ -171,9 +171,9 @@ find_common_paths() {
     IFS='
 '
     for steam_dir in $steamapps_dirs; do
-        fo76_path="$steam_dir/common/Fallout76"
-        if [ -d "$fo76_path" ]; then
-            common_paths="$common_paths$fo76_path
+        commondata_path="$steam_dir/common/Fallout76"
+        if [ -d "$commondata_path" ]; then
+            common_paths="$common_paths$commondata_path
 "
         fi
     done
@@ -413,13 +413,10 @@ prepare_path_selection() {
     return 0
 }
 
-# Main execution starts here
-find_steamapps_dirs
-if [ $? -ne 0 ]; then
+if ! find_steamapps_dirs; then
     printf "%b\n" "${RED}Cannot proceed without Steam library folders.${RC}"
     exit 1
 fi
-
 
 # Get compatdata paths
 compatdata_paths=$(find_compatdata_paths)

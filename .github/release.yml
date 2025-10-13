@@ -2,31 +2,31 @@ changelog:
   categories:
     - title: '🚀 Features'
       labels:
-        - 'enhancement'
+        - 'type: enhancement'
     - title: '🐛 Bug Fixes'
       labels:
-        - 'bug'
+        - 'type: bug'
     - title: '⚙️ Refactoring'
       labels:
-        - 'refactor'
+        - 'type: refactor'
     - title: '🧩 UI/UX'
       labels:
-        - 'UI/UX'
+        - 'scope: UI/UX'
     - title: '📚 Documentation'
       labels:
-        - 'documentation'
+        - 'scope: documentation'
     - title: '🔒 Security'
       labels:
-        - 'security'
+        - 'scope: security'
     - title: '🧰 GitHub Actions'
       labels:
-        - 'github_actions'
+        - 'scope: github_actions'
     - title: '🦀 Rust'
       labels:
-        - 'rust'
+        - 'scope: rust'
     - title: '📃 Scripting'
       labels:
-        - 'script'
+        - 'scope: script'
     - title: 'Other Changes'
       labels:
         - "*"

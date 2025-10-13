@@ -45,3 +45,42 @@ impl Tab {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use temp_dir::TempDir;
+
+    pub(crate) fn create_temp_dir() -> TempDir {
+        TempDir::with_prefix("linutil_test").unwrap()
+    }
+
+    pub(crate) fn create_tab() -> Tab {
+        let command = Rc::new(ListNode {
+            name: "command1".to_string(),
+            description: "herro word :3".to_string(),
+            command: Command::Raw("echo 'cat memes 🙀'".to_string()),
+            task_list: "".to_string(),
+            multi_select: false,
+        });
+
+        Tab {
+            name: "TestTab".to_string(),
+            tree: Tree::new(command),
+        }
+    }
+
+    pub(crate) fn create_tab_list() -> TabList {
+        TabList(vec![create_tab()], create_temp_dir())
+    }
+
+    #[test]
+    fn test_find_command_by_name() {
+        let tab = create_tab();
+        let found_command = tab.find_command_by_name("command1");
+
+        assert!(found_command.is_some());
+        assert_eq!(found_command.unwrap().name, "command1");
+        assert!(tab.find_command_by_name("nonexistent").is_none());
+    }
+}
