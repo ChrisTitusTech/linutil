@@ -171,9 +171,9 @@ find_common_paths() {
     IFS='
 '
     for steam_dir in $steamapps_dirs; do
-        fo76_path="$steam_dir/common/Fallout76"
-        if [ -d "$fo76_path" ]; then
-            common_paths="$common_paths$fo76_path
+        fallout76_path="$steam_dir/common/Fallout76"
+        if [ -d "$fallout76_path" ]; then
+            common_paths="$common_paths$fallout76_path
 "
         fi
     done
