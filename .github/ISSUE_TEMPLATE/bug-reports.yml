@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report a bug or issue to help us improve.
-title: "[Bug]: "
-labels: ["bug"]
+title: "[Bug]: <title>"
+labels: ["type: bug", "initial review required"]
 assignees: []
 body:
   - type: markdown
@@ -26,7 +26,7 @@ body:
   - type: input
     id: specify-distribution
     attributes:
-      label: Specify Distribution (if "Other" selected)
+      label: Distribution (if "Other" selected)
       description: Enter the name of your Linux distribution.
       placeholder: e.g., Manjaro, Pop!_OS
   - type: dropdown
@@ -42,12 +42,13 @@ body:
         - Hyprland
         - i3
         - Other
+        - None
     validations:
       required: true
   - type: input
     id: specify-de-wm
     attributes:
-      label: Specify Desktop Environment/Window Manager (if "Other" selected)
+      label: Desktop Environment / Window Manager (if "Other" selected)
       description: Enter the name of your desktop environment or window manager.
       placeholder: e.g., LXQt, Openbox
   - type: dropdown
@@ -59,13 +60,14 @@ body:
       options:
         - X11
         - Wayland
+        - None
     validations:
       required: true
   - type: input
     id: linutil-version
     attributes:
       label: Linutil Version
-      description: Linutil version (found above the list within linutil).
+      description: Version number (found above the list within Linutil).
     validations:
       required: true
   - type: dropdown
@@ -75,31 +77,31 @@ body:
       multiple: false
       description: Specify the branch of the project you are using.
       options:
-        - main 
-        - prerelease
-        - stable 
+        - main
+        - release
+        - pre-release
         - other
     validations:
       required: true
   - type: input
-    id: specify-branch
+    id: specify-commit
     attributes:
-      label: Specify Branch (if "Other" selected)
-      description: Enter the branch name.
-      placeholder: e.g., feature/new-feature
+      label: Commit Hash (if "Other" selected)
+      description: Enter commit hash if not using a listed branch.
+      placeholder: e.g., 09ebb1c, 09ebb1c604ba8f15fd818de2ead0a9ef2690fc21
   - type: textarea
     id: describe-bug
     attributes:
-      label: Describe the bug
+      label: Description
       description: |
-        Provide a clear and concise description of what the bug is.
+        Provide a clear and concise description of what went wrong.
       placeholder: Describe the issue in detail.
     validations:
       required: true
   - type: textarea
     id: reproduce-steps
     attributes:
-      label: Steps to reproduce
+      label: Steps to Reproduce
       description: Steps to reproduce the behavior.
       placeholder: |
         1. Go to '...'
@@ -111,33 +113,36 @@ body:
   - type: textarea
     id: expected-behavior
     attributes:
-      label: Expected behavior
+      label: Expected Behavior
       description: |
         A clear and concise description of what you expected to happen.
-      placeholder: Explain the expected outcome.
+      placeholder: Describe the correct behavior.
     validations:
       required: true
   - type: textarea
     id: additional-context
     attributes:
-      label: Additional context
+      label: Additional Context
       description: |
         Add any other context or information about the problem here.
       placeholder: Include any related logs, error messages, or configurations.
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots
+      label: Logs or Screenshots
       description: |
-        If applicable, add screenshots to help explain your problem. Provide links or attach images in the comments after submitting the issue.
+        If applicable, add logs or screenshots to help explain your problem.
+      placeholder: Remeber to use code blocks (```) for logs.
   - type: checkboxes
     id: checklist
     attributes:
       label: Checklist
       options:
         - label: I checked for duplicate issues.
+          required: true
         - label: I checked existing discussions.
+          required: true
         - label: This issue is not included in the roadmap.
+          required: true
         - label: This issue is present on both stable and development branches.
           required: true
-
