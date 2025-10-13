@@ -10,7 +10,7 @@ checkKVM() {
     fi
 }
 
-setupLibvirt() {
+setupLibvirt() {who | awk 'NR==1{print $1}'
     printf "%b\n" "${YELLOW}Configuring Libvirt.${RC}"
     if "$PACKAGER" -Q | grep -q "iptables "; then
         "$ESCALATION_TOOL" "$PACKAGER" -Rdd --noconfirm iptables
@@ -39,7 +39,7 @@ setupLibvirt() {
 }
 
 installLibvirt() {
-	printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
+	printf "%b\n" "${YELLOW}Installing libvirt.${RC}"
     case "$PACKAGER" in
         pacman)
 		    if ! command_exists libvirtd; then
@@ -51,7 +51,7 @@ installLibvirt() {
 		    ;;
 		*)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+            #"$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
             ;;
     esac
 }

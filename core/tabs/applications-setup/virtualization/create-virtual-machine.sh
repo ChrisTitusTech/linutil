@@ -3,8 +3,6 @@
 . ../../common-script.sh
 
 virtmanager() {
-	setVMDetails
-
 	case $distroInfo in
 		*"arch"*)
 			distro="archlinux" ;;
@@ -38,6 +36,9 @@ virtmanager() {
 
 	qemu-img create -f qcow2 "$path"/"$name".qcow2 "$driveSize""G"
 	virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2 "$hostDev"
+
+	# Start VM
+	# virt-manager 
 }
 
 qemu() {
@@ -45,17 +46,30 @@ qemu() {
 
 	qemu-img create -f qcow2 "$name".qcow2 "$driveSize""G"
 	qemu-system-x86_64 \
-		  -m "$memory"G \
-		  -smp "$vcpus" \
-		  -boot d \
-		  -cdrom "$isoFile" \
-		  -drive file="$name".qcow2,format=qcow2 \
-		  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
-		  -device e1000,netdev=net0 \
-		  -display default,show-cursor=on \
-		  -cpu host \
-		  -enable-kvm \
-		  -name "$name"
+		-m ${memory}G \
+		-smp ${vcpus} \
+		-boot d \
+		-cdrom ${isoFile} \
+		-drive file=${name}.qcow2,format=qcow2 \
+		-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+		-device e1000,netdev=net0 \
+		-display default,show-cursor=on \
+		-cpu host \
+		-enable-kvm \
+		-name ${name}
+
+	# Start VM
+
+	# qemu-system-x86_64 \
+	# 	-m ${memory}G \
+	# 	-smp ${vcpus} \
+	# 	-drive file=${name}.qcow2,format=qcow2 \
+	# 	-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+	# 	-device e1000,netdev=net0 \
+	# 	-display default,show-cursor=on \
+	# 	-smbios \
+	# 	-enable-kvm \
+	# 	-name ${name}
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
 	printf "%b\n" "qemu-system-x86_64 -m ${memory}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
@@ -65,14 +79,7 @@ qemu() {
 	printf "%b\n" "virt-install --name ${name} --memory=${memory} --vcpus=${vcpus} --os-variant ${distro} --disk ${path}/${name}.qcow2 --network default --import"
 }
 
-libvirt() {
-	#setVMDetails
-	printf "%b\n" "${YELLOW}Libvirt is still under construction${RC}"
-}
-
 virtualbox(){
-	setVMDetails
-
 	case $distroInfo in
 		*"arch"*)
 			distro="ArchLinux" ;;
@@ -149,7 +156,8 @@ virtualbox(){
 	# 	vboxmanage modifyvm "$name" --pci-attach=$graphicsAdapter@01:05.0
 	# fi
 
-	vboxmanage startvm "$name"
+	# Start VM
+	# vboxmanage startvm "$name"
 }
 
 setVMDetails() {
@@ -173,10 +181,10 @@ setVMDetails() {
 		printf "%b\n" "Please enter VM Name"
 		read -r name
 		
-		if ! checkVMExists; then
+		if ! checkVMExists $name; then
 			break
 		else
-			printf "%b\n" "VM with that name already exists"
+			printf "%b\n" "${RED}VM with that name already exists${RC}"
 		fi
 	done
 
@@ -194,7 +202,7 @@ setVMDetails() {
 				installIsoInfo	
 			fi
 
-			distroInfo=$(isoinfo -d -i "$isoFile" | grep -i "volume id:" | awk '{print $3}'  | tr '[:upper:]' '[:lower:]')
+			distroInfo=$(isoinfo -d -i "$isoFile" | grep -i "volume id:" | awk '{print $3}'  | tr '[:upper:]' '[:lower:]' | cut -d'_' -f1)
 			windows=$(isoinfo -d -i "$isoFile" | grep -i "Publisher id:" | awk '{print $3, $4}') ;;
 		*)
 			storageType=hdd ;;
@@ -214,11 +222,10 @@ installIsoInfo() {
 }
 
 checkVMExists() {
-
 	if [ "$hypervisor" = "virt-manager" ]; then
 		vmExists=$(virsh list --all | grep -i "$name" | awk '{print $2}')
 	elif [ "$hypervisor" = "virtualbox" ]; then
-		vmExists=$(vboxmanage list vms | grep -i \""$name"\" | cut -f1 -d" ")
+		vmExists="$(vboxmanage list vms | grep -i \""$name"\" | cut -f1 -d" ")"
 	fi
 
 	if [ -z "$vmExists" ]; then
@@ -230,6 +237,8 @@ checkVMExists() {
 
 checkInstalled() {
 	hypervisor=$1
+
+	setVMDetails
 
 	if command_exists "$hypervisor"; then
 		if [ "$hypervisor" = "virt-manager" ]; then
@@ -259,8 +268,7 @@ main() {
         1) checkInstalled virt-manager ;;
         2) checkInstalled qemu-img ;;
         3) checkInstalled virtualbox ;;
-        # 4) checkInstalled libvirt ;;
-        # 5) checkInstalled gnome-boxes ;;
+        # 4) checkInstalled gnome-boxes ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
