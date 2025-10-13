@@ -57,3 +57,47 @@ impl Config {
             })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_read_config() {
+        let temp_dir = crate::tests::create_temp_dir();
+        let config_path = temp_dir.path().join("config.toml");
+
+        fs::write(
+            &config_path,
+            r#"auto_execute = ["command1", "nonexistent"]
+            skip_confirmation = true
+            size_bypass = false"#,
+        )
+        .unwrap();
+
+        let tab_list = crate::tests::create_tab_list();
+        let config = Config::read_config(&config_path, &tab_list);
+
+        assert_eq!(config.auto_execute_commands.len(), 1);
+        assert_eq!(config.skip_confirmation, true);
+        assert_eq!(config.size_bypass, false);
+
+        drop(temp_dir);
+    }
+
+    #[test]
+    fn test_auto_execute_commands() {
+        let tab_list = crate::tests::create_tab_list();
+
+        let config = Config {
+            auto_execute: Some(vec!["command1".to_string(), "nonexistent".to_string()]),
+            skip_confirmation: Some(true),
+            size_bypass: Some(false),
+        };
+
+        let auto_execute_commands = config.auto_execute_commands(&tab_list);
+
+        assert_eq!(auto_execute_commands.len(), 1);
+        assert_eq!(auto_execute_commands[0].name, "command1");
+    }
+}

@@ -15,7 +15,7 @@ tips = ["rand"]
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
-linutil_core = { version = "25.9.12", path = "../core" }
+linutil_core = { version = "25.9.29", path = "../core" }
 nix = { version = "0.29.0", features = [ "user" ] }
 oneshot = { version = "0.1.8", features = ["std"], default-features = false }
 portable-pty = "0.8.1"

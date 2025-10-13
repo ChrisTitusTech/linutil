@@ -184,7 +184,7 @@ impl RunningCommand {
 
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
         let mut script = String::new();
-        
+
         for command in commands {
             match command {
                 Command::Raw(prompt) => script.push_str(&format!("{prompt}\n")),
@@ -255,7 +255,7 @@ impl RunningCommand {
                             // The mutex is closed here automatically
                         }
                         Err(e) => {
-                            eprintln!("Error reading from terminal: {}", e);
+                            eprintln!("Error reading from terminal: {e}");
                             break;
                         }
                     }
@@ -380,11 +380,11 @@ impl RunningCommand {
         };
         // Send the keycodes to the virtual terminal
         if let Err(e) = self.writer.write_all(&input_bytes) {
-            eprintln!("Failed to write to terminal: {}", e);
+            eprintln!("Failed to write to terminal: {e}");
         }
         // Ensure the data is flushed immediately, especially important for Enter key
         if let Err(e) = self.writer.flush() {
-            eprintln!("Failed to flush terminal: {}", e);
+            eprintln!("Failed to flush terminal: {e}");
         }
     }
 }

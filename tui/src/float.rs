@@ -1,6 +1,6 @@
 use crate::{hint::Shortcut, theme::Theme};
 use ratatui::{
-    crossterm::event::{KeyCode,KeyEvent, MouseEvent},
+    crossterm::event::{KeyCode, KeyEvent, MouseEvent},
     layout::{Constraint, Layout, Rect},
     Frame,
 };
@@ -55,7 +55,6 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
 
     // Returns true if the floating window is finished.
     pub fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
-
         // Let the content handle the key first
         let content_handled = self.content.handle_key_event(key);
 
@@ -67,10 +66,7 @@ impl<Content: FloatContent + ?Sized> Float<Content> {
         // For content that doesn't handle closing (like FloatingText),
         // provide default exit behavior when finished
         if self.content.is_finished() {
-            match key.code {
-                KeyCode::Enter | KeyCode::Char('q') | KeyCode::Esc => true,
-                _ => false,
-            }
+            matches!(key.code, KeyCode::Enter | KeyCode::Char('q') | KeyCode::Esc)
         } else {
             false
         }
