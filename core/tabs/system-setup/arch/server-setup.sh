@@ -196,7 +196,7 @@ keymap () {
 # @description Choose whether drive is SSD or not.
 drivessd () {
     echo -ne "
-    Is this an ssd, flash storage, or hard drive?
+    Is this a solid state, flash, or hard drive?
     "
 
     options=("SSD" "MMC" "HDD")
