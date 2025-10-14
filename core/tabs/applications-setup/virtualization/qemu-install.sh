@@ -81,7 +81,7 @@ uninstallQEMU() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}VirtualBox is not installed.${RC}"
+        printf "%b\n" "${GREEN}QEMU is not installed.${RC}"
     fi
 }
 
