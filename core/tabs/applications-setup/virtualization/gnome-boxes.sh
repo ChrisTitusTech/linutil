@@ -9,8 +9,8 @@ installBoxes() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
             ;;
         pacman)
-            if command_exists yay; then
-                "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+            if command_exists yay || command_exists paru; then
+                "$AUR_HELPER" -S --needed --noconfirm gnome-boxes
             else
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm gnome-boxes
             fi 

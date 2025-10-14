@@ -23,8 +23,8 @@ installQEMUDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
                 ;;
             pacman)
-                if command_exists yay; then
-                    "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+                if command_exists yay || command_exists paru; then
+                    "$AUR_HELPER" -S --needed --noconfirm qemu-desktop
                 else
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
                 fi

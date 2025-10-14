@@ -20,8 +20,8 @@ installVirtManager() {
     			sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
                 ;;
             pacman)
-                if command_exists yay; then
-                    "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+                if command_exists yay || command_exists paru; then
+                    "$AUR_HELPER" -S --needed --noconfirm virt-manager
                 else         	
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm virt-manager
                 fi

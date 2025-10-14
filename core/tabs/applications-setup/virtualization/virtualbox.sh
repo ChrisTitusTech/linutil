@@ -36,7 +36,7 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
-            if command_exists yay; then
+            if command_exists yay || command_exists paru; then
                 "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
             else
             	"$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox-host-modules-arch
@@ -57,8 +57,7 @@ virtualBoxPermissions() {
 }
 
 getLatestVersion() {
-    vboxGitVersion=$(wget "https://raw.githubusercontent.com/VirtualBox/virtualbox/refs/heads/main/Version.kmk" -q -O -)
-    version=$(echo "$vboxGitVersion" | sed '/^#/d' | cut -d'=' -f2 | cut -d'$' -f1 | xargs | sed 's/ /./g' | cut -c -3)
+    version=$(wget "https://raw.githubusercontent.com/VirtualBox/virtualbox/refs/heads/main/Version.kmk" -q -O - | sed '/^#/d' | cut -d'=' -f2 | cut -d'$' -f1 | xargs | sed 's/ /./g' | cut -c -3)
 }
 
 checkVirtualBox() {
