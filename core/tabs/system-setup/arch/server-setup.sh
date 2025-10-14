@@ -209,7 +209,7 @@ drivessd () {
         export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120";;
         2)
         export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-        *) echo "Wrong option.  Try again";drivessd;;
+        *) echo "Wrong option. Try again";drivessd;;
     esac
 }
 
