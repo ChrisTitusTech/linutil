@@ -56,7 +56,6 @@ installQEMUEmulators() {
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
             ;;
     esac
 }
