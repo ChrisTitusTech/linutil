@@ -4,7 +4,7 @@
 
 installOlive() {
 	printf "%b\n" "${YELLOW}Installing Olive Video Editor...${RC}"
-	if ! command_exists openshot; then
+	if ! command_exists olive; then
 	    case "$PACKAGER" in
 	        dnf)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y olive
