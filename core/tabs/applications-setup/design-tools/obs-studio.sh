@@ -14,7 +14,7 @@ installObsStudio() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install obs-studio
 	        	;;
 	        pacman)
-	        	if command_exists yay; then
+	        	if command_exists yay || command_exists paru; then
 	        		"$AUR_HELPER" -S --needed --noconfirm obs-studio
 	        	else
 			    	"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm v4l2loopback-dkms obs-studio

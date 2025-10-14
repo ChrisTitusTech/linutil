@@ -10,7 +10,7 @@ installAudacity() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y audacity
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm audacity
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm audacity

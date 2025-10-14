@@ -10,7 +10,7 @@ installKrita() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y krita
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm krita
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm krita

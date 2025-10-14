@@ -10,7 +10,7 @@ installScribus() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y scribus
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm scribus
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm scribus

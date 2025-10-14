@@ -10,7 +10,7 @@ installOlive() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y olive
 	            ;;
 	        pacman)
-	        	if command_exists yay; then
+	        	if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm olive
 		        else
 				    "$ESCALATION_TOOL" flatpak install --noninteractive org.olivevideoeditor.Olive

@@ -10,7 +10,7 @@ installHandbrake() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y handbrake
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm handbrake
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm handbrake

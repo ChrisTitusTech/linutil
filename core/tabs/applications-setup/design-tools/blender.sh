@@ -10,7 +10,7 @@ installBlender() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y blender
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm blender
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm blender

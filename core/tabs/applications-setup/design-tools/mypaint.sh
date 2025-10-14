@@ -10,7 +10,7 @@ installMyPaint() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y mypaint
 	            ;;
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm mypaint
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm mypaint

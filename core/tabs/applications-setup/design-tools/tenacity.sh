@@ -7,7 +7,7 @@ installTenacity() {
 	if ! command_exists tenacity; then
 	    case "$PACKAGER" in
 	        pacman)
-			    if command_exists yay; then
+			    if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm tenacity
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm tenacity

@@ -10,7 +10,7 @@ installGIMP() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y gimp
 	            ;;
 	        pacman)
-	        	if command_exists yay; then
+	        	if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm pinta
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm gimp
