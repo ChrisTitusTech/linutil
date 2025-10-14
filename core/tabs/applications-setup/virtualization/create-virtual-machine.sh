@@ -188,8 +188,14 @@ setVMDetails() {
 		fi
 	done
 
-	printf "%b\n" "Please enter drive size"
-	read -r driveSize
+	availableDriveSpave=$(df -h . | awk 'NR==2{print $4}')
+	if [ "$availableDriveSpave" -lt "100" ]; then
+		driveSize=25
+	elif [ "$availableDriveSpave" -lt "150" ]; then
+		driveSize=50
+	else
+		driveSize=100
+	fi
 
 	printf "%b\n" "Please enter full iso path"
 	read -r isoFile
