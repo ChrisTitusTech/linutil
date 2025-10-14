@@ -4,7 +4,7 @@
 
 installSynfigStudio() {
 	printf "%b\n" "${YELLOW}Installing Synfig Studio...${RC}"
-	if ! command_exists synfig; then
+	if ! command_exists synfigstudio; then
 	    case "$PACKAGER" in
 	        dnf)
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y synfigstudio

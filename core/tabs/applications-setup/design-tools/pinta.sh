@@ -4,7 +4,7 @@
 
 installPinta() {
 	printf "%b\n" "${YELLOW}Installing Pinta...${RC}"
-	if ! command_exists mypaint; then
+	if ! command_exists pinta; then
 	    case "$PACKAGER" in
 	        dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y pinta

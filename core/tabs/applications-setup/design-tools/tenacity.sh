@@ -4,7 +4,7 @@
 
 installTenacity() {
 	printf "%b\n" "${YELLOW}Installing Tenacity...${RC}"
-	if ! command_exists audacity; then
+	if ! command_exists tenacity; then
 	    case "$PACKAGER" in
 	        pacman)
 			    if command_exists yay; then
