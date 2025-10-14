@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh -e
 
 . ../../common-script.sh
 
