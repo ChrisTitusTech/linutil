@@ -23,6 +23,44 @@ installPinta() {
 	fi
 }
 
+uninstallPinta() {
+	printf "%b\n" "${YELLOW}Uninstalling Pinta...${RC}"
+	if command_exists pinta; then
+	    case "$PACKAGER" in
+	        apt-get|nala|dnf|zypper)
+				"$ESCALATION_TOOL" "$PACKAGER" remove -y pinta
+	            ;;
+	        pacman)
+			    if command_exists yay || command_exists paru; then
+		        	"$AUR_HELPER" -R --noconfirm pinta
+		        else
+				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm pinta
+				fi
+	            ;;
+	        *)
+	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta
+	            exit 1
+	            ;;
+	    esac
+	else
+		printf "%b\n" "${GREEN}Pinta is not installed.${RC}"
+	fi
+}
+
+main() {
+	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Pinta${RC}"
+    printf "%b\n" "1. ${YELLOW}Install${RC}"
+    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
+    printf "%b" "Enter your choice [1-2]: "
+    read -r CHOICE
+    case "$CHOICE" in
+        1) installPinta ;;
+        2) uninstallPinta ;;
+        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+    esac
+}
+
 checkEnv
 checkEscalationTool
-installPinta
+main
