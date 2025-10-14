@@ -29,6 +29,7 @@ installQEMUDesktop() {
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
                 fi
                 checkKVM
+                installQEMUEmulators
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -60,6 +61,31 @@ installQEMUEmulators() {
     esac
 }
 
+uninstallQEMU() {
+    printf "%b\n" "${YELLOW}Uninstalling QEMU...${RC}"
+    if command_exists qemu-img; then
+        case "$PACKAGER" in
+            apt-get|nala|dnf|zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" remove -y qemu*
+                ;;
+            pacman)
+                if command_exists yay || command_exists paru; then
+                    "$AUR_HELPER" -R --noconfirm qemu-desktop
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm qemu-desktop
+                fi
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+                exit 1
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}VirtualBox is not installed.${RC}"
+    fi
+}
+
 checkKVM() {
     if [ ! -e "/dev/kvm" ]; then
         printf "%b\n" "${RED}KVM is not available. Make sure you have CPU virtualization support enabled in your BIOS/UEFI settings. Please refer https://wiki.archlinux.org/title/KVM for more information.${RC}"
@@ -68,7 +94,19 @@ checkKVM() {
     fi
 }
 
+main() {
+    printf "%b\n" "${YELLOW}Do you want to Install or Uninstall QEMU Desktop${RC}"
+    printf "%b\n" "1. ${YELLOW}Install${RC}"
+    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
+    printf "%b" "Enter your choice [1-2]: "
+    read -r CHOICE
+    case "$CHOICE" in
+        1) installQEMUDesktop ;;
+        2) uninstallQEMU ;;
+        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+    esac
+}
+
 checkEnv
 checkEscalationTool
-installQEMUDesktop
-installQEMUEmulators
+main
