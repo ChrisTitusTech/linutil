@@ -56,7 +56,7 @@ name = "Developer Tools"
 
 [[data.entries]]
 name = "Cursor"
-description = "Cursor is an AI first editor for developing programs"
+description = "Cursor is a next-generation AI-powered code editor built on VS Code, designed for enhanced productivity with integrated AI assistance."
 script = "developer-tools/cursor.sh"
 task_list = "I"
 
