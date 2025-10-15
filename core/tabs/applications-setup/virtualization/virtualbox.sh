@@ -67,7 +67,6 @@ uninstallVirtualBox() {
                 fi
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 exit 1
                 ;;
         esac

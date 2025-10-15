@@ -16,7 +16,6 @@ installBoxes() {
             fi 
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER" Installing Flatpak version"${RC}"
             "$ESCALATION_TOOL" flatpak install --noninteractive org.gnome.Boxes
             ;;
     esac
@@ -37,7 +36,6 @@ uninstallBoxes() {
                 fi
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
                 "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gnome.Boxes
                 exit 1
                 ;;
