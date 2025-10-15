@@ -8,7 +8,7 @@ installCursor() {
         case "$PACKAGER" in
             apt-get|nala)
                 TEMP_DEB="$(mktemp)"
-                wget -O "$TEMP_DEB" "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/1.7"
+                wget -O "$TEMP_DEB" "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest"
 
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_DEB
@@ -19,7 +19,7 @@ installCursor() {
                 ;;
             dnf)
                 TEMP_RPM="$(mktemp)"
-                wget -O "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/1.7"
+                wget -O "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest"
 
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_RPM
                 "$ESCALATION_TOOL" rm $TEMP_RPM # Removes temp rpm file
@@ -34,7 +34,6 @@ installCursor() {
     fi
 }
 
-# TODO: Maybe find a way to always get the latest version of Cursor for ubuntu/debian
 checkEnv
 checkEscalationTool
 checkAURHelper
