@@ -11,7 +11,7 @@ installGIMP() {
 	            ;;
 	        pacman)
 	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm pinta
+		        	"$AUR_HELPER" -S --needed --noconfirm gimp
 		        else
 				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm gimp
 				fi
