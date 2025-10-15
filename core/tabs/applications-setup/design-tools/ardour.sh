@@ -17,7 +17,6 @@ installArdour() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallArdour() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.ardour.Ardour
 	            exit 1
 	            ;;

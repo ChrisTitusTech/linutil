@@ -14,7 +14,6 @@ installTenacity() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
 	            exit 1
 	            ;;
@@ -39,7 +38,6 @@ uninstallTenacity() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.tenacityaudio.Tenacity
 	            exit 1
 	            ;;

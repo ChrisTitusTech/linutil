@@ -17,7 +17,6 @@ installInkscape() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallInkscape() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.inkscape.Inkscape
 	            exit 1
 	            ;;

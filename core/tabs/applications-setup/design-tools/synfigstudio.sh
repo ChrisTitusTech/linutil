@@ -17,7 +17,6 @@ installSynfigStudio() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.synfig.SynfigStudio
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallSynfigStudio() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.synfig.SynfigStudio
 	            exit 1
 	            ;;

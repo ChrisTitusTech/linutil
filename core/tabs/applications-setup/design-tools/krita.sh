@@ -17,7 +17,6 @@ installKrita() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallKrita() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.kde.krita
 	            exit 1
 	            ;;

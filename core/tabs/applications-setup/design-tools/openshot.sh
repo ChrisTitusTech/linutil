@@ -17,7 +17,6 @@ installOpenShot() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallOpenShot() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.openshot.OpenShot
 	            exit 1
 	            ;;

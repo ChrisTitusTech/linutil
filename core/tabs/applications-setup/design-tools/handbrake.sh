@@ -17,7 +17,6 @@ installHandbrake() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallHandbrake() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive fr.handbrake.ghb
 	            exit 1
 	            ;;

@@ -17,7 +17,6 @@ installAudacity() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallAudacity() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.audacityteam.Audacity
 	            exit 1
 	            ;;

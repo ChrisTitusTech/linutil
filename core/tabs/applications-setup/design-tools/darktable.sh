@@ -17,7 +17,6 @@ installDarktable() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallDarktable() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.darktable.Darktable
 	            exit 1
 	            ;;

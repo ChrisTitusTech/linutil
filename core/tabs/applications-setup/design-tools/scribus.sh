@@ -17,7 +17,6 @@ installScribus() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallScribus() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.scribus.Scribus
 	            exit 1
 	            ;;

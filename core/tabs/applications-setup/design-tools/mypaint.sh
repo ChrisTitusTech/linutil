@@ -17,7 +17,6 @@ installMyPaint() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.mypaint.MyPaint
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallMyPaint() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.mypaint.mypaint
 	            exit 1
 	            ;;

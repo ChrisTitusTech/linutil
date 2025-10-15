@@ -17,7 +17,6 @@ installOlive() {
 				fi
 	        	;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.olivevideoeditor.Olive
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallOlive() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.olivevideoeditor.Olive
 	            exit 1
 	            ;;

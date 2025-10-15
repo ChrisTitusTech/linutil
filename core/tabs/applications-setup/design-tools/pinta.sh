@@ -13,7 +13,6 @@ installPinta() {
 	        	"$AUR_HELPER" -S --needed --noconfirm pinta
 	        	;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
 	            exit 1
 	            ;;
@@ -38,7 +37,6 @@ uninstallPinta() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta
 	            exit 1
 	            ;;

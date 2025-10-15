@@ -21,7 +21,6 @@ installObsStudio() {
 			    fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
 	            exit 1
 	            ;;
@@ -46,7 +45,6 @@ uninstallObsStudio() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
 	            exit 1
 	            ;;

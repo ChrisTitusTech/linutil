@@ -17,7 +17,6 @@ installGIMP() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
 	            exit 1
 	            ;;
@@ -42,7 +41,6 @@ uninstallGIMP() {
 				fi
 	            ;;
 	        *)
-	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gimp.GIMP
 	            exit 1
 	            ;;
