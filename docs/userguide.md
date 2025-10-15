@@ -49,6 +49,26 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
+
+### Design Tools
+
+- **Ardour**: Ardour is a free and open-source digital audio workstation and hard disk recorder.
+- **Audacity**: Audacity is a free and open-source digital audio editor and recording application software.
+- **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
+- **Darktable**: Darktable is a free and open-source photography application and raw developer.
+- **GNU Image Manipulation Program (GIMP)**: GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats.
+- **Handbrake**: HandBrake is a free and open-source transcoder for digital video files.
+- **Inkscape**: Inkscape is a free and open-source software vector graphics editor.
+- **Krita**: Krita is a free and open-source raster graphics editor designed primarily for digital art and 2D animation.
+- **MyPaint**: MyPaint is a free and open-source raster graphics editor for digital painting.
+- **Natron**: Natron is a powerful, free, and open-source VFX compositing application geared towards digital post-production work.
+- **OBS Studio**: OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application.
+- **Olive**: Olive is a free and open-source cross-platform non-linear video editing application.
+- **OpenShot**: OpenShot Video Editor is a free and open-source video editor.
+- **Pinta**: Pinta is an open-source, cross-platform bitmap image drawing and editing program inspired by Paint.NET.
+- **Scribus**: Scribus is free and open-source desktop publishing software available for most desktop operating systems.
+- **Synfig Studio**: Synfig Studio is a free and open-source vector-based 2D animation software.
+- **Tenacity**: Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
@@ -56,6 +76,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
