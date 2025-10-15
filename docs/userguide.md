@@ -56,6 +56,7 @@ https://github.com/ChrisTitusTech/neovim
 - **VirtualBox**: Oracle VirtualBox is an open source, cross-platform, virtualization software, enables users to run multiple operating systems on a single device.
 - **Virt Manager**: Virt Manager is a Graphical tool to manage libvirt Virtual Machines
 - **QEMU**: QEMU is a generic and open source machine emulator and virtualizer.
+- **Create Virtual Machine**: Create Virtual Machines using QEMU, Virt-manager and VirtualBox
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Auto CPU Frequency**: Automatic CPU speed & power optimizer.

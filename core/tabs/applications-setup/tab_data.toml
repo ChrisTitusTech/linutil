@@ -255,6 +255,12 @@ description = ""
 script = "virtualization/libvirt.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "Create Virtual Machine"
+description = "Create Virtual Machines using QEMU, Virt-manager and VirtualBox"
+script = "virtualization/create-virtual-machine.sh"
+task_list = "I"
+
 [[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
