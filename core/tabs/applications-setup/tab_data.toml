@@ -234,7 +234,7 @@ task_list = "I"
 [[data.entries]]
 name = "VirtualBox"
 description = "Oracle VirtualBox is an open source, cross-platform, virtualization software, enables users to run multiple operating systems on a single device."
-script = "virtualizations/virtualbox.sh"
+script = "virtualization/virtualbox.sh"
 task_list = "I"
 
 [[data.entries]]
