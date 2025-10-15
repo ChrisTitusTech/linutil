@@ -56,6 +56,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
@@ -84,6 +85,17 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### Fallout 76
 
 - **Fallout 76 Custom INI**: This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements.
+
+### Console Emulators
+
+- **RetroArch**: Frontend for emulators, game engines and media players
+- **Dolphin Emulator**: GameCube and Wii Emulator
+- **MelonDS**: Nintendo DS and DSi Emulator
+- **mGBA**: Nintendo Game Boy Advance Emulator
+- **Ryujinx**: Nintendo Switch emulator
+- **PCSX**: A Playstation emulator
+- **PCSX2**: A Playstation 2 emulator
+- **Play!**: A Playstation 2 emulator
 
 ## Security
 
