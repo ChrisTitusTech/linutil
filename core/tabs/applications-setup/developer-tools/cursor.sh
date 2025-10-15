@@ -39,5 +39,3 @@ checkEnv
 checkEscalationTool
 checkAURHelper
 installCursor
-
-echo "Installed Cursor"
