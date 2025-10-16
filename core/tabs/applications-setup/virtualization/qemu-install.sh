@@ -32,7 +32,9 @@ installQEMUDesktop() {
                 installQEMUEmulators
                 ;;
             *)
-                "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+                if command_exists flatpak; then
+                    "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
+                fi
                 ;;
         esac
     else

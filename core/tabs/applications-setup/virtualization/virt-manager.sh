@@ -27,7 +27,9 @@ installVirtManager() {
                 fi
                 ;;
             *)
-                "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt-manager
+                if command_exists flatpak; then
+                    "$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt-manager
+                fi
                 exit 1
                 ;;
         esac
