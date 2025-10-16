@@ -7,12 +7,7 @@ installPlay() {
 	if ! command_exists play-emu; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-	        		"$AUR_HELPER" -S --needed --noconfirm cmake cmake3 make
-		        	"$AUR_HELPER" -S --needed --noconfirm play-emu || "$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
-		        elif command_exists flatpak; then
-		        	"$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm play-emu
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -31,11 +26,7 @@ uninstallPlay() {
 	if command_exists play-emu; then
 	    case "$PACKAGER" in
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm play-emu
-		        else
-				    "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.purei.Play
-				fi
+			    "$AUR_HELPER" -R --noconfirm play-emu
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive org.purei.Play

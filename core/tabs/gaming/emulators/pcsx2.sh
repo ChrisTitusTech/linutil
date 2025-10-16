@@ -14,11 +14,7 @@ installPCSX2() {
 			    fi
 	            ;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm pcsx2-latest-bin
-		        elif command_exists flatpak; then
-		        	"$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm pcsx2-latest-bin
 	            ;;
 	        *)
 	        	if command_exists flatpak; then

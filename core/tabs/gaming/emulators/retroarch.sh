@@ -10,11 +10,7 @@ installRetroArch() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y retroarch retroarch-assets
 	            ;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm retroarch retroarch-assets-xnb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm retroarch retroarch-assets-xnb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm retroarch retroarch-assets-xnb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -44,17 +40,10 @@ configureRetroArch() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-mgba libretro-nestopia libretro-bnes-mercury libretro-pcsx-rearmed
 	        	;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
+	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
 		        	libretro-beetle-psx libretro-pcsx2-launcher libretro-play libretro-ppsspp \
 		        	libretro-snes9x libretro-dolphin libretro-melonds-bin libretro-mgba libretro-nestopia libretro-parallel-n64 \
 		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libretro-core-info \
-				    libretro-beetle-psx libretro-play libretro-ppsspp \
-				    libretro-snes9x libretro-dolphin libretro-melonds libretro-mgba libretro-nestopia libretro-parallel-n64 \
-				    libretro-flycast libretro-genesis-plus-gx libretro-kronos				    
-				fi
 	            ;;
 	        *)
 	            exit 1

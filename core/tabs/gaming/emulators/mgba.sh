@@ -10,11 +10,7 @@ installmGBA() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y mgba-sdl
 	            ;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm mgba-sdl
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm mgba-sdl
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm mgba-sdl
 	            ;;
 	        *)
 	        	if command_exists flatpak; then

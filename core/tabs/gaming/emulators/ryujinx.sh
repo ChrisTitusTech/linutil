@@ -7,11 +7,7 @@ installRyujinx() {
 	if ! command_exists ryujinx; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm ryujinx
-		        else
-				    "$ESCALATION_TOOL" flatpak install --noninteractive io.github.ryubing.Ryujinx
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm ryujinx
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -33,11 +29,7 @@ uninstallRyujinx() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y dolphin-emu
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm dolphin-emu
-		        else
-				    "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.ryubing.Ryujinx
-				fi
+			    "$AUR_HELPER" -R --noconfirm dolphin-emu
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.ryubing.Ryujinx

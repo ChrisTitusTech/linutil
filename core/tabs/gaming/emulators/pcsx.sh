@@ -10,10 +10,7 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-	        		"$AUR_HELPER" -S --needed --noconfirm cmake cmake3 make
-		        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
