@@ -32,11 +32,7 @@ uninstallPinta() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y pinta
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm pinta
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm pinta
-				fi
+			    "$AUR_HELPER" -R --noconfirm pinta
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta
@@ -63,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

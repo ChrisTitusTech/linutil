@@ -10,11 +10,7 @@ installGIMP() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y gimp
 	            ;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm gimp
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm gimp
-				fi
+	        	"$AUR_HELPER" -S --needed --noconfirm gimp
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallGIMP() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y gimp
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm gimp
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm gimp
-				fi
+			    "$AUR_HELPER" -R --noconfirm gimp
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gimp.GIMP
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

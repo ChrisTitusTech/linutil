@@ -10,11 +10,7 @@ installHandbrake() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y handbrake
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm handbrake
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm handbrake
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm handbrake
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallHandbrake() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y handbrake
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm handbrake
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm handbrake
-				fi
+			    "$AUR_HELPER" -R --noconfirm handbrake
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive fr.handbrake.ghb
@@ -66,4 +58,5 @@ main() {
 }
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

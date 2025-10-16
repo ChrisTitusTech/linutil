@@ -10,11 +10,7 @@ installArdour() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y ardour
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm ardour
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm ardour
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm ardour
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallArdour() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y ardour
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm ardour
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm ardour
-				fi
+		       	"$AUR_HELPER" -R --noconfirm ardour
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.ardour.Ardour
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

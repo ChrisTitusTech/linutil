@@ -14,11 +14,7 @@ installObsStudio() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install obs-studio
 	        	;;
 	        pacman)
-	        	if command_exists yay || command_exists paru; then
-	        		"$AUR_HELPER" -S --needed --noconfirm obs-studio
-	        	elif command_exists flatpak; then
-			    	"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm v4l2loopback-dkms obs-studio
-			    fi
+	        	"$AUR_HELPER" -S --needed --noconfirm obs-studio
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -40,11 +36,7 @@ uninstallObsStudio() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y obs-studio
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm obs-studio
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm obs-studio
-				fi
+			    "$AUR_HELPER" -R --noconfirm obs-studio
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
@@ -71,4 +63,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

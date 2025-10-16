@@ -10,11 +10,7 @@ installInkscape() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y inkscape
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm inkscape
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm inkscape
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm inkscape
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallInkscape() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y inkscape
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm inkscape
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm inkscape
-				fi
+			    "$AUR_HELPER" -R --noconfirm inkscape
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.inkscape.Inkscape
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

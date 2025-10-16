@@ -10,11 +10,7 @@ installScribus() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y scribus
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm scribus
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm scribus
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm scribus
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallScribus() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y scribus
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm scribus
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm scribus
-				fi
+			    "$AUR_HELPER" -R --noconfirm scribus
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.scribus.Scribus
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

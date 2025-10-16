@@ -10,11 +10,7 @@ installSynfigStudio() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y synfigstudio
 	        	;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm synfigstudio
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm synfigstudio
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm synfigstudio
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallSynfigStudio() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y synfigstudio
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm synfigstudio
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm synfigstudio
-				fi
+			    "$AUR_HELPER" -R --noconfirm synfigstudio
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.synfig.SynfigStudio
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

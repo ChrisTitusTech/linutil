@@ -10,11 +10,7 @@ installBlender() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y blender
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm blender
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm blender
-				fi
+		        "$AUR_HELPER" -S --needed --noconfirm blender
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallBlender() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y blender
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm blender
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm blender
-				fi
+			    "$AUR_HELPER" -R --noconfirm blender
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.blender.Blender
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

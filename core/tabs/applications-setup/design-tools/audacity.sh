@@ -10,11 +10,7 @@ installAudacity() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y audacity
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm audacity
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm audacity
-				fi
+				"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm audacity
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallAudacity() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y audacity
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm audacity
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm audacity
-				fi
+			    "$AUR_HELPER" -R --noconfirm audacity
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.audacityteam.Audacity
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

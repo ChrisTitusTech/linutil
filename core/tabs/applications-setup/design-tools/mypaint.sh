@@ -10,11 +10,7 @@ installMyPaint() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y mypaint
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm mypaint
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm mypaint
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm mypaint
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,11 +32,7 @@ uninstallMyPaint() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y mypaint
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm mypaint
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm mypaint
-				fi
+			    "$AUR_HELPER" -R --noconfirm mypaint
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.mypaint.mypaint
@@ -67,4 +59,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main

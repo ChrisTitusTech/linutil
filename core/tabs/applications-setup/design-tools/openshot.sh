@@ -10,11 +10,7 @@ installOpenShot() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y openshot-qt
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm openshot
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm openshot
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm openshot
 	            ;;
 	        *)
 	        	if command_exists flatpak; then

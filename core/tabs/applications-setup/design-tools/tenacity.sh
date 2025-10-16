@@ -7,11 +7,7 @@ installTenacity() {
 	if ! command_exists tenacity; then
 	    case "$PACKAGER" in
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -S --needed --noconfirm tenacity
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm tenacity
-				fi
+			    "$AUR_HELPER" -S --needed --noconfirm tenacity
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -29,15 +25,8 @@ uninstallTenacity() {
 	printf "%b\n" "${YELLOW}Uninstalling Tenacity...${RC}"
 	if command_exists tenacity; then
 	    case "$PACKAGER" in
-	        apt-get|nala|dnf|zypper)
-				"$ESCALATION_TOOL" "$PACKAGER" remove -y tenacity
-	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm tenacity
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm tenacity
-				fi
+			    "$AUR_HELPER" -R --noconfirm tenacity
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.tenacityaudio.Tenacity
@@ -64,4 +53,5 @@ main() {
 
 checkEnv
 checkEscalationTool
+checkAURHelper
 main
