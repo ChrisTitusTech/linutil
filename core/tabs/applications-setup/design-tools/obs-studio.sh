@@ -63,5 +63,4 @@ main() {
 
 checkEnv
 checkEscalationTool
-checkAURHelper
 main

@@ -51,13 +51,12 @@ main() {
     printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
-        1) installinkscape ;;
-        2) uninstallinkscape ;;
+        1) installInkscape ;;
+        2) uninstallInkscape ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
 
 checkEnv
 checkEscalationTool
-checkAURHelper
 main
