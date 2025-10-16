@@ -17,7 +17,9 @@ installInkscape() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
+	            fi
 	            exit 1
 	            ;;
 	    esac

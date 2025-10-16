@@ -17,7 +17,9 @@ installKrita() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
+	            fi
 	            exit 1
 	            ;;
 	    esac

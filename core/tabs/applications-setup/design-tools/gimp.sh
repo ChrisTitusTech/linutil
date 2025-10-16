@@ -17,7 +17,9 @@ installGIMP() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
+	            fi
 	            exit 1
 	            ;;
 	    esac

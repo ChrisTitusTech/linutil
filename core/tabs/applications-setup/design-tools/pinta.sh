@@ -13,7 +13,9 @@ installPinta() {
 	        	"$AUR_HELPER" -S --needed --noconfirm pinta
 	        	;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
+	            fi
 	            exit 1
 	            ;;
 	    esac

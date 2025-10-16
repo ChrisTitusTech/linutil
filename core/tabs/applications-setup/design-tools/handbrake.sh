@@ -17,7 +17,9 @@ installHandbrake() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
+	            fi
 	            exit 1
 	            ;;
 	    esac

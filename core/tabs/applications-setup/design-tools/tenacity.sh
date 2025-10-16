@@ -14,7 +14,9 @@ installTenacity() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
+	            fi
 	            exit 1
 	            ;;
 	    esac

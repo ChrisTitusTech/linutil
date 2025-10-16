@@ -16,12 +16,14 @@ installObsStudio() {
 	        pacman)
 	        	if command_exists yay || command_exists paru; then
 	        		"$AUR_HELPER" -S --needed --noconfirm obs-studio
-	        	else
+	        	elif command_exists flatpak; then
 			    	"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm v4l2loopback-dkms obs-studio
 			    fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
+	            fi
 	            exit 1
 	            ;;
 	    esac

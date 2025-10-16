@@ -17,7 +17,9 @@ installScribus() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
+	            fi
 	            exit 1
 	            ;;
 	    esac

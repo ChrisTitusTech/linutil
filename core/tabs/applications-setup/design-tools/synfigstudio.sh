@@ -17,7 +17,9 @@ installSynfigStudio() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.synfig.SynfigStudio
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.synfig.SynfigStudio
+	            fi
 	            exit 1
 	            ;;
 	    esac

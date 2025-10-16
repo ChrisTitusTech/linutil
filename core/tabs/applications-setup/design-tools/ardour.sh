@@ -17,7 +17,9 @@ installArdour() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
+	            fi
 	            exit 1
 	            ;;
 	    esac

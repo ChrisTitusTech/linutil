@@ -17,7 +17,9 @@ installOpenShot() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
+	            fi
 	            exit 1
 	            ;;
 	    esac

@@ -4,7 +4,7 @@
 
 installNatron() {
 	printf "%b\n" "${YELLOW}Installing Natron...${RC}"
-	if ! command_exists natron; then
+	if ! command_exists natron && command_exists flatpak; then
 		"$ESCALATION_TOOL" flatpak install --noninteractive fr.natron.natron
 	else
 		printf "%b\n" "${GREEN}Natron is already installed.${RC}"

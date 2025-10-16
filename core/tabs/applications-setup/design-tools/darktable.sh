@@ -17,7 +17,9 @@ installDarktable() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
+	            fi
 	            exit 1
 	            ;;
 	    esac

@@ -17,7 +17,9 @@ installAudacity() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
+	            fi
 	            exit 1
 	            ;;
 	    esac
