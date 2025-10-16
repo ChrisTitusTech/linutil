@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+# Maybe find a way to fix this without disabling this?
+# shellcheck disable=SC1091
 . ../../common-script.sh
 
 installCursor() {
@@ -7,22 +9,22 @@ installCursor() {
         printf "%b\n" "${YELLOW}Installing Cursor...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                TEMP_DEB="$(mktemp)"
+                TEMP_DEB="$(wd)"
                 curl -sSLo "$TEMP_DEB" 'https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest'
 
                 "$ESCALATION_TOOL" "$PACKAGER" update
-                "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_DEB
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$TEMP_DEB"
                 rm "$TEMP_DEB"
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm cursor-bin
                 ;;
             dnf)
-                TEMP_RPM="$(mktemp)"
+                TEMP_RPM="$(wd)"
                 wget -O "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest"
 
-                "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_RPM
-                "$ESCALATION_TOOL" rm $TEMP_RPM # Removes temp rpm file
+                "$ESCALATION_TOOL" "$PACKAGER" install -y "$TEMP_RPM"
+                "$ESCALATION_TOOL" rm "$TEMP_RPM" # Removes temp rpm file
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
