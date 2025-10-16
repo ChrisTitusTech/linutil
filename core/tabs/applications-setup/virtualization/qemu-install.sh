@@ -23,11 +23,7 @@ installQEMUDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
                 ;;
             pacman)
-                if command_exists yay || command_exists paru; then
-                    "$AUR_HELPER" -S --needed --noconfirm qemu-desktop
-                else
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-desktop
-                fi
+                "$AUR_HELPER" -S --needed --noconfirm qemu-desktop
                 checkKVM
                 installQEMUEmulators
                 ;;
@@ -68,11 +64,7 @@ uninstallQEMU() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y qemu*
                 ;;
             pacman)
-                if command_exists yay || command_exists paru; then
-                    "$AUR_HELPER" -R --noconfirm qemu-desktop
-                else
-                    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm qemu-desktop
-                fi
+                "$AUR_HELPER" -R --noconfirm qemu-desktop
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

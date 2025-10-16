@@ -37,13 +37,7 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
-            if command_exists yay || command_exists paru; then
-                "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
-            else
-            	"$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox-host-modules-arch
-                "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm virtualbox
-            fi
-            "$ESCALATION_TOOL" modprobe vboxdrv
+            "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -60,11 +54,7 @@ uninstallVirtualBox() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y virtualbox*
                 ;;
             pacman)
-                if command_exists yay || command_exists paru; then
-                    "$AUR_HELPER" -R --noconfirm virtualbox-bin
-                else
-                    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm virtualbox
-                fi
+                "$AUR_HELPER" -R --noconfirm virtualbox-bin
                 ;;
             *)
                 exit 1
