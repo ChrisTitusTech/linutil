@@ -14,7 +14,9 @@ installMelonDS() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive net.kuribo64.melonDS
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.kuribo64.melonDS
+	            fi
 	            exit 1
 	            ;;
 	    esac

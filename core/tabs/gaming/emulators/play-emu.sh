@@ -10,12 +10,14 @@ installPlay() {
 	        	if command_exists yay || command_exists paru; then
 	        		"$AUR_HELPER" -S --needed --noconfirm cmake cmake3 make
 		        	"$AUR_HELPER" -S --needed --noconfirm play-emu || "$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
-		        else
+		        elif command_exists flatpak; then
 		        	"$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
+	            fi
 	            exit 1
 	            ;;
 	    esac

@@ -17,7 +17,9 @@ installmGBA() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive io.mgba.mGBA
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive io.mgba.mGBA
+	            fi
 	            exit 1
 	            ;;
 	    esac

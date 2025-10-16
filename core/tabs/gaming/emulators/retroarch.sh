@@ -17,7 +17,9 @@ installRetroArch() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.libretro.RetroArch
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.libretro.RetroArch
+	            fi
 	            exit 1
 	            ;;
 	    esac

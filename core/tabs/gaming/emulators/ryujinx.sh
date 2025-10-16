@@ -14,7 +14,9 @@ installRyujinx() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive io.github.ryubing.Ryujinx
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive io.github.ryubing.Ryujinx
+	            fi
 	            exit 1
 	            ;;
 	    esac

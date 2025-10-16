@@ -9,19 +9,21 @@ installPCSX2() {
 	    	apt-get|nala)
 	    		if [ "$DTYPE" = "Ubuntu" ]; then
 			    	"$ESCALATION_TOOL" "$PACKAGER" install -y pcsx2
-			    else
+			    elif command_exists flatpak; then
 			    	"$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
 			    fi
 	            ;;
 	        pacman)
 	        	if command_exists yay || command_exists paru; then
 		        	"$AUR_HELPER" -S --needed --noconfirm pcsx2-latest-bin
-		        else
+		        elif command_exists flatpak; then
 		        	"$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
+	            fi
 	            exit 1
 	            ;;
 	    esac

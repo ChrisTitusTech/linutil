@@ -17,7 +17,9 @@ installDolphin() {
 				fi
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak install --noninteractive org.DolphinEmu.dolphin-emu
+	        	if command_exists flatpak; then
+	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.DolphinEmu.dolphin-emu
+	            fi
 	            exit 1
 	            ;;
 	    esac
