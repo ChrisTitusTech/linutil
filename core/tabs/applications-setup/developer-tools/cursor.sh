@@ -8,7 +8,7 @@ installCursor() {
         case "$PACKAGER" in
             apt-get|nala)
                 TEMP_DEB="$(mktemp)"
-                wget -O "$TEMP_DEB" "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest"
+                curl -sSLo "$TEMP_DEB" 'https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest'
 
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_DEB
