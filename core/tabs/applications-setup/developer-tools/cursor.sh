@@ -12,7 +12,7 @@ installCursor() {
 
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $TEMP_DEB
-                "$ESCALATION_TOOL" rm $TEMP_DEB # Removes temp deb file
+                rm "$TEMP_DEB"
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm cursor-bin
