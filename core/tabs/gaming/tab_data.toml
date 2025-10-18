@@ -101,7 +101,7 @@ task_list = "FM"
 
 [[data.entries]]
 name = "XEMU"
-description = "An Oringal Xbox emulator"
+description = "An Original Xbox emulator"
 script = "emulators/xemu.sh"
 task_list = "FM"
 

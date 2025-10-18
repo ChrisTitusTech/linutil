@@ -37,19 +37,14 @@ configureRetroArch() {
 	        	libretro-beetle-saturn libretro-blastem
 	        	;;
 	        dnf)
-	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-mgba libretro-nestopia libretro-bnes-mercury libretro-pcsx-rearmed
+	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-mgba libretro-nestopia libretro-bsnes-mercury libretro-pcsx-rearmed
 	        	;;
 	        pacman)
 	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
 		        	libretro-beetle-psx libretro-pcsx2-launcher libretro-play libretro-ppsspp \
-<<<<<<< HEAD
 		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s \
-		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melonds-bin \
+		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melondsds-bin \
 		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos libretro-blastem
-=======
-		        	libretro-snes9x libretro-dolphin libretro-melondsds-bin libretro-mgba libretro-nestopia libretro-parallel-n64 \
-		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos
->>>>>>> 3c429be434099444da5f02e26cc02ab2a7accfa0
 	            ;;
 	        *)
 	            exit 1
