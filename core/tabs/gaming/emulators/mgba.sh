@@ -32,11 +32,7 @@ uninstallmGBA() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y mgba-sdl
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm mgba-sdl
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm mgba-sdl
-				fi
+			    "$AUR_HELPER" -R --noconfirm mgba-sdl
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.mgba.mGBA

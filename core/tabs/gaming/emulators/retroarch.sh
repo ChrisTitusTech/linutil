@@ -34,7 +34,7 @@ configureRetroArch() {
 	        zypper)
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-beetle-psx libretro-play \
 	        	libretro-bsnes libretro-dolphin libretro-desmume libretro-mgba libretro-nestopia libretro-parallel-n64 \
-	        	libretro-beetle-saturn 
+	        	libretro-beetle-saturn libretro-blastem
 	        	;;
 	        dnf)
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-mgba libretro-nestopia libretro-bnes-mercury libretro-pcsx-rearmed
@@ -42,8 +42,9 @@ configureRetroArch() {
 	        pacman)
 	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
 		        	libretro-beetle-psx libretro-pcsx2-launcher libretro-play libretro-ppsspp \
-		        	libretro-snes9x libretro-dolphin libretro-melonds-bin libretro-mgba libretro-nestopia libretro-parallel-n64 \
-		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos
+		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s \
+		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melonds-bin \
+		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos libretro-blastem
 	            ;;
 	        *)
 	            exit 1
@@ -62,11 +63,7 @@ uninstallRetroArch() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y retroarch* libretro*
 	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm retroarch* libretro*
-		        else
-				    "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm retroarch* libretro*
-				fi
+			    "$AUR_HELPER" -R --noconfirm retroarch* libretro*
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.libretro.RetroArch

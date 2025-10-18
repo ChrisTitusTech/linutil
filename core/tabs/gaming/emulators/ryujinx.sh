@@ -25,11 +25,8 @@ uninstallRyujinx() {
 	printf "%b\n" "${YELLOW}Uninstalling Ryujinx...${RC}"
 	if command_exists ryujinx; then
 	    case "$PACKAGER" in
-	        apt-get|nala|dnf|zypper)
-				"$ESCALATION_TOOL" "$PACKAGER" remove -y dolphin-emu
-	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm dolphin-emu
+			    "$AUR_HELPER" -R --noconfirm ryujinx
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.ryubing.Ryujinx

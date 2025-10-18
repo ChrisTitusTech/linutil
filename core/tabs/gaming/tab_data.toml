@@ -28,6 +28,46 @@ script = "emulators/retroarch.sh"
 task_list = "FM"
 
 [[data.entries]]
+name = "Mesen 2"
+description = "NES and SNES Emulator"
+script = "emulators/mesen2.sh"
+task_list = "FM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman"]
+
+[[data.entries]]
+name = "snes9x"
+description = "Super Nintendo Emulator"
+script = "emulators/snes9x.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "bsnes"
+description = "Super Nintendo Emulator"
+script = "emulators/bsnes.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "mGBA"
+description = "Nintendo Game Boy Advance Emulator"
+script = "emulators/mgba.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Mupen 64 Plus"
+description = "N64 Emulator"
+script = "emulators/mupen64plus.sh"
+task_list = "FM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman", "apt-get", "dnf"]
+
+[[data.entries]]
 name = "Dolphin Emulator"
 description = "GameCube and Wii Emulator"
 script = "emulators/dolphin-emu.sh"
@@ -37,12 +77,6 @@ task_list = "FM"
 name = "MelonDS"
 description = "Nintendo DS and DSi Emulator"
 script = "emulators/melonds.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "mGBA"
-description = "Nintendo Game Boy Advance Emulator"
-script = "emulators/mgba.sh"
 task_list = "FM"
 
 [[data.entries]]
@@ -57,6 +91,11 @@ description = "A Playstation emulator"
 script = "emulators/pcsx.sh"
 task_list = "FM"
 
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman", "apt-get"]
+
 [[data.entries]]
 name = "PCSX2"
 description = "A Playstation 2 emulator"
@@ -67,4 +106,61 @@ task_list = "FM"
 name = "Play!"
 description = "A Playstation 2 emulator"
 script = "emulators/play-emu.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "RPCS3"
+description = "A Playstation 3 emulator"
+script = "emulators/rpcs3.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "XEMU"
+description = "An Oringal Xbox emulator"
+script = "emulators/xemu.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Xenia"
+description = "An Experimental Xbox 360 emulator"
+script = "emulators/xenia.sh"
+task_list = "FM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman", "apt-get"]
+
+[[data.entries]]
+name = "Blastem"
+description = "A Genesis emulator"
+script = "emulators/blastem.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Yabause"
+description = "A Sega Saturn emulator"
+script = "emulators/yabause.sh"
+task_list = "FM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman", "apt-get"]
+
+[[data.entries]]
+name = "Kronos"
+description = "A Sega Saturn emulator"
+script = "emulators/kronos.sh"
+task_list = "FM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman"]
+
+[[data.entries]]
+name = "Flycast"
+description = "A Dreamcase emulator"
+script = "emulators/flycast.sh"
 task_list = "FM"

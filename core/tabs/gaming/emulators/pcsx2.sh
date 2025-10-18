@@ -6,13 +6,6 @@ installPCSX2() {
 	printf "%b\n" "${YELLOW}Installing PCSX2...${RC}"
 	if ! command_exists pcsx2; then
 	    case "$PACKAGER" in
-	    	apt-get|nala)
-	    		if [ "$DTYPE" = "Ubuntu" ]; then
-			    	"$ESCALATION_TOOL" "$PACKAGER" install -y pcsx2
-			    elif command_exists flatpak; then
-			    	"$ESCALATION_TOOL" flatpak install --noninteractive net.pcsx2.PCSX2
-			    fi
-	            ;;
 	        pacman)
 	        	"$AUR_HELPER" -S --needed --noconfirm pcsx2-latest-bin
 	            ;;
@@ -32,15 +25,8 @@ uninstallPCSX2() {
 	printf "%b\n" "${YELLOW}Uninstalling PCSX2...${RC}"
 	if command_exists pcsx2; then
 	    case "$PACKAGER" in
-	    	apt-get|nala)
-			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsx2
-	            ;;
 	        pacman)
-			    if command_exists yay || command_exists paru; then
-		        	"$AUR_HELPER" -R --noconfirm pcsx2-latest-bin
-		        else
-				    "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.pcsx2.PCSX2
-				fi
+			    "$AUR_HELPER" -R --noconfirm pcsx2-latest-bin
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive net.pcsx2.PCSX2

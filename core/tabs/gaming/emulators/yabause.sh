@@ -2,15 +2,15 @@
 
 . ../../common-script.sh
 
-installPCSX() {
-	printf "%b\n" "${YELLOW}Installing PCSX...${RC}"
-	if ! command_exists pcsxr; then
+installyabause() {
+	printf "%b\n" "${YELLOW}Installing yabause...${RC}"
+	if ! command_exists yabause; then
 	    case "$PACKAGER" in
 	    	apt-get|nala)
-			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
+			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
+	        	"$AUR_HELPER" -S --needed --noconfirm yabause-qt5
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -18,38 +18,38 @@ installPCSX() {
 	            ;;
 	    esac
 	else
-		printf "%b\n" "${GREEN}PCSX is already installed.${RC}"
+		printf "%b\n" "${GREEN}yabause is already installed.${RC}"
 	fi
 }
 
-uninstallPCSX() {
-	printf "%b\n" "${YELLOW}Uninstalling PCSX...${RC}"
-	if command_exists pcsxr; then
+uninstallyabause() {
+	printf "%b\n" "${YELLOW}Uninstalling yabause...${RC}"
+	if command_exists yabause; then
 	    case "$PACKAGER" in
 	    	apt-get|nala)
-			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
+			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm pcsxr
+			    "$AUR_HELPER" -R --noconfirm yabause-qt5
 	            ;;
 	        *)
 	            exit 1
 	            ;;
 	    esac
 	else
-		printf "%b\n" "${GREEN}PCSX is not installed.${RC}"
+		printf "%b\n" "${GREEN}yabause is not installed.${RC}"
 	fi
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall PCSX${RC}"
+	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall yabause${RC}"
     printf "%b\n" "1. ${YELLOW}Install${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
     printf "%b" "Enter your choice [1-3]: "
     read -r CHOICE
     case "$CHOICE" in
-        1) installPCSX ;;
-        2) uninstallPCSX ;;
+        1) installyabause ;;
+        2) uninstallyabause ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
