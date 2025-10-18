@@ -33,11 +33,6 @@ description = "NES and SNES Emulator"
 script = "emulators/mesen2.sh"
 task_list = "FM"
 
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman"]
-
 [[data.entries]]
 name = "snes9x"
 description = "Super Nintendo Emulator"
@@ -62,11 +57,6 @@ description = "N64 Emulator"
 script = "emulators/mupen64plus.sh"
 task_list = "FM"
 
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman", "apt-get", "dnf"]
-
 [[data.entries]]
 name = "Dolphin Emulator"
 description = "GameCube and Wii Emulator"
@@ -90,11 +80,6 @@ name = "PCSX"
 description = "A Playstation emulator"
 script = "emulators/pcsx.sh"
 task_list = "FM"
-
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman", "apt-get"]
 
 [[data.entries]]
 name = "PCSX2"
@@ -126,11 +111,6 @@ description = "An Experimental Xbox 360 emulator"
 script = "emulators/xenia.sh"
 task_list = "FM"
 
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman", "apt-get"]
-
 [[data.entries]]
 name = "Blastem"
 description = "A Genesis emulator"
@@ -143,21 +123,11 @@ description = "A Sega Saturn emulator"
 script = "emulators/yabause.sh"
 task_list = "FM"
 
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman", "apt-get"]
-
 [[data.entries]]
 name = "Kronos"
 description = "A Sega Saturn emulator"
 script = "emulators/kronos.sh"
 task_list = "FM"
-
-[[data.preconditions]]
-matches = true
-data = "command_exists"
-values = ["pacman"]
 
 [[data.entries]]
 name = "Flycast"
