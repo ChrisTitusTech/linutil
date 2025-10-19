@@ -23,7 +23,8 @@ installQEMUDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm qemu-desktop
+                sh libvirt.sh
+                "$AUR_HELPER" -S --needed --noconfirm qemu-desktop libvirt qemu bridge-utils dnsmasq
                 checkKVM
                 installQEMUEmulators
                 ;;

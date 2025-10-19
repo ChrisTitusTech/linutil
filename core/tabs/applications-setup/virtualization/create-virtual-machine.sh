@@ -3,6 +3,7 @@
 . ../../common-script.sh
 
 virtmanager() {
+	setVMDetails
 	case $distroInfo in
 		*"arch"*)
 			distro="archlinux" ;;
@@ -82,6 +83,8 @@ qemu() {
 }
 
 virtualbox(){
+	setVMDetails
+	
 	case $distroInfo in
 		*"arch"*)
 			distro="ArchLinux" ;;
@@ -191,10 +194,10 @@ setVMDetails() {
 	done
 
 	availableDriveSpave=$(df -h . | awk 'NR==2{print $4}' | cut -d'G' -f1)
-	if [ $availableDriveSpave -lt 100 ]; then
+	if [ "$availableDriveSpave" -lt 100 ]; then
 		driveSizeG=25
 		driveSizeM=25600
-	elif [ $availableDriveSpave -lt 150 ]; then
+	elif [ "$availableDriveSpave" -lt 150 ]; then
 		driveSizeG=50
 		driveSizeM=51200
 	else
@@ -267,8 +270,6 @@ checkVMExists() {
 
 checkInstalled() {
 	hypervisor=$1
-
-	setVMDetails
 
 	if command_exists "$hypervisor"; then
 		if [ "$hypervisor" = "virt-manager" ]; then

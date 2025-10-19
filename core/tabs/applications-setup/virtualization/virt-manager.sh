@@ -20,7 +20,8 @@ installVirtManager() {
     			sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm virt-manager
+                sh libvirt.sh
+                "$AUR_HELPER" -S --needed --noconfirm virt-manager virt-viewer libvirt qemu bridge-utils dnsmasq
                 ;;
             *)
                 if command_exists flatpak; then
