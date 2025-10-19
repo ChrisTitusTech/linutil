@@ -64,15 +64,15 @@ qemu() {
 	# Start VM
 
 	qemu-system-x86_64 \
-		-m ${memoryG}G \
-		-smp ${vcpus} \
-		-drive file=${name}.qcow2,format=qcow2 \
+		-m "${memoryG}G" \
+		-smp "${vcpus}" \
+		-drive file="${name}".qcow2,format=qcow2 \
 		-netdev user,id=net0,hostfwd=tcp::2222-:22 \
 		-device e1000,netdev=net0 \
 		-display default,show-cursor=on \
 		-smbios \
 		-enable-kvm \
-		-name ${name}
+		-name "${name}"
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
 	printf "%b\n" "qemu-system-x86_64 -m ${memoryG}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
