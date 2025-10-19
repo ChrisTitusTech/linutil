@@ -168,15 +168,15 @@ virtualbox(){
 setVMDetails() {
 	# Set memory to 1/4 of host memnory
 	totalMemory=$(grep MemTotal /proc/meminfo | tr -s ' ' | cut -d ' ' -f2)
-	mem=$(($totalMemory / 1024000 + 1))
-	memoryG=$(($mem / 4))
+	mem=$(("$totalMemory" / 1024000 + 1))
+	memoryG=$(("$mem" / 4))
 	if [ "$memoryG" -lt "2" ]; then
 		memoryG="2"
 	fi
-	memoryM=$(($memoryG * 1024))
+	memoryM=$(("$memoryG" * 1024))
 
 	totalCpus=$(getconf _NPROCESSORS_ONLN)
-	vcpus=$(($totalCpus / 4))
+	vcpus=$(("$totalCpus" / 4))
 	if [ "$vcpus" -lt "2" ]; then
 		vcpus="2"
 	fi

@@ -6,10 +6,11 @@ checkKVM() {
     if [ ! -e "/dev/kvm" ]; then
         printf "%b\n" "${RED}KVM is not available. Make sure you have CPU virtualization support enabled in your BIOS/UEFI settings. Please refer https://wiki.archlinux.org/title/KVM for more information.${RC}"
     else
-        "$ESCALATION_TOOL" usermod "$(who | awk 'NR==1{print $1}')" -aG kvm
+        "$ESCALATION_TOOL" usermod "$USER" -aG kvm
     fi
 }
 
+# currently only for Arch. Need to test on other distros later
 setupLibvirt() {
     printf "%b\n" "${YELLOW}Configuring Libvirt.${RC}"
     if "$PACKAGER" -Q | grep -q "iptables "; then
@@ -40,20 +41,25 @@ setupLibvirt() {
 
 installLibvirt() {
 	printf "%b\n" "${YELLOW}Installing libvirt.${RC}"
-    case "$PACKAGER" in
+    if ! command_exists libvirtd; then
+        case "$PACKAGER" in
+        apt-get|nala)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt-daemon libvirt0
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt libvirt-daemon libvirt0
+            ;;
         pacman)
-		    if ! command_exists libvirtd; then
-		        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libvirt dmidecode
-		    else
-		        printf "%b\n" "${GREEN}Libvirt is already installed.${RC}"
-		    fi
-		    setupLibvirt
+            "$AUR_HELPER" -S --needed --noconfirm libvirt dmidecode
+            setupLibvirt
 		    ;;
 		*)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            #"$ESCALATION_TOOL" flatpak install --noninteractive org.virt_manager.virt_manager.Extension.Qemu
             ;;
-    esac
+        esac
+    else
+        printf "%b\n" "${GREEN}Libvirt is already installed.${RC}"
+    fi
 }
 
 checkEnv
