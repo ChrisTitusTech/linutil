@@ -33,9 +33,7 @@ virtmanager() {
 
 	if command_exists qemu-img; then
 		path=$(zenity --file-selection --directory)
-
-		qemu-img create -f qcow2 "$path"/"$name".qcow2 "$driveSizeG""G"
-		chmod 777 "$path"/"$name".qcow2
+		qemu-img create -f qcow2 "$path"/"$name".qcow2 "${driveSizeG}G"
 		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2,cache=none
 	else
 		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk size=$driveSizeG
@@ -50,7 +48,7 @@ qemu() {
 
 	qemu-img create -f qcow2 "$name".qcow2 "$driveSizeG""G"
 	qemu-system-x86_64 \
-		-m "${memoryG}"G \
+		-m "${memoryG}G" \
 		-smp "${vcpus}" \
 		-boot d \
 		-cdrom "${isoFile}" \
@@ -193,10 +191,10 @@ setVMDetails() {
 	done
 
 	availableDriveSpave=$(df -h . | awk 'NR==2{print $4}' | cut -d'G' -f1)
-	if [ "$availableDriveSpave" -lt "100" ]; then
+	if [ $availableDriveSpave -lt 100 ]; then
 		driveSizeG=25
 		driveSizeM=25600
-	elif [ "$availableDriveSpave" -lt "150" ]; then
+	elif [ $availableDriveSpave -lt 150 ]; then
 		driveSizeG=50
 		driveSizeM=51200
 	else
@@ -244,6 +242,9 @@ installIsoInfo() {
         apt-get|nala|dnf|zypper)
             "$ESCALATION_TOOL" "$PACKAGER" -y install genisoimage
             ;;
+        pacman)
+        	"$AUR_HELPER" -S --needed -noconfirm cdrtools
+        	;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
             ;;
