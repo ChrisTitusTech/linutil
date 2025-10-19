@@ -35,10 +35,12 @@ virtmanager() {
 	if command_exists qemu-img; then
 		path=$(zenity --file-selection --directory)
 		qemu-img create -f qcow2 "$path"/"$name".qcow2 "${driveSizeG}G"
-		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2,cache=none
+		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2,cache=none --noautoconsole
 	else
-		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk size=$driveSizeG
+		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk size=$driveSizeG --noautoconsole
 	fi
+
+	virsh shutdown "$name"
 
 	# Start VM
 	# virt-manager 
