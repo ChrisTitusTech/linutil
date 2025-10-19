@@ -33,6 +33,7 @@ virtmanager() {
 	# read -r path
 
 	if command_exists qemu-img; then
+		printf "%b\n" "Select Virtual Drive location"
 		path=$(zenity --file-selection --directory)
 		qemu-img create -f qcow2 "$path"/"$name".qcow2 "${driveSizeG}G"
 		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2,cache=none --noautoconsole
@@ -40,10 +41,7 @@ virtmanager() {
 		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk size=$driveSizeG --noautoconsole
 	fi
 
-	virsh shutdown "$name"
-
-	# Start VM
-	# virt-manager 
+	virt-manager -c qemu:///session
 }
 
 qemu() {
@@ -65,16 +63,16 @@ qemu() {
 
 	# Start VM
 
-	# qemu-system-x86_64 \
-	# 	-m ${memoryG}G \
-	# 	-smp ${vcpus} \
-	# 	-drive file=${name}.qcow2,format=qcow2 \
-	# 	-netdev user,id=net0,hostfwd=tcp::2222-:22 \
-	# 	-device e1000,netdev=net0 \
-	# 	-display default,show-cursor=on \
-	# 	-smbios \
-	# 	-enable-kvm \
-	# 	-name ${name}
+	qemu-system-x86_64 \
+		-m ${memoryG}G \
+		-smp ${vcpus} \
+		-drive file=${name}.qcow2,format=qcow2 \
+		-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+		-device e1000,netdev=net0 \
+		-display default,show-cursor=on \
+		-smbios \
+		-enable-kvm \
+		-name ${name}
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
 	printf "%b\n" "qemu-system-x86_64 -m ${memoryG}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
@@ -224,7 +222,7 @@ setVMDetails() {
         esac
     fi
 
-	isoFile=$(zenity --file-selection)
+	isoFile=$(zenity --file-selection --file-filter='*.iso')
 
 	case $isoFile in
 		*".iso")
