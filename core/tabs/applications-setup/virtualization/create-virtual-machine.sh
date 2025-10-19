@@ -28,14 +28,18 @@ virtmanager() {
 			esac ;;
 	esac
 
-	printf "%b\n" "Please enter full folder path of for VM"
-	read -r path
+	# printf "%b\n" "Please enter full folder path of for VM"
+	# read -r path
 
-	# setup physical PCI/USB etc
-	hostDev=""
+	if command_exists qemu-img; then
+		path=$(zenity --file-selection --directory)
 
-	qemu-img create -f qcow2 "$path"/"$name".qcow2 "$driveSize""G"
-	virt-install --name "$name" --memory="$memory" --vcpus="$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2 "$hostDev"
+		qemu-img create -f qcow2 "$path"/"$name".qcow2 "$driveSizeG""G"
+		chmod 777 "$path"/"$name".qcow2
+		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk "$path"/"$name".qcow2,cache=none
+	else
+		virt-install --name "$name" --memory "${memoryM}" --vcpus "$vcpus" --cdrom "$isoFile" --os-variant "$distro" --disk size=$driveSizeG
+	fi
 
 	# Start VM
 	# virt-manager 
@@ -44,9 +48,9 @@ virtmanager() {
 qemu() {
 	setVMDetails
 
-	qemu-img create -f qcow2 "$name".qcow2 "$driveSize""G"
+	qemu-img create -f qcow2 "$name".qcow2 "$driveSizeG""G"
 	qemu-system-x86_64 \
-		-m "${memory}"G \
+		-m "${memoryG}"G \
 		-smp "${vcpus}" \
 		-boot d \
 		-cdrom "${isoFile}" \
@@ -61,7 +65,7 @@ qemu() {
 	# Start VM
 
 	# qemu-system-x86_64 \
-	# 	-m ${memory}G \
+	# 	-m ${memoryG}G \
 	# 	-smp ${vcpus} \
 	# 	-drive file=${name}.qcow2,format=qcow2 \
 	# 	-netdev user,id=net0,hostfwd=tcp::2222-:22 \
@@ -72,11 +76,11 @@ qemu() {
 	# 	-name ${name}
 	
 	printf "%b\n" "To run the VM after initial exit, use the command below"
-	printf "%b\n" "qemu-system-x86_64 -m ${memory}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
+	printf "%b\n" "qemu-system-x86_64 -m ${memoryG}G -smp ${vcpus} -drive file=${name}.qcow2,format=qcow2 \
 			-netdev user,id=net0,hostfwd=tcp::2222-:22 -device e1000,netdev=net0 \
 		  	-display default,show-cursor=on -smbios -enable-kvm -name ${name}"
 	printf "%b\n" "To import this VM into virt-manager run the below"
-	printf "%b\n" "virt-install --name ${name} --memory=${memory} --vcpus=${vcpus} --os-variant ${distro} --disk ${path}/${name}.qcow2 --network default --import"
+	printf "%b\n" "virt-install --name ${name} --memory=${memoryG} --vcpus=${vcpus} --os-variant ${distro} --disk ${path}/${name}.qcow2 --network default --import"
 }
 
 virtualbox(){
@@ -117,13 +121,13 @@ virtualbox(){
 
 	vboxmanage createvm --name="$name" --platform-architecture="$arch" --ostype="$distro" --register
 
-	vboxmanage modifyvm "$name" --os-type="$subdistro" --memory="$memory" --chipset=piix3 --graphicscontroller=vmsvga --firmware=efi --acpi=on --ioapic=on --cpus="$vcpus" --cpu-profile=host --hwvirtex=on --apic=on --x86-x2apic=on --paravirt-provider=kvm --nested-paging=on --large-pages=off --x86-vtx-vpid=on --x86-vtx-ux=on --accelerate-3d=on --vram=256 --x86-long-mode=on --x86-pae=off
+	vboxmanage modifyvm "$name" --os-type="$subdistro" --memory="$memoryM" --chipset=piix3 --graphicscontroller=vmsvga --firmware=efi --acpi=on --ioapic=on --cpus="$vcpus" --cpu-profile=host --hwvirtex=on --apic=on --x86-x2apic=on --paravirt-provider=kvm --nested-paging=on --large-pages=off --x86-vtx-vpid=on --x86-vtx-ux=on --accelerate-3d=on --vram=256 --x86-long-mode=on --x86-pae=off
 	vboxmanage modifyvm "$name" --mouse=usb --keyboard=ps2 --usb-ohci=on --usb-ehci=on --audio-enabled=on --audio-driver=default --audio-controller=ac97 --audio-codec=ad1980
 	
 	# Create SSH port for headless access after install (ssh -p 2522 username@10.0.2.15)
 	vboxmanage modifyvm "$name" --nat-pf1 "SSH,tcp,127.0.0.1,2522,10.0.2.15,22"
 
-	vboxmanage createmedium disk --filename="/home/""$USER""/VirtualBox VMs/""$name""/""$name"".vdi" --size="$driveSize" --variant=Standard --format=VDI
+	vboxmanage createmedium disk --filename="/home/""$USER""/VirtualBox VMs/""$name""/""$name"".vdi" --size="$driveSizeM" --variant=Standard --format=VDI
 
 	vboxmanage storagectl "$name" --name "IDE" --add ide --controller piix4
 	vboxmanage storagectl "$name" --name "SATA" --add sata --controller IntelAHCI
@@ -163,15 +167,15 @@ virtualbox(){
 setVMDetails() {
 	# Set memory to 1/4 of host memnory
 	totalMemory=$(grep MemTotal /proc/meminfo | tr -s ' ' | cut -d ' ' -f2)
-	mem=$(("$totalMemory" / 1024000 + 1))
-	memory=$(("$mem" / 4))
-	if [ "$memory" -lt "2" ]; then
-		memory="2"
+	mem=$(($totalMemory / 1024000 + 1))
+	memoryG=$(($mem / 4))
+	if [ "$memoryG" -lt "2" ]; then
+		memoryG="2"
 	fi
-	memory=$(("$memory" * 1024))
+	memoryM=$(($memoryG * 1024))
 
 	totalCpus=$(getconf _NPROCESSORS_ONLN)
-	vcpus=$(("$totalCpus" / 4))
+	vcpus=$(($totalCpus / 4))
 	if [ "$vcpus" -lt "2" ]; then
 		vcpus="2"
 	fi
@@ -188,17 +192,36 @@ setVMDetails() {
 		fi
 	done
 
-	availableDriveSpave=$(df -h . | awk 'NR==2{print $4}')
+	availableDriveSpave=$(df -h . | awk 'NR==2{print $4}' | cut -d'G' -f1)
 	if [ "$availableDriveSpave" -lt "100" ]; then
-		driveSize=25
+		driveSizeG=25
+		driveSizeM=25600
 	elif [ "$availableDriveSpave" -lt "150" ]; then
-		driveSize=50
+		driveSizeG=50
+		driveSizeM=51200
 	else
-		driveSize=100
+		driveSizeG=100
+		driveSizeM=102400
 	fi
 
-	printf "%b\n" "Please enter full iso path"
-	read -r isoFile
+	# printf "%b\n" "Please enter full iso path"
+	# read -r isoFile
+	if ! command_exists zenity; then
+		case "$PACKAGER" in
+            apt-get|nala|dnf|zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" install -y zenity
+                ;;
+            pacman)
+                "$AUR_HELPER" -S --needed --noconfirm zenity
+                ;;
+            *)
+          		printf "%b\n" "Please enter full iso path"
+				read -r isoFile
+                ;;
+        esac
+    fi
+
+	isoFile=$(zenity --file-selection)
 
 	case $isoFile in
 		*".iso")
