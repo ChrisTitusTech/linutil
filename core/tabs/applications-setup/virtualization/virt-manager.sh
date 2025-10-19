@@ -33,8 +33,6 @@ installVirtManager() {
     else
         printf "%b\n" "${GREEN}Virt-Manager already installed.${RC}"
     fi
-
-    "$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
 
 uninstallVirtManager() {
