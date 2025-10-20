@@ -7,10 +7,10 @@ installVirtualBox() {
     case "$PACKAGER" in
         apt-get|nala)
         	curl -fsSL https://www.virtualbox.org/download/oracle_vbox_2016.asc | "$ESCALATION_TOOL" gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
-    		printf "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/virtualbox.sources
+    		printf "%b" "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/virtualbox.sources
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-"${version}"
-            echo $version
+
             vboxVersion=$(vboxmanage --version | cut -f1 -d"r")
             wget -c -O /home/"$USER"/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/"${vboxVersion}"/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
             VBoxManage extpack install vbox.vbox-extpack
