@@ -4,7 +4,6 @@
 
 installVirtualBox() {
     printf "%b\n" "${YELLOW}Installing VirtualBox...${RC}"
-    sh libvirt.sh
     case "$PACKAGER" in
         apt-get|nala)
         	wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
@@ -45,6 +44,7 @@ installVirtualBox() {
             exit 1
             ;;
     esac
+    sh libvirt.sh
 }
 
 uninstallVirtualBox() {
@@ -76,11 +76,11 @@ getLatestVersion() {
 }
 
 checkVirtualBox() {
+    getLatestVersion
     if ! command_exists virtualbox; then
         installVirtualBox
     else
         currentVersion=$(vboxmanage --version | cut -d'r' -f1)
-        getLatestVersion
 
         if [ "${currentVersion%.*}" -ge "$version" ]; then
             printf "%b\n" "Latest version of VirtualBox already installed"

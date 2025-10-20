@@ -162,7 +162,7 @@ virtualbox(){
 	# fi
 
 	# Start VM
-	# vboxmanage startvm "$name"
+	vboxmanage startvm "$name"
 }
 
 setVMDetails() {

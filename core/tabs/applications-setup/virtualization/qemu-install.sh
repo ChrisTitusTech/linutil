@@ -4,7 +4,6 @@
 
 installQEMUDesktop() {
     printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
-    sh libvirt.sh
     if ! command_exists qemu-img; then
         case "$PACKAGER" in
             apt-get|nala)
@@ -36,8 +35,8 @@ installQEMUDesktop() {
     else
         printf "%b\n" "${GREEN}QEMU already installed.${RC}"
     fi
-
-    "$ESCALATION_TOOL" systemctl status qemu-kvm.service
+    sh libvirt.sh
+    #"$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
 
 installQEMUEmulators() {
