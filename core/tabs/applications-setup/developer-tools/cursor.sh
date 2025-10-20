@@ -19,7 +19,6 @@ installCursor() {
                 ;;
             dnf)
                 TEMP_RPM="$(wd)"
-                # wget -O "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest"
                 curl -sSLo "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest"
 
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$TEMP_RPM"
