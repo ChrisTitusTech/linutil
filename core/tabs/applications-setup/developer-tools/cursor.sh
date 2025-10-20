@@ -22,7 +22,7 @@ installCursor() {
                 curl -sSLo "$TEMP_RPM" "https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest"
 
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$TEMP_RPM"
-                "$ESCALATION_TOOL" rm "$TEMP_RPM" # Removes temp rpm file
+                rm "$TEMP_RPM"
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
