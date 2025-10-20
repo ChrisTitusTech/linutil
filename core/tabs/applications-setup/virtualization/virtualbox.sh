@@ -7,7 +7,7 @@ installVirtualBox() {
     case "$PACKAGER" in
         apt-get|nala)
         	wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
-    		"$ESCALATION_TOOL" printf "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" > /etc/apt/sources.list.d/virtualbox.sources
+    		printf "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/virtualbox.sources
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-"${version}"
 
