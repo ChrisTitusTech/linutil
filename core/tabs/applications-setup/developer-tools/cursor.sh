@@ -1,7 +1,5 @@
 #!/bin/sh -e
 
-# Maybe find a way to fix this without disabling this?
-# shellcheck disable=SC1091
 . ../../common-script.sh
 
 installCursor() {
