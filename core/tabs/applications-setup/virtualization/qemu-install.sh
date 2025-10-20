@@ -17,7 +17,7 @@ installQEMUDesktop() {
                 sudo systemctl enable libvirtd
 
                 #add current user to virt manager group
-                sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
+                sudo usermod -a -G "libvirt" "$USER"
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu

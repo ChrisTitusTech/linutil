@@ -4,9 +4,11 @@
 
 installVirtualBox() {
     printf "%b\n" "${YELLOW}Installing VirtualBox...${RC}"
+    DEPENDENCIES=("curl")
     case "$PACKAGER" in
         apt-get|nala)
-        	curl -fsSL https://www.virtualbox.org/download/oracle_vbox_2016.asc | "$ESCALATION_TOOL" gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+        	wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | "$ESCALATION_TOOL" gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
     		printf "%b" "Types: deb\nURIs: http://download.virtualbox.org/virtualbox/debian\nSuites: ""$(lsb_release -cs 2>/dev/null)""\nComponents: contrib\nArchitectures: ""${ARCH}""\nSigned-By: /usr/share/keyrings/oracle-virtualbox-2016.gpg\n" | "$ESCALATION_TOOL" tee /etc/apt/sources.list.d/virtualbox.sources
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-"${version}"
@@ -17,14 +19,14 @@ installVirtualBox() {
             sudo rm /home/"$USER"/Downloads/vbox.vbox-extpack
             ;;
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core
+            "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core @virtualization 
             dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)
             if [ "$dnf_version" -eq 4 ]; then
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager --add-repo https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
             else
                 "$ESCALATION_TOOL" "$PACKAGER" config-manager addrepo --from-repofile=https://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-7.2."${ARCH}"
+            "$ESCALATION_TOOL" "$PACKAGER" -y install VirtualBox-"${version}"."${ARCH}"
             "$ESCALATION_TOOL" "$PACKAGER" -y install virtualbox-guest-additions."${ARCH}"
             ;;
         zypper)

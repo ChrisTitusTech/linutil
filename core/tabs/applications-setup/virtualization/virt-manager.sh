@@ -17,7 +17,7 @@ installVirtManager() {
                 sudo systemctl start libvirtd
 
     			#add current user to virt manager group
-    			sudo usermod -a -G "libvirt" "$(who | awk 'NR==1{print $1}')"
+    			sudo usermod -a -G "libvirt" "$USER"
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm virt-manager virt-viewer

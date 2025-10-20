@@ -46,8 +46,18 @@ installLibvirt() {
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt-daemon libvirt0
             ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
+
+            sudo systemctl start libvirtd
+            #sets the libvirtd service to start on system start
+            sudo systemctl enable libvirtd
+
+            #add current user to virt manager group
+            sudo usermod -a -G "libvirt" "$USER"
+            ;;
         zypper)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt libvirt-daemon libvirt0
+            "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt libvirt-daemon
             ;;
         pacman)
             "$AUR_HELPER" -S --needed --noconfirm libvirt dmidecode
