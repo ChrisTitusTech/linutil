@@ -31,7 +31,7 @@ installCursor() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}Cursor desktop is already installed.${RC}"
+        printf "%b\n" "${GREEN}Cursor is already installed.${RC}"
     fi
 }
 
