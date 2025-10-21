@@ -23,114 +23,114 @@ name = "Console Emulators"
 
 [[data.entries]]
 name = "RetroArch"
-description = "Frontend for emulators, game engines and media players"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
 script = "emulators/retroarch.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Mesen 2"
-description = "NES and SNES Emulator"
+description = "NES and SNES Emulator. NO Games are included"
 script = "emulators/mesen2.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "snes9x"
-description = "Super Nintendo Emulator"
+description = "Super Nintendo Emulator. NO Games are included"
 script = "emulators/snes9x.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "bsnes"
-description = "Super Nintendo Emulator"
+description = "Super Nintendo Emulator. NO Games are included"
 script = "emulators/bsnes.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "mGBA"
-description = "Nintendo Game Boy Advance Emulator"
+description = "Nintendo Game Boy Advance Emulator. NO Games are included"
 script = "emulators/mgba.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Mupen 64 Plus"
-description = "N64 Emulator"
+description = "N64 Emulator. NO Games are included"
 script = "emulators/mupen64plus.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Dolphin Emulator"
-description = "GameCube and Wii Emulator"
+description = "GameCube and Wii Emulator. NO Games are included"
 script = "emulators/dolphin-emu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "MelonDS"
-description = "Nintendo DS and DSi Emulator"
+description = "Nintendo DS and DSi Emulator. NO Games are included"
 script = "emulators/melonds.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Ryujinx"
-description = "Nintendo Switch emulator"
+description = "Nintendo Switch emulator. NO Games are included"
 script = "emulators/ryujinx.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "PCSX"
-description = "A Playstation emulator"
+description = "A Playstation emulator. NO Games or Bios' are included"
 script = "emulators/pcsx.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "PCSX2"
-description = "A Playstation 2 emulator"
+description = "A Playstation 2 emulator. NO Games or Bios' are included"
 script = "emulators/pcsx2.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Play!"
-description = "A Playstation 2 emulator"
+description = "An Experimental Playstation 2 emulator. NO Games or Bios' are included"
 script = "emulators/play-emu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "RPCS3"
-description = "A Playstation 3 emulator"
+description = "A Playstation 3 emulator. NO Games or Bios' are included"
 script = "emulators/rpcs3.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "XEMU"
-description = "An Original Xbox emulator"
+description = "An Original Xbox emulator. NO Games or Bios' are included"
 script = "emulators/xemu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Xenia"
-description = "An Experimental Xbox 360 emulator"
+description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
 script = "emulators/xenia.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Blastem"
-description = "A Genesis emulator"
+description = "A Genesis emulator. NO Games are included"
 script = "emulators/blastem.sh"
 task_list = "FM"
 
-[[data.entries]]
-name = "Yabause"
-description = "A Sega Saturn emulator"
-script = "emulators/yabause.sh"
-task_list = "FM"
+# [[data.entries]]
+# name = "Yabause"
+# description = "A Sega Saturn emulator"
+# script = "emulators/yabause.sh"
+# task_list = "FM"
 
 [[data.entries]]
 name = "Kronos"
-description = "A Sega Saturn emulator"
+description = "A Sega Saturn emulator. NO Games are included"
 script = "emulators/kronos.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Flycast"
-description = "A Dreamcase emulator"
+description = "A Dreamcase emulator. NO Games are included"
 script = "emulators/flycast.sh"
 task_list = "FM"

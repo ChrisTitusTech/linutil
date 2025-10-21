@@ -56,6 +56,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
@@ -87,14 +88,24 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ### Console Emulators
 
-- **RetroArch**: Frontend for emulators, game engines and media players
-- **Dolphin Emulator**: GameCube and Wii Emulator
-- **MelonDS**: Nintendo DS and DSi Emulator
-- **mGBA**: Nintendo Game Boy Advance Emulator
-- **Ryujinx**: Nintendo Switch emulator
-- **PCSX**: A Playstation emulator
-- **PCSX2**: A Playstation 2 emulator
-- **Play!**: A Playstation 2 emulator
+- **RetroArch**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+- **Mesen 2**: NES and SNES Emulator. NO Games are included
+- **snes9x**: Super Nintendo Emulator. NO Games are included
+- **bsnes**: Super Nintendo Emulator. NO Games are included
+- **mGBA**: Nintendo Game Boy Advance Emulator. NO Games are included
+- **Mupen 64 Plus**: N64 Emulator. NO Games are included
+- **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
+- **MelonDS**: Nintendo DS and DSi Emulator. NO Games are included
+- **Ryujinx**: Nintendo Switch emulator. NO Games are included
+- **PCSX**: A Playstation emulator. NO Games or Bios' are included
+- **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
+- **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
+- **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
+- **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
+- **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
+- **Blastem**: A Genesis emulator. NO Games are included
+- **Kronos**: A Sega Saturn emulator. NO Games are included
+- **Flycast**: A Dreamcase emulator. NO Games are included
 
 ## Security
 

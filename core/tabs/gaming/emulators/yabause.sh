@@ -10,6 +10,7 @@ installyabause() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
+	        	"$AUR_HELPER" -S --needed --noconfirm cmake3
 	        	"$AUR_HELPER" -S --needed --noconfirm yabause-qt5
 	            ;;
 	        *)
