@@ -10,7 +10,7 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm gtk3 libarchive libcdio libnsl libxv sdl2AUR cmake intltool mesa nasm valgrind
+	        	"$AUR_HELPER" -S --needed --noconfirm gtk3 libarchive libcdio libnsl libxv sdl2 cmake intltool mesa nasm valgrind
 	        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
 	            ;;
 	        *)
