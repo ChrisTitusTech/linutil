@@ -7,7 +7,7 @@ installsnes9x() {
 	if ! command_exists snes9x; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm snes9x
+	        	"$AUR_HELPER" -S --needed --noconfirm snes9x-gtk
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -26,7 +26,7 @@ uninstallsnes9x() {
 	if command_exists snes9x; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm snes9x
+			    "$AUR_HELPER" -R --noconfirm snes9x-gtx
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.snes9x.Snes9x

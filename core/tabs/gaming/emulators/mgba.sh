@@ -7,10 +7,12 @@ installmGBA() {
 	if ! command_exists mgba; then
 	    case "$PACKAGER" in
 	        apt-get|nala)
-			    "$ESCALATION_TOOL" "$PACKAGER" install -y mgba-sdl
+	        	"$ESCALATION_TOOL" "$PACKAGER" install -y liblua5.4-dev
+			    "$ESCALATION_TOOL" "$PACKAGER" install -y mgba-qt
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm mgba-sdl
+	        	"$AUR_HELPER" -S --needed --noconfirm lua
+	        	"$AUR_HELPER" -S --needed --noconfirm mgba-qt
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -29,10 +31,10 @@ uninstallmGBA() {
 	if command_exists mgba; then
 	    case "$PACKAGER" in
 	        apt-get|nala)
-				"$ESCALATION_TOOL" "$PACKAGER" remove -y mgba-sdl
+				"$ESCALATION_TOOL" "$PACKAGER" remove -y mgba-qt
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm mgba-sdl
+			    "$AUR_HELPER" -R --noconfirm mgba-qt
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.mgba.mGBA

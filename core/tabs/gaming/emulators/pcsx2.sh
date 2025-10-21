@@ -7,7 +7,7 @@ installPCSX2() {
 	if ! command_exists pcsx2; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm pcsx2-latest-bin
+	        	"$AUR_HELPER" -S --needed --noconfirm pcsx2
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -26,7 +26,7 @@ uninstallPCSX2() {
 	if command_exists pcsx2; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm pcsx2-latest-bin
+			    "$AUR_HELPER" -R --noconfirm pcsx2
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive net.pcsx2.PCSX2
