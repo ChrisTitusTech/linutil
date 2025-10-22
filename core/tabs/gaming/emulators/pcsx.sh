@@ -10,8 +10,9 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm gtk3 libarchive libcdio libnsl libxv sdl2 cmake intltool mesa nasm valgrind
-	        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx-redux-git/ || true
+	        	"$AUR_HELPER" -S --needed --noconfirm capstone curl ffmpeg fmt freetype2 glfw libuv sdl2 zlib git imagemagick make pkg-config clang glfw-x11 xorg-server-xvfb
+	        	"$AUR_HELPER" -S --needed --noconfirm pcsx-redux-git
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -31,7 +32,8 @@ uninstallPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm pcsxr
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx-redux-git/
+			    "$AUR_HELPER" -R --noconfirm pcsx-redux-git
 	            ;;
 	        *)
 	            exit 1

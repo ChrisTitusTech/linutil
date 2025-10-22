@@ -7,6 +7,7 @@ installMelonDS() {
 	if ! command_exists melonDS; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/melonds-bin/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm melonds-bin
 	            ;;
 	        *)
@@ -26,6 +27,7 @@ uninstallMelonDS() {
 	if command_exists melonDS; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/melonds-bin/
 			    "$AUR_HELPER" -R --noconfirm melonds-bin
 	            ;;
 	        *)

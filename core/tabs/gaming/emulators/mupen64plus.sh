@@ -13,6 +13,7 @@ installmupen64plus() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y mupen64plus
 	        	;;
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mupen64plus/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm mupen64plus
 	            ;;
 	        *)
@@ -29,7 +30,14 @@ uninstallmupen64plus() {
 	printf "%b\n" "${YELLOW}Uninstalling mupen64plus...${RC}"
 	if command_exists mupen64plus; then
 	    case "$PACKAGER" in
+	    	apt-get|nala)
+	        	"$ESCALATION_TOOL" "$PACKAGER" uninstall -y mupen64plus-qt
+	        	;;
+	        dnf)
+	        	"$ESCALATION_TOOL" "$PACKAGER" uninstall -y mupen64plus
+	        	;;
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mupen64plus/
 			    "$AUR_HELPER" -R --noconfirm mupen64plus
 	            ;;
 	        *)

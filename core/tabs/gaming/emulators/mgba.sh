@@ -11,6 +11,7 @@ installmGBA() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y mgba-qt
 	            ;;
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mgba-qt/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm lua
 	        	"$AUR_HELPER" -S --needed --noconfirm mgba-qt
 	            ;;
@@ -34,6 +35,7 @@ uninstallmGBA() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y mgba-qt
 	            ;;
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mgba-qt/ || true
 			    "$AUR_HELPER" -R --noconfirm mgba-qt
 	            ;;
 	        *)

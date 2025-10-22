@@ -7,6 +7,7 @@ installbsnes() {
 	if ! command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/bsnes/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm bsnes
 	            ;;
 	        *)
@@ -26,6 +27,7 @@ uninstallbsnes() {
 	if command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/bsnes/
 			    "$AUR_HELPER" -R --noconfirm bsnes
 	            ;;
 	        *)

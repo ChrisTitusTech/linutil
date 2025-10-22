@@ -7,6 +7,7 @@ installRyujinx() {
 	if ! command_exists ryujinx; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/ryujinx/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm ryujinx
 	            ;;
 	        *)
@@ -26,6 +27,7 @@ uninstallRyujinx() {
 	if command_exists ryujinx; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/ryujinx/
 			    "$AUR_HELPER" -R --noconfirm ryujinx
 	            ;;
 	        *)

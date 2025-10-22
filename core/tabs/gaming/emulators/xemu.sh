@@ -7,6 +7,7 @@ installxemu() {
 	if ! command_exists xemu; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/xemu-bin/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm xemu-bin
 	            ;;
 	        *)
@@ -24,6 +25,7 @@ uninstallxemu() {
 	if command_exists xemu; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/xemu-bin/
 			    "$AUR_HELPER" -R --noconfirm xemu-bin
 	            ;;
 	        *)

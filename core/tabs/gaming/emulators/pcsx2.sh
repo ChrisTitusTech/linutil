@@ -7,6 +7,7 @@ installPCSX2() {
 	if ! command_exists pcsx2; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx2/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm pcsx2
 	            ;;
 	        *)
@@ -26,6 +27,7 @@ uninstallPCSX2() {
 	if command_exists pcsx2; then
 	    case "$PACKAGER" in
 	        pacman)
+	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx2/
 			    "$AUR_HELPER" -R --noconfirm pcsx2
 	            ;;
 	        *)
