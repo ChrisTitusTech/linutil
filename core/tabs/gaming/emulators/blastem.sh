@@ -10,7 +10,7 @@ installblastem() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y blastem
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/blastem/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/blastem/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm blastem
 	            ;;
 	        *)
@@ -33,7 +33,7 @@ uninstallblastem() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y blastem
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/blastem/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/blastem/
 			    "$AUR_HELPER" -R --noconfirm blastem
 	            ;;
 	        *)

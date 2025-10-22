@@ -7,7 +7,7 @@ installkronos() {
 	if ! command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/kronos/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/kronos/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm kronos
 	            ;;
 	        *)
@@ -25,7 +25,7 @@ uninstallkronos() {
 	if command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/kronos/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/kronos/
 			    "$AUR_HELPER" -R --noconfirm kronos
 	            ;;
 	        *)

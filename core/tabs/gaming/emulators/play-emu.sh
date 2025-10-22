@@ -7,7 +7,7 @@ installPlay() {
 	if ! command_exists play-emu; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/play-emu-git/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu-git/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm play-emu-git
 	            ;;
 	        *)
@@ -27,7 +27,7 @@ uninstallPlay() {
 	if command_exists play-emu; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/play-emu-git/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu-git/
 			    "$AUR_HELPER" -R --noconfirm play-emu-git
 	            ;;
 	        *)

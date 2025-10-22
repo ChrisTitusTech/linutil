@@ -7,7 +7,7 @@ installMesen2() {
 	if ! command_exists mesen2; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mesen2-git/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mesen2-git/
 	        	"$AUR_HELPER" -S --needed --noconfirm mesen2-git
 	            ;;
 	        *)
@@ -25,7 +25,7 @@ uninstallMesen2() {
 	if command_exists mesen2; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mesen2-git/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mesen2-git/
 			    "$AUR_HELPER" -R --noconfirm mesen2-git
 	            ;;
 	        *)

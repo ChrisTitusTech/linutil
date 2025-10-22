@@ -7,7 +7,7 @@ installflycast() {
 	if ! command_exists flycast; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/flycast/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/flycast/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm flycast
 	            ;;
 	        *)
@@ -25,7 +25,7 @@ uninstallflycast() {
 	if command_exists flycast; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/flycast/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/flycast/
 			    "$AUR_HELPER" -R --noconfirm flycast
 	            ;;
 	        *)

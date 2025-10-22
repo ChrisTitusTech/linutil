@@ -10,7 +10,7 @@ installyabause() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/yabause-qt5/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/yabause-qt5/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm cmake3
 	        	"$AUR_HELPER" -S --needed --noconfirm yabause-qt5
 	            ;;
@@ -32,7 +32,7 @@ uninstallyabause() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/yabause-qt5/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/yabause-qt5/ || true
 			    "$AUR_HELPER" -R --noconfirm yabause-qt5
 	            ;;
 	        *)

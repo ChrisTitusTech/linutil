@@ -13,7 +13,7 @@ installmupen64plus() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y mupen64plus
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mupen64plus/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mupen64plus/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm mupen64plus
 	            ;;
 	        *)
@@ -37,7 +37,7 @@ uninstallmupen64plus() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" uninstall -y mupen64plus
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/mupen64plus/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mupen64plus/
 			    "$AUR_HELPER" -R --noconfirm mupen64plus
 	            ;;
 	        *)

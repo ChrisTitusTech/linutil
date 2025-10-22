@@ -10,7 +10,7 @@ installRetroArch() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y retroarch retroarch-assets
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/retroarch/ $HOME/.cache/yay/retroarch-assets-xmb/ $HOME/.cache/yay/retroarch-assets-ozone/ $HOME/.cache/yay/retroarch-assets-glui/ $HOME/.cache/yay/libretro-core-info/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/retroarch/ "$HOME"/.cache/yay/retroarch-assets-xmb/ "$HOME"/.cache/yay/retroarch-assets-ozone/ "$HOME"/.cache/yay/retroarch-assets-glui/ "$HOME"/.cache/yay/libretro-core-info/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm retroarch retroarch-assets-xmb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
 	            ;;
 	        *)
@@ -64,7 +64,7 @@ uninstallRetroArch() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y retroarch* libretro*
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/retroarch/ $HOME/.cache/yay/retroarch-assets-xmb/ $HOME/.cache/yay/retroarch-assets-ozone/ $HOME/.cache/yay/retroarch-assets-glui/ $HOME/.cache/yay/libretro-core-info/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/retroarch/ "$HOME"/.cache/yay/retroarch-assets-xmb/ "$HOME"/.cache/yay/retroarch-assets-ozone/ "$HOME"/.cache/yay/retroarch-assets-glui/ "$HOME"/.cache/yay/libretro-core-info/ || true
 			    "$AUR_HELPER" -R --noconfirm retroarch* libretro*
 	            ;;
 	        *)

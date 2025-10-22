@@ -10,7 +10,7 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx-redux-git/ || true
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/pcsx-redux-git/ || true
 	        	"$AUR_HELPER" -S --needed --noconfirm capstone curl ffmpeg fmt freetype2 glfw libuv sdl2 zlib git imagemagick make pkg-config clang glfw-x11 xorg-server-xvfb
 	        	"$AUR_HELPER" -S --needed --noconfirm pcsx-redux-git
 	            ;;
@@ -32,7 +32,7 @@ uninstallPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r $HOME/.cache/yay/pcsx-redux-git/
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/pcsx-redux-git/
 			    "$AUR_HELPER" -R --noconfirm pcsx-redux-git
 	            ;;
 	        *)
