@@ -7,7 +7,6 @@ installCursor() {
         printf "%b\n" "${YELLOW}Installing Cursor...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                # Sometimes in ubuntu, the cursor package already exists.
                 if apt-cache search "^${PACKAGE_NAME}$" | grep -q "^${PACKAGE_NAME} -"; then
                     TEMP_DEB="cursor.deb"
 
