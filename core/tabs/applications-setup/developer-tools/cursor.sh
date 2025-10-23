@@ -5,7 +5,7 @@
 installCursor() {
     if ! command_exists cursor; then
         printf "%b\n" "${YELLOW}Installing Cursor...${RC}"
-        case $PACKAGER in
+        case "$PACKAGER" in
             apt-get|nala)
                 # Sometimes in ubuntu, the cursor package already exists.
                 if apt-cache search "^${PACKAGE_NAME}$" | grep -q "^${PACKAGE_NAME} -"; then
