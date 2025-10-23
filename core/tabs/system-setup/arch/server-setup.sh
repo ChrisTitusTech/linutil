@@ -196,16 +196,18 @@ keymap () {
 # @description Choose whether drive is SSD or not.
 drivessd () {
     echo -ne "
-    Is this an ssd? yes/no:
+    Is this a solid state, flash, or hard drive?
     "
 
-    options=("Yes" "No")
+    options=("SSD" "MMC" "HDD")
     select_option "${options[@]}"
 
-    case ${options[$?]} in
-        y|Y|yes|Yes|YES)
+    case $? in
+        0)
         export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-        n|N|no|NO|No)
+        1)
+        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120";;
+        2)
         export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
         *) echo "Wrong option. Try again";drivessd;;
     esac
@@ -224,12 +226,21 @@ echo -ne "
 
 "
 
-    PS3='
-    Select the disk to install on: '
-    options=($(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}'))
+    #Loop through selection if non-viable device (mmcblkXbootY, mmcblkXrpbm, etc) is selected
+	   while true
+	   do
+       PS3='
+       Select the disk to install on: '
+       mapfile -t options < <(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2"|"$3}')
 
-    select_option "${options[@]}"
-    disk=${options[$?]%|*}
+       select_option "${options[@]}"
+       disk=${options[$?]%|*}
+       if [[ ! "${disk%|*}" =~  ^/dev/mmcblk[0-9]+[a-z]+[0-9]? ]]
+    	  then
+    		    break
+    	  fi
+    	  echo -e "\n${disk%|*} is not a viable install drive \n"
+    done
 
     echo -e "\n${disk%|*} selected \n"
         export DISK=${disk%|*}
@@ -381,7 +392,7 @@ subvolumesetup () {
     mountallsubvol
 }
 
-if [[ "${DISK}" =~ "nvme" ]]; then
+if [[ "${DISK}" =~ "nvme"|"mmcblk" ]]; then
     partition2=${DISK}p2
     partition3=${DISK}p3
 else
