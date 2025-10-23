@@ -37,12 +37,15 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
-            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 software-properties-common"
-
             "$ESCALATION_TOOL" dpkg --add-architecture i386
-
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
+            
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
+            
+            DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine32:i386"
+            apt-cache show software-properties-common >/dev/null 2>&1 && DISTRO_DEPS="$DISTRO_DEPS software-properties-common"
+            
+            "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         dnf)
             printf "%b\n" "${CYAN}Installing rpmfusion repos.${RC}"
@@ -73,23 +76,20 @@ installAdditionalDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
         apt-get | nala)
-            version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
-                grep -v 'latest' |
-                tail -n1 |
-                cut -d '/' --fields=3)
-
-            version_no_v=$(echo "$version" | tr -d v)
-            curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
-
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris_"${version_no_v}"_all.deb
-
-            rm lutris_"${version_no_v}"_all.deb
+            lutris_url=$(curl -s https://api.github.com/repos/lutris/lutris/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+            
+            if [ -n "$lutris_url" ]; then
+                printf "%b\n" "${YELLOW}Downloading latest Lutris from GitHub...${RC}"
+                curl -sSLo lutris.deb "$lutris_url"
+                "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris.deb
+                rm lutris.deb
+                "$ESCALATION_TOOL" "$PACKAGER" update
+                "$ESCALATION_TOOL" "$PACKAGER" install -y lutris
+            fi
 
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
             printf "%b\n" "${YELLOW}Installing steam...${RC}"
-
-    
             "$ESCALATION_TOOL" "$PACKAGER" install -y steam
             ;;
         dnf)
