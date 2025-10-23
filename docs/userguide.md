@@ -29,6 +29,7 @@ https://github.com/ChrisTitusTech/neovim
 - **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
 - **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
 - **Zed**: Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI.
+- **Redot Engine**: Redot is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface
 
 ### Office Suites
 
