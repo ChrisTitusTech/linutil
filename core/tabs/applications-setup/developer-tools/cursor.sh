@@ -18,7 +18,6 @@ installCursor() {
                 else
                     "$ESCALATION_TOOL" "$PACKAGER" install -y cursor
                 fi
-
                 ;;
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm cursor-bin
