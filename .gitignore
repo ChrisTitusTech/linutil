@@ -1,5 +1,6 @@
 /target
 /build
+/result
 rust/target
 rust/build
 /build/linutil
