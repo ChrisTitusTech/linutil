@@ -41,9 +41,18 @@ fastUpdate() {
                 if [ -f "/etc/apt/sources.list.d/nala-sources.list" ]; then
                     "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/nala-sources.list /etc/apt/sources.list.d/nala-sources.list.bak
                 fi
-                if ! "$ESCALATION_TOOL" nala fetch --auto -y || [ ! -s "/etc/apt/sources.list.d/nala-sources.list" ]; then
+                if [ -f "/etc/apt/sources.list.d/fetch.sources" ]; then
+                    "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/fetch.sources /etc/apt/sources.list.d/fetch.sources.bak
+                fi
+
+                if ! "$ESCALATION_TOOL" nala fetch --auto -y; then
                     printf "%b\n" "${RED}Nala fetch failed, restoring backup.${RC}"
-                    "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/nala-sources.list.bak /etc/apt/sources.list.d/nala-sources.list
+                    if [ -f "/etc/apt/sources.list.d/nala-sources.list.bak" ]; then
+                        "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/nala-sources.list.bak /etc/apt/sources.list.d/nala-sources.list
+                    fi
+                    if [ -f "/etc/apt/sources.list.d/fetch.sources.bak" ]; then
+                        "$ESCALATION_TOOL" cp /etc/apt/sources.list.d/fetch.sources.bak /etc/apt/sources.list.d/fetch.sources
+                    fi
                 fi
             fi
             ;;
