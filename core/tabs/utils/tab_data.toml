@@ -186,6 +186,11 @@ script = "samba-ssh-setup.sh"
 task_list = "I SS PFM"
 
 [[data]]
+name = "YubiKey PAM Setup"
+description = "Configure sudo and selected PAM targets to use YubiKey (U2F) touch with password fallback."
+script = "yubikey-pam-setup.sh"
+
+[[data]]
 name = "Timeshift Backup"
 script = "timeshift.sh"
 task_list = "I"
