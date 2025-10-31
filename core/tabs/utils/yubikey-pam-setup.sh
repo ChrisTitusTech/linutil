@@ -111,27 +111,27 @@ ensure_pam_u2f_in_file() {
     _pam_file=$1
     NEWLINE='auth sufficient pam_u2f.so cue'
     # First, remove any existing non-comment pam_u2f auth lines to avoid duplicates
-        EXISTING_COUNT=$("$ESCALATION_TOOL" grep -cE '^[[:space:]]*auth[[:space:]]+.*pam_u2f\\.so' "$_pam_file" 2>/dev/null || true)
-        if [ "${EXISTING_COUNT:-0}" -gt 0 ]; then
-            if [ "$EXISTING_COUNT" -gt 1 ]; then
-                "$ESCALATION_TOOL" sh -c "awk '
-                    BEGIN { pattern = \"^[[:space:]]*auth[[:space:]]+.*pam_u2f\\.so\"; seen = 0 }
-                    {
-                        if (
-                            \$0 ~ pattern
-                        ) {
-                            if (seen) next;
-                            seen = 1;
-                        }
-                        print
+    EXISTING_COUNT=$("$ESCALATION_TOOL" grep -cE '^[[:space:]]*auth[[:space:]]+.*pam_u2f\\.so' "$_pam_file" 2>/dev/null || true)
+    if [ "${EXISTING_COUNT:-0}" -gt 0 ]; then
+        if [ "$EXISTING_COUNT" -gt 1 ]; then
+            "$ESCALATION_TOOL" sh -c "awk '
+                BEGIN { pattern = \"^[[:space:]]*auth[[:space:]]+.*pam_u2f\\.so\"; seen = 0 }
+                {
+                    if (
+                        \$0 ~ pattern
+                    ) {
+                        if (seen) next;
+                        seen = 1;
                     }
-                ' '$_pam_file' > '$_pam_file.tmp' && mv '$_pam_file.tmp' '$_pam_file'"
-                printf "%b\n" "${CYAN}pam_u2f already present: $_pam_file (deduplicated existing entries)${RC}"
-            else
-                printf "%b\n" "${CYAN}pam_u2f already present: $_pam_file (skipping insert)${RC}"
-            fi
-            return 0
+                    print
+                }
+            ' '$_pam_file' > '$_pam_file.tmp' && mv '$_pam_file.tmp' '$_pam_file'"
+            printf "%b\n" "${CYAN}pam_u2f already present: $_pam_file (deduplicated existing entries)${RC}"
+        else
+            printf "%b\n" "${CYAN}pam_u2f already present: $_pam_file (skipping insert)${RC}"
         fi
+        return 0
+    fi
     printf "%b\n" "${YELLOW}Updating PAM: $_pam_file${RC}"
     if "$ESCALATION_TOOL" sh -c "awk -v n=\"$NEWLINE\" '
         BEGIN{inserted=0;}
