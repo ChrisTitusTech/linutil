@@ -168,4 +168,5 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
+- **YubiKey PAM Setup**: Configure sudo and selected PAM targets to require a YubiKey (U2F) touch with password fallback.
 - **WiFi Manager**: This utility is designed to manage wifi in your system
