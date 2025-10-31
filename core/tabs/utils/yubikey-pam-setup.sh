@@ -99,7 +99,7 @@ if "$ESCALATION_TOOL" test -e /etc/u2f_mappings; then
 fi
 FILES_TO_BACKUP=$(printf "%s" "$FILES_TO_BACKUP" | sed 's/^ *//')
 if [ -n "$FILES_TO_BACKUP" ]; then
-    "$ESCALATION_TOOL" sh -c "tar -C / -czf '$BACKUP_PATH' $FILES_TO_BACKUP"
+    "$ESCALATION_TOOL" sh -c "tar -C / -czf '$BACKUP_PATH' \"$FILES_TO_BACKUP\""
     printf "%b\n" "${GREEN}Backup created at ${BACKUP_PATH}${RC}"
 else
     printf "%b\n" "${YELLOW}No PAM files found to back up.${RC}"
