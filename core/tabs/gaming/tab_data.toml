@@ -19,118 +19,136 @@ script = "fallout-76/fallout76settings.sh"
 task_list = "FM"
 
 [[data]]
-name = "Console Emulators"
+name = "Multi System Emulators"
 
 [[data.entries]]
-name = "RetroArch"
+name = "RetroArch Game Emulator"
 description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
 script = "emulators/retroarch.sh"
 task_list = "FM"
 
+[[data]]
+name = "Nintendo Emulators"
+
 [[data.entries]]
 name = "Mesen 2"
 description = "NES and SNES Emulator. NO Games are included"
-script = "emulators/mesen2.sh"
+script = "emulators/nintendo/mesen2.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "snes9x"
 description = "Super Nintendo Emulator. NO Games are included"
-script = "emulators/snes9x.sh"
+script = "emulators/nintendo/snes9x.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "bsnes"
 description = "Super Nintendo Emulator. NO Games are included"
-script = "emulators/bsnes.sh"
+script = "emulators/nintendo/bsnes.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "mGBA"
 description = "Nintendo Game Boy Advance Emulator. NO Games are included"
-script = "emulators/mgba.sh"
+script = "emulators/nintendo/mgba.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Mupen 64 Plus"
 description = "N64 Emulator. NO Games are included"
-script = "emulators/mupen64plus.sh"
+script = "emulators/nintendo/mupen64plus.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Gopher 64"
+description = "N64 Emulator. NO Games are included"
+script = "emulators/nintendo/gopher64.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Dolphin Emulator"
 description = "GameCube and Wii Emulator. NO Games are included"
-script = "emulators/dolphin-emu.sh"
+script = "emulators/nintendo/dolphin-emu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "MelonDS"
 description = "Nintendo DS and DSi Emulator. NO Games are included"
-script = "emulators/melonds.sh"
+script = "emulators/nintendo/melonds.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Ryujinx"
 description = "Nintendo Switch emulator. NO Games are included"
-script = "emulators/ryujinx.sh"
+script = "emulators/nintendo/ryujinx.sh"
 task_list = "FM"
+
+[[data]]
+name = "Playstation Emulators"
 
 [[data.entries]]
 name = "PCSX"
 description = "A Playstation emulator. NO Games or Bios' are included"
-script = "emulators/pcsx.sh"
+script = "emulators/playstation/pcsx.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "PCSX2"
 description = "A Playstation 2 emulator. NO Games or Bios' are included"
-script = "emulators/pcsx2.sh"
+script = "emulators/playstation/pcsx2.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Play!"
 description = "An Experimental Playstation 2 emulator. NO Games or Bios' are included"
-script = "emulators/play-emu.sh"
+script = "emulators/playstation/play-emu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "RPCS3"
 description = "A Playstation 3 emulator. NO Games or Bios' are included"
-script = "emulators/rpcs3.sh"
+script = "emulators/playstation/rpcs3.sh"
 task_list = "FM"
+
+[[data]]
+name = "Xbox Emulators"
 
 [[data.entries]]
 name = "XEMU"
 description = "An Original Xbox emulator. NO Games or Bios' are included"
-script = "emulators/xemu.sh"
+script = "emulators/xbox/xemu.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Xenia"
 description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
-script = "emulators/xenia.sh"
+script = "emulators/xbox/xenia.sh"
 task_list = "FM"
+
+[[data]]
+name = "Sega Emulators"
 
 [[data.entries]]
 name = "Blastem"
 description = "A Genesis emulator. NO Games are included"
-script = "emulators/blastem.sh"
+script = "emulators/sega/blastem.sh"
 task_list = "FM"
 
 # [[data.entries]]
 # name = "Yabause"
 # description = "A Sega Saturn emulator"
-# script = "emulators/yabause.sh"
+# script = "emulators/sega/yabause.sh"
 # task_list = "FM"
 
 [[data.entries]]
 name = "Kronos"
 description = "A Sega Saturn emulator. NO Games are included"
-script = "emulators/kronos.sh"
+script = "emulators/sega/kronos.sh"
 task_list = "FM"
 
 [[data.entries]]
 name = "Flycast"
 description = "A Dreamcase emulator. NO Games are included"
-script = "emulators/flycast.sh"
+script = "emulators/sega/flycast.sh"
 task_list = "FM"
