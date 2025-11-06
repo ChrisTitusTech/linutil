@@ -12,10 +12,7 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-"${version}"
 
-            vboxVersion=$(vboxmanage --version | cut -f1 -d"r")
-            wget -c -O /home/"$USER"/Downloads/vbox.vbox-extpack https://download.virtualbox.org/virtualbox/"${vboxVersion}"/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
-            VBoxManage extpack install vbox.vbox-extpack
-            sudo rm /home/"$USER"/Downloads/vbox.vbox-extpack
+            
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" -y install dnf-plugins-core @virtualization 
@@ -38,7 +35,12 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
-            "$AUR_HELPER" -S --needed --noconfirm virtualbox-bin
+            "$AUR_HELPER" -S --needed --noconfirm virtualbox virtualbox-host-dkms virtualbox-guest-utils virtualbox-guest-iso virtualbox-host-modules-lts
+
+            vboxVersion=$(vboxmanage --version | awk 'NR==8{print}' | cut -f1 -d"r")
+            wget -c -O /home/"$USER"/Downloads/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack https://download.virtualbox.org/virtualbox/"${vboxVersion}"/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
+            VBoxManage extpack install Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
+            sudo rm /home/"$USER"/Downloads/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

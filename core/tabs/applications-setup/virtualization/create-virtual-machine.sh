@@ -19,7 +19,7 @@ virtmanager() {
 					distro="opensusetumbleweed" ;;
 				esac ;;
 		*"ubuntu"*)
-			distro="Ubuntu""$(isoinfo -d -i "$isoFile" | awk 'NR==3{print $4}' | cut -f1,2 -d".")" ;;
+			distro="ubuntu""$(isoinfo -d -i "$isoFile" | awk 'NR==3{print $4}' | cut -f1,2 -d".")" ;;
 		*) 
 			case $windows in
 				*"windows"*)
@@ -110,10 +110,10 @@ virtualbox(){
 			esac ;;
 	esac
 
-	if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+	if [ "$ARCH" = "x86_64" ]; then
 		arch="x86"
 		subdistro="$distro""_64"
-	elif [ "$(dpkg --print-architecture)" = "arm64" ]; then
+	elif [ "$ARCH" = "aarch64" ]; then
 		arch="arm"
 		subdistro="$distro""_arm64"
 	else
