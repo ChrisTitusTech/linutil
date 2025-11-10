@@ -24,7 +24,7 @@ const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
 const FLOAT_SIZE: u16 = 95;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
-const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
+const TITLE: &str = concat!(" Linux Toolbox - ", env!("LINUTIL_VERSION"), " ");
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)

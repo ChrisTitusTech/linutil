@@ -9,6 +9,18 @@
 				"$rustc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "cargo build (workspace)",
+			"type": "shell",
+			"command": "cargo build --workspace",
+			"group": "build"
+		},
+		{
+			"label": "cargo build (workspace)",
+			"type": "shell",
+			"command": "cargo build --workspace",
+			"group": "build"
 		}
 	]
 }
