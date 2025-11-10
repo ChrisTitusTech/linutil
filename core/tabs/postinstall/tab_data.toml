@@ -1,0 +1,6 @@
+name = "Postinstall"
+
+[[data]]
+name = "Run Postinstall"
+description = "Runs baseline: Basic Tools + Build Tools + Python + Node.js; then lets you choose optional setup scripts interactively."
+script = "../postinstall.sh"

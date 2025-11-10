@@ -1,0 +1,155 @@
+# Starship configuration file for customizing the shell prompt in the terminal.
+# Based on Chris Titus's configuration: https://github.com/ChrisTitusTech/mybash/tree/main
+# This TOML file defines the overall format of the prompt, using a series of modules
+# separated by powerline-style symbols (e.g., , , ) with custom background and foreground colors.
+# Each module (like $python, $directory) displays relevant information if available.
+# Colors are defined in hex format (e.g., #3B4252 for Nord theme-inspired palette).
+# The format is a multi-line string that concatenates these elements.
+
+# The 'format' key defines the prompt layout as a string with embedded modules and separators.
+# It starts with a left-rounded corner [] in color #3B4252, followed by Python and username modules.
+# Transitions to next sections with [] separators, changing background colors for visual distinction.
+# Includes Git-related modules ($git_branch, $git_status), programming language modules (e.g., $rust, $nodejs),
+# Docker context, and time, ending with a right-rounded corner [].
+# Modules are placeholders that Starship replaces with actual data based on the current environment.
+format = """
+[](#3B4252)\
+$python\
+$username\
+[](bg:#434C5E fg:#3B4252)\
+$directory\
+[](fg:#434C5E bg:#4C566A)\
+$git_branch\
+$git_status\
+[](fg:#4C566A bg:#86BBD8)\
+$c\
+$elixir\
+$elm\
+$golang\
+$haskell\
+$java\
+$julia\
+$nodejs\
+$nim\
+$rust\
+[](fg:#86BBD8 bg:#06969A)\
+$docker_context\
+[](fg:#06969A bg:#33658A)\
+$time\
+[ ](fg:#33658A)\
+"""
+command_timeout = 5000
+# Disable the blank line at the start of the prompt
+# add_newline = false
+
+# You can also replace your username with a neat symbol like  to save some space
+# Configuration for the username module in Starship prompt
+# This module displays the current username in the prompt
+# [username] - Section defining username display settings
+# show_always = true - Always display the username, even for the default user
+# style_user = "bg:#3B4252" - Background color style for regular users (Nord theme color)
+# style_root = "bg:#3B4252" - Background color style for root user (same as regular user)
+# format = '[$user ]($style)' - Format string: displays username followed by space, styled with the defined style
+[username]
+show_always = true
+style_user = "bg:#3B4252"
+style_root = "bg:#3B4252"
+format = '[$user ]($style)'
+
+[directory]
+style = "bg:#434C5E"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+# Here is how you can shorten some long paths by text replacement
+# similar to mapped_locations in Oh My Posh:
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+# Keep in mind that the order matters. For example:
+# "Important Documents" = "  "
+# will not be replaced, because "Documents" was already substituted before.
+# So either put "Important Documents" before "Documents" or use the substituted version:
+# "Important  " = "  "
+
+# Configuration for the Python module in Starship prompt
+# This module displays the current Python environment in the prompt
+# [python] - Section defining Python display settings
+# style = "bg:#3B4252" - Background color style for the Python module (Nord theme color)
+
+[c]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[docker_context]
+symbol = " "
+style = "bg:#06969A"
+format = '[ $symbol $context ]($style)$path'
+
+[elixir]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[elm]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[git_branch]
+symbol = ""
+style = "bg:#4C566A"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#4C566A"
+format = '[$all_status$ahead_behind ]($style)'
+
+[golang]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[haskell]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[java]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[julia]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[nim]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[python]
+style = "bg:#3B4252"
+format = '[(\($virtualenv\) )]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[time]
+disabled = false
+time_format = "%R"           # Hour:Minute Format
+style = "bg:#33658A"
+format = '[ $time ]($style)'

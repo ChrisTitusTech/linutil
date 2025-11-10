@@ -188,7 +188,7 @@ task_list = "I SS PFM"
 [[data]]
 name = "YubiKey PAM Setup"
 description = "Configure sudo and selected PAM targets to use YubiKey (U2F) touch with password fallback."
-script = "yubikey-pam-setup.sh"
+script = "../system-setup/yk-pam.sh"
 
 [[data]]
 name = "Timeshift Backup"
@@ -198,7 +198,7 @@ task_list = "I"
 [[data.preconditions]]
 matches = false
 data = "command_exists"
-values = [ "dnf" ]
+values = ["dnf"]
 
 [[data]]
 name = "WiFi Manager"

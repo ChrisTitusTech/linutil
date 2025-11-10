@@ -4,13 +4,16 @@
 
 . ../common-script.sh
 
+# Function to install basic dependencies required for Wine and gaming setup.
+# This includes enabling necessary repositories (like multilib for Arch-based systems)
+# and installing core packages depending on the package manager.
 installDepend() {
     DEPENDENCIES='wine dbus git'
     printf "%b\n" "${YELLOW}Installing dependencies...${RC}"
     case "$PACKAGER" in
         pacman)
             if grep -qi "Artix" /etc/os-release; then # Detect Artix Linux
-                # Check for lib32
+                # Check for lib32 repository and enable it if not present
                 if ! grep -q "^\s*\[lib32\]" /etc/pacman.conf; then
                     echo "[lib32]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
@@ -19,7 +22,7 @@ installDepend() {
                     printf "%b\n" "${GREEN}lib32 is already enabled.${RC}"
                 fi
             else
-                # Check for multilib
+                # Check for multilib repository and enable it if not present
                 if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                     echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
@@ -28,6 +31,7 @@ installDepend() {
                     printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
                 fi
             fi
+            # List of distribution-specific dependencies for Wine
             DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk2 gtk3 lib32-gtk2 lib32-gtk3 libpulse lib32-libpulse alsa-lib lib32-alsa-lib \
                 alsa-utils alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib giflib lib32-giflib libpng lib32-libpng \
                 libldap lib32-libldap openal lib32-openal libxcomposite lib32-libxcomposite libxinerama lib32-libxinerama \
@@ -37,8 +41,10 @@ installDepend() {
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
+            # Distribution-specific dependencies for Debian/Ubuntu-based systems
             DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine64 wine32 software-properties-common"
 
+            # Add i386 architecture for 32-bit support
             "$ESCALATION_TOOL" dpkg --add-architecture i386
 
             "$ESCALATION_TOOL" "$PACKAGER" update
@@ -46,6 +52,7 @@ installDepend() {
             ;;
         dnf)
             printf "%b\n" "${CYAN}Installing rpmfusion repos.${RC}"
+            # Install RPM Fusion repositories for additional packages
             "$ESCALATION_TOOL" "$PACKAGER" install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-"$(rpm -E %fedora)".noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-"$(rpm -E %fedora)".noarch.rpm -y
             "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt --repo fedora-cisco-openh264 enabled=1
     
@@ -55,6 +62,7 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -n install $DEPENDENCIES
             ;;
         eopkg)
+            # Distribution-specific dependencies for Solus
             DISTRO_DEPS="libgnutls libgtk-2 libgtk-3 pulseaudio alsa-lib alsa-plugins giflib libpng openal-soft libxcomposite libxinerama ncurses vulkan ocl-icd libva gst-plugins-base sdl2 v4l-utils sqlite3"
 
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
@@ -66,6 +74,8 @@ installDepend() {
     esac
 }
 
+# Function to install additional gaming-related tools like Steam and Lutris.
+# Handles installation based on the package manager, including downloading Lutris from GitHub for apt-based systems.
 installAdditionalDepend() {
     case "$PACKAGER" in
         pacman)
@@ -73,12 +83,14 @@ installAdditionalDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
         apt-get | nala)
+            # Fetch the latest Lutris version from GitHub releases
             version=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/lutris/lutris |
                 grep -v 'latest' |
                 tail -n1 |
                 cut -d '/' --fields=3)
 
             version_no_v=$(echo "$version" | tr -d v)
+            # Download the Lutris .deb package
             curl -sSLo "lutris_${version_no_v}_all.deb" "https://github.com/lutris/lutris/releases/download/${version}/lutris_${version_no_v}_all.deb"
 
             printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
@@ -89,7 +101,7 @@ installAdditionalDepend() {
             printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
             printf "%b\n" "${YELLOW}Installing steam...${RC}"
 
-    
+            # Install Steam
             "$ESCALATION_TOOL" "$PACKAGER" install -y steam
             ;;
         dnf)
@@ -111,6 +123,7 @@ installAdditionalDepend() {
     esac
 }
 
+# Main execution: Check environment, AUR helper, escalation tool, then install dependencies and additional tools
 checkEnv
 checkAURHelper
 checkEscalationTool
