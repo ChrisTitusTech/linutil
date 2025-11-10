@@ -4,3 +4,6 @@
 rust/target
 rust/build
 /build/linutil
+
+# TL40-Dots repository content (referenced by dotfiles scripts)
+/TL40-Dots
