@@ -4,5 +4,11 @@ directories = [
     "gaming",
     "security",
     "system-setup",
-    "utils"
+    "utils",
+    "postinstall",
 ]
+
+# The postinstall orchestrator script (`postinstall.sh`) is placed at the root of tabs directory.
+# It is not part of a tab_data.toml. If you want it exposed inside the TUI as a command,
+# consider wrapping it into a minimal tab (e.g., create a `postinstall/tab_data.toml`).
+# For now we leave this comment as documentation of its purpose.

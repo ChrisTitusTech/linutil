@@ -1,0 +1,454 @@
+# TuxLux40's blendOS system config
+# Packages that are commented out failed to build or were not found and thus are temporarily disabled
+# Command to create symlink at root: sudo ln -s ~/Projects/TL40-Dots/pkg_lists/system.yaml / --force
+# Symlink tutorial: https://www.howtogeek.com/287014/how-to-create-and-use-symbolic-links-aka-symlinks-on-linux/
+
+arch-repo: https://geo.mirror.pkgbuild.com
+impl: https://github.com/blend-os/tracks/raw/main
+repo: https://pkg-repo.blendos.co
+track: default-gnome
+
+# Official Repos
+packages:
+  - aichat # AI-powered chat CLI
+  - aircrack-ng # WiFi security auditing tools
+  - amdgpu_top # AMD GPU monitoring tool
+  - amd-ucode # AMD CPU microcode updates
+  - amd-debug-tools # AMD GPU debugging tools
+  - amdsmi # AMD System Management Interface
+  - android-file-transfer # Android file transfer utility
+  - android-tools # Android platform tools (adb, fastboot)
+  - android-udev # Udev rules for Android devices
+  - aria2 # Lightweight multi-protocol & multi-source command-line download utility
+  - apparmor # Mandatory access control framework
+  - aspell # Spell checker
+  - atuin # Shell history manager
+  - azcopy # Azure storage data transfer tool
+  - azure-cli # Azure command-line interface
+  - bash-completion # Bash completion scripts
+  - bash-preexec # Bash preexec and precmd functions
+  - bat # Cat clone with syntax highlighting
+  - bat-extras # Extra utilities for bat
+  - bcachefs-tools # Bcachefs filesystem utilities
+  - blendr # The hacker's BLE (bluetooth low energy) browser terminal app
+  - bluetui # TUI for managing bluetooth devices
+  - bluez # Bluetooth protocol stack
+  - bluez-utils # Bluetooth utilities
+  - borg # Deduplicating backup program
+  - borgmatic # Simple wrapper for Borg backups
+  - bridge-utils # Network bridge utilities
+  - btop # Resource monitor
+  - btrfs-progs # Btrfs filesystem utilities
+  - cargo-make # Build system for Rust projects
+  - cargo-binstall # Binary installation for Rust projects
+  - chezmoi # Manage your dotfiles across multiple machines
+  - chromium # Web browser
+  - cifs-utils # CIFS/SMB filesystem utilities
+  - clamav # Antivirus engine
+  - cmake # Build system generator
+  - composer # PHP dependency manager
+  - cpufetch # Simple yet fancy CPU architecture fetching tool
+  - cups-pdf # PDF printer for CUPS
+  - davix # A client for data and file management over the WebDav, Amazon S3, Microsoft Azure and HTTP protocols
+  - dconf-editor # Graphical editor for dconf
+  - dd_rescue # A dd version that is very useful for data-recovery
+  - ddrescue # GNU data recovery tool
+  - digikam # An advanced digital photo management application
+  - dmidecode # DMI table decoder
+  - dosfstools # DOS filesystem utilities
+  - dotnet-sdk # .NET SDK
+  - dvdauthor # DVD authoring tools
+  - dvdbackup # DVD backup tool
+  - edk2-ovmf # UEFI firmware for VMs
+  - efibootmgr # EFI boot manager
+  - exfatprogs # exFAT filesystem utilities
+  - exploitdb # Offensive Security’s Exploit Database Archive
+  - f2fs-tools # F2FS filesystem utilities
+  - fastfetch # System information tool
+  - fatresize # Resize FAT filesystems
+  - fd # Simple, fast file search tool
+  - ffmpeg # Multimedia framework
+  - flatpak-builder # Flatpak app builder
+  - flatpak # Linux app sandboxing
+  - flatpak-xdg-utils # XDG utilities for Flatpak
+  - flawz # A Terminal UI for browsing security vulnerabilities (CVEs)
+  - fragments # Download manager
+  - fuse2fs # FUSE module for ext2/3/4
+  - fzf # Command-line fuzzy finder
+  - gamescope # Steam compatibility tool
+  - ghostty # GPU-accelerated terminal emulator
+  - ghostty-shell-integration # Shell integration for Ghostty
+  - ghostty-terminfo # Terminfo for Ghostty
+  - gimp # GNU Image Manipulation Program
+  - github-cli # GitHub command-line tool
+  - gnac # Audio converter
+  - gnome-boxes # Virtual machine manager for GNOME
+  - go # Go programming language
+  - gpgme # GnuPG Made Easy library
+  - gpg-tui # TUI for GnuPG
+  - gpart # Partition manipulation tool
+  - gptfdisk # GPT partitioning tool
+  - gradle # Build automation tool
+  - grafana-agent # Lightweight agent for sending metrics to Grafana Cloud
+  - grafana-agentctl # CLI for Grafana Agent
+  - gvfs # GNOME Virtual File System
+  - gvfs-mtp # MTP support for GVFS
+  - gvfs-smb # SMB support for GVFS
+  - handbrake-cli # CLI for HandBrake
+  - hashcat # Multithreaded advanced password recovery utility
+  - hdparm # ATA/IDE device utility
+  - htop # Interactive process viewer
+  - hwinfo # Hardware information tool, GUI & CLI
+  - hydra # Network logon cracker
+  - hyperv # Hyper-V drivers for Linux
+  - impala # TUI for managing wifi
+  - isd # An interactive systemd TUI
+  - ipp-usb # IPP over USB support
+  - iptables-nft # iptables with nftables backend
+  - jfsutils # JFS filesystem utilities
+  - john # Password cracker
+  - lact # Linux AMD Controller, GUI
+  - lazygit # Simple terminal UI for git commands
+  - libdvdcss # Library for accessing encrypted DVDs
+  - libdvdnav # DVD navigation library
+  - libdvdread # DVD reading library
+  - libfido2 # FIDO2 library
+  - libmtp # MTP device library
+  - libratbag # Generic input device configuration daemon
+  - libreoffice-fresh # Office suite (latest)
+  - libu2f-server # U2F server library
+  - libusb-compat # Compatibility layer for libusb-0.1
+  - libvirt # Virtualization API
+  - linux-firmware-amdgpu # AMD GPU firmware
+  - llm-manager # LLM management tool
+  - lm_sensors # Hardware monitoring tools
+  - lnav # Log file navigator
+  - lsdvd # DVD information tool
+  - lshw # Hardware lister
+  - ltrace # Library call tracer
+  - lua # Lua programming language
+  - luarocks # Lua package manager
+  - lynis # Security auditing tool
+  - make # Build automation tool
+  - man-db # Manual page utilities
+  - man-pages # Linux manual pages
+  - md-tui # Markdown TUI
+  - memtest86+ # Memory testing tool
+  - mesa # Open-source graphics drivers
+  - meson # Build system
+  - miopen-hip # AMD MIOpen library for HIP
+  - mission-center # System information and support tool from Pop!_OS
+  - mitmproxy # Interactive HTTPS proxy
+  - mkcert # Simple tool for creating certificates
+  - mtools # Utilities for manipulating MSDOS files
+  - mtpfs # MTP filesystem
+  - nano # Simple text editor
+  - nano-syntax-highlighting # Syntax highlighting for nano
+  - nautilus-python # Python bindings for Nautilus
+  - nbtscan # NetBIOS scanner
+  - ncdu # Disk usage analyzer
+  - ndisc6 # IPv6 Neighbor Discovery tool
+  - neovim # Vim-based text editor
+  - networkmanager # Network connection manager
+  - nfs-utils # NFS utilities
+  - nilfs-utils # NILFS filesystem utilities
+  - ninja # Small build system
+  - nmap # Network scanner
+  - nodejs # JavaScript runtime
+  - npm # Node.js package manager
+  - nss # Network Security Services
+  - ntfs-3g # NTFS filesystem driver
+  - nvme-cli # NVMe command-line tool
+  - nvtop # GPU monitoring tool
+  - ollama # LLM runner
+  - ollama-docs # Documentation for Ollama
+  - ollama-rocm # ROCm support for Ollama
+  - openconnect # VPN client
+  - opensc # Smart card utilities
+  - openssh # SSH client and server
+  - openvpn # VPN client
+  - oryx # A TUI for sniffing and analyzing network traffic using eBPF
+  - os-prober # Utility to detect other OSes on a system
+  - pam-u2f # U2F PAM module
+  - parted # Partition editor
+  - partimage # Disk imaging tool
+  - patchelf # ELF binary patcher
+  - pcsclite # PC/SC Lite
+  - pcsc-tools # PC/SC tools
+  - pdfcrack # PDF password cracker
+  - pdfgrep # PDF text search tool
+  - perf # Performance analysis tool
+  - php # PHP programming language
+  - pika-backup # Simple backup tool
+  - pipewire-pulse # PulseAudio support for PipeWire
+  - pkgconf # Package compiler and linker metadata toolkit
+  - podman-compose # Docker Compose for Podman
+  - podman-desktop # GUI for Podman
+  - podman-docker # Docker CLI for Podman
+  - podman # OCI container engine
+  - power-profiles-daemon # Power profiles daemon
+  - powertop # Power consumption monitor
+  - promtail # Promtail log collector for Loki
+  - protonmail-bridge # ProtonMail Bridge
+  - protonmail-bridge-core # ProtonMail Bridge core
+  - proton-vpn-gtk-app # Proton VPN GUI
+  - python-pip # Python package installer
+  - python-proton-vpn-api-core # Proton VPN API core
+  - python-proton-vpn-local-agent # Proton VPN local agent
+  - python-proton-vpn-network-manager # Proton VPN NM integration
+  - python-gobject # Python bindings for GLib/GObject/GIO/GTK
+  - python-pyu2f # Python U2F library
+  - python-yubico # Python Yubico library
+  - qrencode # QR code generator
+  - radeontool # Radeon GPU tool, CLI
+  - raider # File deletion tool
+  - ranger # Terminal file manager
+  - rclone # Cloud storage sync tool
+  - refind # UEFI boot manager
+  - refind-docs # Documentation for rEFInd
+  - restic # Fast, secure backup program
+  - ripgrep # Fast text search tool
+  - rocm-hip-sdk # ROCm HIP SDK
+  - rocm-opencl-sdk # ROCm OpenCL SDK
+  - rsync # File transfer tool
+  - ruby-certificate_authority # Ruby library for managing a certificate authority
+  - ruby # Ruby programming language
+  - rust # Systems programming language focused on safety, speed and concurrency
+  - rustup # Rust toolchain installer
+  - scrcpy # Android screen mirroring
+  - seahorse # PGP key manager
+  - sensors-applet # System tray app for hardware sensors
+  - serpl # Search engine results in terminal
+  - sd # Intuitive and fast find & replace CLI
+  - signal-desktop # Secure messenger
+  - smartmontools # SMART monitoring tools
+  - smbclient # SMB/CIFS client
+  - smbnetfs # SMB network filesystem
+  - spytrap-adb # ADB honeypot
+  - sqlmap # Automated SQL injection tool
+  - squashfs-tools # SquashFS tools
+  - sshfs # SSH filesystem
+  - starship # Shell prompt
+  - steam # Gaming platform
+  - step-ca # Step Certificate Authority
+  - step-cli # Step command-line tool
+  - stow # Symlink farm manager
+  - strace # System call tracer
+  - stress # System stress tool
+  - superfile # Fast file copy/move tool
+  - syslog-ng # Next-generation syslogd with advanced networking and filtering capabilities
+  - system-config-printer # Printer configuration tool
+  - systemctl-tui # TUI for systemctl
+  - tailscale # Mesh VPN
+  - tcpdump # Network packet analyzer
+  - tcpflow # Network traffic flow tool
+  - tesseract # OCR engine
+  - tesseract-data-eng # English language data for Tesseract OCR
+  - tesseract-data-deu # German language data for Tesseract OCR
+  - testdisk # Data recovery tool
+  - tgpt # Terminal GPT client
+  - timeshift # System restore tool
+  - tldr # Simplified man pages
+  - tmux # Terminal multiplexer
+  - tor # Anonymity network
+  - transmission-cli # BitTorrent client (CLI)
+  - transmission-gtk # BitTorrent client (GTK)
+  - trash-cli # Trash management CLI
+  - tree # Directory tree viewer
+  - ttf-droid # Droid fonts
+  - ttf-fira-code # Fira Code font
+  - ttf-fira-mono # Fira Mono font
+  - ttf-fira-sans # Fira Sans font
+  - ttf-jetbrains-mono # JetBrains Mono font
+  - ttf-nerd-fonts-symbols # Nerd Fonts Symbols
+  - ttf-roboto-mono # Roboto Mono font
+  - ttf-roboto # Roboto font family
+  - udftools # UDF filesystem tools
+  - udisks2 # Disk management service
+  - ugrep # ultra fast grep with interactive TUI, fuzzy search, boolean queries, hexdumps and more
+  - usbctl # USB device manager
+  - usbguard # USB device policy daemon
+  - usbip # USB over IP
+  - usb_modeswitch # USB mode switching tool
+  - usbutils # USB utilities
+  - usbview # USB device viewer
+  - usbmuxd # USB multiplexing daemon for iOS devices
+  - vamps # DVD and Blu-ray ripping tool
+  - veracrypt # Disk encryption software
+  - virt-install # Command line tool for creating new KVM , Xen, or Linux container guests using the libvirt hypervisor
+  - vlc # Media player
+  - vlc-plugin-alsa # ALSA plugin for VLC
+  - vlc-plugin-avahi # Avahi plugin for VLC
+  - vlc-plugin-bluray # Blu-ray plugin for VLC
+  - vlc-plugin-chromecast # Chromecast plugin for VLC
+  - vlc-plugin-dvd # DVD plugin for VLC
+  - vlc-plugin-nfs # NFS plugin for VLC
+  - vlc-plugin-ogg # OGG plugin for VLC
+  - vlc-plugin-pulse # PulseAudio plugin for VLC
+  - vlc-plugins-base # Base plugins for VLC
+  - vlc-plugins-extra # Extra plugins for VLC
+  - vlc-plugin-sftp # SFTP plugin for VLC
+  - vlc-plugin-smb # SMB plugin for VLC
+  - vlc-plugin-srt # SRT plugin for VLC
+  - vlc-plugin-upnp # UPnP plugin for VLC
+  - watchbind # Turn any shell command into a TUI with custom bindings
+  - wget # Network downloader
+  - wiki-tui # A simple and easy to use Wikipedia Text User Interface
+  - wireguard-tools # WireGuard VPN tools
+  - wireless_tools # Wireless tools
+  - wireplumber # Session and policy manager for PipeWire
+  - xfsprogs # XFS filesystem utilities
+  - yara # Malware identification tool
+  - yarn # JavaScript package manager
+  - yubico-c-client # Yubico C client
+  - yubico-c # Yubico C library
+  - yubico-pam # Yubico PAM module
+  - yubico-piv-tool # Yubico PIV tool
+  - yubikey-personalization-gui # GUI for YubiKey personalization
+  - yubikey-personalization # YubiKey personalization tool
+  - zoxide # Fast alternative to cd command
+
+  # Gnome Packages
+  - gnome-bluetooth-3.0 # Bluetooth support for GNOME
+  - gnome-dictionary # Dictionary application for GNOME
+  - gnome-firmware # Manage firmware on devices supported by fwupd
+  - gnome-keyring # GNOME keyring daemon
+  - gnome-shell-extension-appindicator # AppIndicator extension
+  - gnome-shell-extension-caffeine # Caffeine extension for GNOME Shell
+  - gnome-tweaks # GNOME configuration tool
+  - gtk4 # GTK4 library
+  - guake # Drop-down terminal for GNOME
+  - gvfs # GNOME Virtual File System
+  - libappindicator-gtk3 # Tray-API for GTK3
+  - libnautilus-extension # Extension interface for Nautilus
+  - libnautilus-extension-docs # Documentation for libnautilus-extension
+  - libadwaita # Library for building GNOME apps with Adwaita style
+  - xdg-desktop-portal # XDG desktop portal implementation
+  - xdg-desktop-portal-gnome # GNOME implementation of XDG desktop portal
+
+  # XFCE packages:
+  #  - "xfce4" # xfce desktop environment
+  #  - "lightdm" # display manager
+  #  - "lightdm-gtk-greeter" # lightdm greeter
+
+  # Cinnamon packages:
+  #  - "cinnamon" # cinnamon desktop environment
+  #  - "papirus-icon-theme" # nice icon theme
+  #  - "xed" # text editor
+  #  - "nemo" # file manager
+  #  - "evince" # pdf viewer
+  #  - "totem" # video player
+  #  - "blueberry" # bluetooth manager
+  #  - "gnome-terminal" # terminal emulator
+  #  - "lightdm" # display manager
+  #  - "lightdm-gtk-greeter" # lightdm greeter
+
+# Cosmic DE Packages
+#  - cosmic-app-library # Common library for COSMIC apps
+#  - cosmic-wallpapers # Cosmic wallpaper collection
+#  - cosmic-applets # Applets for COSMIC Panel
+#  - cosmic-bg # Background manager for COSMIC
+#  - cosmic-comp # Window compositor for COSMIC
+#  - cosmic-greeter # Login screen for COSMIC
+#  - cosmic-files # File manager from Pop!_OS (Nautilus fork, disabled until stable release)
+#  - cosmic-icon-theme # Icon theme for COSMIC
+#  - cosmic-idle # Idle manager for COSMIC
+#  - cosmic-launcher # Application launcher for COSMIC
+#  - cosmic-player # Media player for COSMIC
+#  - cosmic-notifications # Notification system for COSMIC
+#  - cosmic-osd # On-screen display for COSMIC
+#  - cosmic-panel # Panel for COSMIC
+#  - cosmic-randr # Display settings for COSMIC
+#  - cosmic-screenshot # Screenshot tool for COSMIC
+#  - cosmic-session # Session manager for COSMIC
+#  - cosmic-settings # Settings app for COSMIC
+#  - cosmic-settings-daemon # Settings daemon for COSMIC
+#  - cosmic-store # App store for COSMIC
+#  - cosmic-terminal # Terminal emulator for COSMIC
+#  - cosmic-text-editor # Text editor for COSMIC
+#  - cosmic-workspaces # Workspace manager for COSMIC
+#  - xdg-desktop-portal-cosmic # XDG desktop portal implementation for COSMIC
+
+  # Hyprland Packages
+  #  - hyprland # Dynamic tiling Wayland compositor
+  #  - hyprcursor # Cursor themes for Hyprland
+  #  - hyprgraphics # Graphics utilities for Hyprland
+  #  - hypridle # Input device management for Hyprland
+  #  - hyprland-protocols # Protocols for Hyprland
+  #  - hyprlock # Screen locker for Hyprland
+  #  - hyprpolkitagent # Polkit agent for Hyprland
+  #  - hyprshot # Screenshot tool for Hyprland
+  #  - hyprsunset # An application to enable a blue light filter based on sunset and sunrise times
+  #  - hyprutils # Utilities for Hyprland
+  #  - xdg-desktop-portal-hyprland # XDG desktop portal implementation for Hyprland
+  #  - waybar # Highly customizable bar for Wayland
+  #  - rofi # Window switcher, application launcher and dmenu replacement
+
+  # Chaotic-AUR Packages
+  - chaotic-keyring # Keyring for Chaotic-AUR
+  - chaotic-mirrorlist # Mirrorlist for Chaotic-AUR
+  - input-remapper-git # Input Remapper (git version)
+  - auto-cpufreq # Automatic CPU speed & power optimizer for Linux
+  - go-mtpfs-git # MTP filesystem for Go (git version)
+  - simple-mtpfs # Simple MTP filesystem
+  - webapp-manager # Web application manager
+  - hardinfo2 # System information and benchmark tool
+  - openrgb-plugin-hardware-sync-git # Hardware Sync plugin for OpenRGB (git version)
+
+aur-packages:
+  - brave-bin # Brave web browser (binary release)
+  - dxvk-bin # Vulkan-based translation layer for Direct3D 9/10/11 to Vulkan
+  - glance-bin # A self-hosted dashboard that puts all your feeds in one place
+  - google-chrome # Google Chrome web browser
+  - graylog # Log management tool
+#  - input-remapper-bin # Input Remapper (binary release)
+  - linutil-bin # Linux utilities by Chris Titus Tech
+  - microsoft-edge-stable-bin # Microsoft Edge web browser (stable)
+  - nautilus-admin-gtk4 # Nautilus Admin with GTK4 support
+  - nautilus-checksums # Checksums extension for Nautilus
+  - nautilus-copy-path # Copy Path extension for Nautilus
+  - powershell-bin # Microsoft PowerShell binary
+  - proton-mail-bin # Proton Mail desktop client
+  - proton-pass-bin # Proton Pass desktop client
+  - tabby-bin # Terminal emulator
+  - turtle # Git repository manager in nautilus
+  - visual-studio-code-bin # Official closed source binary
+  - yubico-authenticator-bin # Yubico Authenticator (binary release)
+
+services:
+  - NetworkManager # Network connection manager, handles network interfaces and connections
+  - protonvpn.service # ProtonVPN daemon, provides VPN connectivity
+  - tailscaled.service # Tailscale mesh VPN daemon, enables secure networking
+  - ollama.service # Ollama LLM runner service, manages local LLMs
+  - pcscd.service # PC/SC smart card daemon, enables smart card support
+  - polkit # PolicyKit authentication agent, manages system permissions
+  - gnome-keyring-daemon # GNOME keyring daemon, stores and manages secrets and passwords
+  - bluetooth.service # Bluetooth service, manages Bluetooth devices and connections
+
+commands:
+  - sudo systemctl enable lactd # Enable lactd service for AMD GPU power management
+
+package-repos:
+  - name: chaotic-aur
+    repo-url: https://cdn-mirror.chaotic.cx/chaotic-aur/$arch
+  - name: arch-mact2
+    repo-url: https://mirror.funami.tech/$repo/os/$arch/
+  - name: archstrike
+    repo-url: https://mirror.archstrike.org/$arch/$repo
+  - name: blackarch
+    repo-url: https://mirrors.dotsrc.org/blackarch/blackarch/os/x86_64/
+#  - name: bioarchlinux
+#    repo-url: https://repo.bioarchlinux.org/$repo/$arch
+#    sig-level: Optional TrustAll
+#  - name: selinux
+#    repo-url: https://mirror1.archlinuxhardened.org/$repo/os/$arch
+#    sig-level: Optional TrustAll
+#  - name: andontie
+#    repo-url: https://aur.andontie.net/$arch
+#    sig-level: Optional TrustAll
+#  - name: cachyos
+#    repo-url: https://mirror.cachyos.org/repo/$repo/$arch
+#    sig-level: Optional TrustAll
+#  - name: arch4edu
+#    repo-url: https://arch4edu.org/$arch
+#    sig-level: Optional TrustAll

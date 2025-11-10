@@ -7,3 +7,5 @@ rust/build
 
 # TL40-Dots repository content (referenced by dotfiles scripts)
 /TL40-Dots
+
+.fake
