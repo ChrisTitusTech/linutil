@@ -1,5 +1,6 @@
 directories = [
     "applications-setup",
+    "dotfiles",
     "gaming",
     "security",
     "system-setup",
