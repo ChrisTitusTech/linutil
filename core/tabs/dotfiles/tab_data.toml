@@ -1,0 +1,40 @@
+name = "Dotfiles & Personalization"
+
+[[data]]
+name = "TL40 Dotfiles"
+
+[[data.entries]]
+name = "TL40 Dotfiles Restore"
+description = "Clone and restore TL40-Dots dotfiles repository. Includes Fish shell, Starship prompt, Atuin history, and custom configurations."
+script = "tl40-dotfiles-restore.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Desktop Shortcuts Restore"
+description = "Restore desktop keyboard shortcuts for GNOME or KDE from TL40-Dots repository."
+script = "desktop-shortcuts-restore.sh"
+task_list = "I"
+
+[[data]]
+name = "Shell & Terminal Tools"
+
+[[data.entries]]
+name = "Atuin Setup"
+description = "Install Atuin - a magical shell history tool that syncs, searches, and backs up your shell history. Provides enhanced history with sync capabilities across machines."
+script = "atuin-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Homebrew Setup"
+description = "Install Homebrew package manager for Linux. Homebrew allows you to install software on Linux similar to macOS, with a large repository of packages."
+script = "homebrew-setup.sh"
+task_list = "I"
+
+[[data]]
+name = "Network & VPN"
+
+[[data.entries]]
+name = "Tailscale Setup"
+description = "Install and configure Tailscale VPN. Tailscale creates a secure network between your devices using WireGuard, making it easy to access your machines from anywhere."
+script = "tailscale-setup.sh"
+task_list = "I"
