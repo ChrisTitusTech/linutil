@@ -45,7 +45,7 @@ configureRetroArch() {
 	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
 		        	libretro-beetle-psx libretro-play libretro-ppsspp \
 		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s libretro-bsnes \
-		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melondsds \
+		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melonds \
 		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos libretro-blastem
 
 		        # Only in AUR
