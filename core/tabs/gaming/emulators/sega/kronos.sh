@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installkronos() {
 	printf "%b\n" "${YELLOW}Installing kronos...${RC}"

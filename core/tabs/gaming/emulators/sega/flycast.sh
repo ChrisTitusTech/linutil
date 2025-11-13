@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installflycast() {
 	printf "%b\n" "${YELLOW}Installing flycast...${RC}"

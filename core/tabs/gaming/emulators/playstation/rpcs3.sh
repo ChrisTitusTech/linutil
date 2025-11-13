@@ -1,14 +1,14 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installrpcs3() {
 	printf "%b\n" "${YELLOW}Installing RPCS3...${RC}"
 	if ! command_exists rpcs3; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/rpcs3-latest-bin/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm rpcs3-latest-bin
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/rpcs3-bin/ || true
+	        	"$AUR_HELPER" -S --needed --noconfirm rpcs3-bin
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak install --noninteractive net.rpcs3.RPCS3
@@ -25,8 +25,8 @@ uninstallrpcs3() {
 	if command_exists rpcs3; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/rpcs3-latest-bin/
-			    "$AUR_HELPER" -R --noconfirm rpcs3-latest-bin
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/rpcs3-bin/
+			    "$AUR_HELPER" -R --noconfirm rpcs3-bin
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak install --noninteractive net.rpcs3.RPCS3

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installsnes9x() {
 	printf "%b\n" "${YELLOW}Installing snes9x...${RC}"

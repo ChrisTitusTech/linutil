@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installmGBA() {
 	printf "%b\n" "${YELLOW}Installing mGBA...${RC}"

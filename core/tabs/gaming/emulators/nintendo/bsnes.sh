@@ -1,14 +1,14 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installbsnes() {
 	printf "%b\n" "${YELLOW}Installing bsnes...${RC}"
 	if ! command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/bsnes/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm bsnes
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/bsnes-hd/ || true
+	        	"$AUR_HELPER" -S --needed --noconfirm bsnes-hd
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -27,8 +27,8 @@ uninstallbsnes() {
 	if command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/bsnes/
-			    "$AUR_HELPER" -R --noconfirm bsnes
+	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/bsnes-hd/
+			    "$AUR_HELPER" -R --noconfirm bsnes-hd
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive dev.bsnes.bsnes

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installPCSX2() {
 	printf "%b\n" "${YELLOW}Installing PCSX2...${RC}"

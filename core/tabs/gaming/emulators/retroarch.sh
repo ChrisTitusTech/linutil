@@ -41,11 +41,15 @@ configureRetroArch() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y libretro-mgba libretro-nestopia libretro-bsnes-mercury libretro-pcsx-rearmed
 	        	;;
 	        pacman)
+	        	# Available in extra
 	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
-		        	libretro-beetle-psx libretro-pcsx2-launcher libretro-play libretro-ppsspp \
-		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s \
-		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melondsds-bin \
+		        	libretro-beetle-psx libretro-play libretro-ppsspp \
+		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s libretro-bsnes \
+		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melondsds \
 		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos libretro-blastem
+
+		        # Only in AUR
+		        "$AUR_HELPER" -S --needed --noconfirm libretro-pcsx2-launcher
 	            ;;
 	        *)
 	            exit 1

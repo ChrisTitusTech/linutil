@@ -30,11 +30,11 @@ task_list = "FM"
 [[data]]
 name = "Nintendo Emulators"
 
-[[data.entries]]
-name = "Mesen 2"
-description = "NES and SNES Emulator. NO Games are included"
-script = "emulators/nintendo/mesen2.sh"
-task_list = "FM"
+# [[data.entries]]
+# name = "Mesen 2"
+# description = "NES and SNES Emulator. NO Games are included"
+# script = "emulators/nintendo/mesen2.sh"
+# task_list = "FM"
 
 [[data.entries]]
 name = "snes9x"
@@ -87,11 +87,11 @@ task_list = "FM"
 [[data]]
 name = "Playstation Emulators"
 
-[[data.entries]]
-name = "PCSX"
-description = "A Playstation emulator. NO Games or Bios' are included"
-script = "emulators/playstation/pcsx.sh"
-task_list = "FM"
+# [[data.entries]]
+# name = "PCSX"
+# description = "A Playstation emulator. NO Games or Bios' are included"
+# script = "emulators/playstation/pcsx.sh"
+# task_list = "FM"
 
 [[data.entries]]
 name = "PCSX2"

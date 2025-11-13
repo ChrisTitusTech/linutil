@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installblastem() {
 	printf "%b\n" "${YELLOW}Installing blastem...${RC}"

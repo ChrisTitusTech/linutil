@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installxemu() {
 	printf "%b\n" "${YELLOW}Installing xemu...${RC}"

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installyabause() {
 	printf "%b\n" "${YELLOW}Installing yabause...${RC}"

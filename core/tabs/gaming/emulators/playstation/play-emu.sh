@@ -1,15 +1,15 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installPlay() {
 	printf "%b\n" "${YELLOW}Installing Play!...${RC}"
 	if ! command_exists play-emu; then
 	    case "$PACKAGER" in
-	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu-git/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm play-emu-git
-	            ;;
+	        # pacman)
+	        # 	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu/ || true
+	        # 	"$AUR_HELPER" -S --needed --noconfirm play-emu
+	        #     ;;
 	        *)
 	        	if command_exists flatpak; then
 	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.purei.Play
@@ -26,11 +26,11 @@ uninstallPlay() {
 	printf "%b\n" "${YELLOW}Uninstalling Play!...${RC}"
 	if command_exists play-emu; then
 	    case "$PACKAGER" in
-	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu-git/
-			    "$AUR_HELPER" -R --noconfirm play-emu-git
-	            ;;
-	        *)
+	        # pacman)
+	        # 	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu/
+			#     "$AUR_HELPER" -R --noconfirm play-emu
+	        #     ;;
+	        # *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive org.purei.Play
 	            exit 1
 	            ;;

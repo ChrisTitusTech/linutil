@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installxenia() {
 	printf "%b\n" "${YELLOW}Installing xenia...${RC}"

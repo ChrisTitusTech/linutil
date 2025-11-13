@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installgopher64() {
 	printf "%b\n" "${YELLOW}Installing gopher64plus...${RC}"

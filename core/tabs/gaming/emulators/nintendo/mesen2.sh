@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installMesen2() {
 	printf "%b\n" "${YELLOW}Installing Mesen2...${RC}"

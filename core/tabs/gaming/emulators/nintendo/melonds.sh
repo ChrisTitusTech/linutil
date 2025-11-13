@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installMelonDS() {
 	printf "%b\n" "${YELLOW}Installing MelonDS...${RC}"

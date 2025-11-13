@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installRyujinx() {
 	printf "%b\n" "${YELLOW}Installing Ryujinx...${RC}"

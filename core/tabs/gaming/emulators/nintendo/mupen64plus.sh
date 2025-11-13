@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../../../common-script.sh
 
 installmupen64plus() {
 	printf "%b\n" "${YELLOW}Installing mupen64plus...${RC}"
