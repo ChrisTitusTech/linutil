@@ -32,5 +32,5 @@ https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
 - [ ] My code adheres to the coding and style guidelines of the project.
 - [ ] I have performed a self-review of my own code.
 - [ ] I have commented my code, particularly in hard-to-understand areas.
-- [ ] I have made corresponding changes to the documentation.
+- [ ] I have made corresponding changes to the documentation (`cargo xtask docgen`).
 - [ ] My changes generate no errors/warnings/merge conflicts.
