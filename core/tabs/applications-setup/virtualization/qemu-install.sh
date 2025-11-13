@@ -4,20 +4,30 @@
 
 installQEMUDesktop() {
     printf "%b\n" "${YELLOW}Installing QEMU.${RC}"
+    sh libvirt.sh
     if ! command_exists qemu-img; then
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu-utils qemu-system-"$ARCH" qemu-system-gui
+
+                "$ESCALATION_TOOL"  systemctl start libvirtd
+                #sets the libvirtd service to start on system start
+                "$ESCALATION_TOOL"  systemctl enable libvirtd
+
+                #add current user to virt manager group
+                "$ESCALATION_TOOL"  usermod -aG "libvirt" "$USER"
+                "$ESCALATION_TOOL"  usermod -aG "kvm" "$USER"
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y @virtualization 
 
-                sudo systemctl start libvirtd
+                "$ESCALATION_TOOL"  systemctl start libvirtd
                 #sets the libvirtd service to start on system start
-                sudo systemctl enable libvirtd
+                "$ESCALATION_TOOL"  systemctl enable libvirtd
 
                 #add current user to virt manager group
-                sudo usermod -a -G "libvirt" "$USER"
+                "$ESCALATION_TOOL"  usermod -aG "libvirt" "$USER"
+                "$ESCALATION_TOOL"  usermod -aG "kvm" "$USER"
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
@@ -35,8 +45,6 @@ installQEMUDesktop() {
     else
         printf "%b\n" "${GREEN}QEMU already installed.${RC}"
     fi
-    sh libvirt.sh
-    #"$ESCALATION_TOOL" systemctl status qemu-kvm.service
 }
 
 installQEMUEmulators() {
