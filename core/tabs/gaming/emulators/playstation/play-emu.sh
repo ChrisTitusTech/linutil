@@ -30,7 +30,7 @@ uninstallPlay() {
 	        # 	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu/
 			#     "$AUR_HELPER" -R --noconfirm play-emu
 	        #     ;;
-	        # *)
+	        *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive org.purei.Play
 	            exit 1
 	            ;;
