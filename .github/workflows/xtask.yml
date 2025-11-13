@@ -1,0 +1,59 @@
+name: XTask Checks
+
+on:
+  pull_request:
+    paths:
+      - "xtask"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo"
+      - "core/tabs"
+      - "docs"
+  push:
+    paths:
+      - "xtask"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo"
+      - "core/tabs"
+      - "docs"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  docgen:
+    name: DocGen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+
+      - name: Cache Cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-index-
+
+      - name: Run cargo xtask docgen
+        run: cargo xtask docgen
+
+      - name: Check uncommitted documentation changes
+        run: |
+          if [[ -n $(git status --porcelain docs) ]]; then
+            echo "Please run 'cargo xtask docgen' and commit the changes.";
+            git --no-pager diff docs/generated;
+            exit 1;
+          fi
