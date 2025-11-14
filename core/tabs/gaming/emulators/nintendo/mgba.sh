@@ -11,9 +11,8 @@ installmGBA() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y mgba-qt
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mgba-qt/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm lua
-	        	"$AUR_HELPER" -S --needed --noconfirm mgba-qt
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter lua
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter mgba-qt
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -35,8 +34,7 @@ uninstallmGBA() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y mgba-qt
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mgba-qt/ || true
-			    "$AUR_HELPER" -R --noconfirm mgba-qt
+			    "$AUR_HELPER" -R --noconfirm --clearafter mgba-qt
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.mgba.mGBA

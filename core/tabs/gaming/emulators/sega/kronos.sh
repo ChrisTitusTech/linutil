@@ -7,8 +7,7 @@ installkronos() {
 	if ! command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/kronos/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm kronos
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter kronos
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -25,8 +24,7 @@ uninstallkronos() {
 	if command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/kronos/
-			    "$AUR_HELPER" -R --noconfirm kronos
+			    "$AUR_HELPER" -R --noconfirm --clearafter kronos
 	            ;;
 	        *)
 	            exit 1

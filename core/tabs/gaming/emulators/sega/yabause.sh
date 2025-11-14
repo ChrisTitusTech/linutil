@@ -10,9 +10,8 @@ installyabause() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/yabause-qt5/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm cmake3
-	        	"$AUR_HELPER" -S --needed --noconfirm yabause-qt5
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter cmake3
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter yabause-qt5
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -32,8 +31,7 @@ uninstallyabause() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y yabause
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/yabause-qt5/ || true
-			    "$AUR_HELPER" -R --noconfirm yabause-qt5
+			    "$AUR_HELPER" -R --noconfirm --clearafter yabause-qt5
 	            ;;
 	        *)
 	            exit 1

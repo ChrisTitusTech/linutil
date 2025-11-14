@@ -13,8 +13,7 @@ installgopher64() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y gopher64
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/gopher64/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm gopher64
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter gopher64
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -39,8 +38,7 @@ uninstallgopher64() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" uninstall -y gopher64
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/gopher64/
-			    "$AUR_HELPER" -R --noconfirm gopher64
+			    "$AUR_HELPER" -R --noconfirm --clearafter gopher64
 	            ;;
 	        *)
 	            if command_exists flatpak; then

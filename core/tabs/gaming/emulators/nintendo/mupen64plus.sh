@@ -13,8 +13,7 @@ installmupen64plus() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y mupen64plus
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mupen64plus/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm mupen64plus
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter mupen64plus
 	            ;;
 	        *)
 	        	printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -37,8 +36,7 @@ uninstallmupen64plus() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" uninstall -y mupen64plus
 	        	;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/mupen64plus/
-			    "$AUR_HELPER" -R --noconfirm mupen64plus
+			    "$AUR_HELPER" -R --noconfirm --clearafter mupen64plus
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

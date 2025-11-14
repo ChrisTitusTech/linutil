@@ -7,8 +7,7 @@ installRyujinx() {
 	if ! command_exists ryujinx; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/ryujinx/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm ryujinx
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter ryujinx
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -27,8 +26,7 @@ uninstallRyujinx() {
 	if command_exists ryujinx; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/ryujinx/
-			    "$AUR_HELPER" -R --noconfirm ryujinx
+			    "$AUR_HELPER" -R --noconfirm --clearafter ryujinx
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.ryubing.Ryujinx

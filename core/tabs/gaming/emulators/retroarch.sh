@@ -10,8 +10,7 @@ installRetroArch() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y retroarch retroarch-assets
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/retroarch/ "$HOME"/.cache/yay/retroarch-assets-xmb/ "$HOME"/.cache/yay/retroarch-assets-ozone/ "$HOME"/.cache/yay/retroarch-assets-glui/ "$HOME"/.cache/yay/libretro-core-info/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm retroarch retroarch-assets-xmb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter retroarch retroarch-assets-xmb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -42,14 +41,14 @@ configureRetroArch() {
 	        	;;
 	        pacman)
 	        	# Available in extra
-	        	"$AUR_HELPER" -S --needed --noconfirm libretro-core-info \
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter libretro-core-info \
 		        	libretro-beetle-psx libretro-play libretro-ppsspp \
 		        	libretro-nestopia libretro-mesen libretro-mgba libretro-snes9x libretro-mesen-s libretro-bsnes \
 		        	libretro-parallel-n64 libretro-mupen64plus-next libretro-dolphin libretro-melonds \
 		        	libretro-flycast libretro-genesis-plus-gx libretro-kronos libretro-blastem
 
 		        # Only in AUR
-		        "$AUR_HELPER" -S --needed --noconfirm libretro-pcsx2-launcher
+		        "$AUR_HELPER" -S --needed --noconfirm --clearafter libretro-pcsx2-launcher
 	            ;;
 	        *)
 	            exit 1
@@ -68,8 +67,7 @@ uninstallRetroArch() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y retroarch* libretro*
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/retroarch/ "$HOME"/.cache/yay/retroarch-assets-xmb/ "$HOME"/.cache/yay/retroarch-assets-ozone/ "$HOME"/.cache/yay/retroarch-assets-glui/ "$HOME"/.cache/yay/libretro-core-info/ || true
-			    "$AUR_HELPER" -R --noconfirm retroarch* libretro*
+	        	"$AUR_HELPER" -R --noconfirm --clearafter retroarch* libretro*
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.libretro.RetroArch

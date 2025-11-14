@@ -10,8 +10,7 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/pcsx-redux-git/ || true
-	        	"$AUR_HELPER" -S --needed --noconfirm pcsxr
+	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter pcsxr
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -31,8 +30,7 @@ uninstallPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/pcsx-redux-git/
-			    "$AUR_HELPER" -R --noconfirm pcsxr
+			    "$AUR_HELPER" -R --noconfirm --clearafter pcsxr
 	            ;;
 	        *)
 	            exit 1

@@ -7,8 +7,7 @@ installPlay() {
 	if ! command_exists play-emu; then
 	    case "$PACKAGER" in
 	        # pacman)
-	        # 	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu/ || true
-	        # 	"$AUR_HELPER" -S --needed --noconfirm play-emu
+	        # 	"$AUR_HELPER" -S --needed --noconfirm --clearafter play-emu
 	        #     ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -27,8 +26,7 @@ uninstallPlay() {
 	if command_exists play-emu; then
 	    case "$PACKAGER" in
 	        # pacman)
-	        # 	"$ESCALATION_TOOL" rm -r "$HOME"/.cache/yay/play-emu/
-			#     "$AUR_HELPER" -R --noconfirm play-emu
+			#     "$AUR_HELPER" -R --noconfirm --clearafter play-emu
 	        #     ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive org.purei.Play
