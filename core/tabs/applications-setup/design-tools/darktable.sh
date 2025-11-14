@@ -10,7 +10,7 @@ installDarktable() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y darktable
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -S --needed --noconfirm darktable
+			    "$AUR_HELPER" -S --needed --noconfirm --clearafter darktable
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallDarktable() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y darktable
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm darktable
+			    "$AUR_HELPER" -R --noconfirm --clearafter darktable
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.darktable.Darktable

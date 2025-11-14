@@ -10,7 +10,7 @@ installBlender() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y blender
 	            ;;
 	        pacman)
-		        "$AUR_HELPER" -S --needed --noconfirm blender
+		        "$AUR_HELPER" -S --needed --noconfirm --clearafter blender
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallBlender() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y blender
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm blender
+			    "$AUR_HELPER" -R --noconfirm --clearafter blender
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.blender.Blender

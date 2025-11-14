@@ -10,7 +10,7 @@ installKrita() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y krita
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -S --needed --noconfirm krita
+			    "$AUR_HELPER" -S --needed --noconfirm --clearafter krita
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallKrita() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y krita
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm krita
+			    "$AUR_HELPER" -R --noconfirm --clearafter krita
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.kde.krita
