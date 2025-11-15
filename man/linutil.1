@@ -1,5 +1,5 @@
 .\" manpage for Linutil
-.TH "linutil" "1" "November 2024" "Linutil 2024.10.31" "Linutil Manual"
+.TH "linutil" "1" "October 2025" "Linutil" "Linutil Manual"
 
 .SH NAME
 linutil \- Chris Titus Tech's Linux Toolbox
@@ -27,18 +27,6 @@ curl -fsSL https://christitus.com/linuxdev | sh
 Path to the configuration file.
 
 .TP
-\fB\-\-override\-validation\fR
-Show all available entries, disregarding compatibility checks (\fBUNSAFE\fR).
-
-.TP
-\fB\-\-size\-bypass\fR
-Bypass the terminal size limit.
-
-.TP
-\fB\-y\fR, \fB\-\-skip\-confirmation\fR
-Skip confirmation prompt before executing commands.
-
-.TP
 \fB\-t\fR, \fB\-\-theme\fR \fI<theme>\fR
 Set the theme to use in the TUI.
 .br
@@ -47,6 +35,26 @@ Possible values:
 \fIcompatible\fR.
 .br
 Defaults to \fIdefault\fR.
+
+.TP
+\fB\-y\fR, \fB\-\-skip\-confirmation\fR
+Skip confirmation prompt before executing commands.
+
+.TP
+\fB\-y\fR, \fB\-\-override\-validation\fR
+Show all available options, disregarding compatibility checks (\fBUNSAFE\fR).
+
+.TP
+\fB\-s\fR, \fB\-\-size\-bypass\fR
+Bypass the terminal size limit.
+
+.TP
+\fB\-m\fR, \fB\-\-mouse\fR
+Enable mouse interaction.
+
+.TP
+\fB\-r\fR, \fB\-\-bypass\-root\fR
+Bypass root user check.
 
 .TP
 \fB\-h\fR, \fB\-\-help\fR
@@ -62,7 +70,7 @@ https://christitustech.github.io/linutil
 
 .SH AUTHOR
 Written by Adam Perkowski.
-<adas1per@protonmail.com>
+<me@adamperkowski.dev>
 
 .SH REPORTING BUGS
 Since the project is still in active development, you may encounter some issues.

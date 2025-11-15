@@ -1,0 +1,8 @@
+# Chris rules EVERYTHING (including paths listed below)
+*          @ChrisTitusTech
+
+# Nix stuff
+# We want the whole `nix` directory here in case we add custom tests/script later
+*.nix      @adamperkowski
+flake.lock @adamperkowski
+/nix/      @adamperkowski
