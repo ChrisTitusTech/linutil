@@ -246,7 +246,7 @@ installIsoInfo() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install genisoimage
             ;;
         pacman)
-        	"$AUR_HELPER" -S --needed -noconfirm cdrtools
+        	"$AUR_HELPER" -S --needed -noconfirm --cleanafter cdrtools
         	;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

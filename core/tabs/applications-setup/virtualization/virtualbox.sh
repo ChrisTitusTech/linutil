@@ -35,7 +35,7 @@ installVirtualBox() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y virtualbox-guest-tools
             ;;
         pacman)
-            "$AUR_HELPER" -S --needed --noconfirm virtualbox virtualbox-host-dkms virtualbox-guest-utils virtualbox-guest-iso virtualbox-host-modules-lts
+            "$AUR_HELPER" -S --needed --noconfirm --cleanafter virtualbox virtualbox-host-dkms virtualbox-guest-utils virtualbox-guest-iso virtualbox-host-modules-lts
 
             vboxVersion=$(vboxmanage --version | awk 'NR==8{print}' | cut -f1 -d"r")
             wget -c -O /home/"$USER"/Downloads/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack https://download.virtualbox.org/virtualbox/"${vboxVersion}"/Oracle_VirtualBox_Extension_Pack-"${vboxVersion}".vbox-extpack
@@ -58,7 +58,7 @@ uninstallVirtualBox() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y virtualbox*
                 ;;
             pacman)
-                "$AUR_HELPER" -R --noconfirm virtualbox-bin
+                "$AUR_HELPER" -R --noconfirm --cleanafter virtualbox-bin
                 ;;
             *)
                 exit 1

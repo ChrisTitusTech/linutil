@@ -14,10 +14,10 @@ checkKVM() {
 setupLibvirt() {
     printf "%b\n" "${YELLOW}Configuring Libvirt.${RC}"
     if "$PACKAGER" -Q | grep -q "iptables "; then
-        "$ESCALATION_TOOL" "$PACKAGER" -Rdd --noconfirm iptables
+        "$ESCALATION_TOOL" "$PACKAGER" -Rdd --noconfirm --cleanafter iptables
     fi
 
-    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm dnsmasq iptables-nft
+    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm --cleanafter dnsmasq iptables-nft
     "$ESCALATION_TOOL" sed -i 's/^#\?firewall_backend\s*=\s*".*"/firewall_backend = "iptables"/' "/etc/libvirt/network.conf"
 
     if systemctl is-active --quiet polkit; then
@@ -60,7 +60,7 @@ installLibvirt() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y libvirt libvirt-daemon
             ;;
         pacman)
-            "$AUR_HELPER" -S --needed --noconfirm libvirt dmidecode
+            "$AUR_HELPER" -S --needed --noconfirm --cleanafter libvirt dmidecode
             setupLibvirt
 		    ;;
 		*)

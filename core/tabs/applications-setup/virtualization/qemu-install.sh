@@ -33,7 +33,7 @@ installQEMUDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y qemu
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm qemu-desktop
+                "$AUR_HELPER" -S --needed --noconfirm --cleanafter qemu-desktop
                 installQEMUEmulators
                 ;;
             *)
@@ -53,7 +53,7 @@ installQEMUEmulators() {
         pacman)
             if ! "$PACKAGER" -Q | grep -q "qemu-emulators-full "; then
                 printf "%b\n" "${YELLOW}Installing QEMU-Emulators.${RC}"
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qemu-emulators-full swtpm
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm --cleanafter qemu-emulators-full swtpm
             else
                 printf "%b\n" "${GREEN}QEMU-Emulators already installed.${RC}"
             fi
@@ -71,7 +71,7 @@ uninstallQEMU() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y qemu*
                 ;;
             pacman)
-                "$AUR_HELPER" -R --noconfirm qemu-desktop
+                "$AUR_HELPER" -R --noconfirm --cleanafter qemu-desktop
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

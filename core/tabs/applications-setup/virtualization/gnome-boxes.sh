@@ -9,7 +9,7 @@ installBoxes() {
             "$ESCALATION_TOOL" "$PACKAGER" -y install gnome-boxes
             ;;
         pacman)
-            "$AUR_HELPER" -S --needed --noconfirm gnome-boxes 
+            "$AUR_HELPER" -S --needed --noconfirm --cleanafter gnome-boxes 
             ;;
         *)
             if command_exists flatpak; then
@@ -27,7 +27,7 @@ uninstallBoxes() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y gnome-boxes
                 ;;
             pacman)
-                "$AUR_HELPER" -R --noconfirm gnome-boxes
+                "$AUR_HELPER" -R --noconfirm --cleanafter gnome-boxes
                 ;;
             *)
                 "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gnome.Boxes

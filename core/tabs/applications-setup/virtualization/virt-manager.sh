@@ -20,7 +20,7 @@ installVirtManager() {
     			sudo usermod -a -G "libvirt" "$USER"
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm virt-manager virt-viewer
+                "$AUR_HELPER" -S --needed --noconfirm --cleanafter virt-manager virt-viewer
                 ;;
             *)
                 if command_exists flatpak; then
@@ -43,7 +43,7 @@ uninstallVirtManager() {
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y virt-manager*
                 ;;
             pacman)
-                "$AUR_HELPER" -R --noconfirm virt-manager
+                "$AUR_HELPER" -R --noconfirm --cleanafter virt-manager
                 ;;
             *)
                 "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.virt_manager.virt-manager
