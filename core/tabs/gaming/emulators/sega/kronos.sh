@@ -7,7 +7,7 @@ installkronos() {
 	if ! command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter kronos
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter kronos
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -24,7 +24,7 @@ uninstallkronos() {
 	if command_exists kronos; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter kronos
+			    "$AUR_HELPER" -R --noconfirm --cleanafter kronos
 	            ;;
 	        *)
 	            exit 1

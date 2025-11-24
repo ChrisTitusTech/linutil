@@ -7,7 +7,7 @@ installbsnes() {
 	if ! command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter bsnes-hd
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter bsnes-hd
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -26,7 +26,7 @@ uninstallbsnes() {
 	if command_exists bsnes; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter bsnes-hd
+			    "$AUR_HELPER" -R --noconfirm --cleanafter bsnes-hd
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive dev.bsnes.bsnes

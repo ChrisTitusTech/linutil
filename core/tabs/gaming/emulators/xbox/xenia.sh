@@ -7,7 +7,7 @@ installxenia() {
 	if ! command_exists xenia; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter xenia-canary-bin
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter xenia-canary-bin
 	            ;;
 	        *)
 	        	printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -24,7 +24,7 @@ uninstallxenia() {
 	if command_exists xenia; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter xenia-canary-bin
+			    "$AUR_HELPER" -R --noconfirm --cleanafter xenia-canary-bin
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

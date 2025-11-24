@@ -7,7 +7,7 @@ installMelonDS() {
 	if ! command_exists melonDS; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter melonds-bin
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter melonds-bin
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -26,7 +26,7 @@ uninstallMelonDS() {
 	if command_exists melonDS; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter melonds-bin
+			    "$AUR_HELPER" -R --noconfirm --cleanafter melonds-bin
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.kuribo64.melonDS

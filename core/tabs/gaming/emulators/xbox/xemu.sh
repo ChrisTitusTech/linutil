@@ -7,7 +7,7 @@ installxemu() {
 	if ! command_exists xemu; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter xemu-bin
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter xemu-bin
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak install --noninteractive app.xemu.xemu
@@ -24,7 +24,7 @@ uninstallxemu() {
 	if command_exists xemu; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter xemu-bin
+			    "$AUR_HELPER" -R --noconfirm --cleanafter xemu-bin
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak install --noninteractive app.xemu.xemu

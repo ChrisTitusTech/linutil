@@ -7,7 +7,7 @@ installMesen2() {
 	if ! command_exists mesen2; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter mesen2-git
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter mesen2-git
 	            ;;
 	        *)
 	        	printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -24,7 +24,7 @@ uninstallMesen2() {
 	if command_exists mesen2; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter mesen2-git
+			    "$AUR_HELPER" -R --noconfirm --cleanafter mesen2-git
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

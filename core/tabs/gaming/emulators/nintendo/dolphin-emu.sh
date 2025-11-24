@@ -10,7 +10,7 @@ installDolphin() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y dolphin-emu
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter dolphin-emu
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter dolphin-emu
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallDolphin() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y dolphin-emu
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter dolphin-emu
+			    "$AUR_HELPER" -R --noconfirm --cleanafter dolphin-emu
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.DolphinEmu.dolphin-emu

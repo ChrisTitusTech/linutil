@@ -7,7 +7,7 @@ installflycast() {
 	if ! command_exists flycast; then
 	    case "$PACKAGER" in
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter flycast
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter flycast
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.flycast.Flycast
@@ -24,7 +24,7 @@ uninstallflycast() {
 	if command_exists flycast; then
 	    case "$PACKAGER" in
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter flycast
+			    "$AUR_HELPER" -R --noconfirm --cleanafter flycast
 	            ;;
 	        *)
 	        	"$ESCALATION_TOOL" flatpak install --noninteractive opp.flycast.Flycast

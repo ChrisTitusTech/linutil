@@ -10,7 +10,7 @@ installPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter pcsxr
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter pcsxr
 	            ;;
 	        *)
 	            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -30,7 +30,7 @@ uninstallPCSX() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y pcsxr
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter pcsxr
+			    "$AUR_HELPER" -R --noconfirm --cleanafter pcsxr
 	            ;;
 	        *)
 	            exit 1

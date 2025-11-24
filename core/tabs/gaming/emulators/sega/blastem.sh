@@ -10,7 +10,7 @@ installblastem() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y blastem
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter blastem
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter blastem
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallblastem() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y blastem
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter blastem
+			    "$AUR_HELPER" -R --noconfirm --cleanafter blastem
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.retrodev.blastem
