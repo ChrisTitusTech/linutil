@@ -10,7 +10,7 @@ installMyPaint() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y mypaint
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -S --needed --noconfirm --clearafter mypaint
+			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter mypaint
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallMyPaint() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y mypaint
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter mypaint
+			    "$AUR_HELPER" -R --noconfirm --cleanafter mypaint
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.mypaint.mypaint

@@ -14,7 +14,7 @@ installObsStudio() {
 	        	"$ESCALATION_TOOL" "$PACKAGER" install obs-studio
 	        	;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter obs-studio
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter obs-studio
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -36,7 +36,7 @@ uninstallObsStudio() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y obs-studio
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter obs-studio
+			    "$AUR_HELPER" -R --noconfirm --cleanafter obs-studio
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio

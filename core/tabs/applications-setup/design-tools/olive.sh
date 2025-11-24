@@ -10,7 +10,7 @@ installOlive() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y olive
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter olive
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter olive
 	        	;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallOlive() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y olive
 	            ;;
 	        pacman)
-		        "$AUR_HELPER" -R --noconfirm --clearafter olive
+		        "$AUR_HELPER" -R --noconfirm --cleanafter olive
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.olivevideoeditor.Olive

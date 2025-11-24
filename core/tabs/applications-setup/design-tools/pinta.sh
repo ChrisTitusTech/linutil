@@ -10,7 +10,7 @@ installPinta() {
 				"$ESCALATION_TOOL" "$PACKAGER" install -y pinta
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter pinta
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter pinta
 	        	;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallPinta() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y pinta
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter pinta
+			    "$AUR_HELPER" -R --noconfirm --cleanafter pinta
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta

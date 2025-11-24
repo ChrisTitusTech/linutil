@@ -10,7 +10,7 @@ installGIMP() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y gimp
 	            ;;
 	        pacman)
-	        	"$AUR_HELPER" -S --needed --noconfirm --clearafter gimp
+	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter gimp
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallGIMP() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y gimp
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter gimp
+			    "$AUR_HELPER" -R --noconfirm --cleanafter gimp
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gimp.GIMP

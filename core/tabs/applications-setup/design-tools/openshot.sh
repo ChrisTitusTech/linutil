@@ -10,7 +10,7 @@ installOpenShot() {
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y openshot-qt
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -S --needed --noconfirm --clearafter openshot
+			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter openshot
 	            ;;
 	        *)
 	        	if command_exists flatpak; then
@@ -32,7 +32,7 @@ uninstallOpenShot() {
 				"$ESCALATION_TOOL" "$PACKAGER" remove -y openshot
 	            ;;
 	        pacman)
-			    "$AUR_HELPER" -R --noconfirm --clearafter openshot
+			    "$AUR_HELPER" -R --noconfirm --cleanafter openshot
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.openshot.OpenShot
