@@ -47,7 +47,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [[ -n ${{ env.LABELS }} ]]; then
+          if [[ -n "${{ env.LABELS }}" ]]; then
             gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required,${{ env.LABELS }}"
           else
             gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
