@@ -6,16 +6,15 @@
 install_packages() {
   pkg_manager=$1
   shift
-  # shellcheck disable=SC2086
-  case $pkg_manager in
+  case "$pkg_manager" in
   paru | yay)
     $pkg_manager -S --needed --noconfirm "$@"
     ;;
   pacman)
-    $ESCALATION_TOOL $pkg_manager -S --needed --noconfirm "$@"
+    $ESCALATION_TOOL "$pkg_manager" -S --needed --noconfirm "$@"
     ;;
   apt-get | nala | dnf | zypper)
-    $ESCALATION_TOOL $pkg_manager install -y "$@"
+    $ESCALATION_TOOL "$pkg_manager" install -y "$@"
     ;;
   esac
 }
@@ -145,7 +144,7 @@ main() {
   printf "%s\n" " 2. Install Window Manager "
   printf "%s\n" " 3. Exit "
   printf "%s" " Please select an option (1-3): "
-  read choice
+  read -r choice
 
   case "$choice" in
   1)
@@ -159,7 +158,7 @@ main() {
     printf "%s\n" " 7. LXQt "
     printf "%s\n" " 8. LXDE "
     printf "%s" " Please select a desktop environment (1-8): "
-    read de_choice
+    read -r de_choice
     case "$de_choice" in
     1) installDesktopEnvironment gnome ;;
     2) installDesktopEnvironment kde ;;
@@ -183,10 +182,8 @@ main() {
     printf "%s\n" " 7. Fluxbox "
     printf "%s\n" " 8. Niri "
     printf "%s\n" " 9. HyDE "
-    printf "%s\n" " 10. Miracle (currently not stable for daily use!) "
-    printf "%s\n" " 11. River (currently not stable for daily use!) "
-    printf "%s" " Please select a window manager (1-7): "
-    read wm_choice
+    printf "%s" " Please select a window manager (1-9): "
+    read -r wm_choice
     case "$wm_choice" in
     1) installWindowManager i3 ;;
     2) installWindowManager sway ;;
@@ -197,8 +194,6 @@ main() {
     7) installWindowManager fluxbox ;;
     8) installWindowManager niri ;;
     9) installWindowManager hyde ;;
-    9) installWindowManager miracle-wm ;;
-    9) installWindowManager river ;;
     *) printf "%s\n" "$RED Invalid selection " ;;
     esac
     ;;

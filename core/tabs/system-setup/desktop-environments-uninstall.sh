@@ -392,7 +392,7 @@ uninstall_desktop() {
 
   echo "Uninstalling $desktop..."
   echo "Removing packages..."
-  uninstall_packages "$pkg_manager" $packages
+  uninstall_packages "$pkg_manager" "$packages"
 
   echo "Cleaning up configuration files..."
   for dir in $config_dirs; do
@@ -409,7 +409,7 @@ uninstall_desktop() {
     $ESCALATION_TOOL "$pkg_manager" clean || true
     ;;
   "pacman")
-    $ESCALATION_TOOL $AUR_HELPER -Scc --noconfirm || true
+    $ESCALATION_TOOL "$AUR_HELPER" -Scc --noconfirm || true
     ;;
   "dnf")
     $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
@@ -443,7 +443,7 @@ main() {
     fi
   done
 
-  set -- $INSTALLED_DESKTOPS
+  set -- "$INSTALLED_DESKTOPS"
   if [ $# -eq 0 ]; then
     echo "No supported desktop environments or window managers detected as installed."
     exit 0
@@ -459,7 +459,7 @@ main() {
   echo "q) Quit"
 
   printf "Enter your choice: "
-  read choice
+  read -r choice
 
   case "$choice" in
   '' | *[!0-9]*)
@@ -472,7 +472,7 @@ main() {
     fi
     ;;
   *)
-    set -- $INSTALLED_DESKTOPS
+    set -- "$INSTALLED_DESKTOPS"
     selected_de=$(printf "%s\n" "$@" | sed -n "${choice}p")
     if [ -n "$selected_de" ]; then
       uninstall_desktop "$PACKAGER" "$selected_de"
