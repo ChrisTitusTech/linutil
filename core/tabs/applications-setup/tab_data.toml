@@ -229,6 +229,111 @@ script = "browsers/waterfox.sh"
 task_list = "FI"
 
 [[data]]
+name = "Design Tools"
+
+[[data.entries]]
+name = "Ardour"
+description = "Ardour is a free and open-source digital audio workstation and hard disk recorder."
+script = "design-tools/ardour.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Audacity"
+description = "Audacity is a free and open-source digital audio editor and recording application software."
+script = "design-tools/audacity.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Blender"
+description = "Blender is a free and open-source 3D computer graphics software tool set."
+script = "design-tools/blender.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Darktable"
+description = "Darktable is a free and open-source photography application and raw developer."
+script = "design-tools/darktable.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "GNU Image Manipulation Program (GIMP)"
+description = "GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats."
+script = "design-tools/gimp.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Handbrake"
+description = "HandBrake is a free and open-source transcoder for digital video files."
+script = "design-tools/handbrake.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Inkscape"
+description = "Inkscape is a free and open-source software vector graphics editor."
+script = "design-tools/inkscape.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Krita"
+description = "Krita is a free and open-source raster graphics editor designed primarily for digital art and 2D animation."
+script = "design-tools/krita.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "MyPaint"
+description = "MyPaint is a free and open-source raster graphics editor for digital painting."
+script = "design-tools/mypaint.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Natron"
+description = "Natron is a powerful, free, and open-source VFX compositing application geared towards digital post-production work."
+script = "design-tools/natron.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OBS Studio"
+description = "OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application."
+script = "design-tools/obs-studio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Olive"
+description = "Olive is a free and open-source cross-platform non-linear video editing application."
+script = "design-tools/olive.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OpenShot"
+description = "OpenShot Video Editor is a free and open-source video editor."
+script = "design-tools/openshot.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Pinta"
+description = "Pinta is an open-source, cross-platform bitmap image drawing and editing program inspired by Paint.NET."
+script = "design-tools/pinta.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Scribus"
+description = "Scribus is free and open-source desktop publishing software available for most desktop operating systems."
+script = "design-tools/scribus.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Synfig Studio"
+description = "Synfig Studio is a free and open-source vector-based 2D animation software."
+script = "design-tools/synfigstudio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Tenacity"
+description = "Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder."
+script = "design-tools/tenacity.sh"
+task_list = "I"
+
+[[data]]
 name = "Alacritty"
 description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
 script = "alacritty-setup.sh"
