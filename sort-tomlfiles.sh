@@ -10,74 +10,79 @@ find core/tabs -name "tab_data.toml" | while IFS= read -r file; do
     
     awk '
     BEGIN { 
-        entry = ""
-        in_entry = 0
-        entry_count = 0
+        data_block = ""
+        data_name = ""
+        data_count = 0
+        in_data = 0
+        header = ""
     }
     
-    # Start of a new [[data]] section or [[data.preconditions]]
-    /^\[\[data\]\]$/ || /^\[\[data\.preconditions\]\]$/ {
-        # Flush any stored entries from previous section
-        if (entry != "") {
-            entries[entry_name] = entry
-            entry_names[++entry_count] = entry_name
-            entry = ""
-        }
-        if (entry_count > 0) {
-            n = asort(entry_names, sorted_names)
-            for (j = 1; j <= n; j++) {
-                name = sorted_names[j]
-                printf "%s", entries[name]
+    # Capture header (lines before first [[data]])
+    !in_data && !/^\[\[data\]\]$/ {
+        header = header $0 "\n"
+        next
+    }
+    
+    # Start of a new [[data]] section
+    /^\[\[data\]\]$/ {
+        # Save previous data block if exists
+        if (data_block != "") {
+            data_blocks[data_name] = data_block
+            data_names[++data_count] = data_name
+            # Check if block has entries
+            if (data_block ~ /\[\[data\.entries\]\]/) {
+                has_entries[data_name] = 1
             }
-            delete entries
-            delete entry_names
-            entry_count = 0
         }
-        print
-        in_entry = 0
+        # Start new data block
+        data_block = $0 "\n"
+        in_data = 1
+        data_name = ""
         next
     }
     
-    # Start of a [[data.entries]] block
-    /^\[\[data\.entries\]\]$/ {
-        # Save previous entry if exists
-        if (entry != "") {
-            entries[entry_name] = entry
-            entry_names[++entry_count] = entry_name
-        }
-        entry = $0 "\n"
-        in_entry = 1
-        entry_name = ""
-        next
-    }
-    
-    # Inside a [[data.entries]] block
-    in_entry {
-        entry = entry $0 "\n"
-        if ($0 ~ /^name = /) {
+    # Inside a [[data]] block - collect everything until next [[data]]
+    in_data {
+        data_block = data_block $0 "\n"
+        # Extract the name field from [[data]] section
+        if ($0 ~ /^name = / && data_name == "") {
             gsub(/^name = "/, "", $0)
             gsub(/".*$/, "", $0)
-            entry_name = tolower($0)
+            data_name = tolower($0)
         }
         next
-    }
-    
-    # Everything else (not in entry block)
-    !in_entry {
-        print
     }
     
     END {
-        # Flush remaining entries at end of file
-        if (entry != "") {
-            entries[entry_name] = entry
-            entry_names[++entry_count] = entry_name
+        # Save last data block
+        if (data_block != "") {
+            data_blocks[data_name] = data_block
+            data_names[++data_count] = data_name
+            # Check if block has entries
+            if (data_block ~ /\[\[data\.entries\]\]/) {
+                has_entries[data_name] = 1
+            }
         }
-        if (entry_count > 0) {
-            n = asort(entry_names, sorted_names)
-            for (j = 1; j <= n; j++) {
-                name = sorted_names[j]
-                printf "%s", entries[name]
+        
+        # Print header
+        printf "%s", header
+        
+        # Sort and print data blocks - first those with entries, then those without
+        if (data_count > 0) {
+            n = asort(data_names, sorted_names)
+            # First pass: blocks with entries
+            for (i = 1; i <= n; i++) {
+                name = sorted_names[i]
+                if (has_entries[name]) {
+                    printf "%s", data_blocks[name]
+                }
+            }
+            # Second pass: blocks without entries
+            for (i = 1; i <= n; i++) {
+                name = sorted_names[i]
+                if (!has_entries[name]) {
+                    printf "%s", data_blocks[name]
+                }
             }
         }
     }
