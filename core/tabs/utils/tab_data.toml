@@ -54,7 +54,6 @@ script = "monitor-control/manage_arrangement.sh"
 name = "Reset Scaling"
 description = "This script is designed to reset scaling of a monitor in your system"
 script = "monitor-control/reset_scaling.sh"
-matches = true
 
 [[data.entries]]
 name = "Scale Monitors"
@@ -65,7 +64,6 @@ script = "monitor-control/scale_monitor.sh"
 name = "Set Brightness"
 script = "monitor-control/set_brightness.sh"
 description = "This script is designed to change the Brightness of monitors connected to your system"
-matches = true
 
 [[data.entries]]
 name = "Set Primary Monitor"
