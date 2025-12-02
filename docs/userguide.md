@@ -17,6 +17,7 @@
 
 ### Developer Tools
 
+- **Cursor**: Next-generation AI-powered code editor built on VS Code, designed for enhanced productivity with integrated AI assistance.
 - **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
 - **JetBrains Toolbox**: JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products.
 - **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
