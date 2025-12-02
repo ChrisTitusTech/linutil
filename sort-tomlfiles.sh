@@ -5,7 +5,7 @@ set -e
 
 echo "Sorting all tab_data.toml files..."
 
-for file in $(find core/tabs -name "tab_data.toml"); do
+find core/tabs -name "tab_data.toml" | while IFS= read -r file; do
     echo "Processing: $file"
     
     awk '
