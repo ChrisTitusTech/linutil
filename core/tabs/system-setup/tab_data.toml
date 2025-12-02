@@ -239,8 +239,4 @@ description = "This script allows you to uninstall desktop environments and wind
 script = "desktop-environments-uninstall.sh"
 task_list = "RP"
 
-[[data]]
-name = "Compile Setup"
-description = "This script is designed to install the necessary packages for compiling software on your system."
-script = "compile-setup.sh"
-task_list = "I"
+
