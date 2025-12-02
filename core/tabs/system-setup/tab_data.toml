@@ -38,11 +38,10 @@ task_list = "I MP"
 multi_select = false
 
 [[data.entries]]
-name = "Omarchy Rice by DHH"
-description = "Simplified Hyprland configuration by DHH the ruby on rails dude."
-script = "arch/omarchy.sh"
-task_list = "I MP"
-multi_select = false
+name = "Install Chaotic-AUR Repository"
+description = "Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/"
+script = "arch/chaotic-aur-setup.sh"
+task_list = "I"
 
 [[data.entries]]
 name = "Linux Neptune for SteamDeck"
@@ -62,6 +61,13 @@ script = "arch/nvidia-drivers.sh"
 task_list = "I FM SS"
 
 [[data.entries]]
+name = "Omarchy Rice by DHH"
+description = "Simplified Hyprland configuration by DHH the ruby on rails dude."
+script = "arch/omarchy.sh"
+task_list = "I MP"
+multi_select = false
+
+[[data.entries]]
 name = "Paru AUR Helper"
 description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/paru-setup.sh"
@@ -77,12 +83,6 @@ task_list = "FM I SS RP"
 name = "Yay AUR Helper"
 description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
 script = "arch/yay-setup.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Install Chaotic-AUR Repository"
-description = "Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/"
-script = "arch/chaotic-aur-setup.sh"
 task_list = "I"
 
 [[data]]
@@ -106,6 +106,12 @@ name = "Fedora"
 matches = true
 data = "command_exists"
 values = ["dnf"]
+
+[[data.entries]]
+name = "Btrfs Assistant, Snapper Config, grub-btrfs"
+description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
+script = "fedora/fedora-btrfs-assistant.sh"
+task_list = "I PFM SS"
 
 [[data.entries]]
 name = "Configure DNF"
@@ -148,12 +154,6 @@ name = "Virtualization"
 description = "Enables Virtualization through dnf"
 script = "fedora/virtualization.sh"
 task_list = "I"
-
-[[data.entries]]
-name = "Btrfs Assistant, Snapper Config, grub-btrfs"
-description = "Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately."
-script = "fedora/fedora-btrfs-assistant.sh"
-task_list = "I PFM SS"
 
 [[data.preconditions]]
 matches = true
@@ -238,9 +238,3 @@ name = "Uninstall Desktop Environment"
 description = "This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically."
 script = "desktop-environments-uninstall.sh"
 task_list = "RP"
-
-[[data]]
-name = "Compile Setup"
-description = "This script is designed to install the necessary packages for compiling software on your system."
-script = "compile-setup.sh"
-task_list = "I"
