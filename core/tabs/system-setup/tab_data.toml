@@ -238,5 +238,3 @@ name = "Uninstall Desktop Environment"
 description = "This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically."
 script = "desktop-environments-uninstall.sh"
 task_list = "RP"
-
-
