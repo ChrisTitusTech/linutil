@@ -137,6 +137,12 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
+### Desktop Environment Setup
+
+- **Install Desktop Environment**: This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically.
+- **Uninstall Desktop Environment**: This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically.
+- **Compile Setup**: This script is designed to install the necessary packages for compiling software on your system.
+
 ## Utilities
 
 
