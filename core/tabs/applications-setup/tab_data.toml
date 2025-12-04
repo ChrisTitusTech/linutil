@@ -52,7 +52,118 @@ script = "communication-apps/zoom-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Design Tools"
+
+[[data.entries]]
+name = "Ardour"
+description = "Ardour is a free and open-source digital audio workstation and hard disk recorder."
+script = "design-tools/ardour.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Audacity"
+description = "Audacity is a free and open-source digital audio editor and recording application software."
+script = "design-tools/audacity.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Blender"
+description = "Blender is a free and open-source 3D computer graphics software tool set."
+script = "design-tools/blender.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Darktable"
+description = "Darktable is a free and open-source photography application and raw developer."
+script = "design-tools/darktable.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "GNU Image Manipulation Program (GIMP)"
+description = "GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats."
+script = "design-tools/gimp.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Handbrake"
+description = "HandBrake is a free and open-source transcoder for digital video files."
+script = "design-tools/handbrake.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Inkscape"
+description = "Inkscape is a free and open-source software vector graphics editor."
+script = "design-tools/inkscape.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Krita"
+description = "Krita is a free and open-source raster graphics editor designed primarily for digital art and 2D animation."
+script = "design-tools/krita.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "MyPaint"
+description = "MyPaint is a free and open-source raster graphics editor for digital painting."
+script = "design-tools/mypaint.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Natron"
+description = "Natron is a powerful, free, and open-source VFX compositing application geared towards digital post-production work."
+script = "design-tools/natron.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OBS Studio"
+description = "OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application."
+script = "design-tools/obs-studio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Olive"
+description = "Olive is a free and open-source cross-platform non-linear video editing application."
+script = "design-tools/olive.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OpenShot"
+description = "OpenShot Video Editor is a free and open-source video editor."
+script = "design-tools/openshot.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Pinta"
+description = "Pinta is an open-source, cross-platform bitmap image drawing and editing program inspired by Paint.NET."
+script = "design-tools/pinta.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Scribus"
+description = "Scribus is free and open-source desktop publishing software available for most desktop operating systems."
+script = "design-tools/scribus.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Synfig Studio"
+description = "Synfig Studio is a free and open-source vector-based 2D animation software."
+script = "design-tools/synfigstudio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Tenacity"
+description = "Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder."
+script = "design-tools/tenacity.sh"
+task_list = "I"
+
+[[data]]
 name = "Developer Tools"
+
+[[data.entries]]
+name = "Cursor"
+description = "Next-generation AI-powered code editor built on VS Code, designed for enhanced productivity with integrated AI assistance."
+script = "developer-tools/cursor.sh"
+task_list = "I"
 
 [[data.entries]]
 name = "Github Desktop"
@@ -193,21 +304,9 @@ script = "browsers/firefox.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "Zen Browser"
-description = "Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience."
-script = "browsers/zen-browser.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "Thorium"
 description = "Thorium is a Chromium-based browser focused on privacy and performance."
 script = "browsers/thorium.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Vivaldi"
-description = "Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies."
-script = "browsers/vivaldi.sh"
 task_list = "I"
 
 [[data.entries]]
@@ -217,10 +316,22 @@ script = "browsers/tor-browser.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Vivaldi"
+description = "Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies."
+script = "browsers/vivaldi.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "waterfox"
 description = "Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet."
 script = "browsers/waterfox.sh"
 task_list = "FI"
+
+[[data.entries]]
+name = "Zen Browser"
+description = "Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience."
+script = "browsers/zen-browser.sh"
+task_list = "I"
 
 [[data]]
 name = "Alacritty"
@@ -259,24 +370,6 @@ script = "docker-setup.sh"
 task_list = "I SS"
 
 [[data]]
-name = "Ghostty"
-description = "Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience."
-script = "ghostty-setup.sh"
-task_list = "I FM"
-
-[[data]]
-name = "Podman"
-description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
-script = "podman-setup.sh"
-task_list = "I SS"
-
-[[data]]
-name = "Podman-compose"
-description = "Podman Compose is a tool for defining and running multi-container applications using Podman."
-script = "podman-compose-setup.sh"
-task_list = "I SS"
-
-[[data]]
 name = "DWM-Titus"
 description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
 script = "dwmtitus-setup.sh"
@@ -293,6 +386,12 @@ name = "Flatpak / Flathub"
 description = "Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository"
 script = "setup-flatpak.sh"
 task_list = "I"
+
+[[data]]
+name = "Ghostty"
+description = "Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience."
+script = "ghostty-setup.sh"
+task_list = "I FM"
 
 [[data]]
 name = "Grub Theme"
@@ -327,6 +426,18 @@ task_list = "I"
 matches = true
 data = "command_exists"
 values = ["linutil"]
+
+[[data]]
+name = "Podman"
+description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
+script = "podman-setup.sh"
+task_list = "I SS"
+
+[[data]]
+name = "Podman-compose"
+description = "Podman Compose is a tool for defining and running multi-container applications using Podman."
+script = "podman-compose-setup.sh"
+task_list = "I SS"
 
 [[data]]
 name = "Rofi"

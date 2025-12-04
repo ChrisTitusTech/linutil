@@ -123,16 +123,16 @@ name = "Remove User From Groups"
 script = "user-account-manager/remove_from_group.sh"
 
 [[data]]
+name = "Auto Login"
+script = "auto-login.sh"
+task_list = "DE setup"
+
+[[data]]
 name = "Auto Mount Drive"
 description = "This utility is designed to help with automating the process of mounting a drive on to your system."
 script = "auto-mount.sh"
 task_list = "PFM"
 multi_select = false
-
-[[data]]
-name = "Auto Login"
-script = "auto-login.sh"
-task_list = "DE setup"
 
 [[data]]
 name = "Bluetooth Manager"
@@ -150,12 +150,6 @@ task_list = "D"
 name = "Crypto tool"
 script = "encrypt_decrypt_tool.sh"
 task_list = "I FM"
-
-[[data]]
-name = "US Locale Setup"
-description = "This fixes US UTF-8 Locale and Folder listings"
-script = "locale-us-setup.sh"
-task_list = "FM"
 
 [[data]]
 name = "Numlock on Startup"
@@ -194,6 +188,12 @@ task_list = "I"
 matches = false
 data = "command_exists"
 values = [ "dnf" ]
+
+[[data]]
+name = "US Locale Setup"
+description = "This fixes US UTF-8 Locale and Folder listings"
+script = "locale-us-setup.sh"
+task_list = "FM"
 
 [[data]]
 name = "WiFi Manager"

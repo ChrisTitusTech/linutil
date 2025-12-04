@@ -17,6 +17,7 @@
 
 ### Developer Tools
 
+- **Cursor**: Next-generation AI-powered code editor built on VS Code, designed for enhanced productivity with integrated AI assistance.
 - **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
 - **JetBrains Toolbox**: JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products.
 - **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
@@ -49,6 +50,26 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
+
+### Design Tools
+
+- **Ardour**: Ardour is a free and open-source digital audio workstation and hard disk recorder.
+- **Audacity**: Audacity is a free and open-source digital audio editor and recording application software.
+- **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
+- **Darktable**: Darktable is a free and open-source photography application and raw developer.
+- **GNU Image Manipulation Program (GIMP)**: GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats.
+- **Handbrake**: HandBrake is a free and open-source transcoder for digital video files.
+- **Inkscape**: Inkscape is a free and open-source software vector graphics editor.
+- **Krita**: Krita is a free and open-source raster graphics editor designed primarily for digital art and 2D animation.
+- **MyPaint**: MyPaint is a free and open-source raster graphics editor for digital painting.
+- **Natron**: Natron is a powerful, free, and open-source VFX compositing application geared towards digital post-production work.
+- **OBS Studio**: OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application.
+- **Olive**: Olive is a free and open-source cross-platform non-linear video editing application.
+- **OpenShot**: OpenShot Video Editor is a free and open-source video editor.
+- **Pinta**: Pinta is an open-source, cross-platform bitmap image drawing and editing program inspired by Paint.NET.
+- **Scribus**: Scribus is free and open-source desktop publishing software available for most desktop operating systems.
+- **Synfig Studio**: Synfig Studio is a free and open-source vector-based 2D animation software.
+- **Tenacity**: Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
@@ -156,6 +177,12 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
+
+### Desktop Environment Setup
+
+- **Install Desktop Environment**: This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically.
+- **Uninstall Desktop Environment**: This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically.
+- **Compile Setup**: This script is designed to install the necessary packages for compiling software on your system.
 
 ## Utilities
 

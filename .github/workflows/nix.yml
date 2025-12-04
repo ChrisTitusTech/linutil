@@ -1,0 +1,62 @@
+name: nix
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: set up nix
+        uses: cachix/install-nix-action@v31
+
+      - name: check formatting
+        run: |
+          nix fmt
+          if [ -n "$(git status --porcelain)" ]; then
+            git --no-pager diff
+            exit 1
+          fi
+
+      - name: check flake evaluation
+        run: nix flake check
+
+  update:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: set up nix
+        uses: cachix/install-nix-action@v31
+
+      - name: update flake inputs
+        run: nix flake update
+
+      - name: open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore(nix): update flake inputs'
+          committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          branch: 'chore/nix/flake-update'
+          title: 'chore(nix): update flake inputs'
+          reviewers: adamperkowski
+          assignees: adamperkowski
