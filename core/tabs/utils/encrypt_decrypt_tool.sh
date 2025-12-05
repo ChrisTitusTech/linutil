@@ -66,7 +66,7 @@ encrypt_file() {
             OUTPUT_FILE="$OUTPUT_PATH/$REL_PATH.enc"
             mkdir -p "$(dirname "$OUTPUT_FILE")"
 
-            if [ "$(openssl enc -aes-256-cbc -salt -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD")" -eq 0 ]; then
+            if openssl enc -aes-256-cbc -salt -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD"; then
                 printf "%b\n" "Encrypted: $OUTPUT_FILE"
             else
                 printf "%b\n" "Failed to encrypt: $FILE"
@@ -80,7 +80,7 @@ encrypt_file() {
         fi
         mkdir -p "$(dirname "$OUTPUT_PATH")"
 
-        if [ "$(openssl enc -aes-256-cbc -salt -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD")" -eq 0 ]; then
+        if openssl enc -aes-256-cbc -salt -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD"; then
             printf "%b\n" "Encrypted: $OUTPUT_PATH"
         else
             printf "%b\n" "Failed to encrypt: $INPUT_PATH"
@@ -111,7 +111,7 @@ decrypt_file() {
             OUTPUT_FILE="$OUTPUT_PATH/${REL_PATH%.enc}"
             mkdir -p "$(dirname "$OUTPUT_FILE")"
 
-            if [ "$(openssl enc -aes-256-cbc -d -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD")" -eq 0 ]; then
+            if openssl enc -aes-256-cbc -d -pbkdf2 -in "$FILE" -out "$OUTPUT_FILE" -k "$PASSWORD"; then
                 printf "%b\n" "Decrypted: $OUTPUT_FILE"
             else
                 printf "%b\n" "Failed to decrypt: $FILE"
@@ -125,7 +125,7 @@ decrypt_file() {
         fi
         mkdir -p "$(dirname "$OUTPUT_PATH")"
 
-        if [ "$(openssl enc -aes-256-cbc -d -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD")" -eq 0 ]; then
+        if openssl enc -aes-256-cbc -d -pbkdf2 -in "$INPUT_PATH" -out "$OUTPUT_PATH" -k "$PASSWORD"; then
             printf "%b\n" "Decrypted: $OUTPUT_PATH"
         else
             printf "%b\n" "Failed to decrypt: $INPUT_PATH"
