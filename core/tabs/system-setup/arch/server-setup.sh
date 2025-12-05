@@ -575,8 +575,15 @@ echo -ne "
 "
 # Graphics Drivers find and install
 if echo "${gpu_type}" | grep -E "NVIDIA|GeForce"; then
-    echo "Installing NVIDIA drivers: nvidia-lts"
-    pacman -S --noconfirm --needed nvidia-lts
+    read -p "Do you have an older NVIDIA GPU (e.g., pre-Maxwell/900 series) that may require legacy drivers or nouveau? [y/N]: " legacy_gpu
+    if [[ "${legacy_gpu}" =~ ^[Yy]$ ]]; then
+        echo "Installing 'nouveau & mesa' drivers for older NVIDIA GPUs."
+        # Install mesa & nouveau drivers
+        pacman -S --noconfirm --needed mesa xf86-video-nouveau
+    else
+        echo "Installing NVIDIA drivers: nvidia-lts"
+        pacman -S --noconfirm --needed nvidia-lts
+    fi
 elif echo "${gpu_type}" | grep 'VGA' | grep -E "Radeon|AMD"; then
     echo "Installing AMD drivers: xf86-video-amdgpu"
     pacman -S --noconfirm --needed xf86-video-amdgpu
