@@ -26,7 +26,7 @@ installPodmanCompose() {
                 fi
 
                 if [ "$ID" = "opensuse-leap" ]; then
-                    "$ESCALATION_TOOL" "$PACKAGER" addrepo https://download.opensuse.org/repositories/devel:languages:python/$VERSION_ID/devel:languages:python.repo
+                    "$ESCALATION_TOOL" "$PACKAGER" addrepo "https://download.opensuse.org/repositories/devel:languages:python/$VERSION_ID/devel:languages:python.repo"
                     "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys refresh
                     "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys install -y podman-compose
                 elif [ "$ID" = "opensuse-tumbleweed" ]; then
