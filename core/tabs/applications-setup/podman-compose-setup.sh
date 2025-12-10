@@ -6,7 +6,7 @@ installPodmanCompose() {
     if ! command_exists podman-compose; then
         printf "%b\n" "${YELLOW}Installing Podman Compose...${RC}"
         case "$PACKAGER" in
-            apt-get|nala|zypper|dnf)
+            apt-get|nala|dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
                 ;;
             pacman)
@@ -17,6 +17,18 @@ installPodmanCompose() {
                 ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy podman-compose
+                ;;
+            zypper)
+                if [ "$ID" = "opensuse-leap" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" addrepo "https://download.opensuse.org/repositories/devel:languages:python/$VERSION_ID/devel:languages:python.repo"
+                    "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys refresh
+                    "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys install -y podman-compose
+                elif [ "$ID" = "opensuse-tumbleweed" ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" install -y podman-compose
+                else
+                    printf "%b\n" "${RED}Unsupported openSUSE distro: ${ID}${RC}"
+                    exit 1
+                fi
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
