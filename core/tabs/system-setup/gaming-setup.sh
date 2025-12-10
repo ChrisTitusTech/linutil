@@ -28,7 +28,8 @@ installDepend() {
                     printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
                 fi
             fi
-            DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk2 gtk3 lib32-gtk2 lib32-gtk3 libpulse lib32-libpulse alsa-lib lib32-alsa-lib \
+            DISTRO_DEPS="gnutls lib32-gnutls base-devel gtk3 lib32-gtk3 python-google-auth python-protobuf libpulse \
+		lib32-libpulse alsa-lib lib32-alsa-lib \
                 alsa-utils alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib giflib lib32-giflib libpng lib32-libpng \
                 libldap lib32-libldap openal lib32-openal libxcomposite lib32-libxcomposite libxinerama lib32-libxinerama \
                 ncurses lib32-ncurses vulkan-icd-loader lib32-vulkan-icd-loader ocl-icd lib32-ocl-icd libva lib32-libva \
