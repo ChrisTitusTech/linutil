@@ -1,12 +1,12 @@
-[workspace.package]
-license = "MIT"
-version = "25.9.29"
-edition = "2021"
 
 [workspace]
-members = ["tui", "core", "xtask"]
+members = ["core", "tui", "xtask"]
 default-members = ["tui", "core"]
 resolver = "2"
+[workspace.package]
+license = "MIT"
+version = "25.12.10"
+edition = "2021"
 
 [profile.release]
 opt-level = "z"

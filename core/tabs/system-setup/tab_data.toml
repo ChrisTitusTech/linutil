@@ -114,6 +114,20 @@ description = "This script allows you to uninstall desktop environments and wind
 script = "desktop-environments-uninstall.sh"
 task_list = "RP"
 [[data]]
+name = "Desktop Environment Setup"
+
+[[data.entries]]
+name = "Install Desktop Environment"
+description = "This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically."
+script = "desktop-environments.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Uninstall Desktop Environment"
+description = "This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically."
+script = "desktop-environments-uninstall.sh"
+task_list = "RP"
+[[data]]
 name = "Fedora"
 
 [[data.preconditions]]
@@ -238,17 +252,3 @@ script = "terminus-tty.sh"
 task_list = "I PFM"
 
 
-[[data]]
-name = "Desktop Environment Setup"
-
-[[data.entries]]
-name = "Install Desktop Environment"
-description = "This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically."
-script = "desktop-environments.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Uninstall Desktop Environment"
-description = "This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically."
-script = "desktop-environments-uninstall.sh"
-task_list = "RP"
