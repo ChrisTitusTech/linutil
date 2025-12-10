@@ -19,12 +19,6 @@ installPodmanCompose() {
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy podman-compose
                 ;;
             zypper)
-                if [ -e /etc/os-release ]; then
-                   . /etc/os-release
-                else
-                   . /usr/lib/os-release
-                fi
-
                 if [ "$ID" = "opensuse-leap" ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" addrepo "https://download.opensuse.org/repositories/devel:languages:python/$VERSION_ID/devel:languages:python.repo"
                     "$ESCALATION_TOOL" "$PACKAGER" --gpg-auto-import-keys refresh
@@ -48,4 +42,5 @@ installPodmanCompose() {
 
 checkEnv
 checkEscalationTool
+checkDistro
 installPodmanCompose
