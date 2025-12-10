@@ -8,9 +8,9 @@ license.workspace = true
 include = ["src/*.rs", "Cargo.toml", "tabs/**"]
 
 [dependencies]
+ego-tree = "0.9.0"
 include_dir = "0.7.4"
-temp-dir = "0.1.14"
 serde = { version = "1.0.215", features = ["derive"], default-features = false }
+temp-dir = "0.1.14"
 toml = { version = "0.8.19", features = ["parse"], default-features = false }
 which = "7.0.0"
-ego-tree = "0.9.0"

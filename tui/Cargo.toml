@@ -9,6 +9,10 @@ repository = "https://github.com/ChrisTitusTech/linutil/tree/main/tui"
 version.workspace = true
 include = ["src/*.rs", "Cargo.toml", "cool_tips.txt", "../man/linutil.1"]
 
+[[bin]]
+name = "linutil"
+path = "src/main.rs"
+
 [features]
 default = ["tips"]
 tips = ["rand"]
@@ -27,7 +31,3 @@ tree-sitter-highlight = "0.24.4"
 tui-term = { version = "0.2.0", default-features = false }
 unicode-width = { version = "0.2.0", default-features = false }
 vt100-ctt = "0.16.0"
-
-[[bin]]
-name = "linutil"
-path = "src/main.rs"

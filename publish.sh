@@ -67,8 +67,21 @@ fi
 
 echo "Version check passed: $expected_version"
 
+echo "Running sort and format checks..."
+if ! cargo sort --check --workspace; then
+	echo "cargo sort check failed. Please run 'cargo sort --workspace' to fix." >&2
+	exit 1
+fi
+
+if ! cargo fmt --check; then
+	echo "cargo fmt check failed. Please run 'cargo fmt' to fix." >&2
+	exit 1
+fi
+
+bash sort-tomlfiles.sh
 cargo test --no-fail-fast --package linutil_core
 cargo build --release
+echo "Checks passed."
 
 read -r -p "Publish to crates.io? [y/N]: " answer
 case "$answer" in
