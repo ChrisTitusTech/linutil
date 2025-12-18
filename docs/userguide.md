@@ -99,6 +99,10 @@ https://github.com/ChrisTitusTech/dwm-titus
 ## Gaming
 
 
+### Arc Raiders
+
+- **Faster Matches and Config Optimizations**: This shortens the videos for transitions in matches and also loads a optimized configuration file for VRR and removing motion blur and other nasty settings
+
 ### Diablo II Resurrected
 
 - **Loot Filter**: This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter
