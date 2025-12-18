@@ -1,6 +1,15 @@
 name = "Gaming"
 
 [[data]]
+name = "Arc Raiders"
+
+[[data.entries]]
+name = "Faster Matches and Config Optimizations"
+description = "This shortens the videos for transitions in matches and also loads a optimized configuration file for VRR and removing motion blur and other nasty settings"
+script = "arc-raiders/config-setup.sh"
+task_list = "FM"
+
+[[data]]
 name = "Diablo II Resurrected"
 
 [[data.entries]]
