@@ -21,7 +21,7 @@ jobs:
     if: github.event_name != 'schedule'
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: set up nix
         uses: cachix/install-nix-action@v31
@@ -42,7 +42,7 @@ jobs:
     if: github.event_name == 'schedule'
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: set up nix
         uses: cachix/install-nix-action@v31
@@ -51,7 +51,7 @@ jobs:
         run: nix flake update
 
       - name: open pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: 'chore(nix): update flake inputs'
           committer: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'

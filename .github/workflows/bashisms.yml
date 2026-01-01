@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: git fetch origin ${{ github.base_ref }}
 
       - name: Install devscripts
@@ -24,7 +24,7 @@ jobs:
       - name: Get changed .sh files (PR only)
         id: changed-sh-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: '**/*.sh'
 

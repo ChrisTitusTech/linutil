@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: git fetch origin ${{ github.base_ref }}
 
       - name: Run spellcheck
-        uses: crate-ci/typos@v1.26.0
+        uses: crate-ci/typos@v1.41.0
