@@ -4,7 +4,39 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    # Group all cargo updates into one PR to reduce noise
+    groups:
+      rust-dependencies:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    # Group all action updates into one PR
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github_actions"
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"
