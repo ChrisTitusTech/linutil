@@ -27,7 +27,7 @@ rand = { version = "0.8.5", optional = true }
 ratatui = { version = "0.29.0", features = ["crossterm"], default-features = false }
 time = { version = "0.3.36", features = ["formatting", "local-offset", "macros"], default-features = false }
 tree-sitter-bash = "0.25.1"
-tree-sitter-highlight = "0.24.4"
+tree-sitter-highlight = "0.26.3"
 tui-term = { version = "0.2.0", default-features = false }
 unicode-width = { version = "0.2.0", default-features = false }
 vt100-ctt = "0.16.0"
