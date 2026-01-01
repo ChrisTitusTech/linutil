@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run ShellCheck
-        uses: reviewdog/action-shellcheck@v1
+        uses: reviewdog/action-shellcheck@4c07458
         with:
           shellcheck_flags: '--source-path=${{ github.workspace }}/.shellcheckrc'
           reviewdog_flags: '-fail-level=any'
@@ -30,4 +30,4 @@ jobs:
     needs: shellcheck
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

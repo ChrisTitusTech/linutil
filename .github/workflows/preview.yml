@@ -17,11 +17,11 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Get latest tag
         id: latest_tag
-        uses: actions/github-script@v8
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const releases = await github.rest.repos.listReleases({
@@ -57,7 +57,7 @@ jobs:
         run: mv preview.gif .github/preview.gif
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5e3a766de399b753aa7c86dd6ee63693e1fe0ac1 # v8
         with:
           commit-message: Preview for ${{ env.tag_name }}
           branch: preview-${{ env.branch_name }}

@@ -12,25 +12,31 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Extract referenced issues
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          BODY="${{ github.event.pull_request.body }}"
-          ISSUES=$(echo "$BODY" | grep -Eio '(Fixes|Resolves|Closes):? #[0-9]+' | grep -Eo '[0-9]+' | uniq)
-
-          echo "ISSUES=$ISSUES" >> $GITHUB_ENV
+          ISSUES=$(echo "$PR_BODY" | grep -Eio '(Fixes|Resolves|Closes):? #[0-9]+' | grep -Eo '[0-9]+' | uniq)
+          {
+            echo "ISSUES<<EOF"
+            echo "$ISSUES"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - name: Get issue labels
         if: env.ISSUES != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
           LABELS=()
 
-          for ISSUE in ${{ env.ISSUES }}; do
+          # Iterate over ISSUES safe from shell injection (ISSUES only contains numbers)
+          for ISSUE in $ISSUES; do
             ISSUE_LABELS=$(curl -s -H "Authorization: token $GH_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE" \
+              "https://api.github.com/repos/$REPO/issues/$ISSUE" \
               | jq -r '.labels[].name')
 
             while IFS= read -r LABEL; do
@@ -41,14 +47,19 @@ jobs:
           done
 
           UNIQUE_LABELS=$(printf "%s\n" "${LABELS[@]}" | sort -u | tr '\n' ',' | sed 's/,$//')
-          echo "LABELS=$UNIQUE_LABELS" >> $GITHUB_ENV
+          {
+            echo "LABELS<<EOF"
+            echo "$UNIQUE_LABELS"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - name: Assign labels
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          if [[ -n "${{ env.LABELS }}" ]]; then
-            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required,${{ env.LABELS }}"
+          if [[ -n "$LABELS" ]]; then
+            gh pr edit "$PR_NUMBER" --add-label "initial review required,$LABELS"
           else
-            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
+            gh pr edit "$PR_NUMBER" --add-label "initial review required"
           fi
