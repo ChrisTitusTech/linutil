@@ -1,0 +1,10 @@
+5. Fully automatic one-liner (find → copy → run via linker64)
+adb shell "pkg=\$(pm path moe.shizuku.privileged.api|sed 's/package://;s/base.apk//'); lib=\$(find \$pkg -name libshizuku.so); cp \$lib /data/local/tmp/; chmod 755 /data/local/tmp/libshizuku.so; /system/bin/linker64 /data/local/tmp/libshizuku.so"
+
+6. Automatic with architecture detection
+adb shell "abi=\$(getprop ro.product.cpu.abi); linker=/system/bin/linker64; [[ \$abi =~ arm64|aarch64|x86_64 ]] || linker=/system/bin/linker; pkg=\$(pm path moe.shizuku.privileged.api|sed 's/package://;s/base.apk//'); lib=\$(find \$pkg -name libshizuku.so); cp \$lib /data/local/tmp/; chmod 755 /data/local/tmp/libshizuku.so; \$linker /data/local/tmp/libshizuku.so"
+
+
+If you want a single compact one-liner tuned specifically to your device’s ABI, tell me the output of:
+
+adb shell getprop ro.product.cpu.abi
