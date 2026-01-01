@@ -21,7 +21,7 @@ jobs:
 
       - name: Get latest tag
         id: latest_tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const releases = await github.rest.repos.listReleases({
