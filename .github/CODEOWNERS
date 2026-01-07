@@ -3,6 +3,6 @@
 
 # Nix stuff
 # We want the whole `nix` directory here in case we add custom tests/script later
-*.nix      @adamperkowski
-flake.lock @adamperkowski
-/nix/      @adamperkowski
+*.nix      @koibtw
+flake.lock @koibtw
+/nix/      @koibtw
