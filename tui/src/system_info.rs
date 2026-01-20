@@ -122,7 +122,7 @@ fn strip_ansi_codes(input: &str) -> String {
     while let Some(c) = chars.next() {
         if c == '\x1b' && matches!(chars.peek(), Some('[')) {
             chars.next();
-            while let Some(next) = chars.next() {
+            for next in chars.by_ref() {
                 if next == 'm' {
                     break;
                 }
@@ -168,7 +168,7 @@ fn extract_total(value: &str) -> String {
     let Some(total_part) = parts.next() else {
         return value.trim().to_string();
     };
-    let mut tokens = total_part.trim().split_whitespace();
+    let mut tokens = total_part.split_whitespace();
     let Some(amount) = tokens.next() else {
         return total_part.trim().to_string();
     };
