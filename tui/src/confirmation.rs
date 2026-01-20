@@ -60,8 +60,9 @@ impl ConfirmPrompt {
 impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
         let block = Block::bordered()
-            .border_set(border::ROUNDED)
-            .title(" Confirm selections ")
+            .border_set(border::PLAIN)
+            .border_style(Style::default().fg(theme.focused_color()))
+            .title(" CONFIRM SELECTIONS ")
             .title_bottom(Line::from(vec![
                 Span::raw(" ["),
                 Span::styled("y", Style::default().fg(theme.success_color())),
@@ -70,7 +71,7 @@ impl FloatContent for ConfirmPrompt {
                 Span::raw("] to abort "),
             ]))
             .title_alignment(Alignment::Center)
-            .title_style(Style::default().bold())
+            .title_style(Style::default().fg(theme.tab_color()).bold())
             .style(Style::default());
 
         let inner_area = block.inner(area);

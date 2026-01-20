@@ -7,6 +7,7 @@ mod hint;
 mod root;
 mod running_command;
 mod state;
+mod system_info;
 mod theme;
 
 #[cfg(feature = "tips")]
