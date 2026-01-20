@@ -18,7 +18,7 @@ check() {
     unset message
 }
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 if [ -f "$SCRIPT_DIR/Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
     TARGET_DIR=${CARGO_TARGET_DIR:-"$HOME/.cache/linutil/target"}
     mkdir -p "$TARGET_DIR"
