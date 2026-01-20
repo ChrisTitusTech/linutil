@@ -6,8 +6,8 @@ use crate::{
     hint::{create_shortcut_list, Shortcut},
     root::check_root_status,
     running_command::RunningCommand,
-    system_info::SystemInfo,
     shortcuts,
+    system_info::SystemInfo,
     theme::Theme,
     Args,
 };
@@ -305,7 +305,10 @@ impl AppState {
             .padding(Padding::horizontal(1));
 
         let label = Paragraph::new(Line::from(vec![
-            Span::styled("LINUTIL", Style::default().fg(self.theme.tab_color()).bold()),
+            Span::styled(
+                "LINUTIL",
+                Style::default().fg(self.theme.tab_color()).bold(),
+            ),
             Span::raw(" "),
             Span::styled(
                 format!("v{}", env!("CARGO_PKG_VERSION")),
@@ -345,8 +348,7 @@ impl AppState {
             .as_ref()
             .map(|info| info.entries_len() as u16 + 2)
             .unwrap_or(0);
-        let show_info =
-            info_height > 0 && horizontal[0].height > info_height.saturating_add(3);
+        let show_info = info_height > 0 && horizontal[0].height > info_height.saturating_add(3);
 
         let left_chunks = if show_info {
             Layout::vertical([

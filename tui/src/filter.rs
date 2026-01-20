@@ -118,17 +118,13 @@ impl Filter {
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
             Span::styled(
                 "Type to search (/)",
-                Style::default()
-                    .fg(theme.unfocused_color())
-                    .dim(),
+                Style::default().fg(theme.unfocused_color()).dim(),
             )
         } else {
             let input_text = self.search_input.iter().collect::<String>();
             Span::styled(
                 input_text,
-                Style::default()
-                    .fg(theme.focused_color())
-                    .bold(),
+                Style::default().fg(theme.focused_color()).bold(),
             )
         };
 

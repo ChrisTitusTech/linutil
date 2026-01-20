@@ -5,7 +5,14 @@ use ratatui::{
 };
 use std::process::Command;
 
-const FASTFETCH_ARGS: [&str; 6] = ["--logo", "none", "--separator", " : ", "--structure", "cpu:disk:memory:gpu"];
+const FASTFETCH_ARGS: [&str; 6] = [
+    "--logo",
+    "none",
+    "--separator",
+    " : ",
+    "--structure",
+    "cpu:disk:memory:gpu",
+];
 
 pub struct SystemInfo {
     entries: Vec<InfoEntry>,
