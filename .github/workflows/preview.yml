@@ -52,10 +52,19 @@ jobs:
           sudo apt-get install -y ffmpeg ttyd fonts-jetbrains-mono
 
       - name: Install VHS
-        run: go install github.com/charmbracelet/vhs@latest
+        run: |
+          go install github.com/charmbracelet/vhs@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Refresh font cache
+        run: fc-cache -f -v
 
       - name: Generate preview with VHS
-        run: vhs .github/preview.tape
+        env:
+          TERM: xterm-256color
+        run: |
+          export PATH="$HOME/go/bin:$PATH"
+          vhs .github/preview.tape
 
       - name: Move preview
         run: mv preview.gif .github/preview.gif
