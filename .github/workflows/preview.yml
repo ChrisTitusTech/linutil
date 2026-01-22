@@ -46,13 +46,10 @@ jobs:
           echo "${{ github.workspace }}/build" >> $GITHUB_PATH
           echo "branch_name=${{ env.tag_name }}" | tr . - >> $GITHUB_ENV
 
-      - name: Generate preview
-        run: |
-          sudo apt update
-          sudo apt install -y ffmpeg ttyd fonts-jetbrains-mono
-          go install github.com/charmbracelet/vhs@latest
-          export TERM=xterm-256color
-          $(go env GOPATH)/bin/vhs .github/preview.tape
+      - name: Generate preview with VHS
+        uses: charmbracelet/vhs-action@v2
+        with:
+          path: .github/preview.tape
 
       - name: Move preview
         run: mv preview.gif .github/preview.gif
