@@ -19,31 +19,13 @@ script = "diablo-ii/d2r-loot-filters.sh"
 task_list = "FM"
 
 [[data]]
-name = "Fallout 76"
-
-[[data.entries]]
-name = "Fallout 76 Custom INI"
-description = "This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements."
-script = "fallout-76/fallout76settings.sh"
-task_list = "FM"
-
-[[data]]
-name = "Multi System Emulators"
+name = "Emulators"
 
 [[data.entries]]
 name = "RetroArch Game Emulator"
 description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
 script = "emulators/retroarch.sh"
 task_list = "FM"
-
-[[data]]
-name = "Nintendo Emulators"
-
-# [[data.entries]]
-# name = "Mesen 2"
-# description = "NES and SNES Emulator. NO Games are included"
-# script = "emulators/nintendo/mesen2.sh"
-# task_list = "FM"
 
 [[data.entries]]
 name = "snes9x"
@@ -93,9 +75,6 @@ description = "Nintendo Switch emulator. NO Games are included"
 script = "emulators/nintendo/ryujinx.sh"
 task_list = "FM"
 
-[[data]]
-name = "Playstation Emulators"
-
 # [[data.entries]]
 # name = "PCSX"
 # description = "A Playstation emulator. NO Games or Bios' are included"
@@ -120,24 +99,6 @@ description = "A Playstation 3 emulator. NO Games or Bios' are included"
 script = "emulators/playstation/rpcs3.sh"
 task_list = "FM"
 
-[[data]]
-name = "Xbox Emulators"
-
-[[data.entries]]
-name = "XEMU"
-description = "An Original Xbox emulator. NO Games or Bios' are included"
-script = "emulators/xbox/xemu.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "Xenia"
-description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
-script = "emulators/xbox/xenia.sh"
-task_list = "FM"
-
-[[data]]
-name = "Sega Emulators"
-
 [[data.entries]]
 name = "Blastem"
 description = "A Genesis emulator. NO Games are included"
@@ -161,3 +122,25 @@ name = "Flycast"
 description = "A Dreamcase emulator. NO Games are included"
 script = "emulators/sega/flycast.sh"
 task_list = "FM"
+
+[[data.entries]]
+name = "XEMU"
+description = "An Original Xbox emulator. NO Games or Bios' are included"
+script = "emulators/xbox/xemu.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Xenia"
+description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
+script = "emulators/xbox/xenia.sh"
+task_list = "FM"
+
+[[data]]
+name = "Fallout 76"
+
+[[data.entries]]
+name = "Fallout 76 INI and Mods"
+description = "This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements."
+script = "fallout-76/fallout76settings.sh"
+task_list = "FM"
+
