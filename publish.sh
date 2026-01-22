@@ -3,7 +3,11 @@
 set -euo pipefail
 
 # Enforce date-based versioning (YY.MM.DD) before publishing.
-today_raw=$(date +%y-%m-%d)
+# Remove leading zeros from month and day to comply with cargo fmt requirements
+year=$(date +%y)
+month=$(date +%-m)
+day=$(date +%-d)
+today_raw="${year}-${month}-${day}"
 expected_version=${today_raw//-/.}
 
 read_versions=$(python - <<'PY'
