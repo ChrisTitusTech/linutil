@@ -57,7 +57,7 @@ jobs:
         run: mv preview.gif .github/preview.gif
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@v7.0.5
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: Preview for ${{ env.tag_name }}
           branch: preview-${{ env.branch_name }}
