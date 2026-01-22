@@ -107,30 +107,29 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Loot Filter**: This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter
 
-### Fallout 76
+### Emulators
 
-- **Fallout 76 Custom INI**: This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements.
-
-### Console Emulators
-
-- **RetroArch**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
-- **Mesen 2**: NES and SNES Emulator. NO Games are included
-- **snes9x**: Super Nintendo Emulator. NO Games are included
+- **Blastem**: A Genesis emulator. NO Games are included
 - **bsnes**: Super Nintendo Emulator. NO Games are included
+- **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
+- **Flycast**: A Dreamcase emulator. NO Games are included
+- **Gopher 64**: N64 Emulator. NO Games are included
+- **Kronos**: A Sega Saturn emulator. NO Games are included
+- **MelonDS**: Nintendo DS and DSi Emulator. NO Games are included
 - **mGBA**: Nintendo Game Boy Advance Emulator. NO Games are included
 - **Mupen 64 Plus**: N64 Emulator. NO Games are included
-- **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
-- **MelonDS**: Nintendo DS and DSi Emulator. NO Games are included
-- **Ryujinx**: Nintendo Switch emulator. NO Games are included
-- **PCSX**: A Playstation emulator. NO Games or Bios' are included
 - **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
 - **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
+- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
 - **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
+- **Ryujinx**: Nintendo Switch emulator. NO Games are included
+- **snes9x**: Super Nintendo Emulator. NO Games are included
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
-- **Blastem**: A Genesis emulator. NO Games are included
-- **Kronos**: A Sega Saturn emulator. NO Games are included
-- **Flycast**: A Dreamcase emulator. NO Games are included
+
+### Fallout 76
+
+- **Fallout 76 INI and Mods**: This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements.
 
 ## Security
 
@@ -159,11 +158,6 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### Debian
 
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
-
-### Desktop Environment Setup
-
-- **Install Desktop Environment**: This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically.
-- **Uninstall Desktop Environment**: This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically.
 
 ### Desktop Environment Setup
 

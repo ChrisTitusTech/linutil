@@ -7,7 +7,7 @@ edition = "2021"
 license.workspace = true
 repository = "https://github.com/ChrisTitusTech/linutil/tree/main/tui"
 version.workspace = true
-include = ["src/*.rs", "Cargo.toml", "cool_tips.txt", "../man/linutil.1"]
+include = ["src/*.rs", "Cargo.toml", "cool_tips.txt", "assets/ctt_logo.png", "../man/linutil.1"]
 
 [[bin]]
 name = "linutil"
@@ -19,12 +19,14 @@ tips = ["rand"]
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
-linutil_core = { version = "25.12.18", path = "../core" }
+image = { version = "0.25.6", default-features = false, features = ["ico", "png"] }
+linutil_core = { version = "26.1.22", path = "../core" }
 nix = { version = "0.29.0", features = [ "user" ] }
 oneshot = { version = "0.1.8", features = ["std"], default-features = false }
 portable-pty = "0.8.1"
 rand = { version = "0.8.5", optional = true }
 ratatui = { version = "0.29.0", features = ["crossterm"], default-features = false }
+ratatui-image = { version = "9.0.0", default-features = false, features = ["crossterm", "image-defaults"] }
 time = { version = "0.3.36", features = ["formatting", "local-offset", "macros"], default-features = false }
 tree-sitter-bash = "0.23.3"
 tree-sitter-highlight = "0.24.4"

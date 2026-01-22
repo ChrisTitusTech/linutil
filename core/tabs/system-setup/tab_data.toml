@@ -238,4 +238,3 @@ description = "This Script will set the default TTY font to Terminus size 32 Bol
 script = "terminus-tty.sh"
 task_list = "I PFM"
 
-

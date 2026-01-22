@@ -4,7 +4,7 @@ use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers},
     prelude::*,
     symbols::border,
-    widgets::{Block, Paragraph},
+    widgets::{Block, Padding, Paragraph},
 };
 use unicode_width::UnicodeWidthChar;
 
@@ -116,10 +116,16 @@ impl Filter {
     pub fn draw_searchbar(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         //Set the search bar text (If empty use the placeholder)
         let display_text = if !self.in_search_mode && self.search_input.is_empty() {
-            Span::raw("Press / to search")
+            Span::styled(
+                "Type to search (/)",
+                Style::default().fg(theme.unfocused_color()).dim(),
+            )
         } else {
             let input_text = self.search_input.iter().collect::<String>();
-            Span::styled(input_text, Style::default().fg(theme.focused_color()))
+            Span::styled(
+                input_text,
+                Style::default().fg(theme.focused_color()).bold(),
+            )
         };
 
         let search_color = if self.in_search_mode {
@@ -132,8 +138,11 @@ impl Filter {
         let search_bar = Paragraph::new(display_text)
             .block(
                 Block::bordered()
-                    .border_set(border::ROUNDED)
-                    .title(" Search "),
+                    .border_set(border::PLAIN)
+                    .border_style(Style::default().fg(search_color))
+                    .title(" SEARCH ")
+                    .title_style(Style::default().fg(theme.tab_color()).bold())
+                    .padding(Padding::horizontal(1)),
             )
             .style(Style::default().fg(search_color));
 
@@ -153,18 +162,20 @@ impl Filter {
                 .iter()
                 .map(|c| c.width().unwrap_or(1) as u16)
                 .sum();
-            let x = area.x + cursor_position + 1;
-            let y = area.y + 1;
-            frame.set_cursor_position(Position::new(x, y));
+            let inner_x = area.x + 2;
+            let inner_y = area.y + 1;
+            let inner_width = area.width.saturating_sub(4);
+            let x = inner_x + cursor_position;
+            frame.set_cursor_position(Position::new(x, inner_y));
 
             if let Some(preview) = &self.completion {
-                let preview_x = area.x + search_input_size + 1;
+                let preview_x = inner_x + search_input_size;
                 let preview_span =
                     Span::styled(preview, Style::default().fg(theme.search_preview_color()));
                 let preview_area = Rect::new(
                     preview_x,
-                    y,
-                    (preview.len() as u16).min(area.width - search_input_size - 1), // Ensure the completion preview stays within the search bar bounds
+                    inner_y,
+                    (preview.len() as u16).min(inner_width.saturating_sub(search_input_size)), // Ensure the completion preview stays within the search bar bounds
                     1,
                 );
                 frame.render_widget(Paragraph::new(preview_span), preview_area);

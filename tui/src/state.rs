@@ -4,9 +4,11 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
+    logo::Logo,
     root::check_root_status,
     running_command::RunningCommand,
     shortcuts,
+    system_info::SystemInfo,
     theme::Theme,
     Args,
 };
@@ -16,7 +18,7 @@ use ratatui::{
     layout::Flex,
     prelude::*,
     symbols::border,
-    widgets::{Block, List, ListState, Paragraph},
+    widgets::{Block, List, ListState, Padding, Paragraph},
 };
 use std::rc::Rc;
 
@@ -24,7 +26,9 @@ const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
 const FLOAT_SIZE: u16 = 95;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
-const TITLE: &str = concat!(" Linux Toolbox - ", env!("CARGO_PKG_VERSION"), " ");
+const LEFT_EXTRA_WIDTH: u16 = 4;
+const TITLE: &str = concat!(" LINUTIL v", env!("CARGO_PKG_VERSION"), " ");
+const LIST_HIGHLIGHT_SYMBOL: &str = "> ";
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -67,6 +71,8 @@ pub struct AppState {
     size_bypass: bool,
     skip_confirmation: bool,
     mouse_enabled: bool,
+    system_info: Option<SystemInfo>,
+    logo: Option<Logo>,
 }
 
 pub enum Focus {
@@ -114,7 +120,7 @@ impl AppState {
             .iter()
             .map(|tab| tab.name.len() + args.theme.tab_icon().len())
             .max()
-            .unwrap_or(22) as u16; // 22 is the length of "Linutil by Chris Titus" title
+            .unwrap_or(22) as u16;
 
         let mut state = Self {
             areas: None,
@@ -134,6 +140,8 @@ impl AppState {
             size_bypass: args.size_bypass,
             skip_confirmation: args.skip_confirmation,
             mouse_enabled: args.mouse,
+            system_info: SystemInfo::gather(),
+            logo: Logo::load(),
         };
 
         #[cfg(unix)]
@@ -294,29 +302,14 @@ impl AppState {
             return frame.render_widget(warning, centered_layout[1]);
         }
 
-        let label_block = Block::bordered().border_set(border::Set {
-            top_left: " ",
-            top_right: " ",
-            bottom_left: " ",
-            bottom_right: " ",
-            vertical_left: " ",
-            vertical_right: " ",
-            horizontal_top: "*",
-            horizontal_bottom: "*",
-        });
-
-        let label = Paragraph::new(Line::from(vec![
-            Span::styled("Linutil ", Style::default().bold()),
-            Span::styled("by Chris Titus", Style::default().italic()),
-        ]))
-        .block(label_block)
-        .centered();
-
         let (keybind_scope, shortcuts) = self.get_keybinds();
 
         let keybinds_block = Block::bordered()
             .title(format!(" {keybind_scope} "))
-            .border_set(border::ROUNDED);
+            .border_set(border::PLAIN)
+            .border_style(Style::default().fg(self.theme.unfocused_color()))
+            .title_style(Style::default().fg(self.theme.tab_color()).bold())
+            .padding(Padding::horizontal(1));
 
         let keybind_render_width = keybinds_block.inner(area).width;
         let keybinds = create_shortcut_list(shortcuts, keybind_render_width);
@@ -329,14 +322,49 @@ impl AppState {
                 .split(area);
 
         let horizontal = Layout::horizontal([
-            Constraint::Min(self.longest_tab_display_len + 5),
+            Constraint::Min(self.longest_tab_display_len + 7 + LEFT_EXTRA_WIDTH),
             Constraint::Percentage(100),
         ])
         .split(vertical[0]);
 
-        let left_chunks =
-            Layout::vertical([Constraint::Length(3), Constraint::Min(1)]).split(horizontal[0]);
-        frame.render_widget(label, left_chunks[0]);
+        let info_height = self
+            .system_info
+            .as_ref()
+            .map(|info| info.entries_len() as u16 + 2)
+            .unwrap_or(0);
+        let show_info = info_height > 0 && horizontal[0].height > info_height.saturating_add(3);
+
+        let reserved_info_height = if show_info { info_height } else { 0 };
+        let max_logo_area_height = horizontal[0]
+            .height
+            .saturating_sub(reserved_info_height)
+            .saturating_sub(1);
+        let logo_height = if let Some(logo) = &self.logo {
+            logo.area_height_for_width(horizontal[0].width, max_logo_area_height)
+        } else {
+            max_logo_area_height.min(1)
+        };
+        let left_chunks = if show_info {
+            Layout::vertical([
+                Constraint::Length(logo_height),
+                Constraint::Min(1),
+                Constraint::Length(info_height),
+            ])
+            .split(horizontal[0])
+        } else {
+            Layout::vertical([Constraint::Length(logo_height), Constraint::Min(1)])
+                .split(horizontal[0])
+        };
+        if let Some(logo) = &mut self.logo {
+            logo.draw(frame, left_chunks[0], &self.theme);
+        } else {
+            let label = Paragraph::new(Line::styled(
+                format!("Linutil V{}", env!("CARGO_PKG_VERSION")),
+                Style::default().fg(self.theme.tab_color()).bold(),
+            ))
+            .alignment(Alignment::Center);
+            frame.render_widget(label, left_chunks[0]);
+        }
 
         self.areas = Some(Areas {
             tab_list: left_chunks[1],
@@ -349,36 +377,85 @@ impl AppState {
             .map(|tab| tab.name.as_str())
             .collect::<Vec<_>>();
 
-        let (tab_hl_style, highlight_symbol) = if let Focus::TabList = self.focus {
-            (
-                Style::default().reversed().fg(self.theme.tab_color()),
-                self.theme.tab_icon(),
-            )
-        } else if let Focus::Search = self.focus {
-            (Style::reset(), "   ")
+        let tab_focus = matches!(self.focus, Focus::TabList);
+        let tab_hl_style = if tab_focus {
+            Style::default()
+                .bg(self.theme.focused_color())
+                .fg(Color::Black)
+                .bold()
         } else {
-            (
-                Style::new().fg(self.theme.tab_color()),
-                self.theme.tab_icon(),
-            )
+            Style::default().fg(self.theme.unfocused_color())
+        };
+        let highlight_symbol = self.theme.tab_icon();
+        let tab_border_style = if tab_focus {
+            Style::default().fg(self.theme.focused_color())
+        } else {
+            Style::default().fg(self.theme.unfocused_color())
         };
 
         let tab_list = List::new(tabs)
-            .block(Block::bordered().border_set(border::ROUNDED))
+            .block(
+                Block::bordered()
+                    .border_set(border::PLAIN)
+                    .border_style(tab_border_style)
+                    .padding(Padding::horizontal(1)),
+            )
+            .style(Style::default().fg(self.theme.tab_color()))
             .highlight_style(tab_hl_style)
             .highlight_symbol(highlight_symbol);
         frame.render_stateful_widget(tab_list, left_chunks[1], &mut self.current_tab);
+        if show_info && left_chunks.len() > 2 {
+            self.draw_system_info(frame, left_chunks[2]);
+        }
 
         let chunks =
             Layout::vertical([Constraint::Length(3), Constraint::Min(1)]).split(horizontal[1]);
 
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
 
+        let title = if self.multi_select {
+            &format!("{TITLE}[Multi-Select] ")
+        } else {
+            TITLE
+        };
+
+        #[cfg(feature = "tips")]
+        let bottom_title = Line::from(format!(" {} ", self.tip))
+            .bold()
+            .fg(self.theme.unfocused_color())
+            .centered();
+        #[cfg(not(feature = "tips"))]
+        let bottom_title = "";
+
+        let task_list_title = Line::from(" FLAGS ").right_aligned();
+        let list_focus = matches!(self.focus, Focus::List);
+        let list_dim_style = if list_focus {
+            Style::default()
+        } else {
+            Style::default().dim()
+        };
+        let list_border_style = if list_focus {
+            Style::default().fg(self.theme.focused_color())
+        } else {
+            Style::default().fg(self.theme.unfocused_color())
+        };
+        let list_block = Block::bordered()
+            .border_set(border::PLAIN)
+            .border_style(list_border_style)
+            .title(title)
+            .title(task_list_title)
+            .title_bottom(bottom_title)
+            .padding(Padding::horizontal(1));
+        let list_inner_width = list_block.inner(chunks[1]).width as usize;
+        let list_content_width = list_inner_width.saturating_sub(LIST_HIGHLIGHT_SYMBOL.len());
+
         let mut items: Vec<Line> = Vec::with_capacity(self.filter.item_list().len());
 
         if !self.at_root() {
             items.push(
-                Line::from(format!("{}  ..", self.theme.dir_icon())).style(self.theme.dir_color()),
+                Line::from(format!("{}  ..", self.theme.dir_icon()))
+                    .style(self.theme.dir_color())
+                    .patch_style(list_dim_style),
             );
         }
 
@@ -403,54 +480,43 @@ impl AppState {
                         self.theme.dir_color(),
                     )
                     .patch_style(style)
+                    .patch_style(list_dim_style)
                 } else {
                     let left_content =
                         format!("{}  {} {}", self.theme.cmd_icon(), node.name, indicator);
                     let right_content = format!("{} ", node.task_list);
                     let center_space = " ".repeat(
-                        chunks[1].width as usize - left_content.len() - right_content.len(),
+                        list_content_width.saturating_sub(left_content.len() + right_content.len()),
                     );
                     Line::styled(
                         format!("{left_content}{center_space}{right_content}"),
                         self.theme.cmd_color(),
                     )
                     .patch_style(style)
+                    .patch_style(list_dim_style)
                 }
             },
         ));
 
-        let style = if let Focus::List = self.focus {
-            Style::default().reversed()
+        let list_highlight_style = if list_focus {
+            Style::default()
+                .bg(self.theme.focused_color())
+                .fg(Color::Black)
+                .bold()
         } else {
-            Style::new()
+            list_dim_style
         };
-
-        let title = if self.multi_select {
-            &format!("{TITLE}[Multi-Select] ")
+        let list_highlight_symbol = if list_focus {
+            LIST_HIGHLIGHT_SYMBOL
         } else {
-            TITLE
+            "  "
         };
-
-        #[cfg(feature = "tips")]
-        let bottom_title = Line::from(format!(" {} ", self.tip))
-            .bold()
-            .blue()
-            .centered();
-        #[cfg(not(feature = "tips"))]
-        let bottom_title = "";
-
-        let task_list_title = Line::from(" Important Actions ").right_aligned();
 
         // Create the list widget with items
         let list = List::new(items)
-            .highlight_style(style)
-            .block(
-                Block::bordered()
-                    .border_set(border::ROUNDED)
-                    .title(title)
-                    .title(task_list_title)
-                    .title_bottom(bottom_title),
-            )
+            .highlight_style(list_highlight_style)
+            .highlight_symbol(list_highlight_symbol)
+            .block(list_block)
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
@@ -900,5 +966,22 @@ impl AppState {
             self.current_tab.select_previous();
         }
         self.refresh_tab();
+    }
+
+    fn draw_system_info(&self, frame: &mut Frame, area: Rect) {
+        let Some(info) = &self.system_info else {
+            return;
+        };
+
+        let block = Block::bordered()
+            .border_set(border::PLAIN)
+            .border_style(Style::default().fg(self.theme.unfocused_color()))
+            .title(" SYSTEM ")
+            .title_style(Style::default().fg(self.theme.tab_color()).bold())
+            .padding(Padding::horizontal(1));
+
+        let inner_width = block.inner(area).width as usize;
+        let text = Text::from(info.render_lines(&self.theme, inner_width));
+        frame.render_widget(Paragraph::new(text).block(block), area);
     }
 }

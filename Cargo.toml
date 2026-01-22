@@ -5,7 +5,7 @@ default-members = ["tui", "core"]
 resolver = "2"
 [workspace.package]
 license = "MIT"
-version = "25.12.18"
+version = "26.1.22"
 edition = "2021"
 
 [profile.release]

@@ -16,14 +16,14 @@ pub enum Theme {
 impl Theme {
     pub const fn dir_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Blue,
-            Theme::Compatible => Color::Blue,
+            Theme::Default => Color::LightCyan,
+            Theme::Compatible => Color::Cyan,
         }
     }
 
     pub const fn cmd_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(204, 224, 208),
+            Theme::Default => Color::White,
             Theme::Compatible => Color::LightGreen,
         }
     }
@@ -37,49 +37,49 @@ impl Theme {
 
     pub const fn tab_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(255, 255, 85),
-            Theme::Compatible => Color::Yellow,
+            Theme::Default => Color::Yellow,
+            Theme::Compatible => Color::LightYellow,
         }
     }
 
     pub const fn dir_icon(&self) -> &'static str {
         match self {
-            Theme::Default => "  ",
-            Theme::Compatible => "[DIR]",
+            Theme::Default => "[D]",
+            Theme::Compatible => "[D]",
         }
     }
 
     pub const fn cmd_icon(&self) -> &'static str {
         match self {
-            Theme::Default => "  ",
-            Theme::Compatible => "[CMD]",
+            Theme::Default => "[*]",
+            Theme::Compatible => "[*]",
         }
     }
 
     pub const fn tab_icon(&self) -> &'static str {
         match self {
-            Theme::Default => "  ",
-            Theme::Compatible => ">> ",
+            Theme::Default => ">> ",
+            Theme::Compatible => ">  ",
         }
     }
 
     pub const fn multi_select_icon(&self) -> &'static str {
         match self {
-            Theme::Default => "",
+            Theme::Default => "*",
             Theme::Compatible => "*",
         }
     }
 
     pub const fn success_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(5, 255, 55),
+            Theme::Default => Color::LightGreen,
             Theme::Compatible => Color::Green,
         }
     }
 
     pub const fn fail_color(&self) -> Color {
         match self {
-            Theme::Default => Color::Rgb(199, 55, 44),
+            Theme::Default => Color::LightRed,
             Theme::Compatible => Color::Red,
         }
     }
@@ -87,21 +87,21 @@ impl Theme {
     pub const fn focused_color(&self) -> Color {
         match self {
             Theme::Default => Color::LightBlue,
-            Theme::Compatible => Color::LightBlue,
+            Theme::Compatible => Color::LightCyan,
         }
     }
 
     pub const fn search_preview_color(&self) -> Color {
         match self {
             Theme::Default => Color::DarkGray,
-            Theme::Compatible => Color::DarkGray,
+            Theme::Compatible => Color::Gray,
         }
     }
 
     pub const fn unfocused_color(&self) -> Color {
         match self {
             Theme::Default => Color::Gray,
-            Theme::Compatible => Color::Gray,
+            Theme::Compatible => Color::DarkGray,
         }
     }
 }

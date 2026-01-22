@@ -172,13 +172,14 @@ impl<'a> FloatingText<'a> {
 }
 
 impl FloatContent for FloatingText<'_> {
-    fn draw(&mut self, frame: &mut Frame, area: Rect, _theme: &Theme) {
+    fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_set(border::ROUNDED)
+            .border_set(border::PLAIN)
+            .border_style(Style::default().fg(theme.focused_color()))
             .title(self.mode_title.as_str())
             .title_alignment(Alignment::Center)
-            .title_style(Style::default().reversed())
+            .title_style(Style::default().fg(theme.tab_color()).bold())
             .style(Style::default());
 
         let inner_area = block.inner(area);

@@ -18,6 +18,20 @@ check() {
     unset message
 }
 
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+if [ -f "$SCRIPT_DIR/Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
+    TARGET_DIR=${CARGO_TARGET_DIR:-"$HOME/.cache/linutil/target"}
+    mkdir -p "$TARGET_DIR"
+    check $? "Preparing build cache"
+
+    cd "$SCRIPT_DIR"
+    check $? "Entering linutil directory"
+
+    CARGO_TARGET_DIR="$TARGET_DIR" cargo run -p linutil_tui --bin linutil -- "$@"
+    check $? "Running linutil from source"
+    exit 0
+fi
+
 findArch() {
     case "$(uname -m)" in
         x86_64|amd64) arch="x86_64" ;;

@@ -48,32 +48,57 @@ impl FloatContent for RunningCommand {
         let block = if !self.is_finished() {
             // Display a block indicating the command is running
             Block::bordered()
-                .border_set(border::ROUNDED)
-                .title_top(Line::from("Running the command....").centered())
-                .title_style(Style::default().reversed())
-                .title_bottom(Line::from("Press Ctrl-C to KILL the command"))
+                .border_set(border::PLAIN)
+                .border_style(Style::default().fg(theme.focused_color()))
+                .title_top(
+                    Line::styled(
+                        " RUNNING COMMAND ",
+                        Style::default().fg(theme.focused_color()).bold(),
+                    )
+                    .centered(),
+                )
+                .title_bottom(
+                    Line::styled(
+                        " Press Ctrl-C to kill the command ",
+                        Style::default().fg(theme.unfocused_color()),
+                    )
+                    .centered(),
+                )
         } else {
             // Display a block with the command's exit status
-            let title_line = if self.get_exit_status().success() {
-                Line::styled(
-                    "SUCCESS! Press <ENTER> to close this window",
-                    Style::default().fg(theme.success_color()).reversed(),
+            let (title_line, border_color) = if self.get_exit_status().success() {
+                (
+                    Line::styled(
+                        " SUCCESS - Press <ENTER> to close ",
+                        Style::default().fg(theme.success_color()).bold(),
+                    ),
+                    theme.success_color(),
                 )
             } else {
-                Line::styled(
-                    "FAILED! Press <ENTER> to close this window",
-                    Style::default().fg(theme.fail_color()).reversed(),
+                (
+                    Line::styled(
+                        " FAILED - Press <ENTER> to close ",
+                        Style::default().fg(theme.fail_color()).bold(),
+                    ),
+                    theme.fail_color(),
                 )
             };
 
             let log_path = if let Some(log_path) = &self.log_path {
-                Line::from(format!(" Log saved: {log_path} "))
+                Line::styled(
+                    format!(" Log saved: {log_path} "),
+                    Style::default().fg(theme.unfocused_color()),
+                )
             } else {
-                Line::from(" Press 'l' to save command log ")
+                Line::styled(
+                    " Press 'l' to save command log ",
+                    Style::default().fg(theme.unfocused_color()),
+                )
             };
 
             Block::bordered()
-                .border_set(border::ROUNDED)
+                .border_set(border::PLAIN)
+                .border_style(Style::default().fg(border_color))
                 .title_top(title_line.centered())
                 .title_bottom(log_path.centered())
         };
