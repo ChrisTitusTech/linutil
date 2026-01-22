@@ -4,6 +4,7 @@ use crate::{
     float::{Float, FloatContent},
     floating_text::FloatingText,
     hint::{create_shortcut_list, Shortcut},
+    logo::Logo,
     root::check_root_status,
     running_command::RunningCommand,
     shortcuts,
@@ -71,6 +72,7 @@ pub struct AppState {
     skip_confirmation: bool,
     mouse_enabled: bool,
     system_info: Option<SystemInfo>,
+    logo: Option<Logo>,
 }
 
 pub enum Focus {
@@ -139,6 +141,7 @@ impl AppState {
             skip_confirmation: args.skip_confirmation,
             mouse_enabled: args.mouse,
             system_info: SystemInfo::gather(),
+            logo: Logo::load(),
         };
 
         #[cfg(unix)]
@@ -299,25 +302,6 @@ impl AppState {
             return frame.render_widget(warning, centered_layout[1]);
         }
 
-        let label_block = Block::bordered()
-            .border_set(border::PLAIN)
-            .border_style(Style::default().fg(self.theme.tab_color()))
-            .padding(Padding::horizontal(1));
-
-        let label = Paragraph::new(Line::from(vec![
-            Span::styled(
-                "LINUTIL",
-                Style::default().fg(self.theme.tab_color()).bold(),
-            ),
-            Span::raw(" "),
-            Span::styled(
-                format!("v{}", env!("CARGO_PKG_VERSION")),
-                Style::default().fg(self.theme.unfocused_color()),
-            ),
-        ]))
-        .block(label_block)
-        .centered();
-
         let (keybind_scope, shortcuts) = self.get_keybinds();
 
         let keybinds_block = Block::bordered()
@@ -350,17 +334,37 @@ impl AppState {
             .unwrap_or(0);
         let show_info = info_height > 0 && horizontal[0].height > info_height.saturating_add(3);
 
+        let reserved_info_height = if show_info { info_height } else { 0 };
+        let max_logo_area_height = horizontal[0]
+            .height
+            .saturating_sub(reserved_info_height)
+            .saturating_sub(1);
+        let logo_height = if let Some(logo) = &self.logo {
+            logo.area_height_for_width(horizontal[0].width, max_logo_area_height)
+        } else {
+            max_logo_area_height.min(1)
+        };
         let left_chunks = if show_info {
             Layout::vertical([
-                Constraint::Length(3),
+                Constraint::Length(logo_height),
                 Constraint::Min(1),
                 Constraint::Length(info_height),
             ])
             .split(horizontal[0])
         } else {
-            Layout::vertical([Constraint::Length(3), Constraint::Min(1)]).split(horizontal[0])
+            Layout::vertical([Constraint::Length(logo_height), Constraint::Min(1)])
+                .split(horizontal[0])
         };
-        frame.render_widget(label, left_chunks[0]);
+        if let Some(logo) = &mut self.logo {
+            logo.draw(frame, left_chunks[0], &self.theme);
+        } else {
+            let label = Paragraph::new(Line::styled(
+                format!("Linutil V{}", env!("CARGO_PKG_VERSION")),
+                Style::default().fg(self.theme.tab_color()).bold(),
+            ))
+            .alignment(Alignment::Center);
+            frame.render_widget(label, left_chunks[0]);
+        }
 
         self.areas = Some(Areas {
             tab_list: left_chunks[1],
