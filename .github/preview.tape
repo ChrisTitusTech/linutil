@@ -60,6 +60,10 @@ Output preview.gif
 Require linutil
 Require sh
 
+Set Shell bash
+Set FontFamily "JetBrainsMono NFM"
+Set Width 2560
+Set Height 1440
 Set Theme nord
 
 Sleep 1s
