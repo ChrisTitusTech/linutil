@@ -46,15 +46,16 @@ jobs:
           echo "${{ github.workspace }}/build" >> $GITHUB_PATH
           echo "branch_name=${{ env.tag_name }}" | tr . - >> $GITHUB_ENV
 
-      - name: Install ffmpeg
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y ffmpeg ttyd fonts-jetbrains-mono
+
+      - name: Install VHS
+        run: go install github.com/charmbracelet/vhs@latest
 
       - name: Generate preview with VHS
-        uses: charmbracelet/vhs-action@v2
-        with:
-          path: .github/preview.tape
+        run: vhs .github/preview.tape
 
       - name: Move preview
         run: mv preview.gif .github/preview.gif
