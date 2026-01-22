@@ -1,9 +1,6 @@
 use crate::theme::Theme;
 use image::{imageops::FilterType, RgbaImage};
-use ratatui::{
-    prelude::*,
-    widgets::Paragraph,
-};
+use ratatui::{prelude::*, widgets::Paragraph};
 use ratatui_image::{
     picker::{Picker, ProtocolType},
     protocol::StatefulProtocol,
@@ -46,9 +43,8 @@ impl Logo {
         let renderer = if picker.protocol_type() == ProtocolType::Halfblocks {
             Renderer::Blocks
         } else {
-            let protocol = Box::new(
-                picker.new_resize_protocol(image::DynamicImage::ImageRgba8(rgba.clone())),
-            );
+            let protocol =
+                Box::new(picker.new_resize_protocol(image::DynamicImage::ImageRgba8(rgba.clone())));
             Renderer::Protocol {
                 protocol,
                 resize: Resize::Scale(Some(FilterType::Triangle)),
@@ -104,8 +100,8 @@ impl Logo {
 
             if !use_blocks {
                 if let Renderer::Protocol { protocol, resize } = &mut self.renderer {
-                    let widget = StatefulImage::<StatefulProtocol>::default()
-                        .resize(resize.clone());
+                    let widget =
+                        StatefulImage::<StatefulProtocol>::default().resize(resize.clone());
                     frame.render_stateful_widget(widget, image_area, protocol.as_mut());
                     if let Some(result) = protocol.last_encoding_result() {
                         if result.is_err() {
@@ -154,8 +150,7 @@ impl Logo {
     }
 
     fn rows_for_width(&self, width: u16) -> u16 {
-        if width == 0 || self.image_size.0 == 0 || self.font_size.0 == 0 || self.font_size.1 == 0
-        {
+        if width == 0 || self.image_size.0 == 0 || self.font_size.0 == 0 || self.font_size.1 == 0 {
             return 0;
         }
 
@@ -169,11 +164,7 @@ impl Logo {
     }
 
     fn width_for_height(&self, height: u16) -> u16 {
-        if height == 0
-            || self.image_size.1 == 0
-            || self.font_size.0 == 0
-            || self.font_size.1 == 0
-        {
+        if height == 0 || self.image_size.1 == 0 || self.font_size.0 == 0 || self.font_size.1 == 0 {
             return 0;
         }
 
@@ -220,10 +211,7 @@ impl Logo {
             }
         }
 
-        frame.render_widget(
-            Paragraph::new(Text::from(self.cached_lines.clone())),
-            area,
-        );
+        frame.render_widget(Paragraph::new(Text::from(self.cached_lines.clone())), area);
     }
 
     fn refresh_protocol_if_needed(&mut self, area: Rect) {
@@ -255,9 +243,9 @@ impl Logo {
         if self.font_size != new_font_size {
             self.font_size = new_font_size;
             self.renderer = Renderer::Protocol {
-                protocol: Box::new(picker.new_resize_protocol(
-                    image::DynamicImage::ImageRgba8(self.rgba.clone()),
-                )),
+                protocol: Box::new(
+                    picker.new_resize_protocol(image::DynamicImage::ImageRgba8(self.rgba.clone())),
+                ),
                 resize: Resize::Scale(Some(FilterType::Triangle)),
             };
         }
