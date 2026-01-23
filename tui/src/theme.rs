@@ -58,8 +58,8 @@ impl Theme {
 
     pub const fn tab_icon(&self) -> &'static str {
         match self {
-            Theme::Default => ">> ",
-            Theme::Compatible => ">  ",
+            Theme::Default => "> ",
+            Theme::Compatible => "> ",
         }
     }
 
