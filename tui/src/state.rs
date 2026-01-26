@@ -27,7 +27,7 @@ const MIN_HEIGHT: u16 = 25;
 const FLOAT_SIZE: u16 = 95;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const LEFT_EXTRA_WIDTH: u16 = 4;
-const TITLE: &str = concat!(" LINUTIL v", env!("CARGO_PKG_VERSION"), " ");
+const TITLE: &str = " LINUTIL ";
 const LIST_HIGHLIGHT_SYMBOL: &str = "> ";
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
