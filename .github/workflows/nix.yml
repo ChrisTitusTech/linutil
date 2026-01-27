@@ -58,5 +58,5 @@ jobs:
           author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
           branch: 'chore/nix/flake-update'
           title: 'chore(nix): update flake inputs'
-          reviewers: adamperkowski
-          assignees: adamperkowski
+          reviewers: koibtw
+          assignees: koibtw
