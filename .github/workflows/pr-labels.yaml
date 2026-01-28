@@ -27,29 +27,37 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LABELS=()
-
+          LABELS=""
+          
           for ISSUE in ${{ env.ISSUES }}; do
-            ISSUE_LABELS=$(curl -s -H "Authorization: token $GH_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE" \
-              | jq -r '.labels[].name')
-
-            while IFS= read -r LABEL; do
-              if [[ "$LABEL" == *:* ]]; then
-                LABELS+=("$LABEL")
+            ISSUE_LABELS=$(gh api "/repos/${{ github.repository }}/issues/$ISSUE" \
+              --jq '.labels[].name | select(contains(":"))')
+            
+            if [[ -n "$ISSUE_LABELS" ]]; then
+              if [[ -z "$LABELS" ]]; then
+                LABELS="$ISSUE_LABELS"
+              else
+                LABELS="$LABELS"$'\n'"$ISSUE_LABELS"
               fi
-            done <<< "$ISSUE_LABELS"
+            fi
           done
-
-          UNIQUE_LABELS=$(printf "%s\n" "${LABELS[@]}" | sort -u | tr '\n' ',' | sed 's/,$//')
-          echo "LABELS=$UNIQUE_LABELS" >> $GITHUB_ENV
+          
+          if [[ -n "$LABELS" ]]; then
+            UNIQUE_LABELS=$(echo "$LABELS" | sort -u | tr '\n' ',' | sed 's/,$//')
+            echo "LABELS=$UNIQUE_LABELS" >> $GITHUB_ENV
+          else
+            echo "LABELS=" >> $GITHUB_ENV
+          fi
 
       - name: Assign labels
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
+          
           if [[ -n "${{ env.LABELS }}" ]]; then
-            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required,${{ env.LABELS }}"
-          else
-            gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
+            IFS=',' read -ra LABEL_ARRAY <<< "${{ env.LABELS }}"
+            for label in "${LABEL_ARRAY[@]}"; do
+              gh pr edit ${{ github.event.pull_request.number }} --add-label "$label"
+            done
           fi
