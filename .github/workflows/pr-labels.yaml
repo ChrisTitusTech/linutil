@@ -8,7 +8,8 @@ jobs:
   labelPR:
     runs-on: ubuntu-latest
     permissions:
-      issues: read
+      contents: read
+      issues: write
       pull-requests: write
 
     steps:
