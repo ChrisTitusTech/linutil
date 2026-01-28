@@ -234,7 +234,7 @@ impl FloatContent for FloatingText<'_> {
                 ("Scroll up", ["k", "Up"]),
                 ("Scroll left", ["h", "Left"]),
                 ("Scroll right", ["l", "Right"]),
-                ("Close window", ["Enter", "p", "q", "d", "g"])
+                ("Close window", ["Enter", "q"])
             ),
         )
     }
