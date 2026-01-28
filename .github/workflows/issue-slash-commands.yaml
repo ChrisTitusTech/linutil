@@ -20,26 +20,26 @@ jobs:
       - name: Check for /label command
         id: check_label_command
         run: |
-          if [[ "${{ contains(github.event.comment.body, '/label') }}" == "true" ]]; then
-            echo "command=true" >> $GITHUB_ENV
-            LABEL_NAME=$(echo '${{ github.event.comment.body }}' | awk -F"/label" '/\/label/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
-            echo "label_command=true" >> $GITHUB_ENV
-            echo "label_name=${LABEL_NAME}" >> $GITHUB_ENV
-          else
-            echo "label_command=false" >> $GITHUB_ENV
-          fi
+            if [[ "${{ contains(github.event.comment.body, '/label') }}" == "true" ]]; then
+              echo "command=true" >> $GITHUB_ENV
+              LABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/label" '/\/label/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}')
+              echo "label_command=true" >> $GITHUB_ENV
+              echo "label_name=${LABEL_NAME}" >> $GITHUB_ENV
+            else
+              echo "label_command=false" >> $GITHUB_ENV
+            fi
       
       - name: Check for /unlabel command
         id: check_unlabel_command
         run: |
-          if [[ "${{ contains(github.event.comment.body, '/unlabel') }}" == "true" ]]; then
-            echo "command=true" >> $GITHUB_ENV
-            UNLABEL_NAME=$(echo '${{ github.event.comment.body }}' | awk -F"/unlabel" '/\/unlabel/ { match($2, /'\''([^'\'']*)'\''/, arr); if (arr[1] != "") print arr[1] }')
-            echo "unlabel_command=true" >> $GITHUB_ENV
-            echo "unlabel_name=${UNLABEL_NAME}" >> $GITHUB_ENV
-          else
-            echo "unlabel_command=false" >> $GITHUB_ENV
-          fi
+            if [[ "${{ contains(github.event.comment.body, '/unlabel') }}" == "true" ]]; then
+              echo "command=true" >> $GITHUB_ENV
+              UNLABEL_NAME=$(echo "${{ github.event.comment.body }}" | awk -F"/unlabel" '/\/unlabel/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}')
+              echo "unlabel_command=true" >> $GITHUB_ENV
+              echo "unlabel_name=${UNLABEL_NAME}" >> $GITHUB_ENV
+            else
+              echo "unlabel_command=false" >> $GITHUB_ENV
+            fi
 
       - name: Check for /close command
         id: check_close_command
