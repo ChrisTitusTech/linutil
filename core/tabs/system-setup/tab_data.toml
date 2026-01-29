@@ -55,7 +55,7 @@ data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
 values = ["Valve"]
 
 [[data.entries]]
-name = "Nvidia Drivers && Hardware Acceleration"
+name = "Nvidia Drivers & Hardware Acceleration"
 description = "This script installs and configures nvidia drivers with Hardware Acceleration."
 script = "arch/nvidia-drivers.sh"
 task_list = "I FM SS"
