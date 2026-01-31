@@ -18,13 +18,14 @@ use ratatui::{
     layout::Flex,
     prelude::*,
     symbols::border,
-    widgets::{Block, List, ListState, Padding, Paragraph},
+    widgets::{Block, Clear, List, ListState, Padding, Paragraph},
 };
 use std::rc::Rc;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
 const FLOAT_SIZE: u16 = 95;
+const PREVIEW_FLOAT_SIZE: u16 = 100;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const LEFT_EXTRA_WIDTH: u16 = 4;
 const TITLE: &str = " LINUTIL ";
@@ -71,6 +72,7 @@ pub struct AppState {
     size_bypass: bool,
     skip_confirmation: bool,
     mouse_enabled: bool,
+    force_clear: bool,
     system_info: Option<SystemInfo>,
     logo: Option<Logo>,
 }
@@ -140,6 +142,7 @@ impl AppState {
             size_bypass: args.size_bypass,
             skip_confirmation: args.skip_confirmation,
             mouse_enabled: args.mouse,
+            force_clear: false,
             system_info: SystemInfo::gather(),
             logo: Logo::load(),
         };
@@ -167,6 +170,12 @@ impl AppState {
             self.selected_commands = config_values.auto_execute_commands;
             self.handle_initial_auto_execute();
         }
+    }
+
+    pub fn take_force_clear(&mut self) -> bool {
+        let should_clear = self.force_clear;
+        self.force_clear = false;
+        should_clear
     }
 
     fn handle_initial_auto_execute(&mut self) {
@@ -277,6 +286,8 @@ impl AppState {
 
     pub fn draw(&mut self, frame: &mut Frame) {
         let area = frame.area();
+        // Clear the full frame so closed floating windows don't leave stale text behind.
+        frame.render_widget(Clear, area);
         self.drawable = !self.is_terminal_drawable(area);
         if !self.drawable {
             let warning = Paragraph::new(format!(
@@ -512,6 +523,9 @@ impl AppState {
             "  "
         };
 
+        // Clear list area so stale content from floating windows isn't left behind.
+        frame.render_widget(Clear, chunks[1]);
+
         // Create the list widget with items
         let list = List::new(items)
             .highlight_style(list_highlight_style)
@@ -621,6 +635,7 @@ impl AppState {
             Focus::FloatingWindow(command) => {
                 if command.handle_key_event(key) {
                     self.focus = Focus::List;
+                    self.force_clear = true;
                 }
             }
 
@@ -857,8 +872,8 @@ impl AppState {
     fn enable_preview(&mut self) {
         if let Some(list_node) = self.get_selected_node() {
             let preview_title = format!("[Preview] - {}", list_node.name.as_str());
-            let preview = FloatingText::from_command(&list_node.command, &preview_title, false);
-            self.spawn_float(preview, FLOAT_SIZE, FLOAT_SIZE);
+            let preview = FloatingText::from_command(&list_node.command, &preview_title, true);
+            self.spawn_float(preview, PREVIEW_FLOAT_SIZE, PREVIEW_FLOAT_SIZE);
         }
     }
 

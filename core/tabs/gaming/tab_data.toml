@@ -143,4 +143,3 @@ name = "Fallout 76 INI and Mods"
 description = "This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements."
 script = "fallout-76/fallout76settings.sh"
 task_list = "FM"
-
