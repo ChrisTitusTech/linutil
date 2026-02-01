@@ -8,7 +8,7 @@ jobs:
   labelPR:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write     # change from 'read' to 'write'
       issues: write
       pull-requests: write
 
