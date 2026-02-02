@@ -21,6 +21,7 @@ use ratatui::{
     widgets::{Block, Clear, List, ListState, Padding, Paragraph},
 };
 use std::rc::Rc;
+use unicode_width::UnicodeWidthStr;
 
 const MIN_WIDTH: u16 = 100;
 const MIN_HEIGHT: u16 = 25;
@@ -29,7 +30,6 @@ const PREVIEW_FLOAT_SIZE: u16 = 100;
 const CONFIRM_PROMPT_FLOAT_SIZE: u16 = 40;
 const LEFT_EXTRA_WIDTH: u16 = 4;
 const TITLE: &str = " LINUTIL ";
-const LIST_HIGHLIGHT_SYMBOL: &str = "> ";
 const ACTIONS_GUIDE: &str = "List of important tasks performed by commands' names:
 
 D  - disk modifications (ex. partitioning) (privileged)
@@ -120,7 +120,7 @@ impl AppState {
 
         let longest_tab_display_len = tabs
             .iter()
-            .map(|tab| tab.name.len() + args.theme.tab_icon().len())
+            .map(|tab| tab.name.width() + args.theme.tab_icon().width())
             .max()
             .unwrap_or(22) as u16;
 
@@ -458,7 +458,7 @@ impl AppState {
             .title_bottom(bottom_title)
             .padding(Padding::horizontal(1));
         let list_inner_width = list_block.inner(chunks[1]).width as usize;
-        let list_content_width = list_inner_width.saturating_sub(LIST_HIGHLIGHT_SYMBOL.len());
+        let list_content_width = list_inner_width.saturating_sub(self.theme.tab_icon().width());
 
         let mut items: Vec<Line> = Vec::with_capacity(self.filter.item_list().len());
 
@@ -497,7 +497,8 @@ impl AppState {
                         format!("{}  {} {}", self.theme.cmd_icon(), node.name, indicator);
                     let right_content = format!("{} ", node.task_list);
                     let center_space = " ".repeat(
-                        list_content_width.saturating_sub(left_content.len() + right_content.len()),
+                        list_content_width
+                            .saturating_sub(left_content.width() + right_content.width()),
                     );
                     Line::styled(
                         format!("{left_content}{center_space}{right_content}"),
@@ -518,7 +519,7 @@ impl AppState {
             list_dim_style
         };
         let list_highlight_symbol = if list_focus {
-            LIST_HIGHLIGHT_SYMBOL
+            self.theme.tab_icon()
         } else {
             "  "
         };
