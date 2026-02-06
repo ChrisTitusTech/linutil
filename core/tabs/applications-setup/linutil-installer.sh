@@ -1,8 +1,14 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+LINUTIL_UNINSTALL_SUPPORTED=1
 
 installLinutil() {
+    if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+        uninstallLinutil
+        return 0
+    fi
+
     printf "%b\n" "${YELLOW}Installing Linutil...${RC}"
     case "$PACKAGER" in
         pacman)
@@ -62,6 +68,26 @@ installLinutil() {
             esac
             ;;
     esac
+}
+
+uninstallLinutil() {
+    printf "%b\n" "${YELLOW}Uninstalling Linutil...${RC}"
+    case "$PACKAGER" in
+        pacman)
+            "$AUR_HELPER" -R --noconfirm linutil linutil-bin linutil-git || true
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" remove -y linutil || true
+            ;;
+        *)
+            if command_exists cargo; then
+                cargo uninstall linutil_tui || true
+            fi
+            ;;
+    esac
+    "$ESCALATION_TOOL" rm -f /usr/share/man/man1/linutil.1
+    "$ESCALATION_TOOL" rm -f /usr/share/applications/linutil.desktop
+    printf "%b\n" "${GREEN}Uninstall complete.${RC}"
 }
 
 installExtra() {

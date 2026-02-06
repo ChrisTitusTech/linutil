@@ -23,6 +23,11 @@ use time::{macros::format_description, OffsetDateTime};
 use tui_term::widget::PseudoTerminal;
 use vt100_ctt::{Parser, Screen};
 
+pub enum CommandAction {
+    Install,
+    Uninstall,
+}
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -193,7 +198,7 @@ impl FloatContent for RunningCommand {
 pub static TERMINAL_UPDATED: AtomicBool = AtomicBool::new(true);
 
 impl RunningCommand {
-    pub fn new(commands: &[&Command]) -> Self {
+    pub fn new_with_action(commands: &[&Command], action: CommandAction) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -206,6 +211,13 @@ impl RunningCommand {
         // Ensure that interactive tools can detect they're in a terminal
         cmd.env("FORCE_COLOR", "1");
         cmd.env("NO_COLOR", "");
+        cmd.env(
+            "LINUTIL_ACTION",
+            match action {
+                CommandAction::Install => "install",
+                CommandAction::Uninstall => "uninstall",
+            },
+        );
 
         // All the merged commands are passed as a single argument to reduce the overhead of rebuilding the command arguments for each and every command
         let mut script = String::new();

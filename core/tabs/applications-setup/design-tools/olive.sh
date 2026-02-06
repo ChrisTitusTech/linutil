@@ -4,7 +4,10 @@
 
 installOlive() {
 	printf "%b\n" "${YELLOW}Installing Olive Video Editor...${RC}"
-	if ! command_exists olive; then
+	if ! flatpak_app_installed org.olivevideoeditor.Olive && ! command_exists olive; then
+	    if try_flatpak_install org.olivevideoeditor.Olive; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        dnf)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y olive
@@ -13,10 +16,8 @@ installOlive() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter olive
 	        	;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.olivevideoeditor.Olive
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installOlive() {
 
 uninstallOlive() {
 	printf "%b\n" "${YELLOW}Uninstalling Olive...${RC}"
+	if uninstall_flatpak_if_installed org.olivevideoeditor.Olive; then
+	    return 0
+	fi
 	if command_exists olive; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallOlive() {
 		        "$AUR_HELPER" -R --noconfirm --cleanafter olive
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.olivevideoeditor.Olive
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

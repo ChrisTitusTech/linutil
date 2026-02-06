@@ -6,7 +6,7 @@ use crate::{
     hint::{create_shortcut_list, Shortcut},
     logo::Logo,
     root::check_root_status,
-    running_command::RunningCommand,
+    running_command::{CommandAction, RunningCommand},
     shortcuts,
     system_info::SystemInfo,
     theme::Theme,
@@ -75,6 +75,7 @@ pub struct AppState {
     force_clear: bool,
     system_info: Option<SystemInfo>,
     logo: Option<Logo>,
+    confirm_prompt: Option<Float<ConfirmPrompt>>,
 }
 
 pub enum Focus {
@@ -82,7 +83,7 @@ pub enum Focus {
     TabList,
     List,
     FloatingWindow(Float<dyn FloatContent>),
-    ConfirmationPrompt(Float<ConfirmPrompt>),
+    ConfirmationPrompt,
 }
 
 pub struct ListEntry {
@@ -145,6 +146,7 @@ impl AppState {
             force_clear: false,
             system_info: SystemInfo::gather(),
             logo: Logo::load(),
+            confirm_prompt: None,
         };
 
         #[cfg(unix)]
@@ -186,7 +188,7 @@ impl AppState {
 
     fn spawn_confirmprompt(&mut self) {
         if self.skip_confirmation {
-            self.handle_confirm_command();
+            self.handle_confirm_command(CommandAction::Install);
         } else {
             let cmd_names: Vec<_> = self
                 .selected_commands
@@ -194,12 +196,14 @@ impl AppState {
                 .map(|node| node.name.as_str())
                 .collect();
 
-            let prompt = ConfirmPrompt::new(&cmd_names);
-            self.focus = Focus::ConfirmationPrompt(Float::new(
-                Box::new(prompt),
+            let mut prompt = Float::new(
+                Box::new(ConfirmPrompt::new(&cmd_names)),
                 CONFIRM_PROMPT_FLOAT_SIZE,
                 CONFIRM_PROMPT_FLOAT_SIZE,
-            ));
+            );
+            prompt.content.is_focused = true;
+            self.confirm_prompt = Some(prompt);
+            self.focus = Focus::ConfirmationPrompt;
         }
     }
 
@@ -275,7 +279,11 @@ impl AppState {
             ),
 
             Focus::FloatingWindow(ref float) => float.get_shortcut_list(),
-            Focus::ConfirmationPrompt(ref prompt) => prompt.get_shortcut_list(),
+            Focus::ConfirmationPrompt => self
+                .confirm_prompt
+                .as_ref()
+                .map(|prompt| prompt.get_shortcut_list())
+                .unwrap_or(("", Box::new([]))),
         }
     }
 
@@ -534,10 +542,13 @@ impl AppState {
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
-        match &mut self.focus {
-            Focus::FloatingWindow(float) => float.draw(frame, chunks[1], &self.theme),
-            Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1], &self.theme),
-            _ => {}
+        if let Focus::FloatingWindow(float) = &mut self.focus {
+            float.draw(frame, chunks[1], &self.theme);
+        }
+
+        if let Some(prompt) = &mut self.confirm_prompt {
+            prompt.content.is_focused = matches!(self.focus, Focus::ConfirmationPrompt);
+            prompt.draw(frame, chunks[1], &self.theme);
         }
 
         frame.render_widget(keybind_para, vertical[1]);
@@ -592,8 +603,10 @@ impl AppState {
             Focus::FloatingWindow(float) => {
                 float.handle_mouse_event(event);
             }
-            Focus::ConfirmationPrompt(confirm) => {
-                confirm.content.handle_mouse_event(event);
+            Focus::ConfirmationPrompt => {
+                if let Some(confirm) = &mut self.confirm_prompt {
+                    confirm.content.handle_mouse_event(event);
+                }
             }
             _ => {}
         }
@@ -611,7 +624,7 @@ impl AppState {
             return false;
         }
 
-        if matches!(self.focus, Focus::ConfirmationPrompt(_))
+        if matches!(self.focus, Focus::ConfirmationPrompt)
             && (key.modifiers.contains(KeyModifiers::CONTROL) && key.code == KeyCode::Char('c'))
         {
             return false;
@@ -639,26 +652,36 @@ impl AppState {
                 }
             }
 
-            Focus::ConfirmationPrompt(confirm) => {
-                confirm.content.handle_key_event(key);
-                match confirm.content.status {
-                    ConfirmStatus::Abort => {
-                        self.focus = Focus::List;
-                        // selected command was pushed to selection list if multi-select was
-                        // enabled, need to clear it to prevent state corruption
-                        if !self.multi_select {
-                            self.selected_commands.clear()
-                        } else {
-                            // Prevents non multi_selectable cmd from being pushed into the selected list
-                            if let Some(node) = self.get_selected_node() {
-                                if !node.multi_select {
-                                    self.selected_commands.retain(|cmd| cmd.name != node.name);
+            Focus::ConfirmationPrompt => {
+                if let Some(confirm) = &mut self.confirm_prompt {
+                    confirm.content.handle_key_event(key);
+                    match confirm.content.status {
+                        ConfirmStatus::Abort => {
+                            self.focus = Focus::List;
+                            self.confirm_prompt = None;
+                            // selected command was pushed to selection list if multi-select was
+                            // enabled, need to clear it to prevent state corruption
+                            if !self.multi_select {
+                                self.selected_commands.clear()
+                            } else {
+                                // Prevents non multi_selectable cmd from being pushed into the selected list
+                                if let Some(node) = self.get_selected_node() {
+                                    if !node.multi_select {
+                                        self.selected_commands.retain(|cmd| cmd.name != node.name);
+                                    }
                                 }
                             }
                         }
+                        ConfirmStatus::Confirm => {
+                            self.confirm_prompt = None;
+                            self.handle_confirm_command(CommandAction::Install)
+                        }
+                        ConfirmStatus::Uninstall => {
+                            self.confirm_prompt = None;
+                            self.handle_confirm_command(CommandAction::Uninstall)
+                        }
+                        ConfirmStatus::None => {}
                     }
-                    ConfirmStatus::Confirm => self.handle_confirm_command(),
-                    ConfirmStatus::None => {}
                 }
             }
 
@@ -923,14 +946,14 @@ impl AppState {
         }
     }
 
-    fn handle_confirm_command(&mut self) {
+    fn handle_confirm_command(&mut self, action: CommandAction) {
         let commands: Vec<&Command> = self
             .selected_commands
             .iter()
             .map(|node| &node.command)
             .collect();
 
-        let command = RunningCommand::new(&commands);
+        let command = RunningCommand::new_with_action(&commands, action);
         self.spawn_float(command, FLOAT_SIZE, FLOAT_SIZE);
         self.selected_commands.clear();
     }

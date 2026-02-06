@@ -4,7 +4,10 @@
 
 installSynfigStudio() {
 	printf "%b\n" "${YELLOW}Installing Synfig Studio...${RC}"
-	if ! command_exists synfigstudio; then
+	if ! flatpak_app_installed org.synfig.SynfigStudio && ! command_exists synfigstudio; then
+	    if try_flatpak_install org.synfig.SynfigStudio; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        dnf)
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y synfigstudio
@@ -13,10 +16,8 @@ installSynfigStudio() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter synfigstudio
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.synfig.SynfigStudio
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installSynfigStudio() {
 
 uninstallSynfigStudio() {
 	printf "%b\n" "${YELLOW}Uninstalling Synfig Studio...${RC}"
+	if uninstall_flatpak_if_installed org.synfig.SynfigStudio; then
+	    return 0
+	fi
 	if command_exists synfigstudio; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallSynfigStudio() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter synfigstudio
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.synfig.SynfigStudio
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

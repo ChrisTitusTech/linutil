@@ -4,7 +4,10 @@
 
 installOpenShot() {
 	printf "%b\n" "${YELLOW}Installing OpenShot...${RC}"
-	if ! command_exists openshot; then
+	if ! flatpak_app_installed org.openshot.OpenShot && ! command_exists openshot; then
+	    if try_flatpak_install org.openshot.OpenShot; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y openshot-qt
@@ -13,10 +16,8 @@ installOpenShot() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter openshot
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installOpenShot() {
 
 uninstallOpenShot() {
 	printf "%b\n" "${YELLOW}Uninstalling OpenShot...${RC}"
+	if uninstall_flatpak_if_installed org.openshot.OpenShot; then
+	    return 0
+	fi
 	if command_exists openshot; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallOpenShot() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter openshot
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.openshot.OpenShot
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

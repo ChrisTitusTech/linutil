@@ -3,8 +3,11 @@
 . ../../common-script.sh
 
 installJitsi() {
-    if ! command_exists org.jitsi.jitsi-meet && ! command_exists jitsi-meet; then
+    if ! flatpak_app_installed org.jitsi.jitsi-meet && ! command_exists jitsi-meet; then
         printf "%b\n" "${YELLOW}Installing Jitsi meet...${RC}"
+        if try_flatpak_install org.jitsi.jitsi-meet; then
+            return 0
+        fi
         case "$PACKAGER" in
             apt-get|nala)
                 curl https://download.jitsi.org/jitsi-key.gpg.key | "$ESCALATION_TOOL" gpg --dearmor > /usr/share/keyrings/jitsi-keyring.gpg
@@ -22,8 +25,8 @@ installJitsi() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
                 ;;
             apk)
-                checkFlatpak
-                flatpak install flathub org.jitsi.jitsi-meet
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

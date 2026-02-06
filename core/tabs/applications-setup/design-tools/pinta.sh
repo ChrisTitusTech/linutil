@@ -4,7 +4,10 @@
 
 installPinta() {
 	printf "%b\n" "${YELLOW}Installing Pinta...${RC}"
-	if ! command_exists pinta; then
+	if ! flatpak_app_installed com.github.PintaProject.Pinta && ! command_exists pinta; then
+	    if try_flatpak_install com.github.PintaProject.Pinta; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y pinta
@@ -13,10 +16,8 @@ installPinta() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter pinta
 	        	;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installPinta() {
 
 uninstallPinta() {
 	printf "%b\n" "${YELLOW}Uninstalling Pinta...${RC}"
+	if uninstall_flatpak_if_installed com.github.PintaProject.Pinta; then
+	    return 0
+	fi
 	if command_exists pinta; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallPinta() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter pinta
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

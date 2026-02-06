@@ -3,15 +3,14 @@
 . ../../common-script.sh
 
 installLibreOffice() {
-    if ! command_exists org.libreoffice.LibreOffice && ! command_exists libreoffice; then
+    if ! flatpak_app_installed org.libreoffice.LibreOffice && ! command_exists libreoffice; then
         printf "%b\n" "${YELLOW}Installing Libre Office...${RC}"
+        if try_flatpak_install org.libreoffice.LibreOffice; then
+            return 0
+        fi
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
-                ;;
-            zypper|dnf)
-                checkFlatpak
-                flatpak install -y flathub org.libreoffice.LibreOffice
                 ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
@@ -24,6 +23,10 @@ installLibreOffice() {
                 ;;
             eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install libreoffice
+                ;;
+            zypper|dnf)
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

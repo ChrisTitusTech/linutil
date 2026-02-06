@@ -4,7 +4,10 @@
 
 installInkscape() {
 	printf "%b\n" "${YELLOW}Installing Inkscape...${RC}"
-	if ! command_exists inkscape; then
+	if ! flatpak_app_installed org.inkscape.Inkscape && ! command_exists inkscape; then
+	    if try_flatpak_install org.inkscape.Inkscape; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y inkscape
@@ -13,10 +16,8 @@ installInkscape() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter inkscape
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installInkscape() {
 
 uninstallInkscape() {
 	printf "%b\n" "${YELLOW}Uninstalling Inkscape...${RC}"
+	if uninstall_flatpak_if_installed org.inkscape.Inkscape; then
+	    return 0
+	fi
 	if command_exists inkscape; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallInkscape() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter inkscape
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.inkscape.Inkscape
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

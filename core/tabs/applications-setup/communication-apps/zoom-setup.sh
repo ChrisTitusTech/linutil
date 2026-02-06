@@ -3,15 +3,18 @@
 . ../../common-script.sh
 
 installZoom() {
-    if ! command_exists us.zoom.Zoom && ! command_exists zoom; then
+    if ! flatpak_app_installed us.zoom.Zoom && ! command_exists zoom; then
         printf "%b\n" "${YELLOW}Installing Zoom...${RC}"
+        if try_flatpak_install us.zoom.Zoom; then
+            return 0
+        fi
         case "$PACKAGER" in
             pacman)
                 "$AUR_HELPER" -S --needed --noconfirm zoom
                 ;;
             *)
-                checkFlatpak
-                flatpak install -y flathub us.zoom.Zoom
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
         esac
     else

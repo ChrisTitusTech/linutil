@@ -4,7 +4,10 @@
 
 installScribus() {
 	printf "%b\n" "${YELLOW}Installing Scribus...${RC}"
-	if ! command_exists scribus; then
+	if ! flatpak_app_installed net.scribus.Scribus && ! command_exists scribus; then
+	    if try_flatpak_install net.scribus.Scribus; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y scribus
@@ -13,10 +16,8 @@ installScribus() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter scribus
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installScribus() {
 
 uninstallScribus() {
 	printf "%b\n" "${YELLOW}Uninstalling Scribus...${RC}"
+	if uninstall_flatpak_if_installed net.scribus.Scribus; then
+	    return 0
+	fi
 	if command_exists scribus; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallScribus() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter scribus
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.scribus.Scribus
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

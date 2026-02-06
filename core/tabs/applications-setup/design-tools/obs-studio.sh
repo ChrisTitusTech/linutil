@@ -4,7 +4,10 @@
 
 installObsStudio() {
 	printf "%b\n" "${YELLOW}Installing OBS Studio...${RC}"
-	if ! command_exists obs-studio; then
+	if ! flatpak_app_installed com.obsproject.Studio && ! command_exists obs-studio; then
+	    if try_flatpak_install com.obsproject.Studio; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y v4l2loopback-dkms obs-studio
@@ -17,10 +20,8 @@ installObsStudio() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter obs-studio
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -30,6 +31,9 @@ installObsStudio() {
 
 uninstallObsStudio() {
 	printf "%b\n" "${YELLOW}Uninstalling OBS Studio...${RC}"
+	if uninstall_flatpak_if_installed com.obsproject.Studio; then
+	    return 0
+	fi
 	if command_exists obs-studio; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -39,7 +43,7 @@ uninstallObsStudio() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter obs-studio
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

@@ -4,8 +4,8 @@
 
 installNatron() {
 	printf "%b\n" "${YELLOW}Installing Natron...${RC}"
-	if ! command_exists natron && command_exists flatpak; then
-		"$ESCALATION_TOOL" flatpak install --noninteractive fr.natron.natron
+	if ! flatpak_app_installed fr.natron.natron && ! command_exists natron; then
+		try_flatpak_install fr.natron.natron
 	else
 		printf "%b\n" "${GREEN}Natron is already installed.${RC}"
 	fi
@@ -13,8 +13,8 @@ installNatron() {
 
 uninstallNatron() {
 	printf "%b\n" "${YELLOW}Installing Natron...${RC}"
-	if command_exists natron; then
-		"$ESCALATION_TOOL" flatpak uninstall --noninteractive fr.natron.natron
+	if uninstall_flatpak_if_installed fr.natron.natron; then
+		return 0
 	else
 		printf "%b\n" "${GREEN}Natron is not installed.${RC}"
 	fi

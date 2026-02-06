@@ -4,7 +4,10 @@
 
 installDarktable() {
 	printf "%b\n" "${YELLOW}Installing Darktable...${RC}"
-	if ! command_exists darktable; then
+	if ! flatpak_app_installed org.darktable.Darktable && ! command_exists darktable; then
+	    if try_flatpak_install org.darktable.Darktable; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y darktable
@@ -13,10 +16,8 @@ installDarktable() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter darktable
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installDarktable() {
 
 uninstallDarktable() {
 	printf "%b\n" "${YELLOW}Uninstalling Darktable...${RC}"
+	if uninstall_flatpak_if_installed org.darktable.Darktable; then
+	    return 0
+	fi
 	if command_exists darktable; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallDarktable() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter darktable
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.darktable.Darktable
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

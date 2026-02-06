@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+LINUTIL_UNINSTALL_SUPPORTED=1
 
 installRofi() {
     if ! command_exists rofi; then
@@ -26,9 +27,7 @@ installRofi() {
 
 setupRofiConfig() {
     printf "%b\n" "${YELLOW}Copying Rofi configuration files...${RC}"
-    if [ -d "$HOME/.config/rofi" ] && [ ! -d "$HOME/.config/rofi-bak" ]; then
-        cp -r "$HOME/.config/rofi" "$HOME/.config/rofi-bak"
-    fi
+    backup_dir "$HOME/.config/rofi"
     mkdir -p "$HOME/.config/rofi"
     curl -sSLo "$HOME/.config/rofi/powermenu.sh" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/powermenu.sh
     chmod +x "$HOME/.config/rofi/powermenu.sh"
@@ -39,7 +38,21 @@ setupRofiConfig() {
     curl -sSLo "$HOME/.config/rofi/themes/powermenu.rasi" https://github.com/ChrisTitusTech/dwm-titus/raw/main/config/rofi/themes/powermenu.rasi
 }
 
+uninstallRofi() {
+    printf "%b\n" "${YELLOW}Uninstalling Rofi...${RC}"
+    if [ "$DTYPE" = "nixos" ] && command_exists nix; then
+        nix profile remove nixpkgs#rofi || true
+    else
+        uninstall_native rofi || true
+    fi
+    restore_dir_backup "$HOME/.config/rofi"
+}
+
 checkEnv
 checkEscalationTool
-installRofi
-setupRofiConfig
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstallRofi
+else
+    installRofi
+    setupRofiConfig
+fi

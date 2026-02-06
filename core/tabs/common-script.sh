@@ -46,6 +46,95 @@ checkFlatpak() {
     fi
 }
 
+backup_file() {
+    file="$1"
+    if [ -e "$file" ] && [ ! -e "${file}.bak" ]; then
+        cp -a "$file" "${file}.bak"
+    fi
+}
+
+restore_file_backup() {
+    file="$1"
+    if [ -e "${file}.bak" ]; then
+        mv -f "${file}.bak" "$file"
+    fi
+}
+
+backup_dir() {
+    dir="$1"
+    if [ -d "$dir" ] && [ ! -d "${dir}-bak" ]; then
+        cp -r "$dir" "${dir}-bak"
+    fi
+}
+
+restore_dir_backup() {
+    dir="$1"
+    if [ -d "${dir}-bak" ]; then
+        rm -rf "$dir"
+        mv "${dir}-bak" "$dir"
+    fi
+}
+
+flatpak_app_installed() {
+    appid="$1"
+    if command_exists "${appid}"; then
+        return 0
+    fi
+    if command_exists flatpak && flatpak info "${appid}" >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
+try_flatpak_install() {
+    appid="$1"
+    checkFlatpak
+    printf "%b\n" "${CYAN}Using Flatpak (preferred) for ${appid}...${RC}"
+    "$ESCALATION_TOOL" flatpak install -y flathub "${appid}"
+}
+
+uninstall_flatpak_if_installed() {
+    appid="$1"
+    if command_exists flatpak && flatpak info "${appid}" >/dev/null 2>&1; then
+        "$ESCALATION_TOOL" flatpak uninstall --noninteractive "${appid}"
+        return 0
+    fi
+    return 1
+}
+
+uninstall_flatpak_app() {
+    appid="$1"
+    if flatpak_app_installed "$appid"; then
+        "$ESCALATION_TOOL" flatpak uninstall --noninteractive "$appid"
+        return 0
+    fi
+    return 1
+}
+
+uninstall_native() {
+    pkg="$1"
+    case "$PACKAGER" in
+        apt-get|nala|dnf|zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" remove -y "$pkg"
+            ;;
+        pacman)
+            "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm "$pkg"
+            ;;
+        apk)
+            "$ESCALATION_TOOL" "$PACKAGER" del "$pkg"
+            ;;
+        xbps-install)
+            "$ESCALATION_TOOL" "$PACKAGER" -R "$pkg"
+            ;;
+        eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" remove -y "$pkg"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 checkArch() {
     case "$(uname -m)" in
         x86_64 | amd64) ARCH="x86_64" ;;
@@ -140,6 +229,11 @@ checkPackageManager() {
     fi
 
     if [ -z "$PACKAGER" ]; then
+        if [ "$DTYPE" = "nixos" ] && command_exists flatpak; then
+            PACKAGER="flatpak"
+            printf "%b\n" "${YELLOW}NixOS detected: using Flatpak-only installs where supported${RC}"
+            return 0
+        fi
         printf "%b\n" "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
@@ -181,13 +275,52 @@ checkDistro() {
     fi
 }
 
+wait_for_package_lock() {
+    timeout_seconds="${1:-5}"
+    lock_path=""
+
+    case "$PACKAGER" in
+        pacman) lock_path="/var/lib/pacman/db.lck" ;;
+        apt-get|nala) lock_path="/var/lib/dpkg/lock-frontend" ;;
+        dnf) lock_path="/var/run/dnf.pid" ;;
+        zypper) lock_path="/var/run/zypp.pid" ;;
+        apk) lock_path="/var/lib/apk/lock" ;;
+        xbps-install) lock_path="/var/lib/xbps/.xbps-lock" ;;
+        eopkg) lock_path="/var/lib/eopkg/lock" ;;
+        *) return 0 ;;
+    esac
+
+    if [ -z "$lock_path" ]; then
+        return 0
+    fi
+
+    start_time="$(date +%s)"
+    while [ -e "$lock_path" ]; do
+        now="$(date +%s)"
+        elapsed=$((now - start_time))
+        if [ "$elapsed" -ge "$timeout_seconds" ]; then
+            printf "%b\n" "${RED}Package manager lock detected at ${lock_path}.${RC}"
+            printf "%b\n" "${YELLOW}You can remove lock file by executing: sudo rm -rf ${lock_path} and try again${RC}"
+            exit 1
+        fi
+        sleep 2
+    done
+}
+
 checkEnv() {
     checkArch
     checkEscalationTool
     checkCommandRequirements "curl groups $ESCALATION_TOOL"
-    checkPackageManager 'nala apt-get dnf pacman zypper apk xbps-install eopkg'
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
+    if [ "$LINUTIL_ACTION" = "uninstall" ] && [ -z "$LINUTIL_UNINSTALL_SUPPORTED" ]; then
+        printf "%b\n" "${RED}Uninstall is not supported for this item yet.${RC}"
+        exit 1
+    fi
+    checkPackageManager 'nala apt-get dnf pacman zypper apk xbps-install eopkg'
+    if [ "$PACKAGER" != "flatpak" ]; then
+        wait_for_package_lock 5
+    fi
     checkAURHelper
 }

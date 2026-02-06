@@ -4,16 +4,17 @@
 
 installTenacity() {
 	printf "%b\n" "${YELLOW}Installing Tenacity...${RC}"
-	if ! command_exists tenacity; then
+	if ! flatpak_app_installed org.tenacityaudio.Tenacity && ! command_exists tenacity; then
+	    if try_flatpak_install org.tenacityaudio.Tenacity; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        pacman)
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter tenacity
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -23,13 +24,16 @@ installTenacity() {
 
 uninstallTenacity() {
 	printf "%b\n" "${YELLOW}Uninstalling Tenacity...${RC}"
+	if uninstall_flatpak_if_installed org.tenacityaudio.Tenacity; then
+	    return 0
+	fi
 	if command_exists tenacity; then
 	    case "$PACKAGER" in
 	        pacman)
 			    "$AUR_HELPER" -R --noconfirm --cleanafter tenacity
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.tenacityaudio.Tenacity
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

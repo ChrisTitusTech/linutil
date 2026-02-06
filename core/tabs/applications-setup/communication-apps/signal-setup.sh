@@ -3,8 +3,11 @@
 . ../../common-script.sh
 
 installSignal() {
-    if ! command_exists org.signal.Signal && ! command_exists signal; then
+    if ! flatpak_app_installed org.signal.Signal && ! command_exists signal; then
         printf "%b\n" "${YELLOW}Installing Signal...${RC}"
+        if try_flatpak_install org.signal.Signal; then
+            return 0
+        fi
         case "$PACKAGER" in
             apt-get|nala)
                 curl -fsSL https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg
@@ -19,16 +22,12 @@ installSignal() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm signal-desktop
                 ;;
-            dnf)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
-                ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy Signal-Desktop
                 ;;   
-            apk)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
+            dnf|apk)
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

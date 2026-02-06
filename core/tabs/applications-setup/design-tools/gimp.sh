@@ -4,7 +4,10 @@
 
 installGIMP() {
 	printf "%b\n" "${YELLOW}Installing GIMP...${RC}"
-	if ! command_exists gimp; then
+	if ! flatpak_app_installed org.gimp.GIMP && ! command_exists gimp; then
+	    if try_flatpak_install org.gimp.GIMP; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 			    "$ESCALATION_TOOL" "$PACKAGER" install -y gimp
@@ -13,10 +16,8 @@ installGIMP() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter gimp
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installGIMP() {
 
 uninstallGIMP() {
 	printf "%b\n" "${YELLOW}Uninstalling GIMP...${RC}"
+	if uninstall_flatpak_if_installed org.gimp.GIMP; then
+	    return 0
+	fi
 	if command_exists gimp; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallGIMP() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter gimp
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gimp.GIMP
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

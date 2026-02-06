@@ -4,7 +4,10 @@
 
 installKrita() {
 	printf "%b\n" "${YELLOW}Installing Krita...${RC}"
-	if ! command_exists krita; then
+	if ! flatpak_app_installed org.kde.krita && ! command_exists krita; then
+	    if try_flatpak_install org.kde.krita; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y krita
@@ -13,10 +16,8 @@ installKrita() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter krita
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installKrita() {
 
 uninstallKrita() {
 	printf "%b\n" "${YELLOW}Uninstalling Krita...${RC}"
+	if uninstall_flatpak_if_installed org.kde.krita; then
+	    return 0
+	fi
 	if command_exists krita; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallKrita() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter krita
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.kde.krita
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

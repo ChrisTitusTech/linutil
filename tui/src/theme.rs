@@ -38,7 +38,7 @@ impl Theme {
     pub const fn tab_color(&self) -> Color {
         match self {
             Theme::Default => Color::Yellow,
-            Theme::Compatible => Color::LightYellow,
+            Theme::Compatible => Color::Yellow,
         }
     }
 

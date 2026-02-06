@@ -3,8 +3,11 @@
 . ../../common-script.sh
 
 installTelegram() {
-    if ! command_exists telegram-desktop; then
+    if ! flatpak_app_installed org.telegram.desktop && ! command_exists telegram-desktop; then
         printf "%b\n" "${YELLOW}Installing Telegram...${RC}"
+        if try_flatpak_install org.telegram.desktop; then
+            return 0
+        fi
         case "$PACKAGER" in
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm telegram-desktop 
@@ -19,7 +22,8 @@ installTelegram() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram
                 ;;
             *)
-                flatpak install flathub --noninteractive org.telegram.desktop 
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
         esac
     else

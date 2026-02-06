@@ -3,8 +3,11 @@
 . ../../common-script.sh
 
 installLibreWolf() {
-    if ! command_exists io.gitlab.librewolf-community && ! command_exists librewolf; then
+    if ! flatpak_app_installed io.gitlab.librewolf-community && ! command_exists librewolf; then
         printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
+        if try_flatpak_install io.gitlab.librewolf-community; then
+            return 0
+        fi
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y extrepo
@@ -29,8 +32,8 @@ installLibreWolf() {
                 "$ESCALATION_TOOL" "$PACKAGER" -Syu librewolf
                 ;;
             apk)
-                checkFlatpak
-                flatpak install flathub io.gitlab.librewolf-community
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"

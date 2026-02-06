@@ -3,15 +3,18 @@
 . ../../common-script.sh
 
 installWaterfox() {
-    if ! command_exists net.waterfox.waterfox && ! command_exists waterfox; then
+    if ! flatpak_app_installed net.waterfox.waterfox && ! command_exists waterfox; then
         printf "%b\n" "${YELLOW}Installing waterfox...${RC}"
+        if try_flatpak_install net.waterfox.waterfox; then
+            return 0
+        fi
         case "$PACKAGER" in
             pacman)
 		        "$AUR_HELPER" -S --needed --noconfirm waterfox-bin
                 ;;
             *)
-		        checkFlatpak
-                flatpak install -y flathub net.waterfox.waterfox
+                printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+                exit 1
                 ;;
         esac
     else

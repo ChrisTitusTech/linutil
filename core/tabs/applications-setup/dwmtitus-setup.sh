@@ -3,6 +3,11 @@
 . ../common-script.sh
 . ../common-service-script.sh
 
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    printf "%b\n" "${YELLOW}Uninstall is not supported for DWM-Titus in Linutil yet. Aborting.${RC}"
+    exit 0
+fi
+
 setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites

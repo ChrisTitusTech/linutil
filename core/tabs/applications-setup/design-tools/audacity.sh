@@ -4,7 +4,10 @@
 
 installAudacity() {
 	printf "%b\n" "${YELLOW}Installing Audacity...${RC}"
-	if ! command_exists audacity; then
+	if ! flatpak_app_installed org.audacityteam.Audacity && ! command_exists audacity; then
+	    if try_flatpak_install org.audacityteam.Audacity; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y audacity
@@ -13,10 +16,8 @@ installAudacity() {
 				"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm --cleanafter audacity
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installAudacity() {
 
 uninstallAudacity() {
 	printf "%b\n" "${YELLOW}Uninstalling Audacity...${RC}"
+	if uninstall_flatpak_if_installed org.audacityteam.Audacity; then
+	    return 0
+	fi
 	if command_exists audacity; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallAudacity() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter audacity
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.audacityteam.Audacity
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

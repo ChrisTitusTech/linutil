@@ -3,6 +3,9 @@
 . ../common-script.sh
 
 gitpath="$HOME/.local/share/mybash"
+BASHRC_BACKUP="$HOME/.bashrc.bak"
+STARSHIP_TOML="$HOME/.config/starship.toml"
+LINUTIL_UNINSTALL_SUPPORTED=1
 
 installDepend() {
     if [ ! -f "/usr/share/bash-completion/bash_completion" ] || ! command_exists bash tar bat tree unzip fc-list git; then
@@ -94,7 +97,7 @@ installZoxide() {
 
 linkConfig() {
     OLD_BASHRC="$HOME/.bashrc"
-    if [ -e "$OLD_BASHRC" ] && [ ! -e "$HOME/.bashrc.bak" ]; then
+    if [ -e "$OLD_BASHRC" ] && [ ! -e "$BASHRC_BACKUP" ]; then
         printf "%b\n" "${YELLOW}Moving old bash config file to $HOME/.bashrc.bak${RC}"
         if ! mv "$OLD_BASHRC" "$HOME/.bashrc.bak"; then
             printf "%b\n" "${RED}Can't move the old bash config file!${RC}"
@@ -109,18 +112,36 @@ linkConfig() {
     }
 
     mkdir -p "$HOME/.config"
-    ln -svf "$gitpath/starship.toml" "$HOME/.config/starship.toml" || {
+    backup_file "$STARSHIP_TOML"
+    ln -svf "$gitpath/starship.toml" "$STARSHIP_TOML" || {
         printf "%b\n" "${RED}Failed to create symbolic link for starship.toml${RC}"
         exit 1
     }
     printf "%b\n" "${GREEN}Done! restart your shell to see the changes.${RC}"
 }
 
+uninstallMyBash() {
+    printf "%b\n" "${YELLOW}Uninstalling Bash Prompt...${RC}"
+    if [ -L "$HOME/.bashrc" ] || [ -f "$HOME/.bashrc" ]; then
+        rm -f "$HOME/.bashrc"
+    fi
+    restore_file_backup "$HOME/.bashrc"
+
+    if [ -L "$STARSHIP_TOML" ] || [ -f "$STARSHIP_TOML" ]; then
+        rm -f "$STARSHIP_TOML"
+    fi
+    restore_file_backup "$STARSHIP_TOML"
+}
+
 checkEnv
 checkEscalationTool
-installDepend
-cloneMyBash
-installFont
-installStarshipAndFzf
-installZoxide
-linkConfig
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstallMyBash
+else
+    installDepend
+    cloneMyBash
+    installFont
+    installStarshipAndFzf
+    installZoxide
+    linkConfig
+fi

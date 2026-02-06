@@ -4,7 +4,10 @@
 
 installBlender() {
 	printf "%b\n" "${YELLOW}Installing Blender...${RC}"
-	if ! command_exists blender; then
+	if ! flatpak_app_installed org.blender.Blender && ! command_exists blender; then
+	    if try_flatpak_install org.blender.Blender; then
+	        return 0
+	    fi
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y blender
@@ -13,10 +16,8 @@ installBlender() {
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter blender
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.blender.Blender
-	            fi
-	            exit 1
+	        	printf "%b\n" "${RED}Flatpak install failed and no native package is configured for ${PACKAGER}.${RC}"
+	        	exit 1
 	            ;;
 	    esac
 	else
@@ -26,6 +27,9 @@ installBlender() {
 
 uninstallBlender() {
 	printf "%b\n" "${YELLOW}Uninstalling Blender...${RC}"
+	if uninstall_flatpak_if_installed org.blender.Blender; then
+	    return 0
+	fi
 	if command_exists blender; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +39,7 @@ uninstallBlender() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter blender
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.blender.Blender
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac

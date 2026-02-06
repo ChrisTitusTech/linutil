@@ -2,28 +2,55 @@
 
 . ../../common-script.sh
 
+installDiscordFlatpak() {
+    try_flatpak_install com.discordapp.Discord || return 1
+}
+
+installDiscordNative() {
+    case "$PACKAGER" in
+        zypper|eopkg)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+            ;;
+        pacman)
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord
+            ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" install -y "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+            "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 installDiscord() {
     if ! command_exists com.discordapp.Discord && ! command_exists discord; then
         printf "%b\n" "${YELLOW}Installing Discord...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
-                "$ESCALATION_TOOL" rm discord.deb
+                installDiscordFlatpak
                 ;;
             zypper|eopkg)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+                if ! installDiscordFlatpak; then
+                    printf "%b\n" "${YELLOW}Flatpak install failed, falling back to native package...${RC}"
+                    installDiscordNative
+                fi
                 ;;
             pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm discord 
+                if ! installDiscordFlatpak; then
+                    printf "%b\n" "${YELLOW}Flatpak install failed, falling back to native package...${RC}"
+                    installDiscordNative
+                fi
                 ;;
             dnf)
-                "$ESCALATION_TOOL" "$PACKAGER" install -y "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord
+                if ! installDiscordFlatpak; then
+                    printf "%b\n" "${YELLOW}Flatpak install failed, falling back to native package...${RC}"
+                    installDiscordNative
+                fi
                 ;;
             apk | xbps-install)
-                checkFlatpak
-                flatpak install -y flathub com.discordapp.Discord
+                installDiscordFlatpak
                 ;;
             *)
                 printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
