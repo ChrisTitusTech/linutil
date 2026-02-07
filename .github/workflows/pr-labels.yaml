@@ -10,7 +10,7 @@ jobs:
     permissions:
       pull-requests: write
       issues: write
-      contents: read
+      contents: write
 
     steps:
       - name: Check PR body for Type of Change
@@ -18,7 +18,7 @@ jobs:
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
-            const labelsToAdd = [];
+            const labelsToAdd = ['initial review required'];
 
             // Check for Type of Change checkboxes
             if (/\[x\]\s*New feature/i.test(prBody)) {
