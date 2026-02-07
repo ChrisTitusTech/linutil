@@ -144,3 +144,46 @@ description = "This script will add a Custom Fallout 76 INI file that improves p
 script = "fallout-76/fallout76settings.sh"
 task_list = "FM"
 
+[[data]]
+name = "Related Tools and Setups"
+
+[[data.entries]]
+name = "Auto CPU Frequency"
+description = "Automatic CPU speed & power optimizer.\nhttps://github.com/AdnanHodzic/auto-cpufreq"
+script = "../applications-setup/auto-cpufreq.sh"
+task_list = "I SS"
+
+[[data.entries]]
+name = "Auto Mount Drive"
+description = "This utility is designed to help with automating the process of mounting a drive on to your system."
+script = "../utils/auto-mount.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data.entries]]
+name = "Bottles"
+description = "Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications."
+script = "../applications-setup/bottles-setup.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "Gaming Dependencies"
+description = "Run the Gaming Dependencies installer (same script kept under System Setup)."
+script = "../system-setup/gaming-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Nvidia Drivers & Hardware Acceleration"
+description = "Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch)."
+script = "../system-setup/arch/nvidia-drivers.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Waydroid"
+description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
+script = "../applications-setup/waydroid-setup.sh"
+task_list = "I SS"
+[[data.preconditions]]
+matches = true
+data = { environment = "XDG_SESSION_TYPE" }
+values = ["wayland", "Wayland"]
