@@ -61,13 +61,13 @@ disable_password_auth() {
     printf "%b\n" "Enter the alias of the host: " 
     read -r host_alias
     printf "\n"
-    ssh "$host_alias" "
-        "$ESCALATION_TOOL" -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
-    "
+    remote_cmd="$ESCALATION_TOOL -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S systemctl restart sshd"
+    # shellcheck disable=SC2029
+    ssh "$host_alias" "$remote_cmd"
     printf "%b\n" "PasswordAuthentication set to no and PubkeyAuthentication set to yes."
 }
 
@@ -76,13 +76,13 @@ enable_password_auth() {
     printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
     printf "\n"
-    ssh "$host_alias" "
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
-    "
+    remote_cmd="$ESCALATION_TOOL -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config && \
+$ESCALATION_TOOL -S systemctl restart sshd"
+    # shellcheck disable=SC2029
+    ssh "$host_alias" "$remote_cmd"
     printf "%b\n" "PasswordAuthentication set to yes and PubkeyAuthentication set to no."
 }
 
@@ -99,6 +99,7 @@ run_remote_command() {
     read -r host_alias
     printf "%b" "Enter the command to run: " 
     read -r remote_command
+    # shellcheck disable=SC2029
     ssh "$host_alias" "$remote_command"
 }
 

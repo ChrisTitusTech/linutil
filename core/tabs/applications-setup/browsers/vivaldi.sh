@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="dnf-plugins-core vivaldi-stable"
+
+
 installVivaldi() {
     if ! command_exists vivaldi; then
         printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
@@ -42,4 +47,10 @@ installVivaldi() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installVivaldi

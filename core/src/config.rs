@@ -79,8 +79,8 @@ mod tests {
         let config = Config::read_config(&config_path, &tab_list);
 
         assert_eq!(config.auto_execute_commands.len(), 1);
-        assert_eq!(config.skip_confirmation, true);
-        assert_eq!(config.size_bypass, false);
+        assert!(config.skip_confirmation);
+        assert!(!config.size_bypass);
 
         drop(temp_dir);
     }

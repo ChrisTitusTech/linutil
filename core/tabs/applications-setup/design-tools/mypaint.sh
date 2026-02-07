@@ -2,9 +2,14 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.mypaint.MyPaint"
+APP_UNINSTALL_PKGS="mypaint"
+
+
 installMyPaint() {
 	printf "%b\n" "${YELLOW}Installing MyPaint...${RC}"
-	if ! command_exists mypaint; then
+	if ! flatpak_app_installed org.mypaint.MyPaint && ! command_exists mypaint; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y mypaint
@@ -13,12 +18,15 @@ installMyPaint() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter mypaint
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.mypaint.MyPaint
-	            fi
-	            exit 1
+	        	printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
 	            ;;
 	    esac
+        if command_exists mypaint; then
+            return 0
+        fi
+        if try_flatpak_install org.mypaint.MyPaint; then
+            return 0
+        fi
 	else
 		printf "%b\n" "${GREEN}MyPaint is already installed.${RC}"
 	fi
@@ -26,6 +34,9 @@ installMyPaint() {
 
 uninstallMyPaint() {
 	printf "%b\n" "${YELLOW}Uninstalling MyPaint...${RC}"
+	if uninstall_flatpak_if_installed org.mypaint.MyPaint; then
+	    return 0
+	fi
 	if command_exists mypaint; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +46,7 @@ uninstallMyPaint() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter mypaint
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.mypaint.mypaint
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac
@@ -59,4 +70,10 @@ main() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 main

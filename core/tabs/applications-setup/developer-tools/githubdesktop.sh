@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="github-desktop"
+
+
 installGithubDesktop() {
     if ! command_exists github-desktop; then
         printf "%b\n" "${YELLOW}Installing Github Desktop...${RC}"
@@ -39,4 +44,10 @@ installGithubDesktop() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installGithubDesktop

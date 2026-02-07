@@ -2,6 +2,8 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+
 # Function to install Timeshift
 install_timeshift() {
     clear
@@ -22,6 +24,11 @@ install_timeshift() {
     else
         printf "%b\n" "${GREEN}Timeshift is already installed.${RC}"
     fi
+}
+
+uninstall_timeshift() {
+    printf "%b\n" "${YELLOW}Uninstalling Timeshift...${RC}"
+    uninstall_native timeshift || true
 }
 
 # Function to display the menu
@@ -163,5 +170,9 @@ main_menu() {
 
 checkEnv
 checkEscalationTool
-install_timeshift  
-main_menu
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_timeshift
+else
+    install_timeshift  
+    main_menu
+fi

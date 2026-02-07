@@ -3,6 +3,8 @@
 . ../../common-script.sh
 . ./install-cups.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+
 installEpsonPrinterDriver() {
     clear
 
@@ -26,8 +28,18 @@ installEpsonPrinterDriver() {
     esac
 }
 
+uninstallEpsonPrinterDriver() {
+    printf "%b\n" "${YELLOW}Uninstalling Epson printer drivers...${RC}"
+    uninstall_native epson-inkjet-printer-escpr || true
+    uninstall_native printer-driver-escpr || true
+}
+
 checkEnv
 checkEscalationTool
 checkAURHelper
-installCUPS
-installEpsonPrinterDriver
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstallEpsonPrinterDriver
+else
+    installCUPS
+    installEpsonPrinterDriver
+fi

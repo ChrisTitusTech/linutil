@@ -2,9 +2,14 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="fr.handbrake.ghb"
+APP_UNINSTALL_PKGS="handbrake"
+
+
 installHandbrake() {
 	printf "%b\n" "${YELLOW}Installing Handbrake...${RC}"
-	if ! command_exists handbrake; then
+	if ! flatpak_app_installed fr.handbrake.ghb && ! command_exists handbrake; then
 	    case "$PACKAGER" in
 	        apt-get|nala)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y handbrake
@@ -13,12 +18,15 @@ installHandbrake() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter handbrake
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
-	            fi
-	            exit 1
+	        	printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
 	            ;;
 	    esac
+        if command_exists handbrake; then
+            return 0
+        fi
+        if try_flatpak_install fr.handbrake.ghb; then
+            return 0
+        fi
 	else
 		printf "%b\n" "${GREEN}Handbrake is already installed.${RC}"
 	fi
@@ -26,6 +34,9 @@ installHandbrake() {
 
 uninstallHandbrake() {
 	printf "%b\n" "${YELLOW}Uninstalling Handbrake...${RC}"
+	if uninstall_flatpak_if_installed fr.handbrake.ghb; then
+	    return 0
+	fi
 	if command_exists handbrake; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +46,7 @@ uninstallHandbrake() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter handbrake
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive fr.handbrake.ghb
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac
@@ -58,4 +69,10 @@ main() {
 }
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 main

@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="com.visualstudio.code"
+APP_UNINSTALL_PKGS="644 apt-transport-https code com.visualstudio.code flathub packages.microsoft.gpg root vscode"
+
+
 installVsCode() {
     if ! command_exists com.visualstudio.code && ! command_exists code; then
         printf "%b\n" "${YELLOW}Installing VS Code..${RC}."
@@ -51,4 +56,10 @@ installVsCode() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installVsCode 

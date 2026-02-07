@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="build-base gcc linutil_tui man man-db man-pages tr"
+
+
 updateLinutil() {
     if [ ! -e "$HOME/.cargo/bin/linutil" ]; then
         printf "%b\n" "${RED}This script only updates the binary installed through cargo.\nlinutil_tui is not installed.${RC}"
@@ -51,4 +56,10 @@ updateLinutil() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 updateLinutil

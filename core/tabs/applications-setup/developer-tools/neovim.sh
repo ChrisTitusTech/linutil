@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="ShellCheck fd-find fzf go golang golang-go lua53-luarocks luarocks neovim py3-virtualenv python3-venv python3-virtualenv ripgrep shellcheck virtualenv"
+
+
 gitpath="$HOME/.local/share/neovim"
 
 cloneNeovim() {
@@ -65,6 +70,12 @@ linkNeovimConfig() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installNeovim
 cloneNeovim
 backupNeovimConfig

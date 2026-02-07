@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="sublime-text"
+
+
 installSublime() {
     if ! command_exists sublime; then
         printf "%b\n" "${YELLOW}Installing Sublime...${RC}"
@@ -44,4 +49,10 @@ installSublime() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installSublime

@@ -2,8 +2,13 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.signal.Signal"
+APP_UNINSTALL_PKGS="signal-desktop"
+
+
 installSignal() {
-    if ! command_exists org.signal.Signal && ! command_exists signal; then
+    if ! flatpak_app_installed org.signal.Signal && ! command_exists signal; then
         printf "%b\n" "${YELLOW}Installing Signal...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -19,22 +24,22 @@ installSignal() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm signal-desktop
                 ;;
-            dnf)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
-                ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy Signal-Desktop
                 ;;   
-            apk)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
+            dnf|apk)
+                printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                printf "%b\n" "${YELLOW}Unsupported package manager: ""$PACKAGER"". Falling back to Flatpak...${RC}"
                 ;;
         esac
+        if command_exists signal; then
+            return 0
+        fi
+        if try_flatpak_install org.signal.Signal; then
+            return 0
+        fi
     else
         printf "%b\n" "${GREEN}Signal is already installed.${RC}"
     fi
@@ -42,4 +47,10 @@ installSignal() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installSignal

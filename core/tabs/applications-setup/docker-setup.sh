@@ -1,6 +1,11 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="containerd.io dnf-plugins-core docker docker-buildx-plugin docker-ce docker-ce-cli docker-cli-compose docker-compose docker-compose-plugin"
+
 . ../common-service-script.sh
 
 # Function to prompt the user for installation choice
@@ -123,5 +128,11 @@ docker_permission() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 install_components
 docker_permission

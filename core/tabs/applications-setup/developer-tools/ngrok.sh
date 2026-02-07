@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="ngrok"
+
+
 installNgrok() {
     if ! command_exists ngrok; then
         printf "%b\n" "${YELLOW}Installing Ngrok.${RC}"
@@ -22,4 +27,13 @@ installNgrok() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    if [ -x /usr/local/bin/ngrok ]; then
+        "$ESCALATION_TOOL" rm -f /usr/local/bin/ngrok || true
+    fi
+    exit 0
+fi
+
+
 installNgrok

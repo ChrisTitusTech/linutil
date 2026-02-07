@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="waydroid"
+
+
 checkGpu() {
     if lspci | grep -i nvidia >/dev/null; then
         printf "%b\n" "${RED}Waydroid is not compatible with NVIDIA GPUs.${RC}"
@@ -81,6 +86,12 @@ setupWaydroid() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 checkGpu
 installWaydroid
 setupWaydroid

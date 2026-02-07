@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="docker.io list of podman search the to unqualified"
+
+
 installPodman() {
     if ! command_exists podman; then
         printf "%b\n" "${YELLOW}Installing Podman...${RC}"
@@ -53,5 +58,11 @@ addRegistry() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installPodman
 addRegistry

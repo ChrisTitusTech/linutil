@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS=""
+
+
 themeinstall(){
     mkdir -p "$HOME/.local/share"
     cd "$HOME/.local/share"
@@ -15,4 +20,10 @@ themeinstall(){
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 themeinstall

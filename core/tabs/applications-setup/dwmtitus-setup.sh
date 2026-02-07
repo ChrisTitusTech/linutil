@@ -163,6 +163,12 @@ setupDisplayManager() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    printf "%b\n" "${YELLOW}Uninstall is not supported for DWM-Titus in Linutil yet. Aborting.${RC}"
+    exit 0
+fi
+
+
 setupDisplayManager
 setupDWM
 makeDWM

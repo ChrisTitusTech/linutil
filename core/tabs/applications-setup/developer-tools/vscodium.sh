@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="com.vscodium.codium"
+APP_UNINSTALL_PKGS="codium com.vscodium.codium flathub"
+
+
 installVsCodium() {
     if ! command_exists com.vscodium.codium && ! command_exists codium; then
         printf "%b\n" "${YELLOW}Installing VS Codium...${RC}"
@@ -44,4 +49,10 @@ installVsCodium() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installVsCodium

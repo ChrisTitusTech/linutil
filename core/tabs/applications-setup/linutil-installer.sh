@@ -1,6 +1,37 @@
 #!/bin/sh -e
 
 . ../common-script.sh
+LINUTIL_UNINSTALL_SUPPORTED=1
+
+uninstallLinutil() {
+    printf "%b\n" "${YELLOW}Uninstalling Linutil...${RC}"
+    case "$PACKAGER" in
+        pacman)
+            "$AUR_HELPER" -R --noconfirm linutil linutil-bin linutil-git || true
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" remove -y linutil || true
+            ;;
+        *)
+            if command_exists cargo; then
+                cargo uninstall linutil_tui || true
+            fi
+            ;;
+    esac
+    "$ESCALATION_TOOL" rm -f /usr/share/man/man1/linutil.1
+    "$ESCALATION_TOOL" rm -f /usr/share/applications/linutil.desktop
+    printf "%b\n" "${GREEN}Uninstall complete.${RC}"
+}
+
+installExtra() {
+    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    printf "%b\n" "${GREEN}Done.${RC}"
+}
 
 installLinutil() {
     printf "%b\n" "${YELLOW}Installing Linutil...${RC}"
@@ -35,6 +66,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
+                    # shellcheck disable=SC2218
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
@@ -64,17 +96,12 @@ installLinutil() {
     esac
 }
 
-installExtra() {
-    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
-    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
-    printf "%b\n" "${GREEN}Done.${RC}"
-}
-
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstallLinutil
+    exit 0
+fi
+
 installLinutil

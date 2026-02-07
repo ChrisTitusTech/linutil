@@ -3,10 +3,12 @@
 
 ## Applications Setup
 
+> [!NOTE]
+> Uninstall actions are best-effort: Linutil will try to remove Flatpak apps first, then native packages. Repo files or custom install artifacts may need manual cleanup.
 
 ### Communication Apps
 
-- **Discord**: Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features.
+- **Discord**: Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features. Installed via native packages when available, with Flatpak used as a fallback.
 - **Jitsi**: Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads.
 - **Signal**: Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication.
 - **Slack**: Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools.
@@ -17,6 +19,8 @@
 
 ### Design Tools
 
+- **Aether**: Aether is a visual theming application for Omarchy that extracts colors from wallpapers and applies themes across supported apps.
+- **Image Viewer**: GNOME Image Viewer uses Loupe by default, with fallback to Eye of GNOME (EOG) where needed.
 - **Ardour**: Ardour is a free and open-source digital audio workstation and hard disk recorder.
 - **Audacity**: Audacity is a free and open-source digital audio editor and recording application software.
 - **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
@@ -56,6 +60,10 @@ https://github.com/ChrisTitusTech/neovim
 
 ### PDF Suites
 
+- **Document Viewer (Evince)**: Evince is a document viewer for PDF and other document formats.
+- **Okular**: Okular is a universal document viewer developed by KDE.
+- **PDF Studio**: PDF Studio is a full-featured PDF editor with a powerful OCR engine, annotation tools, and PDF form creation.
+- **PDF Studio Viewer**: PDF Studio Viewer is a free PDF reader built by Qoppa Software.
 
 ### Web Browsers
 
@@ -70,11 +78,9 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
-- **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
 https://github.com/AdnanHodzic/auto-cpufreq
-- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
@@ -85,16 +91,22 @@ The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
-- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
 - **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
-- **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
 - **Linutil Installer**: Installs a distro-specific Linutil package locally.
 - **Linutil Updater**: Updates your local Linutil crate installation.
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
+
+### Terminals
+
+- **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance.
+- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
+- **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features.
+- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
+- **Starship**: Starship is a minimal, blazing-fast, and infinitely customizable prompt for any shell.
 
 ## Gaming
 
@@ -188,6 +200,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ## Utilities
 
+> [!NOTE]
+> Utility uninstall actions are best-effort and may leave configuration files or user data behind.
 
 ### Monitor Control
 
@@ -204,11 +218,18 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
 - **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
 
-### Printers
+### Printing Utilities
 
 - **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
 - **Epson printer drivers**: This script will install the Epson printer drivers.
 - **HP printer drivers**: This script will install HP printer drivers.
+- **Print Settings**: Printer configuration tool for managing local and network printers.
+
+### Utilities
+
+- **Calculator**: GNOME Calculator is a simple calculator application for the GNOME desktop.
+- **Disks**: GNOME Disks provides tools to manage disk drives and disk images.
+- **Disk Usage**: Defaults to the `dust` TUI launcher when available (with terminal fallbacks), otherwise uses GNOME Disk Usage Analyzer (Baobab).
 
 ### User Account Manager
 

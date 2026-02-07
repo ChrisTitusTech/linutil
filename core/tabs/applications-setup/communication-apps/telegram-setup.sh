@@ -2,8 +2,13 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.telegram.desktop"
+APP_UNINSTALL_PKGS="telegram telegram-desktop"
+
+
 installTelegram() {
-    if ! command_exists telegram-desktop; then
+    if ! flatpak_app_installed org.telegram.desktop && ! command_exists telegram-desktop; then
         printf "%b\n" "${YELLOW}Installing Telegram...${RC}"
         case "$PACKAGER" in
             pacman)
@@ -19,9 +24,15 @@ installTelegram() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram
                 ;;
             *)
-                flatpak install flathub --noninteractive org.telegram.desktop 
+                printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
                 ;;
         esac
+        if command_exists telegram-desktop; then
+            return 0
+        fi
+        if try_flatpak_install org.telegram.desktop; then
+            return 0
+        fi
     else
         printf "%b\n" "${GREEN}Telegram is already installed.${RC}"
     fi
@@ -29,4 +40,10 @@ installTelegram() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installTelegram

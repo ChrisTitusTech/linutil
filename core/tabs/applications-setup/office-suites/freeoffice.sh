@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="softmaker-freeoffice-2024"
+
+
 installFreeOffice() {  
     if ! command_exists softmaker-freeoffice-2024 freeoffice softmaker; then
         printf "%b\n" "${YELLOW}Installing Free Office...${RC}"
@@ -36,4 +41,10 @@ installFreeOffice() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installFreeOffice

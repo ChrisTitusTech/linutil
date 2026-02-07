@@ -2,9 +2,14 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.synfig.SynfigStudio"
+APP_UNINSTALL_PKGS="synfigstudio"
+
+
 installSynfigStudio() {
 	printf "%b\n" "${YELLOW}Installing Synfig Studio...${RC}"
-	if ! command_exists synfigstudio; then
+	if ! flatpak_app_installed org.synfig.SynfigStudio && ! command_exists synfigstudio; then
 	    case "$PACKAGER" in
 	        dnf)
 	        	"$ESCALATION_TOOL" "$PACKAGER" install -y synfigstudio
@@ -13,12 +18,15 @@ installSynfigStudio() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter synfigstudio
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.synfig.SynfigStudio
-	            fi
-	            exit 1
+	        	printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
 	            ;;
 	    esac
+        if command_exists synfigstudio; then
+            return 0
+        fi
+        if try_flatpak_install org.synfig.SynfigStudio; then
+            return 0
+        fi
 	else
 		printf "%b\n" "${GREEN}Synfig Studio is already installed.${RC}"
 	fi
@@ -26,6 +34,9 @@ installSynfigStudio() {
 
 uninstallSynfigStudio() {
 	printf "%b\n" "${YELLOW}Uninstalling Synfig Studio...${RC}"
+	if uninstall_flatpak_if_installed org.synfig.SynfigStudio; then
+	    return 0
+	fi
 	if command_exists synfigstudio; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +46,7 @@ uninstallSynfigStudio() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter synfigstudio
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.synfig.SynfigStudio
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac
@@ -59,4 +70,10 @@ main() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 main

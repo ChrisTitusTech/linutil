@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="Discover GNOME KDE Plasma Software backend for gnome-software-plugin-flatpak plasma-discover-backend-flatpak plugin"
+
+
 checkDE() {
     if [ -n "$XDG_CURRENT_DESKTOP" ]; then
         case "$XDG_CURRENT_DESKTOP" in
@@ -39,5 +44,11 @@ installExtra() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 checkFlatpak
 installExtra

@@ -2,6 +2,8 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+
 installCUPS() {
     clear
 
@@ -22,6 +24,17 @@ installCUPS() {
     esac
 }
 
-checkEnv
-checkEscalationTool
-installCUPS
+uninstallCUPS() {
+    printf "%b\n" "${YELLOW}Uninstalling CUPS...${RC}"
+    uninstall_native cups || true
+}
+
+if [ "${0##*/}" = "install-cups.sh" ]; then
+    checkEnv
+    checkEscalationTool
+    if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+        uninstallCUPS
+    else
+        installCUPS
+    fi
+fi

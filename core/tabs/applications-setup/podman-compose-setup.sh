@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="podman-compose"
+
+
 installPodmanCompose() {
     if ! command_exists podman-compose; then
         printf "%b\n" "${YELLOW}Installing Podman Compose...${RC}"
@@ -42,4 +47,10 @@ installPodmanCompose() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installPodmanCompose

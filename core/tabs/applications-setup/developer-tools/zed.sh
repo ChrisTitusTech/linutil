@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="dev.zed.Zed"
+APP_UNINSTALL_PKGS="dev.zed.Zed flathub from or package zed"
+
+
 installZed() {
     if ! command_exists dev.zed.Zed && ! command_exists zed && ! command_exists zeditor; then
         printf "%b\n" "${CYAN}Installing Zed.${RC}"
@@ -51,5 +56,11 @@ installZed() {
 }
 
 checkEnv
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 clear
 installZed

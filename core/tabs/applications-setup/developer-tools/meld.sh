@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.gnome.meld"
+APP_UNINSTALL_PKGS="flathub meld org.gnome.meld"
+
+
 installMeld() {
     if ! command_exists org.gnome.meld && ! command_exists meld; then
         printf "%b\n" "${YELLOW}Installing Meld...${RC}"
@@ -30,4 +35,10 @@ installMeld() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installMeld

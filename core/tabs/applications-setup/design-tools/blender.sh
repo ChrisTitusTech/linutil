@@ -2,9 +2,14 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.blender.Blender"
+APP_UNINSTALL_PKGS="blender"
+
+
 installBlender() {
 	printf "%b\n" "${YELLOW}Installing Blender...${RC}"
-	if ! command_exists blender; then
+	if ! flatpak_app_installed org.blender.Blender && ! command_exists blender; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y blender
@@ -13,12 +18,15 @@ installBlender() {
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter blender
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.blender.Blender
-	            fi
-	            exit 1
+	        	printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
 	            ;;
 	    esac
+        if command_exists blender; then
+            return 0
+        fi
+        if try_flatpak_install org.blender.Blender; then
+            return 0
+        fi
 	else
 		printf "%b\n" "${GREEN}Blender is already installed.${RC}"
 	fi
@@ -26,6 +34,9 @@ installBlender() {
 
 uninstallBlender() {
 	printf "%b\n" "${YELLOW}Uninstalling Blender...${RC}"
+	if uninstall_flatpak_if_installed org.blender.Blender; then
+	    return 0
+	fi
 	if command_exists blender; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +46,7 @@ uninstallBlender() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter blender
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.blender.Blender
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac
@@ -59,4 +70,10 @@ main() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 main

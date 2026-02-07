@@ -2,8 +2,13 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="io.gitlab.librewolf-community"
+APP_UNINSTALL_PKGS="extrepo librewolf"
+
+
 installLibreWolf() {
-    if ! command_exists io.gitlab.librewolf-community && ! command_exists librewolf; then
+    if ! flatpak_app_installed io.gitlab.librewolf-community && ! command_exists librewolf; then
         printf "%b\n" "${YELLOW}Installing Librewolf...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -29,14 +34,18 @@ installLibreWolf() {
                 "$ESCALATION_TOOL" "$PACKAGER" -Syu librewolf
                 ;;
             apk)
-                checkFlatpak
-                flatpak install flathub io.gitlab.librewolf-community
+                printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                printf "%b\n" "${YELLOW}Unsupported package manager: ""$PACKAGER"". Falling back to Flatpak...${RC}"
                 ;;
         esac
+        if command_exists librewolf; then
+            return 0
+        fi
+        if try_flatpak_install io.gitlab.librewolf-community; then
+            return 0
+        fi
     else
         printf "%b\n" "${GREEN}LibreWolf Browser is already installed.${RC}"
     fi
@@ -45,4 +54,10 @@ installLibreWolf() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installLibreWolf

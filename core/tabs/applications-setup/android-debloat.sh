@@ -2,6 +2,11 @@
 
 . ../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="android-sdk-platform-tools android-tools"
+
+
 install_adb() {
     if ! command_exists adb ; then
         printf "%b\n" "${YELLOW}Installing ADB...${RC}."
@@ -44,5 +49,11 @@ install_universal_android_debloater() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 install_adb
 install_universal_android_debloater 

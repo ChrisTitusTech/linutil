@@ -3,6 +3,8 @@
 . ../../common-script.sh
 . ./install-cups.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+
 installHpPrinterDriver() {
     clear
 
@@ -23,7 +25,16 @@ installHpPrinterDriver() {
     esac
 }
 
+uninstallHpPrinterDriver() {
+    printf "%b\n" "${YELLOW}Uninstalling HP printer drivers...${RC}"
+    uninstall_native hplip || true
+}
+
 checkEnv
 checkEscalationTool
-installCUPS
-installHpPrinterDriver
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstallHpPrinterDriver
+else
+    installCUPS
+    installHpPrinterDriver
+fi

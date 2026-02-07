@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS=""
+
+
 installPdfstudioviewer() {
     if ! command_exists pdfstudioviewer2024; then
         printf "%b\n" "${YELLOW}Installing PDF Studio Viewer...${RC}"
@@ -20,4 +25,10 @@ installPdfstudioviewer() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installPdfstudioviewer

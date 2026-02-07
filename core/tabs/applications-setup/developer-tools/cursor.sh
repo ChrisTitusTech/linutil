@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="cursor cursor-bin"
+
+
 installCursor() {
     if ! command_exists cursor; then
         printf "%b\n" "${YELLOW}Installing Cursor...${RC}"
@@ -40,4 +45,10 @@ installCursor() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installCursor

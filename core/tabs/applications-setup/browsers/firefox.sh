@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="MozillaFirefox firefox firefox-esr"
+
+
 installFirefox() {
     if ! command_exists firefox; then
         printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"
@@ -38,4 +43,10 @@ installFirefox() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installFirefox

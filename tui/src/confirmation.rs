@@ -10,6 +10,7 @@ use std::borrow::Cow;
 
 pub enum ConfirmStatus {
     Confirm,
+    Uninstall,
     Abort,
     None,
 }
@@ -19,6 +20,7 @@ pub struct ConfirmPrompt {
     names: Box<[String]>,
     scroll: usize,
     pub status: ConfirmStatus,
+    pub is_focused: bool,
 }
 
 impl ConfirmPrompt {
@@ -41,6 +43,7 @@ impl ConfirmPrompt {
             names,
             scroll: 0,
             status: ConfirmStatus::None,
+            is_focused: true,
         }
     }
 
@@ -59,16 +62,24 @@ impl ConfirmPrompt {
 
 impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
+        let border_color = if self.is_focused {
+            theme.focused_color()
+        } else {
+            theme.unfocused_color()
+        };
+
         let block = Block::bordered()
             .border_set(border::PLAIN)
-            .border_style(Style::default().fg(theme.focused_color()))
+            .border_style(Style::default().fg(border_color))
             .title(" CONFIRM SELECTIONS ")
             .title_bottom(Line::from(vec![
                 Span::raw(" ["),
-                Span::styled("y", Style::default().fg(theme.success_color())),
-                Span::raw("] to continue ["),
-                Span::styled("n", Style::default().fg(theme.fail_color())),
-                Span::raw("] to abort "),
+                Span::styled("I", Style::default().fg(Color::Rgb(0xB9, 0xF2, 0x7C))),
+                Span::raw("] Install - ["),
+                Span::styled("U", Style::default().fg(Color::Rgb(0xFF, 0x00, 0x00))),
+                Span::raw("] Uninstall - ["),
+                Span::styled("Q-ESC", Style::default().fg(Color::White)),
+                Span::raw("] Abort "),
             ]))
             .title_alignment(Alignment::Center)
             .title_style(Style::default().fg(theme.tab_color()).bold())
@@ -110,8 +121,9 @@ impl FloatContent for ConfirmPrompt {
         use ConfirmStatus::*;
         use KeyCode::{Char, Down, Esc, Up};
         self.status = match key.code {
-            Char('y') | Char('Y') => Confirm,
-            Char('n') | Char('N') | Esc | Char('q') => Abort,
+            Char('i') | Char('I') => Confirm,
+            Char('u') | Char('U') => Uninstall,
+            Char('n') | Char('N') | Esc | Char('q') | Char('Q') => Abort,
             Char('j') | Char('J') | Down => {
                 self.scroll_down();
                 None
@@ -128,7 +140,7 @@ impl FloatContent for ConfirmPrompt {
     fn is_finished(&self) -> bool {
         use ConfirmStatus::*;
         match self.status {
-            Confirm | Abort => true,
+            Confirm | Uninstall | Abort => true,
             None => false,
         }
     }
@@ -137,8 +149,9 @@ impl FloatContent for ConfirmPrompt {
         (
             "Confirmation prompt",
             shortcuts!(
-                ("Continue", ["Y", "y"]),
-                ("Abort", ["N", "n", "q", "Esc"]),
+                ("Install", ["I", "i"]),
+                ("Uninstall", ["U", "u"]),
+                ("Abort", ["q", "Q", "Esc"]),
                 ("Scroll up", ["k", "Up"]),
                 ("Scroll down", ["j", "Down"]),
                 ("Close linutil", ["CTRL-c"]),

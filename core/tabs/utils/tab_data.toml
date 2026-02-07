@@ -76,7 +76,7 @@ description = "This script is designed to change the resolution of monitors conn
 script = "monitor-control/set_resolutions.sh"
 
 [[data]]
-name = "Printers"
+name = "Printing Utilities"
 
 [[data.entries]]
 name = "CUPS"
@@ -94,6 +94,12 @@ task_list = "I"
 name = "HP printer drivers"
 script = "printers/install-hp-printer-drivers.sh"
 description = "This script will install HP printer drivers."
+task_list = "I"
+
+[[data.entries]]
+name = "Print Settings"
+description = "Printer configuration tool for managing local and network printers."
+script = "printing-utilities/print-settings.sh"
 task_list = "I"
 
 [[data]]
@@ -145,9 +151,27 @@ script = "create-bootable-usb.sh"
 task_list = "D"
 
 [[data]]
+name = "Calculator"
+description = "GNOME Calculator is a simple calculator application for the GNOME desktop."
+script = "calculator.sh"
+task_list = "I"
+
+[[data]]
 name = "Crypto tool"
 script = "encrypt_decrypt_tool.sh"
 task_list = "I FM"
+
+[[data]]
+name = "Disk Usage"
+description = "GNOME Disk Usage Analyzer (Baobab) helps visualize disk usage and find large files."
+script = "disk-usage.sh"
+task_list = "I"
+
+[[data]]
+name = "Disks"
+description = "GNOME Disks provides tools to manage disk drives and disk images."
+script = "disks.sh"
+task_list = "I"
 
 [[data]]
 name = "Numlock on Startup"

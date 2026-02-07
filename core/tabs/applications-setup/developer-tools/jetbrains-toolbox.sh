@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="libfuse2"
+
+
 manualInstall() {
     JETBRAINS_TOOLBOX_DIR="/opt/jetbrains-toolbox"
 
@@ -49,4 +54,10 @@ installJetBrainsToolBox() {
 checkEnv
 checkEscalationTool
 checkAURHelper
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installJetBrainsToolBox

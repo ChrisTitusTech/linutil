@@ -2,9 +2,14 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID="org.ardour.Ardour"
+APP_UNINSTALL_PKGS="ardour"
+
+
 installArdour() {
 	printf "%b\n" "${YELLOW}Installing Ardour...${RC}"
-	if ! command_exists ardour; then
+	if ! flatpak_app_installed org.ardour.Ardour && ! command_exists ardour; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y ardour
@@ -13,12 +18,15 @@ installArdour() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter ardour
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
-	            fi
-	            exit 1
+	        	printf "%b\n" "${YELLOW}No native package configured for ${PACKAGER}. Falling back to Flatpak...${RC}"
 	            ;;
 	    esac
+        if command_exists ardour; then
+            return 0
+        fi
+        if try_flatpak_install org.ardour.Ardour; then
+            return 0
+        fi
 	else
 		printf "%b\n" "${GREEN}Ardour is already installed.${RC}"
 	fi
@@ -26,6 +34,9 @@ installArdour() {
 
 uninstallArdour() {
 	printf "%b\n" "${YELLOW}Uninstalling Ardour...${RC}"
+	if uninstall_flatpak_if_installed org.ardour.Ardour; then
+	    return 0
+	fi
 	if command_exists ardour; then
 	    case "$PACKAGER" in
 	        apt-get|nala|dnf|zypper)
@@ -35,7 +46,7 @@ uninstallArdour() {
 		       	"$AUR_HELPER" -R --noconfirm --cleanafter ardour
 	            ;;
 	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.ardour.Ardour
+	            printf "%b\n" "${RED}No native uninstall is configured for ${PACKAGER}.${RC}"
 	            exit 1
 	            ;;
 	    esac
@@ -59,4 +70,10 @@ main() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 main

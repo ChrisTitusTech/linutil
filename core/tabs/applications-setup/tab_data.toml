@@ -5,7 +5,7 @@ name = "Communication Apps"
 
 [[data.entries]]
 name = "Discord"
-description = "Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features."
+description = "Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features. Installed via native packages when available, with Flatpak used as a fallback."
 script = "communication-apps/discord-setup.sh"
 task_list = "I"
 
@@ -55,6 +55,12 @@ task_list = "I"
 name = "Design Tools"
 
 [[data.entries]]
+name = "Aether"
+description = "Aether is a visual theming application for Omarchy that extracts colors from wallpapers and applies themes across supported apps."
+script = "design-tools/aether.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Ardour"
 description = "Ardour is a free and open-source digital audio workstation and hard disk recorder."
 script = "design-tools/ardour.sh"
@@ -88,6 +94,12 @@ task_list = "I"
 name = "Handbrake"
 description = "HandBrake is a free and open-source transcoder for digital video files."
 script = "design-tools/handbrake.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Image Viewer"
+description = "GNOME Image Viewer uses Loupe by default, with fallback to Eye of GNOME (EOG) where needed."
+script = "design-tools/image-viewer.sh"
 task_list = "I"
 
 [[data.entries]]
@@ -246,7 +258,7 @@ task_list = "I"
 name = "PDF Suites"
 
 [[data.entries]]
-name = "Evince"
+name = "Document Viewer (Evince)"
 script = "pdf-suites/evince.sh"
 task_list = "I"
 
@@ -263,6 +275,45 @@ task_list = "I"
 [[data.entries]]
 name = "PDF Studio Viewer"
 script = "pdf-suites/pdfstudioviewer.sh"
+
+[[data]]
+name = "Terminals"
+
+[[data.entries]]
+name = "Alacritty"
+description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance."
+script = "alacritty-setup.sh"
+task_list = "I FM"
+
+[[data.entries]]
+name = "Bash Prompt"
+description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
+script = "mybash-setup.sh"
+task_list = "I FM"
+
+[[data.entries]]
+name = "Ghostty"
+description = "Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience."
+script = "ghostty-setup.sh"
+task_list = "I FM"
+
+[[data.entries]]
+name = "Kitty"
+description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features."
+script = "kitty-setup.sh"
+task_list = "I FM"
+
+[[data.entries]]
+name = "Starship"
+description = "Starship is a minimal, blazing-fast, and infinitely customizable prompt for any shell."
+script = "starship-setup.sh"
+task_list = "I FM"
+
+[[data.entries]]
+name = "ZSH Prompt"
+description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
+script = "zsh-setup.sh"
+task_list = "I FM"
 
 [[data]]
 name = "Web Browsers"
@@ -334,12 +385,6 @@ script = "browsers/zen-browser.sh"
 task_list = "I"
 
 [[data]]
-name = "Alacritty"
-description = "Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator."
-script = "alacritty-setup.sh"
-task_list = "I FM"
-
-[[data]]
 name = "Android Debloater"
 description = "Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience."
 script = "android-debloat.sh"
@@ -351,11 +396,6 @@ description = "Automatic CPU speed & power optimizer.\nhttps://github.com/AdnanH
 script = "auto-cpufreq.sh"
 task_list = "I SS"
 
-[[data]]
-name = "Bash Prompt"
-description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
-script = "mybash-setup.sh"
-task_list = "I FM"
 
 [[data]]
 name = "Bottles"
@@ -387,11 +427,6 @@ description = "Flatpak is a universal application sandbox for Linux that uses is
 script = "setup-flatpak.sh"
 task_list = "I"
 
-[[data]]
-name = "Ghostty"
-description = "Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience."
-script = "ghostty-setup.sh"
-task_list = "I FM"
 
 [[data]]
 name = "Grub Theme"
@@ -399,11 +434,6 @@ description = "Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow
 script = "grub-theme.sh"
 task_list = "PFM"
 
-[[data]]
-name = "Kitty"
-description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty."
-script = "kitty-setup.sh"
-task_list = "I FM"
 
 [[data]]
 name = "Linutil Installer"
@@ -454,9 +484,3 @@ task_list = "I SS"
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
 values = ["wayland", "Wayland"]
-
-[[data]]
-name = "ZSH Prompt"
-description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
-script = "zsh-setup.sh"
-task_list = "I FM"

@@ -2,6 +2,11 @@
 
 . ../../common-script.sh
 
+LINUTIL_UNINSTALL_SUPPORTED=1
+APP_FLATPAK_ID=""
+APP_UNINSTALL_PKGS="torbrowser-launcher"
+
+
 installTorBrowser() {
     if ! command_exists torbrowser-launcher; then
         printf "%b\n" "${YELLOW}Installing Tor Browser...${RC}"
@@ -30,5 +35,11 @@ installTorBrowser() {
 
 checkEnv
 checkEscalationTool
+if [ "$LINUTIL_ACTION" = "uninstall" ]; then
+    uninstall_app "$APP_FLATPAK_ID" "$APP_UNINSTALL_PKGS"
+    exit 0
+fi
+
+
 installTorBrowser
 
