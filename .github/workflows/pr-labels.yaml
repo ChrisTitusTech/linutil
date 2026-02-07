@@ -1,63 +1,95 @@
-name: Label PR
+name: Label PRs by Type of Change
 
 on:
-  pull_request:
-    types: [opened]
+  pull_request_target:
+    types: [opened, edited, synchronize]
 
 jobs:
-  labelPR:
+  label-pr:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      issues: write
       pull-requests: write
+      issues: write
+      contents: read
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Check PR body for Type of Change
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const labelsToAdd = [];
 
-      - name: Extract referenced issues
-        run: |
-          BODY="${{ github.event.pull_request.body }}"
-          ISSUES=$(echo "$BODY" | grep -Eio '(Fixes|Resolves|Closes):? #[0-9]+' | grep -Eo '[0-9]+' | uniq)
+            // Check for Type of Change checkboxes
+            if (/\[x\]\s*New feature/i.test(prBody)) {
+              labelsToAdd.push('new feature');
+            }
+            if (/\[x\]\s*Bug fix/i.test(prBody)) {
+              labelsToAdd.push('bug');
+            }
+            if (/\[x\]\s*Documentation update/i.test(prBody)) {
+              labelsToAdd.push('documentation');
+            }
+            if (/\[x\]\s*Hotfix/i.test(prBody)) {
+              labelsToAdd.push('hotfix');
+            }
+            if (/\[x\]\s*UI\/UX improvement/i.test(prBody)) {
+              labelsToAdd.push('UI update');
+            }
 
-          echo "ISSUES=$ISSUES" >> $GITHUB_ENV
+            // Check changed files for automatic labeling
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
 
-      - name: Get issue labels
-        if: env.ISSUES != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          LABELS=""
-          
-          for ISSUE in ${{ env.ISSUES }}; do
-            ISSUE_LABELS=$(gh api "/repos/${{ github.repository }}/issues/$ISSUE" \
-              --jq '.labels[].name | select(contains(":"))')
+            const hasRustFiles = files.some(file => file.filename.endsWith('.rs'));
+            const hasShellFiles = files.some(file => file.filename.endsWith('.sh'));
+            const hasMarkdownFiles = files.some(file => file.filename.endsWith('.md'));
+
+            if (hasRustFiles) {
+              labelsToAdd.push('rust');
+            }
+            if (hasShellFiles) {
+              labelsToAdd.push('script');
+            }
+            if (hasMarkdownFiles) {
+              labelsToAdd.push('documentation');
+            }
+
+            // Extract referenced issues and get their labels
+            const issueRegex = /(?:Fixes|Resolves|Closes):?\s*#(\d+)/gi;
+            const issueMatches = [...prBody.matchAll(issueRegex)];
+            const issueNumbers = [...new Set(issueMatches.map(match => parseInt(match[1])))];
+
+            for (const issueNumber of issueNumbers) {
+              try {
+                const issue = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber
+                });
+                
+                // Add labels from referenced issues that contain a colon
+                const issueLabels = issue.data.labels
+                  .map(label => typeof label === 'string' ? label : label.name)
+                  .filter(name => name.includes(':'));
+                
+                labelsToAdd.push(...issueLabels);
+              } catch (error) {
+                console.log(`Could not fetch issue #${issueNumber}: ${error.message}`);
+              }
+            }
+
+            // Remove duplicates and add labels
+            const uniqueLabels = [...new Set(labelsToAdd)];
             
-            if [[ -n "$ISSUE_LABELS" ]]; then
-              if [[ -z "$LABELS" ]]; then
-                LABELS="$ISSUE_LABELS"
-              else
-                LABELS="$LABELS"$'\n'"$ISSUE_LABELS"
-              fi
-            fi
-          done
-          
-          if [[ -n "$LABELS" ]]; then
-            UNIQUE_LABELS=$(echo "$LABELS" | sort -u | tr '\n' ',' | sed 's/,$//')
-            echo "LABELS=$UNIQUE_LABELS" >> $GITHUB_ENV
-          else
-            echo "LABELS=" >> $GITHUB_ENV
-          fi
-
-      - name: Assign labels
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr edit ${{ github.event.pull_request.number }} --add-label "initial review required"
-          
-          if [[ -n "${{ env.LABELS }}" ]]; then
-            IFS=',' read -ra LABEL_ARRAY <<< "${{ env.LABELS }}"
-            for label in "${LABEL_ARRAY[@]}"; do
-              gh pr edit ${{ github.event.pull_request.number }} --add-label "$label"
-            done
-          fi
+            if (uniqueLabels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: uniqueLabels
+              });
+            }
