@@ -70,6 +70,9 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
                 .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
                 .is_ok()
             {
+                if state.take_force_clear() {
+                    terminal.clear()?;
+                }
                 terminal.draw(|frame| state.draw(frame)).unwrap();
             }
             continue;
@@ -93,6 +96,9 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
                 }
             }
             _ => {}
+        }
+        if state.take_force_clear() {
+            terminal.clear()?;
         }
         terminal.draw(|frame| state.draw(frame)).unwrap();
     }

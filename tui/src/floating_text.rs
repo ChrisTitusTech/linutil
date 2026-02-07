@@ -1,13 +1,14 @@
-use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme::Theme};
+use crate::{float::FloatContent, hint::Shortcut, theme::Theme};
 use linutil_core::Command;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     prelude::*,
     symbols::border,
-    widgets::{Block, Borders, Clear, Paragraph, Wrap},
+    widgets::{Block, Borders, Clear, Paragraph},
 };
 use tree_sitter_bash as hl_bash;
 use tree_sitter_highlight::{self as hl, HighlightEvent};
+use unicode_width::UnicodeWidthChar;
 
 macro_rules! style {
     ($r:literal, $g:literal, $b:literal) => {{
@@ -26,27 +27,35 @@ const SYNTAX_HIGHLIGHT_STYLES: [(&str, Style); 8] = [
     ("number", style!(181, 206, 168)),   // light green
 ];
 
-pub struct FloatingText<'a> {
+pub struct FloatingText {
     // Width, Height
     inner_area_size: (usize, usize),
     mode_title: String,
     // Cache the text to avoid reprocessing it every frame
-    processed_text: Text<'a>,
+    processed_text: Text<'static>,
+    raw_text: String,
+    highlighted_text: Option<Text<'static>>,
+    syntax_highlight: bool,
     // Vertical, Horizontal
     scroll: (u16, u16),
     wrap_words: bool,
+    last_layout: Option<(usize, bool, bool)>,
 }
 
-impl<'a> FloatingText<'a> {
+impl FloatingText {
     pub fn new(text: String, title: &str, wrap_words: bool) -> Self {
-        let processed_text = Text::from(text);
+        let processed_text = Text::from(text.clone());
 
         Self {
             inner_area_size: (0, 0),
             mode_title: title.to_string(),
             processed_text,
+            raw_text: text,
+            highlighted_text: None,
+            syntax_highlight: false,
             scroll: (0, 0),
             wrap_words,
+            last_layout: None,
         }
     }
 
@@ -60,18 +69,26 @@ impl<'a> FloatingText<'a> {
         }
         .unwrap();
 
-        let processed_text = Self::get_highlighted_string(&src).unwrap_or_else(|| Text::from(src));
+        let src = Self::expand_tabs(&src, 4);
+        let highlighted_text = Self::get_highlighted_string(&src);
+        let processed_text = highlighted_text
+            .clone()
+            .unwrap_or_else(|| Text::from(src.clone()));
 
         Self {
             inner_area_size: (0, 0),
             mode_title: title.to_string(),
             processed_text,
+            raw_text: src,
+            highlighted_text,
+            syntax_highlight: true,
             scroll: (0, 0),
             wrap_words,
+            last_layout: None,
         }
     }
 
-    fn get_highlighted_string(s: &str) -> Option<Text<'a>> {
+    fn get_highlighted_string(s: &str) -> Option<Text<'static>> {
         let matched_tokens = SYNTAX_HIGHLIGHT_STYLES
             .iter()
             .map(|hl| hl.0)
@@ -169,32 +186,188 @@ impl<'a> FloatingText<'a> {
         };
         self.scroll.1 = (self.scroll.1 + 1).min(max_scroll);
     }
+
+    fn expand_tabs(s: &str, tab_width: usize) -> String {
+        let mut out = String::with_capacity(s.len());
+        let mut col = 0usize;
+        for ch in s.chars() {
+            if ch == '\t' {
+                let spaces = tab_width.saturating_sub(col % tab_width).max(1);
+                out.extend(std::iter::repeat_n(' ', spaces));
+                col = col.saturating_add(spaces);
+                continue;
+            }
+            out.push(ch);
+            col = col.saturating_add(UnicodeWidthChar::width(ch).unwrap_or(0).max(1));
+            if ch == '\n' {
+                col = 0;
+            }
+        }
+        out
+    }
+
+    fn split_at_width(s: &str, width: usize) -> usize {
+        if width == 0 {
+            return 0;
+        }
+        let mut used = 0usize;
+        let mut last_idx = 0usize;
+        for (idx, ch) in s.char_indices() {
+            let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0).max(1);
+            if used.saturating_add(ch_width) > width {
+                break;
+            }
+            used = used.saturating_add(ch_width);
+            last_idx = idx + ch.len_utf8();
+        }
+        last_idx
+    }
+
+    fn str_width(s: &str) -> usize {
+        s.chars()
+            .map(|ch| UnicodeWidthChar::width(ch).unwrap_or(0).max(1))
+            .sum()
+    }
+
+    fn wrap_plain_text(s: &str, width: usize) -> Text<'static> {
+        let mut lines = Vec::new();
+        for line in s.split('\n') {
+            if line.is_empty() {
+                lines.push(Line::from(""));
+                continue;
+            }
+            let mut remaining = line;
+            while !remaining.is_empty() {
+                let mut split = Self::split_at_width(remaining, width);
+                if split == 0 {
+                    let ch = remaining.chars().next().unwrap();
+                    split = ch.len_utf8();
+                }
+                let (head, tail) = remaining.split_at(split);
+                lines.push(Line::from(head.to_string()));
+                remaining = tail;
+            }
+        }
+        Text::from(lines)
+    }
+
+    fn wrap_highlighted_text(text: &Text<'static>, width: usize) -> Text<'static> {
+        if width == 0 {
+            return Text::from("");
+        }
+
+        let mut lines: Vec<Line<'static>> = Vec::new();
+        for line in &text.lines {
+            if line.spans.is_empty() {
+                lines.push(Line::from(""));
+                continue;
+            }
+
+            let mut current: Vec<Span<'static>> = Vec::new();
+            let mut current_width = 0usize;
+
+            for span in &line.spans {
+                let style = span.style;
+                let mut content = span.content.as_ref();
+
+                while !content.is_empty() {
+                    let remaining = width.saturating_sub(current_width);
+                    if remaining == 0 {
+                        lines.push(Line::from(std::mem::take(&mut current)));
+                        current_width = 0;
+                        continue;
+                    }
+
+                    let mut split = Self::split_at_width(content, remaining);
+                    if split == 0 {
+                        let ch = content.chars().next().unwrap();
+                        split = ch.len_utf8();
+                    }
+
+                    let (head, tail) = content.split_at(split);
+                    if !head.is_empty() {
+                        current.push(Span::styled(head.to_string(), style));
+                        current_width = current_width.saturating_add(Self::str_width(head));
+                    }
+                    content = tail;
+
+                    if current_width >= width {
+                        lines.push(Line::from(std::mem::take(&mut current)));
+                        current_width = 0;
+                    }
+                }
+            }
+
+            if !current.is_empty() {
+                lines.push(Line::from(current));
+            }
+        }
+
+        Text::from(lines)
+    }
+
+    fn refresh_processed_text(&mut self, width: usize) {
+        let key = (width, self.wrap_words, self.syntax_highlight);
+        if self.last_layout == Some(key) {
+            return;
+        }
+        self.last_layout = Some(key);
+
+        if self.wrap_words {
+            self.scroll.1 = 0;
+            self.processed_text = if self.syntax_highlight {
+                if let Some(highlighted) = &self.highlighted_text {
+                    Self::wrap_highlighted_text(highlighted, width)
+                } else {
+                    Self::wrap_plain_text(&self.raw_text, width)
+                }
+            } else {
+                Self::wrap_plain_text(&self.raw_text, width)
+            };
+        } else if self.syntax_highlight {
+            self.processed_text = self
+                .highlighted_text
+                .clone()
+                .unwrap_or_else(|| Text::from(self.raw_text.clone()));
+        } else {
+            self.processed_text = Text::from(self.raw_text.clone());
+        }
+    }
+
+    fn clamp_scroll(&mut self) {
+        let max_scroll = self
+            .processed_text
+            .lines
+            .len()
+            .saturating_sub(self.inner_area_size.1) as u16;
+        self.scroll.0 = self.scroll.0.min(max_scroll);
+        if self.wrap_words {
+            self.scroll.1 = 0;
+        }
+    }
 }
 
-impl FloatContent for FloatingText<'_> {
+impl FloatContent for FloatingText {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
+        let title = self.mode_title.clone();
         let block = Block::default()
             .borders(Borders::ALL)
             .border_set(border::PLAIN)
             .border_style(Style::default().fg(theme.focused_color()))
-            .title(self.mode_title.as_str())
+            .title(title)
             .title_alignment(Alignment::Center)
             .title_style(Style::default().fg(theme.tab_color()).bold())
             .style(Style::default());
 
         let inner_area = block.inner(area);
         self.inner_area_size = (inner_area.width as usize, inner_area.height as usize);
+        self.refresh_processed_text(inner_area.width as usize);
+        self.clamp_scroll();
 
         frame.render_widget(Clear, area);
         frame.render_widget(block, area);
 
-        let paragraph = if self.wrap_words {
-            Paragraph::new(self.processed_text.clone())
-                .scroll(self.scroll)
-                .wrap(Wrap { trim: false })
-        } else {
-            Paragraph::new(self.processed_text.clone()).scroll(self.scroll)
-        };
+        let paragraph = Paragraph::new(self.processed_text.clone()).scroll(self.scroll);
 
         frame.render_widget(paragraph, inner_area);
     }
@@ -227,15 +400,13 @@ impl FloatContent for FloatingText<'_> {
     }
 
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
-        (
-            &self.mode_title,
-            shortcuts!(
-                ("Scroll down", ["j", "Down"]),
-                ("Scroll up", ["k", "Up"]),
-                ("Scroll left", ["h", "Left"]),
-                ("Scroll right", ["l", "Right"]),
-                ("Close window", ["Enter", "q"])
-            ),
-        )
+        let mut shortcuts = vec![
+            Shortcut::new("Scroll down", ["j", "Down"]),
+            Shortcut::new("Scroll up", ["k", "Up"]),
+            Shortcut::new("Scroll left", ["h", "Left"]),
+            Shortcut::new("Scroll right", ["l", "Right"]),
+        ];
+        shortcuts.push(Shortcut::new("Close window", ["Enter", "q"]));
+        (&self.mode_title, shortcuts.into_boxed_slice())
     }
 }
