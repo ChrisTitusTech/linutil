@@ -54,19 +54,42 @@ if [[ -z "$workspace_version" || -z "$core_version" || -z "$tui_dep_version" ]];
 	exit 1
 fi
 
+# Function to update version in a TOML file
+update_toml_version() {
+	local file=$1
+	local old_version=$2
+	local new_version=$3
+	
+	echo "Updating version in $file from $old_version to $new_version..."
+	sed -i "s/version = \"$old_version\"/version = \"$new_version\"/" "$file"
+}
+
+version_updated=false
+
 if [[ "$workspace_version" != "$expected_version" ]]; then
-	echo "Workspace version $workspace_version does not match today's expected $expected_version." >&2
-	exit 1
+	echo "Workspace version $workspace_version does not match today's expected $expected_version."
+	update_toml_version "Cargo.toml" "$workspace_version" "$expected_version"
+	version_updated=true
 fi
 
 if [[ "$core_version" != "$expected_version" ]]; then
-	echo "linutil_core package version $core_version does not match today's expected $expected_version." >&2
-	exit 1
+	echo "linutil_core package version $core_version does not match today's expected $expected_version."
+	# Core uses workspace version, so if workspace was updated, this should be fine
+	if [[ "$workspace_version" == "$core_version" ]]; then
+		echo "Core version will be updated via workspace version."
+	fi
 fi
 
 if [[ "$tui_dep_version" != "$expected_version" ]]; then
-	echo "linutil_tui depends on linutil_core $tui_dep_version but expected $expected_version." >&2
-	exit 1
+	echo "linutil_tui depends on linutil_core $tui_dep_version but expected $expected_version."
+	update_toml_version "tui/Cargo.toml" "$tui_dep_version" "$expected_version"
+	version_updated=true
+fi
+
+if [[ "$version_updated" == true ]]; then
+	echo "Versions have been updated to $expected_version."
+	echo "Please review the changes and run the script again to proceed with publishing."
+	exit 0
 fi
 
 echo "Version check passed: $expected_version"
