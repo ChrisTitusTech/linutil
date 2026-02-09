@@ -220,6 +220,62 @@ script = "developer-tools/zed.sh"
 task_list = "I"
 
 [[data]]
+name = "Nix Ecosystem"
+
+[[data.preconditions]]
+matches = false
+data = { containing_file = "/etc/os-release" }
+values = ["ID=nixos"]
+
+[[data.entries]]
+name = "Download NixOS ISO"
+description = "Download and verify NixOS installation ISOs. Choose between stable/unstable and minimal/GNOME variants."
+script = "nix/download-nixos-iso.sh"
+task_list = "D"
+multi_select = false
+
+[[data.entries]]
+name = "Install Home Manager"
+description = "Install Home Manager for declarative user package and dotfile management. Requires Nix."
+script = "nix/install-home-manager.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install Lix"
+description = "Install Lix, a community fork of Nix focused on stability and improved UX. For fresh installs only."
+script = "nix/install-lix.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install Nix (Determinate)"
+description = "Install Nix using the Determinate Systems installer. Enables flakes by default and includes an uninstaller. Recommended for most users."
+script = "nix/install-nix-determinate.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install Nix (Official)"
+description = "Install Nix using the official multi-user daemon installer from nixos.org."
+script = "nix/install-nix-official.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Nix Quick Reference"
+description = "Display a quick reference card for common Nix commands and resources."
+script = "nix/nix-quick-reference.sh"
+
+[[data.entries]]
+name = "Uninstall Nix/Lix"
+description = "Remove Nix or Lix from your system. Detects which installer was used and runs appropriate cleanup."
+script = "nix/uninstall-nix.sh"
+task_list = "RP"
+
+[[data.entries]]
+name = "Upgrade Nix to Lix"
+description = "Upgrade an existing Nix installation to Lix. Preserves your current setup."
+script = "nix/upgrade-to-lix.sh"
+task_list = "I"
+
+[[data]]
 name = "Office Suites"
 
 [[data.entries]]
@@ -400,6 +456,11 @@ script = "grub-theme.sh"
 task_list = "PFM"
 
 [[data]]
+name = "Install GNU Guix"
+description = "Install the GNU Guix functional package manager. Similar philosophy to Nix with Scheme-based configuration."
+script = "nix/install-guix.sh"
+task_list = "I"
+[[data]]
 name = "Kitty"
 description = "kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty."
 script = "kitty-setup.sh"
@@ -460,3 +521,4 @@ name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
 task_list = "I FM"
+
