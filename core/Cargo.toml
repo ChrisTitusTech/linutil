@@ -13,4 +13,4 @@ include_dir = "0.7.4"
 serde = { version = "1.0.215", features = ["derive"] }
 temp-dir = "0.1.14"
 toml = { version = "0.9.11", features = ["parse", "serde"] }
-which = "7.0.0"
+which = "8.0.0"
