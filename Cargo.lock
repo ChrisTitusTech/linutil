@@ -996,7 +996,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_core"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -1008,7 +1008,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "clap",
  "image",
@@ -2210,9 +2210,9 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-bash"
-version = "0.23.3"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "329a4d48623ac337d42b1df84e81a1c9dbb2946907c102ca72db158c1964a52e"
+checksum = "9e5ec769279cc91b561d3df0d8a5deb26b0ad40d183127f409494d6d8fc53062"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -2652,7 +2652,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "linutil_core",
 ]
