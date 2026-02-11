@@ -8,7 +8,6 @@ https://github.com/ChrisTitusTech/linutil/blob/main/.github/CONTRIBUTING.md
 - [ ] Bug fix
 - [ ] Documentation update
 - [ ] Refactoring
-- [ ] Hotfix
 - [ ] Security patch
 - [ ] UI/UX improvement
 
