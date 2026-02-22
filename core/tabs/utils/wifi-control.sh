@@ -141,7 +141,7 @@ select_network_index() {
         [ "$end" -gt "$total" ] && end=$total
 
         printf "%b\n" "${YELLOW}Available Networks (page ${page}/${pages})${RC}"
-        nl -ba "$list_file" | sed -n "${start},${end}p"
+        nl -w1 -s'. ' "$list_file" | sed -n "${start},${end}p"
         printf "%b\n" "n. Next page    p. Previous page    r. Refresh list    0. Exit to main menu"
         printf "%b" "$prompt_msg"
         read -r choice
