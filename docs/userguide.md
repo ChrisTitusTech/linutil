@@ -182,6 +182,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
 - **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions
+- **GPU Driver**: Auto-detects your GPU and installs a recommended driver stack for your distro. On NixOS, it provides declarative configuration guidance.
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
@@ -218,4 +219,4 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
-- **WiFi Manager**: This utility is designed to manage wifi in your system
+- **WiFi Manager**: This utility is designed to manage wifi in your system with paginated network selection and connect/disconnect/remove actions.

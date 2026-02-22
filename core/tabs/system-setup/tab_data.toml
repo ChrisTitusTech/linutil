@@ -221,6 +221,13 @@ script = "gaming-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "GPU Driver"
+description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
+script = "gpu-driver.sh"
+task_list = "I"
+multi_select = false
+
+[[data]]
 name = "Global Theme"
 description = "This script is designed to handle the installation and configuration of global theming"
 script = "global-theme.sh"
@@ -237,4 +244,3 @@ name = "TTY Fonts"
 description = "This Script will set the default TTY font to Terminus size 32 Bold"
 script = "terminus-tty.sh"
 task_list = "I PFM"
-
