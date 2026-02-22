@@ -108,6 +108,74 @@ wifi_off() {
 }
 
 # Function to prompt for WiFi network selection
+build_network_list() {
+    action=$1
+
+    case "$action" in
+        connect)
+            nmcli -t -f SSID dev wifi list | sed '/^$/d' | awk '!seen[$0]++'
+            ;;
+        disconnect | remove)
+            nmcli -t -f NAME,TYPE connection show | awk -F: '$2 == "802-11-wireless" && $1 != "" { print $1 }' | awk '!seen[$0]++'
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+select_network_index() {
+    list_file=$1
+    prompt_msg=$2
+    page_size=10
+    total=$(wc -l < "$list_file")
+    [ "$total" -eq 0 ] && return 1
+
+    page=1
+    pages=$(( (total + page_size - 1) / page_size ))
+
+    while true; do
+        clear
+        start=$(( (page - 1) * page_size + 1 ))
+        end=$(( page * page_size ))
+        [ "$end" -gt "$total" ] && end=$total
+
+        printf "%b\n" "${YELLOW}Available Networks (page ${page}/${pages})${RC}"
+        nl -ba "$list_file" | sed -n "${start},${end}p"
+        printf "%b\n" "n. Next page    p. Previous page    r. Refresh list    0. Exit to main menu"
+        printf "%b" "$prompt_msg"
+        read -r choice
+
+        case "$choice" in
+            0) return 1 ;;
+            n | N)
+                [ "$page" -lt "$pages" ] && page=$((page + 1))
+                ;;
+            p | P)
+                [ "$page" -gt 1 ] && page=$((page - 1))
+                ;;
+            r | R) return 2 ;;
+            *)
+                case "$choice" in
+                    '' | *[!0-9]*)
+                        printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
+                        ;;
+                    *)
+                        if [ "$choice" -ge 1 ] && [ "$choice" -le "$total" ]; then
+                            SELECTED_NETWORK_INDEX=$choice
+                            return 0
+                        fi
+                        printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
+                        ;;
+                esac
+                ;;
+        esac
+
+        printf "%b\n" "Press any key to continue..."
+        read -r _
+    done
+}
+
 prompt_for_network() {
     action=$1
     prompt_msg=$2
@@ -117,7 +185,7 @@ prompt_for_network() {
 
     while true; do
         clear
-        networks=$(nmcli -t -f SSID dev wifi list | awk -F: '!seen[$1]++' | grep -v '^$')
+        networks=$(build_network_list "$action")
         if [ -z "$networks" ]; then
             printf "%b\n" "${RED}No networks available. Please scan for networks first.${RC}"
             printf "%b\n" "Press any key to return to the main menu..."
@@ -128,32 +196,52 @@ prompt_for_network() {
 
         echo "$networks" > "$temp_file"
 
-        i=1
-        while IFS= read -r network; do
-            ssid=$(echo "$network" | awk -F: '{print $1}')
-            printf "%b\n" "$i. SSID: " "$ssid"
-            i=$((i + 1))
-        done < "$temp_file"
+        if select_network_index "$temp_file" "$prompt_msg"; then
+            selection_status=0
+        else
+            selection_status=$?
+        fi
+        if [ "$selection_status" -eq 1 ]; then
+            rm -f "$temp_file"
+            return
+        fi
+        if [ "$selection_status" -eq 2 ]; then
+            continue
+        fi
 
-        printf "%b\n" "0. Exit to main menu"
-        printf "%b" "$prompt_msg"
-        read -r choice
-
-        if [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
-            ssid=$(sed -n "${choice}p" "$temp_file" | awk -F: '{print $1}')
-            if [ "$action" = "connect" ]; then
-                printf "%b" "Enter password for SSID: " "$ssid"
+        ssid=$(sed -n "${SELECTED_NETWORK_INDEX}p" "$temp_file")
+        case "$action" in
+            connect)
+                printf "%b" "Enter password for SSID: $ssid "
                 read -r password
                 printf "\n"
-                if "$(nmcli dev wifi connect "$ssid" password "$password")"; then
+                if [ -n "$password" ]; then
+                    if nmcli dev wifi connect "$ssid" password "$password"; then
+                        printf "%b\n" "${GREEN}$success_msg${RC}"
+                    else
+                        printf "%b\n" "${RED}$failure_msg${RC}"
+                    fi
+                elif nmcli dev wifi connect "$ssid"; then
                     printf "%b\n" "${GREEN}$success_msg${RC}"
                 else
                     printf "%b\n" "${RED}$failure_msg${RC}"
                 fi
-            fi
-        else
-            printf "%b\n" "${RED}Invalid choice. Please try again.${RC}"
-        fi
+                ;;
+            disconnect)
+                if nmcli connection down "$ssid"; then
+                    printf "%b\n" "${GREEN}$success_msg${RC}"
+                else
+                    printf "%b\n" "${RED}$failure_msg${RC}"
+                fi
+                ;;
+            remove)
+                if nmcli connection delete "$ssid"; then
+                    printf "%b\n" "${GREEN}$success_msg${RC}"
+                else
+                    printf "%b\n" "${RED}$failure_msg${RC}"
+                fi
+                ;;
+        esac
 
         printf "%b\n" "Press any key to return to the selection menu..."
         read -r _
