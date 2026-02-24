@@ -24,6 +24,5 @@ installHpPrinterDriver() {
 }
 
 checkEnv
-checkEscalationTool
 installCUPS
 installHpPrinterDriver

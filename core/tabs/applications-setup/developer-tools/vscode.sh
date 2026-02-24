@@ -49,6 +49,5 @@ installVsCode() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installVsCode 

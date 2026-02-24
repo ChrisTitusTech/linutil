@@ -41,5 +41,4 @@ installSignal() {
 }
 
 checkEnv
-checkEscalationTool
 installSignal

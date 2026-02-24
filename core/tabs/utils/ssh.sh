@@ -249,5 +249,4 @@ done
 }
 
 checkEnv
-checkEscalationTool
 main

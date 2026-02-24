@@ -126,5 +126,4 @@ installDriver() {
 }
 
 checkEnv
-checkEscalationTool
 installDriver

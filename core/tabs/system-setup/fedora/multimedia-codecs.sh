@@ -20,5 +20,4 @@ multimedia() {
 }
 
 checkEnv
-checkEscalationTool
 multimedia

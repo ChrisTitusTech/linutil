@@ -520,6 +520,14 @@ impl AppState {
             .scroll_padding(1);
         frame.render_stateful_widget(list, chunks[1], &mut self.selection);
 
+        let should_auto_close_float = match &mut self.focus {
+            Focus::FloatingWindow(float) => float.content.should_auto_close(),
+            _ => false,
+        };
+        if should_auto_close_float {
+            self.focus = Focus::List;
+        }
+
         match &mut self.focus {
             Focus::FloatingWindow(float) => float.draw(frame, chunks[1], &self.theme),
             Focus::ConfirmationPrompt(prompt) => prompt.draw(frame, chunks[1], &self.theme),

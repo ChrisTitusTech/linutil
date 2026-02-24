@@ -64,7 +64,6 @@ linkNeovimConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installNeovim
 cloneNeovim
 backupNeovimConfig

@@ -36,5 +36,4 @@ configureFirewallD() {
 }
 
 checkEnv
-checkEscalationTool
 configureFirewallD

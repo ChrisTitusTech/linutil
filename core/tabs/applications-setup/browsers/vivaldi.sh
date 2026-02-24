@@ -41,5 +41,4 @@ installVivaldi() {
 }
 
 checkEnv
-checkEscalationTool
 installVivaldi

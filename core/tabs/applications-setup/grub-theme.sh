@@ -14,5 +14,4 @@ themeinstall(){
 }
 
 checkEnv
-checkEscalationTool
 themeinstall

@@ -29,6 +29,5 @@ installOnlyOffice() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installOnlyOffice

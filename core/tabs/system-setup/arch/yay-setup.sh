@@ -24,5 +24,4 @@ installDepend() {
 }
 
 checkEnv
-checkEscalationTool
 installDepend

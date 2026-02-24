@@ -35,6 +35,5 @@ setupGhosttyConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installGhostty
 setupGhosttyConfig

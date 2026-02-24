@@ -160,7 +160,6 @@ someNotices() {
 }
 
 checkEnv
-checkEscalationTool
 installBtrfsStack
 configureSnapper
 serviceStartEnable

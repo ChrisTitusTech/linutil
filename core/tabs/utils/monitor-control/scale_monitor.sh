@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to scale smaller monitors to the highest resolution of a bigger monitor
 scale_monitors() {

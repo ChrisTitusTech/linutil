@@ -212,5 +212,4 @@ setup_ssh_samba(){
 }
 
 checkEnv
-checkEscalationTool
 setup_ssh_samba

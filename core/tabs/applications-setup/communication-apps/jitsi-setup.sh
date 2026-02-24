@@ -36,6 +36,5 @@ installJitsi() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installJitsi

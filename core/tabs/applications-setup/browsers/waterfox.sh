@@ -20,6 +20,5 @@ installWaterfox() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installWaterfox

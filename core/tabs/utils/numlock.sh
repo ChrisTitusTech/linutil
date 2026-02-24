@@ -59,5 +59,4 @@ numlockSetup() {
 }
 
 checkEnv
-checkEscalationTool
 numlockSetup

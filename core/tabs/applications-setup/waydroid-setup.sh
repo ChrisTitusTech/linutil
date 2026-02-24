@@ -79,7 +79,6 @@ setupWaydroid() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 checkGpu
 installWaydroid

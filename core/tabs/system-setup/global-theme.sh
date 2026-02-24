@@ -83,7 +83,6 @@ successOutput() {
 }
 
 checkEnv
-checkEscalationTool
 applyTheming
 install_theme_tools
 configure_qt6ct

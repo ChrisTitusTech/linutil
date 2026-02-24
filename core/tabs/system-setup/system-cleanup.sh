@@ -75,7 +75,6 @@ clean_data() {
 }
 
 checkEnv
-checkEscalationTool
 cleanup_system
 common_cleanup
 clean_data

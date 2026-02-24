@@ -10,6 +10,9 @@ pub trait FloatContent {
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
     fn handle_mouse_event(&mut self, key: &MouseEvent) -> bool;
     fn is_finished(&self) -> bool;
+    fn should_auto_close(&mut self) -> bool {
+        false
+    }
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>);
 }
 

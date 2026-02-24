@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to duplicate displays
 duplicate_displays() {

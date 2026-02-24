@@ -27,7 +27,6 @@ installEpsonPrinterDriver() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installCUPS
 installEpsonPrinterDriver

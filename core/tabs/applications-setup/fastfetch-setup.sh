@@ -91,7 +91,6 @@ setupFastfetchShell() {
 }
 
 checkEnv
-checkEscalationTool
 installFastfetch
 setupFastfetchConfig
 setupFastfetchShell

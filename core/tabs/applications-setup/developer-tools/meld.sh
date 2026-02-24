@@ -29,5 +29,4 @@ installMeld() {
 }
 
 checkEnv
-checkEscalationTool
 installMeld

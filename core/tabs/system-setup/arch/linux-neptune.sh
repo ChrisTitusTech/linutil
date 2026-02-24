@@ -54,7 +54,6 @@ copyFirmwareFiles() {
 }
 
 checkEnv
-checkEscalationTool
 setUpRepos
 installKernel
 copyFirmwareFiles

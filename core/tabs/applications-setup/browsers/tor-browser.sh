@@ -29,6 +29,5 @@ installTorBrowser() {
 }
 
 checkEnv
-checkEscalationTool
 installTorBrowser
 

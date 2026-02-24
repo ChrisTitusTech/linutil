@@ -162,6 +162,5 @@ main_menu() {
 }
 
 checkEnv
-checkEscalationTool
 install_timeshift  
 main_menu

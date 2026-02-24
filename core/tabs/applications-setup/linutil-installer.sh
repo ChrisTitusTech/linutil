@@ -75,6 +75,5 @@ installExtra() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installLinutil

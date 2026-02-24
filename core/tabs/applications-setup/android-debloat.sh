@@ -43,6 +43,5 @@ install_universal_android_debloater() {
 }                   
 
 checkEnv
-checkEscalationTool
 install_adb
 install_universal_android_debloater 

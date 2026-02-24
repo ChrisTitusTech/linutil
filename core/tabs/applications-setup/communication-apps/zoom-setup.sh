@@ -20,6 +20,5 @@ installZoom() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installZoom

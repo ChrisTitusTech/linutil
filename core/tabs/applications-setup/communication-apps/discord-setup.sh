@@ -36,5 +36,4 @@ installDiscord() {
 }
 
 checkEnv
-checkEscalationTool
 installDiscord

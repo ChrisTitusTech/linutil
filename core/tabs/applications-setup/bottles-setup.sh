@@ -12,6 +12,5 @@ installBottles() {
 }
 
 checkEnv
-checkEscalationTool
 checkFlatpak
 installBottles

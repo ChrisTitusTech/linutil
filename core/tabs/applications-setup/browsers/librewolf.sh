@@ -43,6 +43,5 @@ installLibreWolf() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installLibreWolf

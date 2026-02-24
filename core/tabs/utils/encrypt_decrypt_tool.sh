@@ -153,5 +153,4 @@ main(){
 }
 
 checkEnv
-checkEscalationTool
 main

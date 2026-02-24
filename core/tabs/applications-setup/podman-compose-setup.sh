@@ -41,5 +41,4 @@ installPodmanCompose() {
 }
 
 checkEnv
-checkEscalationTool
 installPodmanCompose

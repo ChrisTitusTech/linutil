@@ -81,7 +81,6 @@ mount_drive() {
 }
 
 checkEnv
-checkEscalationTool
 select_drive
 get_uuid_fstype
 create_mount_point

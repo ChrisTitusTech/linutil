@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to extend displays
 extend_displays() {

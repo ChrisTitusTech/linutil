@@ -167,6 +167,10 @@ impl FloatContent for RunningCommand {
         }
     }
 
+    fn should_auto_close(&mut self) -> bool {
+        self.is_finished() && self.get_exit_status().exit_code() == 130
+    }
+
     fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
         if self.is_finished() {
             (

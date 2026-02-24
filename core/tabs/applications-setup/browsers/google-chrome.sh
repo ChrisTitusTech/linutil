@@ -35,6 +35,5 @@ installChrome() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installChrome

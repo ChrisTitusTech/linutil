@@ -42,6 +42,5 @@ addToGroup() {
 }
 
 checkEnv
-checkEscalationTool
 checkGroups
 addToGroup

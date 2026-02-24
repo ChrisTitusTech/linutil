@@ -12,5 +12,4 @@ installBrave() {
 }
 
 checkEnv
-checkEscalationTool
 installBrave

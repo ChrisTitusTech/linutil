@@ -25,5 +25,4 @@ installOkular() {
 }
 
 checkEnv
-checkEscalationTool
 installOkular
