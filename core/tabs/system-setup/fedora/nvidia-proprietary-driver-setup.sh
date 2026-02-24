@@ -52,7 +52,7 @@ installDriver() {
   "$ESCALATION_TOOL" dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda -y
   printf "%b\n" "${YELLOW}Building the drivers may take upto 5 minutes. Please don't kill the script!\n If the build failed try running the script again, select \"Remove Nvidia Drivers\" and reboot the system, then try installing drivers again.${RC}"
 
-  for i in $(seq 1 5); do
+  for _ in $(seq 1 5); do
     if checkDriverInstallation; then
       printf "%b\n" "${GREEN}Driver installed successfully.${RC}"
       printf "%b\n" "${GREEN}Installed driver version $(modinfo -F version nvidia)${RC}"

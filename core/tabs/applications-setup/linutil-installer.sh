@@ -1,6 +1,17 @@
 #!/bin/sh -e
 
+# shellcheck source=core/tabs/common-script.sh
 . ../common-script.sh
+
+installExtra() {
+    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    printf "%b\n" "${GREEN}Done.${RC}"
+}
 
 installLinutil() {
     printf "%b\n" "${YELLOW}Installing Linutil...${RC}"
@@ -35,6 +46,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
+                    # shellcheck disable=SC2218
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
@@ -62,16 +74,6 @@ installLinutil() {
             esac
             ;;
     esac
-}
-
-installExtra() {
-    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
-    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
-    printf "%b\n" "${GREEN}Done.${RC}"
 }
 
 checkEnv
