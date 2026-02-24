@@ -23,6 +23,15 @@ curl -fsSL https://christitus.com/linux | sh
 curl -fsSL https://christitus.com/linuxdev | sh
 ```
 
+### Script Menu Behavior
+Many install/uninstall script menus now use a shared flow:
+
+- `1` Install
+- `2` Uninstall
+- `3` Abort
+
+Selecting `3` aborts the script action and returns to the menu flow without running install/uninstall steps.
+
 ### CLI arguments
 
 View available options by running:
