@@ -12,7 +12,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  pull-requests: write
 
 concurrency:
   group: "pages"
