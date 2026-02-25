@@ -4,7 +4,7 @@ use linutil_core::Command;
 
 use crate::{path, DynError};
 
-pub const USER_GUIDE: &str = "userguide.md";
+pub const USER_GUIDE: &str = "content/userguide/walkthrough.md";
 
 pub fn userguide() -> Result<String, DynError> {
     let mut md = String::new();
