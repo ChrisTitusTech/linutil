@@ -67,7 +67,7 @@ dateFormat = "January 2, 2006"
 
   [params.navbar]
   displayTitle = false
-  displayLogo = true
+  displayLogo = false
 
     [params.navbar.logo]
     path = "navlogo.png"
