@@ -10,6 +10,10 @@ width: full
   <a href="https://discord.gg/RUbZUZyByQ"><img src="https://dcbadge.limes.pink/api/server/https://discord.gg/RUbZUZyByQ" alt="Discord Community Server" style="height: 28px; width: auto; min-width: 10px; object-fit: contain; margin: 0;"></a>
 </div>
 
+<div style="text-align: center; margin: 24px 0;">
+  <img src="/preview.gif" alt="Linutil preview" style="max-width: 100%; border-radius: 8px;">
+</div>
+
 Welcome to the official documentation for Linutil, your go-to utility for optimizing and managing your Linux environment. Whether you’re an IT professional, power user, or regular user, Linutil provides a comprehensive set of tools to enhance your Linux experience.
 
 ## Running the latest release of Linutil
