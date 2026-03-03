@@ -1,0 +1,165 @@
+name = "Nix Ecosystem"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DOWNLOAD ISOs
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[data]]
+name = "Download ISOs"
+
+[[data.entries]]
+name = "Burn ISO to USB"
+description = "Write a downloaded ISO to a USB drive. Lists available ISOs and guides you through dd safely."
+script = "isos/burn-iso-to-usb.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "Download NixOS ISO (ARM)"
+description = "Download NixOS for ARM devices: Raspberry Pi 4/5, Apple Silicon VMs, ARM servers."
+script = "isos/download-nixos-iso-arm.sh"
+task_list = "D"
+
+[[data.entries]]
+name = "Download NixOS ISO (x86_64)"
+description = "Download NixOS for standard PCs and laptops. Stable or unstable, minimal or graphical."
+script = "isos/download-nixos-iso-x86.sh"
+task_list = "D"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# INSTALL & UNINSTALL
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[data]]
+name = "Install & Uninstall"
+
+[[data.entries]]
+name = "Install Lix"
+description = "Install Lix, a community fork of Nix focused on stability and improved UX. For fresh installs only."
+script = "install/install-lix.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install Nix (Determinate)"
+description = "Install Nix via Determinate Systems installer. Flakes enabled by default, includes uninstaller. Recommended."
+script = "install/install-nix-determinate.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install Nix (Official)"
+description = "Install Nix via official multi-user installer with daemon."
+script = "install/install-nix-official.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Uninstall Nix/Lix"
+description = "Remove Nix or Lix from your system. Auto-detects installer type, offers config backup."
+script = "install/uninstall-nix.sh"
+task_list = "RP"
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["nix"]
+
+[[data.entries]]
+name = "Upgrade Nix to Lix"
+description = "Upgrade an existing Nix installation to Lix. Preserves your current setup."
+script = "install/upgrade-to-lix.sh"
+task_list = "I"
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["nix"]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LEARN MORE NIX
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[data]]
+name = "Learn More Nix"
+
+[[data.entries]]
+name = "Commands Cheatsheet"
+description = "Quick reference for common Nix commands: install, search, flakes, garbage collection, and more."
+script = "learn/nix-cheatsheet.sh"
+
+[[data.entries]]
+name = "Guides & Resources"
+description = "Learning resources, documentation links, video tutorials, and community references."
+script = "learn/nix-resources.sh"
+
+[[data.entries]]
+name = "Tools & Inputs"
+description = "Curated list of essential Nix ecosystem tools: nh, disko, devenv, flake-parts, home-manager, and more."
+script = "learn/nix-tools.sh"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# QUICK ACTIONS (requires nix)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[data]]
+name = "NixOS+"
+
+[[data.entries]]
+name = "Install GNU Guix"
+description = "Install the GNU Guix functional package manager. Similar philosophy to Nix, uses Guile Scheme."
+script = "install-guix.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Install NixOS Guide"
+description = "Generate a portable .md guide for installing NixOS. Covers partitioning, btrfs/ZFS, LUKS, and post-install."
+script = "nixos-install-guide.sh"
+
+[[data.entries]]
+name = "Nix Templates"
+description = "Generate reference templates: flakes, modules, derivations, devshells, disko partitioning."
+script = "nix-templates.sh"
+
+[[data.entries]]
+name = "Scaffold Flake Config"
+description = "Generate a Snowfall-style directory structure for NixOS/Home Manager configs. Creates starter flake.nix, system and home configs."
+script = "scaffold-flake.sh"
+[[data]]
+name = "Quick Actions"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["nix"]
+
+[[data.entries]]
+name = "Channel Setup"
+description = "Add, remove, or update Nix channels (stable/unstable/home-manager)."
+script = "quick-actions/channel-setup.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "Enable Flakes"
+description = "Enable experimental flakes feature in nix.conf. Not needed for Determinate installer."
+script = "quick-actions/enable-flakes.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "Install Home Manager"
+description = "Install Home Manager for declarative user package and dotfile management."
+script = "quick-actions/install-home-manager.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Store Maintenance"
+description = "Garbage collection and store optimization. Clean old generations and deduplicate with hard links."
+script = "quick-actions/store-maintenance.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "Update Flake"
+description = "Update flake inputs and manage flake.lock files."
+script = "quick-actions/update-flake.sh"
+task_list = "PFM"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NixOS+ (extras)
+# ═══════════════════════════════════════════════════════════════════════════════
+

@@ -3,5 +3,6 @@ directories = [
     "gaming",
     "security",
     "system-setup",
-    "utils"
+    "utils",
+    "nix-ecosystem"
 ]

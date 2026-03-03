@@ -219,3 +219,41 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system
+
+## Nix Ecosystem
+
+
+### Download ISOs
+
+- **Burn ISO to USB**: Write a downloaded ISO to a USB drive. Lists available ISOs and guides you through dd safely.
+- **Download NixOS ISO (ARM)**: Download NixOS for ARM devices: Raspberry Pi 4/5, Apple Silicon VMs, ARM servers.
+- **Download NixOS ISO (x86_64)**: Download NixOS for standard PCs and laptops. Stable or unstable, minimal or graphical.
+
+### Install & Uninstall
+
+- **Install Lix**: Install Lix, a community fork of Nix focused on stability and improved UX. For fresh installs only.
+- **Install Nix (Determinate)**: Install Nix via Determinate Systems installer. Flakes enabled by default, includes uninstaller. Recommended.
+- **Install Nix (Official)**: Install Nix via official multi-user installer with daemon.
+- **Uninstall Nix/Lix**: Remove Nix or Lix from your system. Auto-detects installer type, offers config backup.
+- **Upgrade Nix to Lix**: Upgrade an existing Nix installation to Lix. Preserves your current setup.
+
+### Learn More Nix
+
+- **Commands Cheatsheet**: Quick reference for common Nix commands: install, search, flakes, garbage collection, and more.
+- **Guides & Resources**: Learning resources, documentation links, video tutorials, and community references.
+- **Tools & Inputs**: Curated list of essential Nix ecosystem tools: nh, disko, devenv, flake-parts, home-manager, and more.
+
+### NixOS+
+
+- **Install GNU Guix**: Install the GNU Guix functional package manager. Similar philosophy to Nix, uses Guile Scheme.
+- **Install NixOS Guide**: Generate a portable .md guide for installing NixOS. Covers partitioning, btrfs/ZFS, LUKS, and post-install.
+- **Nix Templates**: Generate reference templates: flakes, modules, derivations, devshells, disko partitioning.
+- **Scaffold Flake Config**: Generate a Snowfall-style directory structure for NixOS/Home Manager configs. Creates starter flake.nix, system and home configs.
+
+### Quick Actions
+
+- **Channel Setup**: Add, remove, or update Nix channels (stable/unstable/home-manager).
+- **Enable Flakes**: Enable experimental flakes feature in nix.conf. Not needed for Determinate installer.
+- **Install Home Manager**: Install Home Manager for declarative user package and dotfile management.
+- **Store Maintenance**: Garbage collection and store optimization. Clean old generations and deduplicate with hard links.
+- **Update Flake**: Update flake inputs and manage flake.lock files.
