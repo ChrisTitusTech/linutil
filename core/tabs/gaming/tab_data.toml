@@ -144,3 +144,12 @@ description = "This script will add a Custom Fallout 76 INI file that improves p
 script = "fallout-76/fallout76settings.sh"
 task_list = "FM"
 
+[[data]]
+name = "Sand Games"
+
+[[data.entries]]
+name = "SandEngine Game Selector"
+description = "A nostalgic collection of classic falling sand physics games and browser-based sandboxes."
+script = "gaming/sandselector.sh"
+task_list = "FM"
+
