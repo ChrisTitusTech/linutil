@@ -150,6 +150,6 @@ name = "Sand Games"
 [[data.entries]]
 name = "SandEngine Game Selector"
 description = "A nostalgic collection of classic falling sand physics games and browser-based sandboxes."
-script = "gaming/sandselector.sh"
+script = "sand-games/sandselector.sh"
 task_list = "FM"
 
