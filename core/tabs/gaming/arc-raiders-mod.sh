@@ -5,6 +5,7 @@ steam_common="Arc Raiders/PioneerGame/Content/Movies/Frontend/"
 steam_compatdata="1808500/pfx/drive_c/users/steamuser/Local Settings/Application Data/PioneerGame/Saved/Config/WindowsClient/"
 git_repo="https://github.com/christitustech/arc-raiders.git"
 
+# shellcheck source=./common-steam-script.sh
 . ./common-steam-script.sh
 
 # Clone git repo then copy to compatdata_path and common_path

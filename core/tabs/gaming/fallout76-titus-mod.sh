@@ -5,6 +5,7 @@ steam_common="Fallout76"
 steam_compatdata="1151340/pfx/drive_c/users/steamuser/Documents/My Games/Fallout 76"
 git_repo="https://github.com/ChrisTitusTech/fallout76-configs"
 
+# shellcheck source=./common-steam-script.sh
 . ./common-steam-script.sh
 
 # Clone git repo then copy to compatdata_path and common_path

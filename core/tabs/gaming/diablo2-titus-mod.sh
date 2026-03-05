@@ -5,6 +5,7 @@ steam_common="Diablo II Resurrected/mods"
 steam_compatdata="2536520/pfx/drive_c/users/steamuser/Saved Games/Diablo II Resurrected"
 git_repo="https://github.com/ChrisTitusTech/d2r-loot-filter"
 
+# shellcheck source=./common-steam-script.sh
 . ./common-steam-script.sh
 
 # Clone git repo then copy to common_path (mods folder)
