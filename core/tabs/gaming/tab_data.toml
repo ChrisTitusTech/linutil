@@ -5,8 +5,8 @@ name = "Arc Raiders"
 
 [[data.entries]]
 name = "Faster Matches and Config Optimizations"
-description = "This shortens the videos for transitions in matches and also loads a optimized configuration file for VRR and removing motion blur and other nasty settings"
-script = "arc-raiders/config-setup.sh"
+description = "Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations."
+script = "arc-raiders-mod.sh"
 task_list = "FM"
 
 [[data]]
@@ -14,8 +14,8 @@ name = "Diablo II Resurrected"
 
 [[data.entries]]
 name = "Loot Filter"
-description = "This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter"
-script = "diablo-ii/d2r-loot-filters.sh"
+description = "Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt"
+script = "diablo2-titus-mod.sh"
 task_list = "FM"
 
 [[data]]
@@ -140,8 +140,8 @@ name = "Fallout 76"
 
 [[data.entries]]
 name = "Fallout 76 INI and Mods"
-description = "This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements."
-script = "fallout-76/fallout76settings.sh"
+description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
+script = "fallout76-titus-mod.sh"
 task_list = "FM"
 
 [[data]]
