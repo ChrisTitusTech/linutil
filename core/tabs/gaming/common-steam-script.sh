@@ -1,4 +1,8 @@
 #!/bin/sh
+# shellcheck disable=SC2034,SC2154
+# SC2034: variables set here (compatdata_path, common_path) are used by the sourcing script
+# SC2154: variables referenced here (git_repo, steam_game, steam_common, steam_compatdata)
+#         are set by the sourcing script before this file is sourced
 
 . ../common-script.sh
 
