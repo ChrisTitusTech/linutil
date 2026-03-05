@@ -996,7 +996,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_core"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -1008,12 +1008,12 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "clap",
  "image",
  "linutil_core",
- "nix 0.29.0",
+ "nix 0.31.1",
  "oneshot",
  "portable-pty",
  "rand 0.8.5",
@@ -1155,9 +1155,9 @@ dependencies = [
 
 [[package]]
 name = "nix"
-version = "0.29.0"
+version = "0.31.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
+checksum = "225e7cfe711e0ba79a68baeddb2982723e4235247aefce1482f2f16c27865b66"
 dependencies = [
  "bitflags 2.10.0",
  "cfg-if",
@@ -2652,7 +2652,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "26.1.22"
+version = "26.2.6"
 dependencies = [
  "linutil_core",
 ]
