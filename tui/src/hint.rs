@@ -1,5 +1,5 @@
 use ratatui::{
-    style::{Style, Stylize},
+    style::Style,
     text::{Line, Span},
 };
 use std::borrow::Cow;

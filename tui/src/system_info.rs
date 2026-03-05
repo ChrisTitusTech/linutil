@@ -1,6 +1,6 @@
 use crate::theme::Theme;
 use ratatui::{
-    style::{Style, Stylize},
+    style::Style,
     text::{Line, Span},
 };
 use std::process::Command;
