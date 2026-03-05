@@ -52,6 +52,5 @@ addRegistry() {
 }
 
 checkEnv
-checkEscalationTool
 installPodman
 addRegistry

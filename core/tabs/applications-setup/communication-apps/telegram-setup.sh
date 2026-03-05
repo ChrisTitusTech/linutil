@@ -28,5 +28,4 @@ installTelegram() {
 }
 
 checkEnv
-checkEscalationTool
 installTelegram

@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to auto-detect displays and set common resolution
 auto_detect_displays() {

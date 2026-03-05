@@ -43,5 +43,4 @@ removeFromGroup() {
 }
 
 checkEnv
-checkEscalationTool
 removeFromGroup

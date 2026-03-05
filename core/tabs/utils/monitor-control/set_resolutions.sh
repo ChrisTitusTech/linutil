@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to set resolutions
 set_resolutions() {
@@ -41,13 +40,8 @@ set_resolutions() {
         resolutions=$(get_unique_resolutions "$monitor_name" | sort -rn -t'x' -k1,1 -k2,2)
 
         temp_res_file=$(mktemp)
-        printf "%b\n" "$resolutions" | awk '{print NR " " $0}' > "$temp_res_file"
-
-        i=1
-        while read -r resolution; do
-            echo "$resolution" >> "$temp_res_file"
-            i=$((i + 1))
-        done < "$temp_res_file"
+        printf "%b\n" "$resolutions" | nl -w1 -s' ' > "$temp_res_file"
+        i=$(wc -l < "$temp_res_file")
 
         clear
         printf "%b\n" "${YELLOW}=========================================${RC}"
@@ -65,12 +59,12 @@ set_resolutions() {
                 return
             fi
 
-            if ! echo "$resolution_choice" | grep -qE '^[0-9]+$' || [ "$resolution_choice" -lt 1 ] || [ "$resolution_choice" -gt "$((i - 1))" ]; then
+            if ! echo "$resolution_choice" | grep -qE '^[0-9]+$' || [ "$resolution_choice" -lt 1 ] || [ "$resolution_choice" -gt "$i" ]; then
                 printf "%b\n" "${RED}Invalid selection. Please try again.${RC}"
                 continue
             fi
 
-            selected_resolution=$(awk "NR==$resolution_choice" "$temp_res_file")
+            selected_resolution=$(awk "NR==$resolution_choice { print \$2 }" "$temp_res_file")
 
             printf "%b" "Set resolution for $monitor_name to $selected_resolution? (y/N): "
             read -r confirm

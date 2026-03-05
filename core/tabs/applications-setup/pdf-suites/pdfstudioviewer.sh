@@ -19,5 +19,4 @@ installPdfstudioviewer() {
 }
 
 checkEnv
-checkEscalationTool
 installPdfstudioviewer

@@ -106,6 +106,5 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 installAutoCpufreq
 main

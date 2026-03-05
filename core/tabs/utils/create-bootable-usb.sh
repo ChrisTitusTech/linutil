@@ -270,6 +270,5 @@ write_iso(){
 }
 
 checkEnv
-checkEscalationTool
 installDependencies
 write_iso

@@ -113,7 +113,6 @@ updateFlatpaks() {
 
 checkEnv
 checkAURHelper
-checkEscalationTool
 fastUpdate
 updateSystem
 updateFlatpaks

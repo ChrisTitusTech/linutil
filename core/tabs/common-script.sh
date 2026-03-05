@@ -181,6 +181,26 @@ checkDistro() {
     fi
 }
 
+run_install_uninstall_menu() {
+    menu_title="$1"
+    install_fn="$2"
+    uninstall_fn="$3"
+
+    printf "%b\n" "${YELLOW}${menu_title}${RC}"
+    printf "%b\n" "1. ${YELLOW}Install${RC}"
+    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
+    printf "%b\n" "3. ${YELLOW}Abort${RC}"
+    printf "%b" "Enter your choice [1-3]: "
+    read -r CHOICE
+
+    case "$CHOICE" in
+        1) "$install_fn" ;;
+        2) "$uninstall_fn" ;;
+        3) exit 130 ;;
+        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+    esac
+}
+
 checkEnv() {
     checkArch
     checkEscalationTool

@@ -34,5 +34,4 @@ createUser() {
 }
 
 checkEnv
-checkEscalationTool
 createUser

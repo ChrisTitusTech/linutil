@@ -37,6 +37,5 @@ installGithubDesktop() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installGithubDesktop

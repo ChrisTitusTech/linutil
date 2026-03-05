@@ -43,5 +43,4 @@ installSublime() {
 }
 
 checkEnv
-checkEscalationTool
 installSublime

@@ -29,5 +29,4 @@ changePassword() {
 }
 
 checkEnv
-checkEscalationTool
 changePassword

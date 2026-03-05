@@ -47,6 +47,5 @@ installJetBrainsToolBox() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installJetBrainsToolBox

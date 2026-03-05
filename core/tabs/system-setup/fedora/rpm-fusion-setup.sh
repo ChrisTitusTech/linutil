@@ -55,5 +55,4 @@ installRPMFusion() {
 }
 
 checkEnv
-checkEscalationTool
 installRPMFusion

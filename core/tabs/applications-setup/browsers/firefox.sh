@@ -37,5 +37,4 @@ installFirefox() {
 }
 
 checkEnv
-checkEscalationTool
 installFirefox

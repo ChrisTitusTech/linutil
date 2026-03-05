@@ -30,5 +30,4 @@ removeSnaps() {
 }
 
 checkEnv
-checkEscalationTool
 removeSnaps

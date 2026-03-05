@@ -117,7 +117,6 @@ linkConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installDepend
 cloneMyBash
 installFont

@@ -171,5 +171,4 @@ configure_or_remove_autologin() {
 }
 
 checkEnv
-checkEscalationTool
 configure_or_remove_autologin

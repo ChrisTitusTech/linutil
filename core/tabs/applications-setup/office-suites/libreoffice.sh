@@ -36,5 +36,4 @@ installLibreOffice() {
 }
 
 checkEnv
-checkEscalationTool
 installLibreOffice

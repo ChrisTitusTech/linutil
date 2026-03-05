@@ -30,5 +30,4 @@ installChaoticAUR() {
 }
 
 checkEnv
-checkEscalationTool
 installChaoticAUR

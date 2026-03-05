@@ -26,5 +26,4 @@ deleteUser() {
 }
 
 checkEnv
-checkEscalationTool
 deleteUser

@@ -42,6 +42,5 @@ installVsCodium() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installVsCodium

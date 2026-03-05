@@ -144,6 +144,5 @@ remove_device() {
 }
 
 checkEnv
-checkEscalationTool
 setupBluetooth
 main_menu

@@ -55,6 +55,5 @@ EOL
 }
 
 checkEnv
-checkEscalationTool
 installZsh
 setupZshConfig

@@ -25,5 +25,4 @@ installEvince() {
 }
 
 checkEnv
-checkEscalationTool
 installEvince

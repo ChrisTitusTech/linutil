@@ -20,6 +20,5 @@ installSlack() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installSlack

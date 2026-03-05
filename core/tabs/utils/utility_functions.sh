@@ -120,5 +120,4 @@ confirmAction() {
 }
 
 checkEnv
-checkEscalationTool
 setup_xrandr

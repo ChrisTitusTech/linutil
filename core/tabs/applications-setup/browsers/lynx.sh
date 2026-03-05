@@ -25,5 +25,4 @@ installLynx() {
 }
 
 checkEnv
-checkEscalationTool
 installLynx

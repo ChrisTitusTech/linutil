@@ -34,6 +34,5 @@ installFreeOffice() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installFreeOffice

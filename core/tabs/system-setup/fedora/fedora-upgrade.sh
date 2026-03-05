@@ -62,7 +62,6 @@ post_upgrade() {
 }
 
 checkEnv
-checkEscalationTool
 
 printf "%b\n" "${YELLOW}Select an option:${RC}"
 printf "%b\n" "${GREEN}1. Upgrade to the next Fedora version${RC}"

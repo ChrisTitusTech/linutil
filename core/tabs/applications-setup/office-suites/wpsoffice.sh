@@ -20,6 +20,5 @@ installWpsOffice() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installWpsOffice

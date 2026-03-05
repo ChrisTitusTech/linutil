@@ -201,7 +201,6 @@ menu() {
 }
 
 checkEnv
-checkEscalationTool
 installollama
 menu
 

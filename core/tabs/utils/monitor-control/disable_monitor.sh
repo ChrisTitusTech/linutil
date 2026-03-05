@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to disable a monitor
 disable_monitor() {
@@ -38,19 +37,6 @@ disable_monitor() {
         printf "%b\n" "${GREEN}Monitor $monitor_name disabled successfully.${RC}"
     else
         printf "%b\n" "${RED}Action canceled.${RC}"
-    fi
-}
-
-# Function to prompt for confirmation
-confirm_action() {
-    action="$1"
-    printf "%b\n" "${YELLOW}$action${RC}"
-    printf "%b" "Are you sure? (y/N): "
-    read -r confirm
-    if echo "$confirm" | grep -qE '^[Yy]$'; then
-        return 0
-    else
-        return 1
     fi
 }
 

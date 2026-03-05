@@ -20,6 +20,5 @@ installZenBrowser() {
 }
 
 checkEnv
-checkEscalationTool
 checkAURHelper
 installZenBrowser

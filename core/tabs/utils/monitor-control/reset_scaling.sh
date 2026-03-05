@@ -2,7 +2,6 @@
 
 . ../utility_functions.sh
 
-. ../../common-script.sh
 
 # Function to Reset scaling back to 1 (native resolution) for all monitors
 Reset_scaling() {

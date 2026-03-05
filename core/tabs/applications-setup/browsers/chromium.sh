@@ -25,5 +25,4 @@ fi
 }
 
 checkEnv
-checkEscalationTool
 installChromium

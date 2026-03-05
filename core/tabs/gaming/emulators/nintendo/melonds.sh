@@ -39,18 +39,8 @@ uninstallMelonDS() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall MelonDS${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installMelonDS ;;
-        2) uninstallMelonDS ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+	run_install_uninstall_menu "Do you want to Install or Uninstall MelonDS" installMelonDS uninstallMelonDS
 }
 
 checkEnv
-checkEscalationTool
 main

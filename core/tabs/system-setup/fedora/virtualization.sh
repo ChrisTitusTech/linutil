@@ -17,5 +17,4 @@ configureVirtualization() {
 }
 
 checkEnv
-checkEscalationTool
 configureVirtualization

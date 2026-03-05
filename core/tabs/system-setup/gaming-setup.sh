@@ -118,6 +118,5 @@ installAdditionalDepend() {
 
 checkEnv
 checkAURHelper
-checkEscalationTool
 installDepend
 installAdditionalDepend

@@ -19,5 +19,4 @@ configureDNF() {
 }
 
 checkEnv
-checkEscalationTool
 configureDNF

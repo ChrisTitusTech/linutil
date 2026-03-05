@@ -25,5 +25,4 @@ installThunderBird() {
 }
 
 checkEnv
-checkEscalationTool
 installThunderBird

@@ -50,6 +50,5 @@ configureUFW() {
 }
 
 checkEnv
-checkEscalationTool
 installPkg
 configureUFW
