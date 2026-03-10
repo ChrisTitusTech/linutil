@@ -99,14 +99,6 @@ https://github.com/ChrisTitusTech/dwm-titus
 ## Gaming
 
 
-### Arc Raiders
-
-- **Faster Matches and Config Optimizations**: This shortens the videos for transitions in matches and also loads a optimized configuration file for VRR and removing motion blur and other nasty settings
-
-### Diablo II Resurrected
-
-- **Loot Filter**: This is a loot filter for Diablo II Resurrected. It's designed to be a simple, clean, and easy to read loot filter that highlights the most important items. Works on battle.net and single player. No frills, no config, just highlights high runes and other valuable items. For more information visit: https://github.com/ChrisTitusTech/d2r-loot-filter
-
 ### Emulators
 
 - **Blastem**: A Genesis emulator. NO Games are included
@@ -127,9 +119,18 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
 
-### Fallout 76
+### Related Tools and Setups
 
-- **Fallout 76 INI and Mods**: This script will add a Custom Fallout 76 INI file that improves performance and stability. It also includes some quality of life improvements.
+- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
+https://github.com/AdnanHodzic/auto-cpufreq
+- **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
+- **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
+- **Gaming Dependencies**: Run the Gaming Dependencies installer (same script kept under System Setup).
+- **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
+- **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
+- **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
+- **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
+- **Fallout 76 INI and Mods**: Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks.
 
 ## Security
 
@@ -149,7 +150,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Install Chaotic-AUR Repository**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
-- **Nvidia Drivers && Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
+- **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
@@ -183,6 +184,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Full System Update**: This command updates your system to the latest packages available for your distro
 - **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
+- **GPU Driver**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
