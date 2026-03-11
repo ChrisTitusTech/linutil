@@ -98,7 +98,7 @@ setupRepos() {
     checkCPU x86-64-v4
 
     if [ "$isInstalled" -ne "0" ] || [ "$isCommented" -ne "0" ]; then
-        if [ $isAM5 -eq "0" ]; then
+        if [ "$isAM5" -eq "0" ]; then
             addRepo znver4
         elif [ "$v4Supported" -eq "0" ]; then
             addRepo v4
@@ -124,7 +124,6 @@ installKernel() {
         "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
     else
         printf "%b\n" "CachyOS Repos are not installed.  Please install before Installing Kernel"
-        break
     fi
 }
 
