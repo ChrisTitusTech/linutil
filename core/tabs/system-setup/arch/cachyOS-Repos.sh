@@ -204,7 +204,7 @@ main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall CachyOS${RC}"
     printf "%b\n" "1. ${YELLOW}Install CachyOS Repos${RC}"
     printf "%b\n" "2. ${YELLOW}Install CachyOS Kernel${RC}"
-    printf "%b\n" "1. ${YELLOW}Install CachyOS Repos and Kernal${RC}"
+    printf "%b\n" "1. ${YELLOW}Install CachyOS Repos and Kernel${RC}"
     printf "%b\n" "2. ${YELLOW}Remove CachyOS Kernel${RC}"
     printf "%b" "Enter your choice [1-4]: "
     read -r CHOICE
