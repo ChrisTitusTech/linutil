@@ -85,7 +85,7 @@ setupRepos() {
     pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
     pacman-key --lsign-key F3B607488DB35A47
 
-    local mirror_url="https://mirror.cachyos.org/repo/x86_64/cachyos"
+    mirror_url="https://mirror.cachyos.org/repo/x86_64/cachyos"
 
     pacman -U "${mirror_url}/cachyos-keyring-20240331-1-any.pkg.tar.zst" \
               "${mirror_url}/cachyos-mirrorlist-22-1-any.pkg.tar.zst"    \
@@ -93,13 +93,14 @@ setupRepos() {
               "${mirror_url}/cachyos-v4-mirrorlist-22-1-any.pkg.tar.zst"  \
               "${mirror_url}/pacman-7.1.0.r9.g54d9411-2-x86_64.pkg.tar.zst"
 
+    mv /etc/pacman.conf /etc/pacman.conf.bak
     checkRepo
     checkCPU x86-64-v4
 
-    if [ $isInstalled -ne 0 ] || [ $isCommented -ne 0 ]; then
-        if [ $isAM5 -eq 0 ]; then
+    if [ $isInstalled -ne "0" ] || [ $isCommented -ne "0" ]; then
+        if [ $isAM5 -eq "0" ]; then
             addRepo znver4
-        elif [ $v4Supported -eq 0 ]; then
+        elif [ $v4Supported -eq "0" ]; then
             addRepo v4
         else
             addRepo v3
@@ -130,59 +131,14 @@ installKernel() {
 removeRepos() {
     printf "%b\n" "Removing CachyOS repo.."
 
-    local pacman_conf="/etc/pacman.conf"
-    local pacman_conf_cachyos="./pacman.conf"
-    local pacman_conf_path_backup="/etc/pacman.conf.bak"
+    pacman_conf="/etc/pacman.conf"
+    pacman_conf_cachyos="./pacman.conf"
+    pacman_conf_path_backup="/etc/pacman.conf.bak"
 
-    local is_repo_added="$(check_if_repo_was_added)"
-    local is_repo_commented="$(check_if_repo_was_commented)"
-    if [ $is_repo_added -eq 0 ] || [ $is_repo_commented -eq 0 ]; then
-        cp $pacman_conf $pacman_conf_cachyos
-        gawk -i inplace '
-        BEGIN { err = 1 }
-        {
-        if ($0 == "[options]") {
-            print
-            next
-        }
-
-        if ($0 == "[cachyos]" ||
-            $0 == "[cachyos-v3]" ||
-            $0 == "[cachyos-core-v3]" ||
-            $0 == "[cachyos-extra-v3]" ||
-            $0 == "[cachyos-testing-v3]" ||
-            $0 == "[cachyos-v4]" ||
-            $0 == "[cachyos-core-v4]" ||
-            $0 == "[cachyos-extra-v4]" ||
-            $0 == "[cachyos-znver4]" ||
-            $0 == "[cachyos-core-znver4]" ||
-            $0 == "[cachyos-extra-znver4]") {
-            rm = 2
-            next
-        }
-
-        if ($0 == "Architecture = x86_64 x86_64_v3" ||
-            $0 == "Architecture = x86_64 x86_64_v3 x86_64_v4") {
-            print "Architecture = auto"
-            next
-        }
-
-        if (rm) {
-            rm--
-            next
-        }
-
-        print
-        }
-        END { exit err }
-        ' "/etc/pacman.conf" || true
-
-        printf "%b\n" "Backup old config"
-        mv $pacman_conf $pacman_conf_path_backup
-
-        printf "%b\n" "CachyOS repo removed"
-        mv $pacman_conf_cachyos $pacman_conf
-
+    checkRepo
+    if [ $isInstalled -eq "0" ] || [ $isCommented -eq "0" ]; then
+       
+        mv /etc/pacman.conf.bak /etc/pacman.conf 
         pacman -Suuy
         pacman -S core/pacman
         pacman -Qqn | pacman -S -
