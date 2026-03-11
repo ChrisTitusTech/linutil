@@ -4,16 +4,16 @@
 
 CheckCPU() {
     /lib/ld-linux-x86-64.so.2 --help | grep "$1 (supported, searched)" > /dev/null
-    v4Supported=$(echo $?)
+    v4Supported=$?
     gcc -march=native -Q --help=target 2>&1 | grep 'march' | grep -E '(znver4|znver5)' > /dev/null
-    isAM5=$(echo $?)
+    isAM5=$?
 }
 
 checkRepo() {
     cat /etc/pacman.conf | grep "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
-    isInstalled=$(echo $?)
+    isInstalled=$?
     cat /etc/pacman.conf | grep "cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4" | grep -v "#\[" | grep "\[" > /dev/null
-    isCommented=$(echo $?)
+    isCommented=$?
 }
 
 addRepo() {
@@ -97,10 +97,10 @@ setupRepos() {
     checkRepo
     checkCPU x86-64-v4
 
-    if [ $isInstalled -ne "0" ] || [ $isCommented -ne "0" ]; then
+    if [ "$isInstalled" -ne "0" ] || [ "$isCommented" -ne "0" ]; then
         if [ $isAM5 -eq "0" ]; then
             addRepo znver4
-        elif [ $v4Supported -eq "0" ]; then
+        elif [ "$v4Supported" -eq "0" ]; then
             addRepo v4
         else
             addRepo v3
@@ -113,7 +113,7 @@ setupRepos() {
 }
 
 installKernel() {
-    if [ $isInstalled -ne 0 ] || [ $isCommented -ne 0 ]; then
+    if [ "$isInstalled" -ne "0" ] || [ "$isCommented" -ne "0" ]; then
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos linux-cachyos-headers linux-cachyos-lts linux-cachyos-lts-headers
 
         oldDefaultKernel="GRUB_DEFAULT=0"
@@ -131,12 +131,8 @@ installKernel() {
 removeRepos() {
     printf "%b\n" "Removing CachyOS repo.."
 
-    pacman_conf="/etc/pacman.conf"
-    pacman_conf_cachyos="./pacman.conf"
-    pacman_conf_path_backup="/etc/pacman.conf.bak"
-
     checkRepo
-    if [ $isInstalled -eq "0" ] || [ $isCommented -eq "0" ]; then
+    if [ "$isInstalled" -eq "0" ] || [ "$isCommented" -eq "0" ]; then
        
         mv /etc/pacman.conf.bak /etc/pacman.conf 
         pacman -Suuy
