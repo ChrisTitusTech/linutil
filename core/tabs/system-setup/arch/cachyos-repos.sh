@@ -10,16 +10,16 @@ CheckCPU() {
 }
 
 checkRepo() {
-    cat /etc/pacman.conf | grep "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
+    "$ESCALATION_TOOL" cat /etc/pacman.conf | grep -E "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
     isInstalled=$?
-    cat /etc/pacman.conf | grep "cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4" | grep -v "#\[" | grep "\[" > /dev/null
+    "$ESCALATION_TOOL" cat /etc/pacman.conf | grep "cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4" | grep -v "#\[" | grep "\[" > /dev/null
     isCommented=$?
 }
 
 addRepo() {
     version="${1:-v3}"   # default to v3 if not provided
 
-    gawk -i inplace -v version="$version" '
+    "$ESCALATION_TOOL" gawk -i inplace -v version="$version" '
     BEGIN {
         err = 1
         repo1 = "[cachyos-" version "]"
@@ -82,18 +82,18 @@ addRepo() {
 setupRepos() {
     printf "%b\n" "Installing CachyOS repo.."
 
-    pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-    pacman-key --lsign-key F3B607488DB35A47
+    "$ESCALATION_TOOL" pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+    "$ESCALATION_TOOL" pacman-key --lsign-key F3B607488DB35A47
 
     mirror_url="https://mirror.cachyos.org/repo/x86_64/cachyos"
 
-    pacman -U "${mirror_url}/cachyos-keyring-20240331-1-any.pkg.tar.zst" \
+    "$ESCALATION_TOOL" "$PACKAGER" -U "${mirror_url}/cachyos-keyring-20240331-1-any.pkg.tar.zst" \
               "${mirror_url}/cachyos-mirrorlist-22-1-any.pkg.tar.zst"    \
               "${mirror_url}/cachyos-v3-mirrorlist-22-1-any.pkg.tar.zst" \
               "${mirror_url}/cachyos-v4-mirrorlist-22-1-any.pkg.tar.zst"  \
               "${mirror_url}/pacman-7.1.0.r9.g54d9411-2-x86_64.pkg.tar.zst"
 
-    mv /etc/pacman.conf /etc/pacman.conf.bak
+    "$ESCALATION_TOOL" cp /etc/pacman.conf /etc/pacman.conf.bak
     checkRepo
     checkCPU x86-64-v4
 
@@ -108,22 +108,42 @@ setupRepos() {
     else
         printf "%b\n" "Repo is already added!"
     fi
-
-    printf "%b\n" "Done installing CachyOS repo."
+    if ! "$ESCALATION_TOOL" "$PACKAGER" -Syu --needed --noconfirm; then
+        printf "%b\n" "Failed to properly install repos. Rolling back changes"
+        removeRepos
+        printf "%b\n" "Failed to install CachyOS Repos"
+    else
+        printf "%b\n" "Done installing CachyOS repo."
+    fi
 }
 
-installKernel() {
+setDefaultKernel() {
+    checkRepo
     if [ "$isInstalled" -ne "0" ] || [ "$isCommented" -ne "0" ]; then
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos linux-cachyos-headers linux-cachyos-lts linux-cachyos-lts-headers
+        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers
 
-        oldDefaultKernel="GRUB_DEFAULT=0"
+        oldDefaultKernel=$(cat /etc/default/grub | grep GRUB_DEFAULT | awk 'NR==1{print}')
         newDefaultKernel='GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'
 
-        sed -i "s/${oldDefaultKernel}/${newDefaultKernel}/g" /etc/default/grub
+        "$ESCALATION_TOOL" sed -i "s/${oldDefaultKernel}/${newDefaultKernel}/g" /etc/default/grub || 
 
         "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
     else
-        printf "%b\n" "CachyOS Repos are not installed.  Please install before Installing Kernel"
+        printf "%b\n" "CachyOS repos are not installed.  Please install before Installing Kernel"
+    fi
+}
+
+resetDefaultKernel() {
+    oldDefaultKernel=$(cat /etc/default/grub | grep GRUB_DEFAULT | awk 'NR==1{print}')
+
+    if "$oldDefaultKernel" -eq "GRUB_DEFAULT=\"Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts\""; then      
+        newDefaultKernel="GRUB_DEFAULT=0"
+
+        "$ESCALATION_TOOL" sed -i "s/${oldDefaultKernel}/${newDefaultKernel}/g" /etc/default/grub || 
+
+        "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
+    else
+        printf "%b\n" "CachyOS is not the default kernel"
     fi
 }
 
@@ -134,16 +154,16 @@ removeRepos() {
     if [ "$isInstalled" -eq "0" ] || [ "$isCommented" -eq "0" ]; then
        
         mv /etc/pacman.conf.bak /etc/pacman.conf 
-        pacman -Suuy
-        pacman -S core/pacman
-        pacman -Qqn | pacman -S -
+        "$ESCALATION_TOOL" "$PACKAGER" -Suuy
+        # pacman -S core/pacman
+        # pacman -Qqn | pacman -S -
 
-        pacman -R "cachyos-keyring"       \
+        "$ESCALATION_TOOL" "$PACKAGER"  -R "cachyos-keyring"       \
                   "cachyos-mirrorlist"    \
                   "cachyos-v3-mirrorlist" \
                   "cachyos-v4-mirrorlist"
 
-        pacman-key --delete F3B607488DB35A47 || true
+       "$ESCALATION_TOOL" pacman-key --delete F3B607488DB35A47 || true
     else
         printf "%b\n" "Repo is not added!"
     fi
@@ -153,18 +173,21 @@ removeRepos() {
 
 main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall CachyOS${RC}"
-    printf "%b\n" "1. ${YELLOW}Install CachyOS Repos${RC}"
-    printf "%b\n" "2. ${YELLOW}Install CachyOS Kernel${RC}"
-    printf "%b\n" "1. ${YELLOW}Install CachyOS Repos and Kernel${RC}"
-    printf "%b\n" "2. ${YELLOW}Remove CachyOS Kernel${RC}"
-    printf "%b" "Enter your choice [1-4]: "
+    printf "%b\n" "1. ${YELLOW}Install CachyOS repos${RC}"
+    printf "%b\n" "2. ${YELLOW}Set CachyOS-LTS default as kernel${RC}"
+    printf "%b\n" "3. ${YELLOW}Install CachyOS repos and and set CachyOS-LTS as default kernel${RC}"
+    printf "%b\n" "4. ${YELLOW}Remove CachyOS Repos and set default kernel to stock${RC}"
+    printf "%b\n" "5. ${YELLOW}Reset default kernel to stock${RC}"
+    printf "%b" "Enter your choice [1-5]: "
     read -r CHOICE
     case "$CHOICE" in
         1) setupRepos ;;
-        2) installKernel ;;
+        2) setDefaultKernel ;;
         3) setupRepos
-           installKernel ;;
-        4) removeRepos ;;
+           setDefaultKernel ;;
+        4) removeRepos 
+           resetDefaultKernel;;
+        5) resetDefaultKernel ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac
 }
