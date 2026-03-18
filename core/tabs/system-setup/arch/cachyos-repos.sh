@@ -19,28 +19,28 @@ checkRepo() {
 addRepo() {
     version="${1:-v3}"   # default to v3 if not provided
 
-    "$ESCALATION_TOOL" gawk -i inplace -v version="$version" '
+    "$ESCALATION_TOOL" gawk -i inplace -v version="$version" "
     BEGIN {
         err = 1
-        repo1 = "[cachyos-" version "]"
-        repo2 = "[cachyos-core-" version "]"
-        repo3 = "[cachyos-extra-" version "]"
-        mirror1 = "Include = /etc/pacman.d/cachyos-" version "-mirrorlist"
+        repo1 = \"[cachyos-\" version \"]\"
+        repo2 = \"[cachyos-core-\" version \"]\"
+        repo3 = \"[cachyos-extra-\" version \"]\"
+        mirror1 = \"Include = /etc/pacman.d/cachyos-\" version \"-mirrorlist\"
     }
 
     {
-        if ($0 == "[options]") {
+        if (\$0 == \"[options]\") {
             print
             next
-        } else if ($0 == "[cachyos]" || $0 == repo1 || $0 == repo2 || $0 == repo3) {
+        } else if (\$0 == \"[cachyos]\" || \$0 == repo1 || \$0 == repo2 || \$0 == repo3) {
             if (set) {
                 rm = 2
             }
             set = 1
-        } else if ($0 == "Architecture = x86_64" ||
-                $0 == "Architecture = x86_64 x86_64_v3" ||
-                $0 == "Architecture = x86_64 x86_64_v3 x86_64_v4") {
-            print "Architecture = auto"
+        } else if (\$0 == \"Architecture = x86_64\" ||
+                \$0 == \"Architecture = x86_64 x86_64_v3\" ||
+                \$0 == \"Architecture = x86_64 x86_64_v3 x86_64_v4\") {
+            print \"Architecture = auto\"
             next
         }
 
@@ -54,19 +54,19 @@ addRepo() {
         if (!set) {
             print repo1
             print mirror1
-            print ""
+            print \"\"
 
             print repo2
             print mirror1
-            print ""
+            print \"\"
 
             print repo3
             print mirror1
-            print ""
+            print \"\"
 
-            print "[cachyos]"
-            print "Include = /etc/pacman.d/cachyos-mirrorlist"
-            print ""
+            print \"[cachyos]\"
+            print \"Include = /etc/pacman.d/cachyos-mirrorlist\"
+            print \"\"
 
             set = 1
             err = 0
@@ -76,7 +76,7 @@ addRepo() {
     END { exit err }
 
     1
-    ' "/etc/pacman.conf"
+    " "/etc/pacman.conf"
 }
 
 setupRepos() {
