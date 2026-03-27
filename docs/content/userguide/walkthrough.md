@@ -77,7 +77,9 @@ https://github.com/ChrisTitusTech/neovim
 - **DWM-Titus**: DWM is a dynamic window manager for X.
 It manages windows in tiled, monocle and floating layouts.
 All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
-This command installs and configures DWM and a desktop manager.
+This command provides an interactive menu with Install, Uninstall, and Quit options.
+On install, it configures DWM, ensures `/usr/share/xsessions/dwm.desktop` exists for display managers, optionally disables SDDM autologin configs, and prompts for reboot.
+On uninstall, it removes the DWM-Titus install artifacts and related config copies.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash

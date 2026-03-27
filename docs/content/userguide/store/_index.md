@@ -86,7 +86,7 @@ Use the search feature to quickly find what you need:
 | Flatpak / Flathub | Universal Linux app sandbox |
 | Bottles | Run Windows apps on Linux |
 | Waydroid | Run Android apps on Linux |
-| DWM-Titus | CTT's configured DWM window manager |
+| DWM-Titus | CTT's configured DWM window manager with install/uninstall menu and post-install session setup |
 | Rofi | App launcher and window switcher |
 | Auto CPU Frequency | Automatic CPU power optimizer |
 

@@ -1,16 +1,7 @@
 #!/bin/sh -e
 
+# shellcheck source=core/tabs/common-script.sh
 . ../common-script.sh
-
-install_extra() {
-    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
-    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
-    printf "%b\n" "${GREEN}Done.${RC}"
-}
 
 installLinutil() {
     printf "%b\n" "${YELLOW}Installing Linutil...${RC}"
@@ -45,7 +36,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
-                    if ! command -v cargo > /dev/null 2>&1; then
+                    if ! command -v cargo >/dev/null 2>&1; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
                             dnf)
@@ -62,20 +53,26 @@ installLinutil() {
                         esac
                     fi
                     rustup default stable
-                    if [ -f "$HOME/.cargo/env" ]; then
-                        # shellcheck disable=SC1091
-                        . "$HOME/.cargo/env"
-                    else
-                        export PATH="$HOME/.cargo/bin:$PATH"
-                    fi
+                    # shellcheck disable=SC1091
+                    . "$HOME/.cargo/env"
                     cargo install --force linutil_tui
                     printf "%b\n" "${GREEN}Installed successfully.${RC}"
-                    install_extra
+                    installExtra
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;
             esac
             ;;
     esac
+}
+
+installExtra() {
+    printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/applications
+    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    printf "%b\n" "${GREEN}Done.${RC}"
 }
 
 checkEnv

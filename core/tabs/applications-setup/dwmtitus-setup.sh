@@ -7,7 +7,11 @@ setupDWM() {
     printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
         pacman)
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak networkmanager network-manager-applet noto-fonts-emoji
+            NM_PACKAGE="networkmanager"
+            if pacman -Qq networkmanager-iwd >/dev/null 2>&1; then
+                NM_PACKAGE="networkmanager-iwd"
+            fi
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst feh nwg-look dex xscreensaver xorg-xprop polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak "$NM_PACKAGE" network-manager-applet
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -70,15 +74,6 @@ clone_config_folders() {
     [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
     # Copy scripts to local bin
     cp -rf "$HOME/.local/share/dwm-titus/scripts/." "$HOME/.local/bin/"
-
-    # Install Polybar icon fonts (MaterialIcons, Feather)
-    FONT_DIR="$HOME/.local/share/fonts"
-    mkdir -p "$FONT_DIR"
-    if [ -d "$HOME/.local/share/dwm-titus/polybar/fonts" ]; then
-        cp -r "$HOME/.local/share/dwm-titus/polybar/fonts/"* "$FONT_DIR/"
-        fc-cache -fv
-        printf "%b\n" "${GREEN}Polybar icon fonts installed${RC}"
-    fi
 
     # Iterate over all directories in config/*
     for dir in config/*/; do
@@ -167,14 +162,130 @@ setupDisplayManager() {
         printf "%b\n" "${GREEN}$DM installed successfully${RC}"
         enableService "$DM"
         
+	    fi
+}
+
+post_install_fixups() {
+    printf "%b\n" "${YELLOW}Ensuring DWM session entry exists...${RC}"
+    "$ESCALATION_TOOL" mkdir -p /usr/share/xsessions
+    "$ESCALATION_TOOL" cp "$HOME/.local/share/dwm-titus/dwm.desktop" /usr/share/xsessions/
+    "$ESCALATION_TOOL" chmod 644 /usr/share/xsessions/dwm.desktop
+
+    found_sddm_autologin=0
+    for autologin_file in /etc/sddm.conf.d/autologin.conf /etc/sddm.conf.d/autologin.conf.disabled /etc/sddm.conf.d/*autologin*.conf /etc/sddm.conf.d/*autologin*.disabled; do
+        [ -e "$autologin_file" ] || continue
+        if [ "$found_sddm_autologin" -eq 0 ]; then
+            printf "%b\n" "${YELLOW}Found SDDM autologin config, disabling it...${RC}"
+            "$ESCALATION_TOOL" mkdir -p /etc/sddm-disabled
+            found_sddm_autologin=1
+        fi
+        "$ESCALATION_TOOL" mv "$autologin_file" /etc/sddm-disabled/
+    done
+
+    if [ "$found_sddm_autologin" -eq 1 ]; then
+        printf "%b\n" "${GREEN}Moved SDDM autologin config(s) to /etc/sddm-disabled.${RC}"
+    fi
+
+    OWNER_USER="${SUDO_USER:-$USER}"
+    OWNER_GROUP=$(id -gn "$OWNER_USER")
+    if [ -d "$HOME/.config/dwm-titus" ]; then
+        "$ESCALATION_TOOL" chown -R "$OWNER_USER:$OWNER_GROUP" "$HOME/.config/dwm-titus"
     fi
 }
 
+prompt_reboot() {
+    while :; do
+        printf "%b\n" "${YELLOW}Reboot now? (Recommended)${RC}"
+        printf "%b" "Choices: Y / N: "
+        read -r reboot_choice
+        case "$reboot_choice" in
+            Y|y)
+                "$ESCALATION_TOOL" reboot
+                return 0
+                ;;
+            N|n)
+                printf "%b\n" "${GREEN}Returning to Linutil...${RC}"
+                return 0
+                ;;
+            *)
+                printf "%b\n" "${RED}Invalid choice. Enter Y or N.${RC}"
+                ;;
+        esac
+    done
+}
+
+uninstallDWM() {
+    printf "%b\n" "${YELLOW}Uninstalling DWM-Titus...${RC}"
+    REPO_DIR="$HOME/.local/share/dwm-titus"
+    SCRIPT_NAMES=""
+    CONFIG_DIR_NAMES=""
+
+    if [ -d "$REPO_DIR/scripts" ]; then
+        for f in "$REPO_DIR"/scripts/*; do
+            [ -f "$f" ] || continue
+            case "$(basename "$f")" in
+                autostart*) continue ;;
+            esac
+            SCRIPT_NAMES="$SCRIPT_NAMES $(basename "$f")"
+        done
+    fi
+
+    if [ -d "$REPO_DIR/config" ]; then
+        for dir in "$REPO_DIR"/config/*/; do
+            [ -d "$dir" ] || continue
+            CONFIG_DIR_NAMES="$CONFIG_DIR_NAMES $(basename "$dir")"
+        done
+    fi
+
+    if [ -d "$REPO_DIR" ]; then
+        (
+            cd "$REPO_DIR" || exit 1
+            "$ESCALATION_TOOL" make uninstall || true
+        )
+    fi
+
+    for script_name in $SCRIPT_NAMES; do
+        "$ESCALATION_TOOL" rm -f "/usr/local/bin/$script_name" || true
+        rm -f "$HOME/.local/bin/$script_name" || true
+    done
+
+    for config_name in $CONFIG_DIR_NAMES; do
+        rm -rf "$HOME/.config/$config_name" || true
+    done
+
+    rm -rf "$HOME/.config/dwm-titus" || true
+    "$ESCALATION_TOOL" rm -f /usr/share/xsessions/dwm.desktop || true
+    rm -rf "$REPO_DIR" || true
+
+    printf "%b\n" "${GREEN}DWM-Titus uninstall completed.${RC}"
+}
+
+installDWM() {
+    setupDisplayManager
+    setupDWM
+    makeDWM
+    install_nerd_font
+    clone_config_folders
+    configure_backgrounds
+    post_install_fixups
+    prompt_reboot
+}
+
+main() {
+    printf "%b\n" "${YELLOW}DWM-Titus${RC}"
+    printf "%b\n" "1. Install"
+    printf "%b\n" "2. Uninstall"
+    printf "%b\n" "3. Quit"
+    printf "%b" "Select an option (1-3): "
+    read -r choice
+
+    case "$choice" in
+        1) installDWM ;;
+        2) uninstallDWM ;;
+        3) exit 0 ;;
+        *) printf "%b\n" "${RED}Invalid selection${RC}" ;;
+    esac
+}
+
 checkEnv
-checkEscalationTool
-setupDisplayManager
-setupDWM
-makeDWM
-install_nerd_font
-clone_config_folders
-configure_backgrounds
+main

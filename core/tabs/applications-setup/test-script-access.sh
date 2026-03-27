@@ -1,4 +1,3 @@
-#!/bin/sh -e
+#!/bin/sh
 
-# Reserved for script-access validation hooks.
-exit 0
+# Placeholder script for script-access checks.
