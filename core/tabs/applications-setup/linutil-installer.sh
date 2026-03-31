@@ -36,6 +36,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
+                    # shellcheck disable=SC2218
                     if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
