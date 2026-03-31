@@ -36,7 +36,7 @@ installLinutil() {
             read -r choice
             case $choice in
                 y | Y)
-                    if ! command -v cargo >/dev/null 2>&1; then
+                    if ! command_exists cargo; then
                         printf "%b\n" "${YELLOW}Installing rustup...${RC}"
                         case "$PACKAGER" in
                             dnf)
