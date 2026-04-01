@@ -346,22 +346,10 @@ script = "android-debloat.sh"
 task_list = "I"
 
 [[data]]
-name = "Auto CPU Frequency"
-description = "Automatic CPU speed & power optimizer.\nhttps://github.com/AdnanHodzic/auto-cpufreq"
-script = "auto-cpufreq.sh"
-task_list = "I SS"
-
-[[data]]
 name = "Bash Prompt"
 description = "The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash"
 script = "mybash-setup.sh"
 task_list = "I FM"
-
-[[data]]
-name = "Bottles"
-description = "Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications."
-script = "bottles-setup.sh"
-task_list = "FI"
 
 [[data]]
 name = "Docker"
@@ -444,16 +432,6 @@ name = "Rofi"
 description = "Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus"
 script = "rofi-setup.sh"
 task_list = "I FM"
-
-[[data]]
-name = "Waydroid"
-description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
-script = "waydroid-setup.sh"
-task_list = "I SS"
-[[data.preconditions]]
-matches = true
-data = { environment = "XDG_SESSION_TYPE" }
-values = ["wayland", "Wayland"]
 
 [[data]]
 name = "ZSH Prompt"
