@@ -8,6 +8,6 @@ pub fn get_random_tip() -> &'static str {
         return "";
     }
 
-    let random_index = rand::thread_rng().gen_range(0..tips.len());
+    let random_index = rand::rng().random_range(0..tips.len());
     tips[random_index]
 }
