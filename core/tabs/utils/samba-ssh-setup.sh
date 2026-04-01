@@ -1,12 +1,17 @@
 #!/bin/sh -e
 
 # Load common script functions
-. ../common-script.sh  
+# shellcheck disable=SC1091
+# shellcheck source=../common-script.sh
+. ../common-script.sh
+# shellcheck disable=SC1091
+# shellcheck source=../common-service-script.sh
 . ../common-service-script.sh
 
 # Function to install packages based on the package manager
 install_package() {
     PACKAGE=$1
+    PACKAGER=${PACKAGER:-}
     if ! command_exists "$PACKAGE"; then
         case "$PACKAGER" in
             pacman)

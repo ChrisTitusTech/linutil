@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+# shellcheck disable=SC1091
+# shellcheck source=../common-script.sh
 . ../common-script.sh
 
 ensure_ssh_config() {
@@ -178,6 +180,7 @@ run_remote_command() {
     read -r host_alias
     printf "%b" "Enter the command to run: " 
     read -r remote_command
+    # shellcheck disable=SC2029
     ssh "$host_alias" "$remote_command"
 }
 
