@@ -1016,7 +1016,7 @@ dependencies = [
  "nix 0.31.1",
  "oneshot",
  "portable-pty",
- "rand 0.8.5",
+ "rand 0.9.2",
  "ratatui 0.30.0",
  "ratatui-image",
  "time",
