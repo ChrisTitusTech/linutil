@@ -2,17 +2,104 @@
 
 . ../common-script.sh
 
-# Check if ~/.ssh/config exists, if not, create it
-if [ ! -f ~/.ssh/config ]; then
-    mkdir -p "$HOME/.ssh"
-    touch "$HOME/.ssh/config"
-    chmod 600 "$HOME/.ssh/config"
+ensure_ssh_config() {
+    if [ ! -f "$HOME/.ssh/config" ]; then
+        mkdir -p "$HOME/.ssh"
+        touch "$HOME/.ssh/config"
+        chmod 600 "$HOME/.ssh/config"
+    fi
+}
+
+host_exists() {
+    awk -v alias="$1" '$1 == "Host" { for (i = 2; i <= NF; i++) if ($i == alias) found = 1 } END { exit found ? 0 : 1 }' "$HOME/.ssh/config"
+}
+
+remove_host_block() {
+    tmp_config=$(mktemp)
+    awk -v alias="$1" '
+        $1 == "Host" {
+            skip = 0
+            for (i = 2; i <= NF; i++) {
+                if ($i == alias) {
+                    skip = 1
+                }
+            }
+        }
+        !skip { print }
+    ' "$HOME/.ssh/config" > "$tmp_config" && mv "$tmp_config" "$HOME/.ssh/config"
+}
+
+print_host_block() {
+    awk -v alias="$1" '
+        $1 == "Host" {
+            printing = 0
+            for (i = 2; i <= NF; i++) {
+                if ($i == alias) {
+                    printing = 1
+                    found = 1
+                }
+            }
+        }
+        printing { print }
+        END { exit found ? 0 : 1 }
+    ' "$HOME/.ssh/config"
+}
+
+run_remote_as_root() {
+    host_alias=$1
+    shift
+    ssh "$host_alias" sh -s -- "$@" <<'EOF'
+set -e
+
+if [ "$(id -u)" = "0" ]; then
+    remote_escalation=""
+elif command -v sudo >/dev/null 2>&1; then
+    remote_escalation="sudo"
+elif command -v doas >/dev/null 2>&1; then
+    remote_escalation="doas"
+else
+    printf "%s\n" "No supported escalation tool found on the remote host." >&2
+    exit 1
 fi
+
+run_privileged() {
+    if [ -n "$remote_escalation" ]; then
+        "$remote_escalation" "$@"
+    else
+        "$@"
+    fi
+}
+
+password_auth=$1
+pubkey_auth=$2
+
+run_privileged sed -i \
+    -e "s/^#\?PasswordAuthentication .*/PasswordAuthentication $password_auth/" \
+    -e "s/^#\?PubkeyAuthentication .*/PubkeyAuthentication $pubkey_auth/" \
+    /etc/ssh/sshd_config
+
+if ! grep -q '^PasswordAuthentication ' /etc/ssh/sshd_config; then
+    printf "%s\n" "PasswordAuthentication $password_auth" | run_privileged tee -a /etc/ssh/sshd_config >/dev/null
+fi
+
+if ! grep -q '^PubkeyAuthentication ' /etc/ssh/sshd_config; then
+    printf "%s\n" "PubkeyAuthentication $pubkey_auth" | run_privileged tee -a /etc/ssh/sshd_config >/dev/null
+fi
+
+if command -v systemctl >/dev/null 2>&1; then
+    run_privileged systemctl restart sshd || run_privileged systemctl restart ssh
+else
+    printf "%s\n" "Could not restart SSH automatically because systemctl is unavailable on the remote host." >&2
+fi
+EOF
+}
+
+ensure_ssh_config
 
 # Function to show available hosts from ~/.ssh/config
 show_available_hosts() {
     printf "%b\n" "Available Systems:"
-    grep -E "^Host " "$HOME/.ssh/config" | awk '{print $2}'
+    awk '$1 == "Host" { for (i = 2; i <= NF; i++) print $i }' "$HOME/.ssh/config"
     printf "%b\n" "-------------------"
 }
 
@@ -24,6 +111,10 @@ ask_for_host_details() {
     read -r host
     printf "%b" "Enter Remote User: "
     read -r  user
+    if host_exists "$host_alias"; then
+        printf "%b\n" "Host $host_alias already exists. Replacing existing entry."
+        remove_host_block "$host_alias"
+    fi
     {
         printf "%b\n" "Host $host_alias"
         printf "%b\n" "    HostName $host"
@@ -61,13 +152,7 @@ disable_password_auth() {
     printf "%b\n" "Enter the alias of the host: " 
     read -r host_alias
     printf "\n"
-    ssh "$host_alias" "
-        "$ESCALATION_TOOL" -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
-    "
+    run_remote_as_root "$host_alias" no yes
     printf "%b\n" "PasswordAuthentication set to no and PubkeyAuthentication set to yes."
 }
 
@@ -76,13 +161,7 @@ enable_password_auth() {
     printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
     printf "\n"
-    ssh "$host_alias" "
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
-    "
+    run_remote_as_root "$host_alias" yes no
     printf "%b\n" "PasswordAuthentication set to yes and PubkeyAuthentication set to no."
 }
 
@@ -151,7 +230,11 @@ move_directory_to_remote() {
 remove_system() {
     printf "%b\n" "Enter the alias of the host to remove: "
     read -r host_alias
-    sed -i "/^Host $host_alias/,+3d" ~/.ssh/config
+    if ! host_exists "$host_alias"; then
+        printf "%b\n" "Host $host_alias not found."
+        return 1
+    fi
+    remove_host_block "$host_alias"
     printf "%b\n" "Removed $host_alias from SSH configuration."
 }
 
@@ -160,9 +243,12 @@ view_ssh_config() {
     printf "%b\n" "Enter the alias of the host to view (or press Enter to view all): "
     read -r  host_alias
     if [ -z "$host_alias" ]; then
-        cat ~/.ssh/config
+        cat "$HOME/.ssh/config"
     else
-        grep -A 3 "^Host $host_alias" ~/.ssh/config
+        if ! print_host_block "$host_alias"; then
+            printf "%b\n" "Host $host_alias not found."
+            return 1
+        fi
     fi
 }
 
