@@ -72,10 +72,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
-- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
-https://github.com/AdnanHodzic/auto-cpufreq
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
-- **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **DWM-Titus**: DWM is a dynamic window manager for X.
 It manages windows in tiled, monocle and floating layouts.
@@ -93,7 +90,6 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
 - **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
 - **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
-- **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
 - **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
 
 ## Gaming
@@ -101,31 +97,47 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ### Emulators
 
-- **Blastem**: A Genesis emulator. NO Games are included
+
+### Nintendo Emulators
+
 - **bsnes**: Super Nintendo Emulator. NO Games are included
 - **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
-- **Flycast**: A Dreamcase emulator. NO Games are included
 - **Gopher 64**: N64 Emulator. NO Games are included
-- **Kronos**: A Sega Saturn emulator. NO Games are included
 - **MelonDS**: Nintendo DS and DSi Emulator. NO Games are included
 - **mGBA**: Nintendo Game Boy Advance Emulator. NO Games are included
 - **Mupen 64 Plus**: N64 Emulator. NO Games are included
-- **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
-- **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
-- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
-- **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
 - **Ryujinx**: Nintendo Switch emulator. NO Games are included
 - **snes9x**: Super Nintendo Emulator. NO Games are included
+
+### PlayStation Emulators
+
+- **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
+- **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
+- **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
+
+### Sega Emulators
+
+- **Blastem**: A Genesis emulator. NO Games are included
+- **Flycast**: A Dreamcase emulator. NO Games are included
+- **Kronos**: A Sega Saturn emulator. NO Games are included
+
+### Multi-System Emulators
+
+- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+
+### Xbox Emulators
+
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
 
-### Related Tools and Setups
+### Tools and Setups
 
 - **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
 https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
-- **Gaming Dependencies**: Run the Gaming Dependencies installer (same script kept under System Setup).
+- **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions.
+- **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
 - **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
@@ -182,9 +194,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
-- **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
-- **GPU Driver**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
 
@@ -214,7 +224,6 @@ https://github.com/AdnanHodzic/auto-cpufreq
 
 ### User Account Manager
 
-- **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system

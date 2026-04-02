@@ -49,6 +49,12 @@ description = "Valve's fork of Linux Kernel for the SteamDeck"
 script = "arch/linux-neptune.sh"
 task_list = "I PFM K"
 
+[[data.entries]]
+name = "Install CachyOS Repository and Kernel"
+description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
+script = "arch/cachyos-repos.sh"
+task_list = "I"
+
 [[data.entries.preconditions]]
 matches = true
 data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
@@ -215,23 +221,10 @@ task_list = "PFM"
 multi_select = false
 
 [[data]]
-name = "Gaming Dependencies"
-description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions"
-script = "gaming-setup.sh"
-task_list = "I"
-
-[[data]]
 name = "Global Theme"
 description = "This script is designed to handle the installation and configuration of global theming"
 script = "global-theme.sh"
 task_list = "I PFM"
-
-[[data]]
-name = "GPU Driver"
-description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
-script = "gpu-driver.sh"
-task_list = "I"
-multi_select = false
 
 [[data]]
 name = "Remove Snaps"

@@ -126,13 +126,6 @@ script = "auto-login.sh"
 task_list = "DE setup"
 
 [[data]]
-name = "Auto Mount Drive"
-description = "This utility is designed to help with automating the process of mounting a drive on to your system."
-script = "auto-mount.sh"
-task_list = "PFM"
-multi_select = false
-
-[[data]]
 name = "Bluetooth Manager"
 description = "This utility is designed to manage bluetooth in your system"
 script = "bluetooth-control.sh"
