@@ -158,8 +158,16 @@ filesystem () {
 # @description Detects and sets timezone.
 timezone () {
     time_zone="$(curl -sfm 5 https://ipapi.co/timezone)"
-    read -r -p "Detected timezone: '$time_zone'. Press Enter to accept or type a new one: " input
-    export TIMEZONE="${input:-$time_zone}"
+    while true; do
+        read -r -p "Detected timezone: '$time_zone'. Press Enter to accept or type a new one: " input
+        TIMEZONE="${input:-$time_zone}"
+        if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
+            break
+        else
+            echo "ERROR! Timezone '${TIMEZONE}' not found. Please enter a valid timezone (e.g. America/New_York)."
+        fi
+    done
+    export TIMEZONE
 }
 # @description Set user's keyboard mapping.
 keymap () {
@@ -167,10 +175,14 @@ keymap () {
     Please select key board layout from this list"
     # These are default key maps as presented in official arch repo archinstall
     # shellcheck disable=SC1010
-    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg ua uk)
+    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk)
 
     select_option "${options[@]}"
     keymap=${options[$?]}
+
+    if ! localectl list-x11-keymap-layouts 2>/dev/null | grep -qx "${keymap}"; then
+        echo "WARNING: '${keymap}' was not found in X11 keymap layouts. It may still work for console keymaps."
+    fi
 
     echo -ne "Your key boards layout: ${keymap} \n"
     export KEYMAP=$keymap
@@ -307,7 +319,6 @@ pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 setfont ter-v18b
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 pacman -S --noconfirm --needed rate-mirrors rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 echo -ne "
@@ -538,9 +549,6 @@ echo "Keymap set to: ${KEYMAP}"
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
-
-#Add parallel downloading
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 #Set colors and enable the easter egg
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
