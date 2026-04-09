@@ -157,26 +157,9 @@ filesystem () {
 
 # @description Detects and sets timezone.
 timezone () {
-    # Added this from arch wiki https://wiki.archlinux.org/title/System_time
-    time_zone="$(curl --fail https://ipapi.co/timezone)"
-    echo -ne "
-    System detected your timezone to be '$time_zone' \n"
-    echo -ne "Is this correct?
-    "
-    options=("Yes" "No")
-    select_option "${options[@]}"
-
-    case ${options[$?]} in
-        y|Y|yes|Yes|YES)
-        echo "${time_zone} set as timezone"
-        export TIMEZONE=$time_zone;;
-        n|N|no|NO|No)
-        echo "Please enter your desired timezone e.g. Europe/London :"
-        read -r new_timezone
-        echo "${new_timezone} set as timezone"
-        export TIMEZONE=$new_timezone;;
-        *) echo "Wrong option. Try again";timezone;;
-    esac
+    time_zone="$(curl -sfm 5 https://ipapi.co/timezone)"
+    read -r -p "Detected timezone: '$time_zone'. Press Enter to accept or type a new one: " input
+    export TIMEZONE="${input:-$time_zone}"
 }
 # @description Set user's keyboard mapping.
 keymap () {
@@ -371,11 +354,14 @@ echo -ne "
 createsubvolumes () {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
+    # Set @ as the default subvolume so genfstab records subvolid=256 (not 5)
+    # Path form requires btrfs-progs >= 5.6 (standard on Arch rolling)
+    btrfs subvolume set-default /mnt/@
 }
 
 # @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol () {
-    mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
+    mount -o "${MOUNT_OPTIONS}",subvol=@home "${BTRFS_DEVICE}" /mnt/home
 }
 
 # @description BTRFS subvolulme creation and mounting.
@@ -385,8 +371,8 @@ subvolumesetup () {
 # unmount root to remount with subvolume
     umount /mnt
 # mount @ subvolume
-    mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
-# make directories home, .snapshots, var, tmp
+    mount -o "${MOUNT_OPTIONS}",subvol=@ "${BTRFS_DEVICE}" /mnt
+# make directories for subvolumes
     mkdir -p /mnt/home
 # mount subvolumes
     mountallsubvol
@@ -404,6 +390,7 @@ if [[ "${FS}" == "btrfs" ]]; then
     mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.btrfs -f "${partition3}"
     mount -t btrfs "${partition3}" /mnt
+    BTRFS_DEVICE="${partition3}"
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
     mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
@@ -416,9 +403,10 @@ elif [[ "${FS}" == "luks" ]]; then
 # open luks container and ROOT will be place holder
     echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
-    mkfs.btrfs "${partition3}"
+    mkfs.btrfs /dev/mapper/ROOT
 # create subvolumes for btrfs
-    mount -t btrfs "${partition3}" /mnt
+    mount -t btrfs /dev/mapper/ROOT /mnt
+    BTRFS_DEVICE=/dev/mapper/ROOT
     subvolumesetup
     ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value "${partition3}")
 fi
