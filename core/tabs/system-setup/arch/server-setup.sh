@@ -176,24 +176,28 @@ keymap () {
     export KEYMAP=$keymap
 }
 
-# @description Choose whether drive is SSD or not.
+# @description Auto-detects drive type (SSD, MMC, or HDD) and sets mount options accordingly.
 drivessd () {
-    echo -ne "
-    Is this a solid state, flash, or hard drive?
-    "
+    local disk_name
+    disk_name=$(basename "${DISK}")
 
-    options=("SSD" "MMC" "HDD")
-    select_option "${options[@]}"
-
-    case $? in
-        0)
-        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-        1)
-        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120";;
-        2)
-        export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-        *) echo "Wrong option. Try again";drivessd;;
-    esac
+    if [[ "${DISK}" =~ "mmcblk" ]]; then
+        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120"
+        echo "Detected MMC/eMMC drive (${disk_name}): using MMC mount options"
+    elif [[ -f "/sys/block/${disk_name}/queue/rotational" ]]; then
+        local rotational
+        rotational=$(cat "/sys/block/${disk_name}/queue/rotational")
+        if [[ "${rotational}" == "0" ]]; then
+            export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120"
+            echo "Detected SSD/NVMe drive (${disk_name}): using SSD mount options"
+        else
+            export MOUNT_OPTIONS="noatime,compress=zstd,commit=120"
+            echo "Detected HDD (${disk_name}): using HDD mount options"
+        fi
+    else
+        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120"
+        echo "Could not detect drive type for ${disk_name}, defaulting to SSD mount options"
+    fi
 }
 
 # @description Disk selection for drive to be used with installation.
