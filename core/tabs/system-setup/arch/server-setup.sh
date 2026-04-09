@@ -308,16 +308,21 @@ pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent pa
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 setfont ter-v18b
 sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-pacman -S --noconfirm --needed reflector rsync grub
+pacman -S --noconfirm --needed rate-mirrors rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c "$iso" --score 5 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then #check if there are less than 5 mirrors
-    cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+if rate-mirrors --country "$iso" arch --save /etc/pacman.d/mirrorlist; then
+    if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then
+        echo "rate-mirrors returned fewer than 5 mirrors, restoring backup"
+        cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
+    fi
+else
+    echo "rate-mirrors failed, restoring backup mirrorlist"
+    cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
 fi
 
 if [ ! -d "/mnt" ]; then
