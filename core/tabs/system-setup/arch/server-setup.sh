@@ -188,6 +188,34 @@ keymap () {
     export KEYMAP=$keymap
 }
 
+# @description Derives a default locale from the selected keymap and lets the user confirm or override.
+set_locale () {
+    declare -A keymap_locale_map=(
+        [us]="en_US.UTF-8"  [uk]="en_GB.UTF-8"  [ca]="en_CA.UTF-8"
+        [cf]="fr_CA.UTF-8"  [by]="be_BY.UTF-8"  [cz]="cs_CZ.UTF-8"
+        [de]="de_DE.UTF-8"  [dk]="da_DK.UTF-8"  [es]="es_ES.UTF-8"
+        [et]="et_EE.UTF-8"  [fa]="fa_IR.UTF-8"  [fi]="fi_FI.UTF-8"
+        [fr]="fr_FR.UTF-8"  [gr]="el_GR.UTF-8"  [hu]="hu_HU.UTF-8"
+        [il]="he_IL.UTF-8"  [it]="it_IT.UTF-8"  [lt]="lt_LT.UTF-8"
+        [lv]="lv_LV.UTF-8"  [mk]="mk_MK.UTF-8"  [nl]="nl_NL.UTF-8"
+        [no]="nb_NO.UTF-8"  [pl]="pl_PL.UTF-8"  [ro]="ro_RO.UTF-8"
+        [ru]="ru_RU.UTF-8"  [se]="sv_SE.UTF-8"  [sg]="de_CH.UTF-8"
+        [si]="sl_SI.UTF-8"  [tr]="tr_TR.UTF-8"  [ua]="uk_UA.UTF-8"
+    )
+    local suggested_locale="${keymap_locale_map[${KEYMAP}]:-en_US.UTF-8}"
+    while true; do
+        read -r -p "Detected locale: '$suggested_locale'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " input
+        LOCALE="${input:-$suggested_locale}"
+        # Basic sanity check: must look like xx_XX.UTF-8 or similar
+        if [[ "${LOCALE}" =~ ^[a-z]{2,3}_[A-Z]{2,3}\. ]]; then
+            break
+        else
+            echo "ERROR! Locale '${LOCALE}' does not look valid. Please enter a locale like en_US.UTF-8."
+        fi
+    done
+    export LOCALE
+}
+
 # @description Auto-detects drive type (SSD, MMC, or HDD) and sets mount options accordingly.
 drivessd () {
     local disk_name
@@ -311,6 +339,9 @@ timezone
 clear
 logo
 keymap
+clear
+logo
+set_locale
 
 echo "Setting up mirrors for optimal download"
 iso=$(curl -4 ifconfig.io/country_code)
@@ -534,11 +565,11 @@ echo -ne "
                     Setup Language to US and set locale
 -------------------------------------------------------------------------
 "
-sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sed -i "s/^#${LOCALE}/${LOCALE}/" /etc/locale.gen
 locale-gen
 timedatectl --no-ask-password set-timezone ${TIMEZONE}
-timedatectl --no-ask-password set-ntp 1
-localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_TIME="en_US.UTF-8"
+timedatectl --no-ask-password set-ntp true
+localectl --no-ask-password set-locale LANG="${LOCALE}" LC_TIME="${LOCALE}"
 ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 
 # Set keymaps
