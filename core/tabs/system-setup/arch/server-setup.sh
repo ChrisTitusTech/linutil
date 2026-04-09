@@ -357,7 +357,7 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-if rate-mirrors --allow-root --entry-country="$iso" --save=/etc/pacman.d/mirrorlist arch --max-delay=21600; then
+if rate-mirrors --allow-root --entry-country="$iso" --max-jumps=0 --save=/etc/pacman.d/mirrorlist arch --max-delay=21600; then
     if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then
         echo "rate-mirrors returned fewer than 5 mirrors, restoring backup"
         cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
@@ -485,6 +485,10 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
+# Pre-seed machine-id so systemd's post-install hook skips entropy-blocking generation
+mkdir -p /mnt/etc
+systemd-machine-id-setup --print > /mnt/etc/machine-id
+
 if [[ ! -d "/sys/firmware/efi" ]]; then
     pacstrap /mnt base base-devel linux-lts linux-firmware --noconfirm --needed
 else
