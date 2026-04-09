@@ -357,7 +357,7 @@ echo -ne "
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-if rate-mirrors --country "$iso" arch --save /etc/pacman.d/mirrorlist; then
+if rate-mirrors --allow-root --entry-country="$iso" --save=/etc/pacman.d/mirrorlist arch --max-delay=21600; then
     if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then
         echo "rate-mirrors returned fewer than 5 mirrors, restoring backup"
         cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
