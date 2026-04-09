@@ -548,22 +548,12 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed pacman-contrib curl terminus-font
-pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
+pacman -S --noconfirm --needed rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-NUM_CORES=$(grep -c ^"cpu cores" /proc/cpuinfo)
-echo -ne "
--------------------------------------------------------------------------
-                    You have $NUM_CORES cores. And
-            changing the makeflags for $NUM_CORES cores. Aswell as
-                changing the compression settings.
--------------------------------------------------------------------------
-"
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -gt 8000000 ]]; then
-sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$NUM_CORES\"/g" /etc/makepkg.conf
+NUM_CORES=$(nproc)
+sed -i "s/#MAKEFLAGS=\"-j\"/MAKEFLAGS=\"-j$NUM_CORES\"/g" /etc/makepkg.conf
 sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $NUM_CORES -z -)/g" /etc/makepkg.conf
-fi
 echo -ne "
 -------------------------------------------------------------------------
                     Setup Language to US and set locale
@@ -696,8 +686,6 @@ systemctl disable dhcpcd.service
 echo "  DHCP disabled"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
-systemctl enable reflector.timer
-echo "  Reflector enabled"
 
 echo -ne "
 -------------------------------------------------------------------------
