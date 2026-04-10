@@ -165,12 +165,16 @@ timezone () {
                 TIMEZONE="${time_zone}"
                 if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
                     break
+				else
+					echo "ERROR '${TIMEZONE}' is in incorrect"
                 fi
                 ;;
             [Nn]* )
                 TIMEZONE="$(tzselect)"
                 if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
                     break
+				else
+					echo "ERROR '${TIMEZONE}' is in incorrect"
                 fi
                 ;;
         esac
