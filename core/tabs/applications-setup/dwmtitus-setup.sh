@@ -11,7 +11,15 @@ setupDWM() {
             if pacman -Qq networkmanager-iwd >/dev/null 2>&1; then
                 NM_PACKAGE="networkmanager-iwd"
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak sddm "$NM_PACKAGE" network-manager-applet noto-fonts-emoji
+
+            QT_MEDIA_PACKAGE=""
+            if pacman -Si qt5-multimedia >/dev/null 2>&1; then
+                QT_MEDIA_PACKAGE="qt5-multimedia"
+            elif pacman -Si qt6-multimedia >/dev/null 2>&1; then
+                QT_MEDIA_PACKAGE="qt6-multimedia"
+            fi
+
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak sddm "$NM_PACKAGE" network-manager-applet noto-fonts-emoji ${QT_MEDIA_PACKAGE}
             enableService sddm
             printf "%b\n" "${GREEN}SDDM enabled${RC}"
 
@@ -99,34 +107,37 @@ install_nerd_font() {
 }
 
 clone_config_folders() {
-    # Ensure the target directory exists
-    [ ! -d ~/.config ] && mkdir -p ~/.config
-    [ ! -d ~/.local/bin ] && mkdir -p ~/.local/bin
+    REPO_DIR="$HOME/.local/share/dwm-titus"
+
+    # Ensure the target directories exist
+    mkdir -p "$HOME/.config"
+    mkdir -p "$HOME/.local/bin"
+
     # Copy scripts to local bin
-    cp -rf "$HOME/.local/share/dwm-titus/scripts/." "$HOME/.local/bin/"
+    if [ -d "$REPO_DIR/scripts" ]; then
+        cp -rf "$REPO_DIR/scripts/." "$HOME/.local/bin/"
+    fi
 
     # Install Polybar icon fonts (MaterialIcons, Feather)
     FONT_DIR="$HOME/.local/share/fonts"
     mkdir -p "$FONT_DIR"
-    if [ -d "$HOME/.local/share/dwm-titus/polybar/fonts" ]; then
-        cp -r "$HOME/.local/share/dwm-titus/polybar/fonts/"* "$FONT_DIR/"
+    if [ -d "$REPO_DIR/polybar/fonts" ]; then
+        cp -r "$REPO_DIR/polybar/fonts/"* "$FONT_DIR/"
         fc-cache -fv
         printf "%b\n" "${GREEN}Polybar icon fonts installed${RC}"
     fi
 
-    # Iterate over all directories in config/*
-    for dir in config/*/; do
-        # Extract the directory name
-        dir_name=$(basename "$dir")
-
-        # Clone the directory to ~/.config/
-        if [ -d "$dir" ]; then
-            cp -r "$dir" ~/.config/
+    # Iterate over all directories in the repo config/ folder
+    if [ -d "$REPO_DIR/config" ]; then
+        for dir in "$REPO_DIR"/config/*/; do
+            [ -d "$dir" ] || continue
+            dir_name=$(basename "$dir")
+            cp -r "$dir" "$HOME/.config/"
             printf "%b\n" "${GREEN}Cloned $dir_name to ~/.config/${RC}"
-        else
-            printf "%b\n" "${RED}Directory $dir_name does not exist, skipping${RC}"
-        fi
-    done
+        done
+    else
+        printf "%b\n" "${RED}Repo config directory not found: $REPO_DIR/config${RC}"
+    fi
 }
 
 configure_backgrounds() {
