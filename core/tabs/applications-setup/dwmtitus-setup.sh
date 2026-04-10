@@ -4,14 +4,44 @@
 . ../common-service-script.sh
 
 setupDWM() {
-    printf "%b\n" "${YELLOW}Installing DWM-Titus...${RC}"
+    printf "%b\n" "${YELLOW}Installing DWM-Titus dependencies...${RC}"
     case "$PACKAGER" in # Install pre-Requisites
-        pacman)
+        "pacman")
             NM_PACKAGE="networkmanager"
             if pacman -Qq networkmanager-iwd >/dev/null 2>&1; then
                 NM_PACKAGE="networkmanager-iwd"
             fi
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak "$NM_PACKAGE" network-manager-applet noto-fonts-emoji
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak sddm "$NM_PACKAGE" network-manager-applet noto-fonts-emoji
+            enableService sddm
+            printf "%b\n" "${GREEN}SDDM enabled${RC}"
+
+            # Install SDDM astronaut theme manually (avoid duplicate SDDM install)
+            printf "%b\n" "${YELLOW}Installing SDDM astronaut theme...${RC}"
+            if command -v git >/dev/null 2>&1; then
+                # Clone theme repo
+                THEME_DIR="$HOME/sddm-astronaut-theme"
+                THEMES_DEST="/usr/share/sddm/themes"
+                [ -d "$THEME_DIR" ] && rm -rf "$THEME_DIR"
+                if git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$THEME_DIR" 2>/dev/null; then
+                    # Install theme
+                    "$ESCALATION_TOOL" mkdir -p "$THEMES_DEST"
+                    "$ESCALATION_TOOL" cp -r "$THEME_DIR" "$THEMES_DEST/"
+                    # Install fonts if available
+                    [ -d "$THEME_DIR/Fonts" ] && "$ESCALATION_TOOL" cp -r "$THEME_DIR/Fonts"/* /usr/share/fonts/ 2>/dev/null && fc-cache -f
+                    # Configure SDDM to use astronaut theme
+                    "$ESCALATION_TOOL" tee /etc/sddm.conf >/dev/null << 'EOF'
+[Theme]
+Current=sddm-astronaut-theme
+EOF
+                    # Cleanup
+                    rm -rf "$THEME_DIR"
+                    printf "%b\n" "${GREEN}SDDM astronaut theme installed${RC}"
+                else
+                    printf "%b\n" "${YELLOW}Failed to clone SDDM theme repository${RC}"
+                fi
+            else
+                printf "%b\n" "${YELLOW}Git not available, skipping SDDM theme installation${RC}"
+            fi
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
@@ -24,13 +54,13 @@ makeDWM() {
     [ ! -d "$HOME/.local/share" ] && mkdir -p "$HOME/.local/share/"
     if [ ! -d "$HOME/.local/share/dwm-titus" ]; then
 	printf "%b\n" "${YELLOW}DWM-Titus not found, cloning repository...${RC}"
-	cd "$HOME/.local/share/" && git clone https://github.com/ChrisTitusTech/dwm-titus.git # CD to Home directory to install dwm-titus This path can be changed (e.g. to linux-toolbox directory)
-	cd dwm-titus/ # Hardcoded path, maybe not the best.
+	cd "$HOME/.local/share/" && git clone https://github.com/ChrisTitusTech/dwm-titus.git
+	cd dwm-titus/ || exit 1
     else
-	printf "%b\n" "${GREEN}DWM-Titus directory already exists, replacing..${RC}"
+	printf "%b\n" "${GREEN}DWM-Titus directory already exists, updating...${RC}"
 	cd "$HOME/.local/share/dwm-titus" && git pull
     fi
-    "$ESCALATION_TOOL" make clean install # Run make clean install
+    "$ESCALATION_TOOL" make clean install
 }
 
 install_nerd_font() {
@@ -130,7 +160,7 @@ configure_backgrounds() {
     fi
 }
 
-setupDisplayManager() {
+setupXorg() {
     printf "%b\n" "${YELLOW}Setting up Xorg${RC}"
     case "$PACKAGER" in
         pacman)
@@ -142,58 +172,15 @@ setupDisplayManager() {
             ;;
     esac
     printf "%b\n" "${GREEN}Xorg installed successfully${RC}"
-    printf "%b\n" "${YELLOW}Setting up Display Manager${RC}"
-    currentdm="none"
-    for dm in gdm sddm lightdm; do
-        if command -v "$dm" >/dev/null 2>&1 || isServiceActive "$dm"; then
-            currentdm="$dm"
-            break
-        fi
-    done
-    printf "%b\n" "${GREEN}Display Manager Setup: $currentdm${RC}"
-    if [ "$currentdm" = "none" ]; then
-        printf "%b\n" "${YELLOW}--------------------------${RC}" 
-        DM="sddm"
-        case "$PACKAGER" in
-            pacman)
-                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$DM"
-                if [ "$DM" = "lightdm" ]; then
-                    "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lightdm-gtk-greeter
-                elif [ "$DM" = "sddm" ]; then
-                    sh -c "$(curl -fsSL https://raw.githubusercontent.com/keyitdev/sddm-astronaut-theme/master/setup.sh)"
-                fi
-                ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: $PACKAGER${RC}"
-                exit 1
-                ;;
-        esac
-        printf "%b\n" "${GREEN}$DM installed successfully${RC}"
-        enableService "$DM"
-        
-	    fi
+    "$ESCALATION_TOOL" mkdir -p /usr/share/xsessions
+    printf "%b\n" "${GREEN}Xsessions directory ready${RC}"
 }
 
 post_install_fixups() {
-    printf "%b\n" "${YELLOW}Ensuring DWM session entry exists...${RC}"
-    "$ESCALATION_TOOL" mkdir -p /usr/share/xsessions
+    printf "%b\n" "${YELLOW}Configuring DWM session entry...${RC}"
     "$ESCALATION_TOOL" cp "$HOME/.local/share/dwm-titus/dwm.desktop" /usr/share/xsessions/
     "$ESCALATION_TOOL" chmod 644 /usr/share/xsessions/dwm.desktop
-
-    found_sddm_autologin=0
-    for autologin_file in /etc/sddm.conf.d/autologin.conf /etc/sddm.conf.d/autologin.conf.disabled /etc/sddm.conf.d/*autologin*.conf /etc/sddm.conf.d/*autologin*.disabled; do
-        [ -e "$autologin_file" ] || continue
-        if [ "$found_sddm_autologin" -eq 0 ]; then
-            printf "%b\n" "${YELLOW}Found SDDM autologin config, disabling it...${RC}"
-            "$ESCALATION_TOOL" mkdir -p /etc/sddm-disabled
-            found_sddm_autologin=1
-        fi
-        "$ESCALATION_TOOL" mv "$autologin_file" /etc/sddm-disabled/
-    done
-
-    if [ "$found_sddm_autologin" -eq 1 ]; then
-        printf "%b\n" "${GREEN}Moved SDDM autologin config(s) to /etc/sddm-disabled.${RC}"
-    fi
+    printf "%b\n" "${GREEN}DWM session entry installed${RC}"
 
     OWNER_USER="${SUDO_USER:-$USER}"
     OWNER_GROUP=$(id -gn "$OWNER_USER")
@@ -204,7 +191,7 @@ post_install_fixups() {
 
 prompt_reboot() {
     while :; do
-        printf "%b\n" "${YELLOW}Reboot now? (Recommended)${RC}"
+        printf "%b\n" "${YELLOW}Reboot now? \(Recommended\)${RC}"
         printf "%b" "Choices: Y / N: "
         read -r reboot_choice
         case "$reboot_choice" in
@@ -270,9 +257,9 @@ uninstallDWM() {
 }
 
 installDWM() {
-    setupDisplayManager
     setupDWM
     makeDWM
+    setupXorg
     install_nerd_font
     clone_config_folders
     configure_backgrounds
@@ -285,7 +272,7 @@ main() {
     printf "%b\n" "1. Install"
     printf "%b\n" "2. Uninstall"
     printf "%b\n" "3. Quit"
-    printf "%b" "Select an option (1-3): "
+    printf "%b" "Select an option \(1-3\): "
     read -r choice
 
     case "$choice" in
