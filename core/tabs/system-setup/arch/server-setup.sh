@@ -161,23 +161,14 @@ timezone () {
     while true; do
         read -r -p "Detected timezone: '$time_zone'. Is this correct? (Y/n) "
         case "${REPLY:-Y}" in
-            [Yy]* )
-                TIMEZONE="${time_zone}"
-                if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
-                    break
-				else
-					echo "ERROR '${TIMEZONE}' is in incorrect"
-                fi
-                ;;
-            [Nn]* )
-                TIMEZONE="$(tzselect)"
-                if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
-                    break
-				else
-					echo "ERROR '${TIMEZONE}' is in incorrect"
-                fi
-                ;;
+            [Yy]* ) TIMEZONE="${time_zone}" ;;
+            [Nn]* ) TIMEZONE="$(tzselect)" ;;
         esac
+        if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
+            break
+        else
+            echo "ERROR '${TIMEZONE:-${REPLY}}' is in incorrect"
+        fi
     done
     export TIMEZONE
 }
