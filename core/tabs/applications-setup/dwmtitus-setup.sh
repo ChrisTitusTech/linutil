@@ -19,7 +19,25 @@ setupDWM() {
                 QT_MEDIA_PACKAGE="qt6-multimedia"
             fi
 
-            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel libx11 libxinerama libxft imlib2 libxcb git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak sddm "$NM_PACKAGE" network-manager-applet noto-fonts-emoji ${QT_MEDIA_PACKAGE}
+            if pacman -Qq xorg-server >/dev/null 2>&1; then
+                printf "%b\n" "${GREEN}xorg-server already installed${RC}"
+            elif pacman -Qq xlibre >/dev/null 2>&1; then
+                printf "%b\n" "${YELLOW}Xlibre detected — skipping xorg-server install...${RC}"
+            else
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm xorg-server
+            fi
+
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm \
+                base-devel libx11 libxinerama libxft imlib2 libxcb xcb-util freetype2 fontconfig git unzip flameshot nwg-look feh mate-polkit alsa-utils ghostty rofi xclip xarchiver thunar tumbler tldr gvfs thunar-archive-plugin dunst dex xscreensaver xorg-xinit xorg-xprop xorg-xrandr xorg-xsetroot xorg-xset polybar picom xdg-user-dirs xdg-desktop-portal-gtk pipewire pavucontrol gnome-keyring flatpak sddm "$NM_PACKAGE" network-manager-applet noto-fonts-emoji ttf-meslo-nerd ${QT_MEDIA_PACKAGE} dconf libnotify rsync
+
+            if pacman -Si qt6ct >/dev/null 2>&1; then
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qt6ct
+            elif pacman -Si qt5ct >/dev/null 2>&1; then
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm qt5ct
+            else
+                printf "%b\n" "${YELLOW}Neither qt6ct nor qt5ct found in repos — Qt apps may not respect dark mode.${RC}"
+            fi
+
             enableService sddm
             printf "%b\n" "${GREEN}SDDM enabled${RC}"
 
@@ -80,6 +98,11 @@ install_nerd_font() {
 
     if [ -n "$FONT_INSTALLED" ]; then
         printf "%b\n" "${GREEN}Meslo Nerd-fonts are already installed.${RC}"
+        return 0
+    fi
+
+    if command -v pacman >/dev/null 2>&1 && pacman -Qq ttf-meslo-nerd >/dev/null 2>&1; then
+        printf "%b\n" "${GREEN}ttf-meslo-nerd package is already installed.${RC}"
         return 0
     fi
 
