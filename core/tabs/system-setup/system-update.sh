@@ -5,7 +5,7 @@
 fastUpdate() {
     case "$PACKAGER" in
         pacman)
-            "$AUR_HELPER" -S --needed --noconfirm rate-mirrors-bin
+            "$AUR_HELPER" -S --needed --noconfirm rate-mirrors
 
             printf "%b\n" "${YELLOW}Generating a new list of mirrors using rate-mirrors. This process may take a few seconds...${RC}"
 
