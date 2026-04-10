@@ -167,7 +167,7 @@ timezone () {
         if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
             break
         else
-            echo "ERROR '${TIMEZONE:-${REPLY}}' is in incorrect"
+            echo "ERROR! Timezone: '${TIMEZONE:-${REPLY}}' is incorrect"
         fi
     done
     export TIMEZONE
