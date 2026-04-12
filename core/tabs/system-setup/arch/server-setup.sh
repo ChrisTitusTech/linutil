@@ -102,7 +102,7 @@ select_option() {
                         ;;
                     '[B') # Down arrow
                         ((selected++))
-                        if [ $selected -ge $num_options ]; then
+                        if [ "$selected" -ge "$num_options" ]; then
                             selected=0
                         fi
                         ;;
@@ -157,26 +157,17 @@ filesystem () {
 
 # @description Detects and sets timezone.
 timezone () {
-    # Added this from arch wiki https://wiki.archlinux.org/title/System_time
-    time_zone="$(curl --fail https://ipapi.co/timezone)"
-    echo -ne "
-    System detected your timezone to be '$time_zone' \n"
-    echo -ne "Is this correct?
-    "
-    options=("Yes" "No")
-    select_option "${options[@]}"
-
-    case ${options[$?]} in
-        y|Y|yes|Yes|YES)
-        echo "${time_zone} set as timezone"
-        export TIMEZONE=$time_zone;;
-        n|N|no|NO|No)
-        echo "Please enter your desired timezone e.g. Europe/London :"
-        read -r new_timezone
-        echo "${new_timezone} set as timezone"
-        export TIMEZONE=$new_timezone;;
-        *) echo "Wrong option. Try again";timezone;;
-    esac
+    time_zone="$(curl -sfm 5 https://ipapi.co/timezone)"
+    while true; do
+        read -r -p "Detected timezone: '$time_zone'. Press Enter to accept or type a new one: " input
+        TIMEZONE="${input:-$time_zone}"
+        if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
+            break
+        else
+            echo "ERROR! Timezone '${TIMEZONE}' not found. Please enter a valid timezone (e.g. America/New_York)."
+        fi
+    done
+    export TIMEZONE
 }
 # @description Set user's keyboard mapping.
 keymap () {
@@ -184,33 +175,69 @@ keymap () {
     Please select key board layout from this list"
     # These are default key maps as presented in official arch repo archinstall
     # shellcheck disable=SC1010
-    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg ua uk)
+    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk)
 
     select_option "${options[@]}"
     keymap=${options[$?]}
+
+    if ! localectl list-x11-keymap-layouts 2>/dev/null | grep -qx "${keymap}"; then
+        echo "WARNING: '${keymap}' was not found in X11 keymap layouts. It may still work for console keymaps."
+    fi
 
     echo -ne "Your key boards layout: ${keymap} \n"
     export KEYMAP=$keymap
 }
 
-# @description Choose whether drive is SSD or not.
+# @description Derives a default locale from the selected keymap and lets the user confirm or override.
+set_locale () {
+    declare -A keymap_locale_map=(
+        [us]="en_US.UTF-8"  [uk]="en_GB.UTF-8"  [ca]="en_CA.UTF-8"
+        [cf]="fr_CA.UTF-8"  [by]="be_BY.UTF-8"  [cz]="cs_CZ.UTF-8"
+        [de]="de_DE.UTF-8"  [dk]="da_DK.UTF-8"  [es]="es_ES.UTF-8"
+        [et]="et_EE.UTF-8"  [fa]="fa_IR.UTF-8"  [fi]="fi_FI.UTF-8"
+        [fr]="fr_FR.UTF-8"  [gr]="el_GR.UTF-8"  [hu]="hu_HU.UTF-8"
+        [il]="he_IL.UTF-8"  [it]="it_IT.UTF-8"  [lt]="lt_LT.UTF-8"
+        [lv]="lv_LV.UTF-8"  [mk]="mk_MK.UTF-8"  [nl]="nl_NL.UTF-8"
+        [no]="nb_NO.UTF-8"  [pl]="pl_PL.UTF-8"  [ro]="ro_RO.UTF-8"
+        [ru]="ru_RU.UTF-8"  [se]="sv_SE.UTF-8"  [sg]="de_CH.UTF-8"
+        [si]="sl_SI.UTF-8"  [tr]="tr_TR.UTF-8"  [ua]="uk_UA.UTF-8"
+    )
+    local suggested_locale="${keymap_locale_map[${KEYMAP}]:-en_US.UTF-8}"
+    while true; do
+        read -r -p "Detected locale: '$suggested_locale'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " input
+        LOCALE="${input:-$suggested_locale}"
+        # Basic sanity check: must look like xx_XX.UTF-8 or similar
+        if [[ "${LOCALE}" =~ ^[a-z]{2,3}_[A-Z]{2,3}\. ]]; then
+            break
+        else
+            echo "ERROR! Locale '${LOCALE}' does not look valid. Please enter a locale like en_US.UTF-8."
+        fi
+    done
+    export LOCALE
+}
+
+# @description Auto-detects drive type (SSD, MMC, or HDD) and sets mount options accordingly.
 drivessd () {
-    echo -ne "
-    Is this a solid state, flash, or hard drive?
-    "
+    local disk_name
+    disk_name=$(basename "${DISK}")
 
-    options=("SSD" "MMC" "HDD")
-    select_option "${options[@]}"
-
-    case $? in
-        0)
-        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120";;
-        1)
-        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120";;
-        2)
-        export MOUNT_OPTIONS="noatime,compress=zstd,commit=120";;
-        *) echo "Wrong option. Try again";drivessd;;
-    esac
+    if [[ "${DISK}" =~ "mmcblk" ]]; then
+        export MOUNT_OPTIONS="noatime,compress=zstd:5,ssd,commit=120"
+        echo "Detected MMC/eMMC drive (${disk_name}): using MMC mount options"
+    elif [[ -f "/sys/block/${disk_name}/queue/rotational" ]]; then
+        local rotational
+        rotational=$(cat "/sys/block/${disk_name}/queue/rotational")
+        if [[ "${rotational}" == "0" ]]; then
+            export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120"
+            echo "Detected SSD/NVMe drive (${disk_name}): using SSD mount options"
+        else
+            export MOUNT_OPTIONS="noatime,compress=zstd,commit=120"
+            echo "Detected HDD (${disk_name}): using HDD mount options"
+        fi
+    else
+        export MOUNT_OPTIONS="noatime,compress=zstd,ssd,commit=120"
+        echo "Could not detect drive type for ${disk_name}, defaulting to SSD mount options"
+    fi
 }
 
 # @description Disk selection for drive to be used with installation.
@@ -312,6 +339,9 @@ timezone
 clear
 logo
 keymap
+clear
+logo
+set_locale
 
 echo "Setting up mirrors for optimal download"
 iso=$(curl -4 ifconfig.io/country_code)
@@ -320,17 +350,21 @@ pacman -Sy
 pacman -S --noconfirm archlinux-keyring #update keyrings to latest to prevent packages failing to install
 pacman -S --noconfirm --needed pacman-contrib terminus-font
 setfont ter-v18b
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-pacman -S --noconfirm --needed reflector rsync grub
+pacman -S --noconfirm --needed rate-mirrors rsync grub
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 echo -ne "
 -------------------------------------------------------------------------
                     Setting up $iso mirrors for faster downloads
 -------------------------------------------------------------------------
 "
-reflector -a 48 -c "$iso" --score 5 -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
-if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then #check if there are less than 5 mirrors
-    cp /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist
+if rate-mirrors --allow-root --entry-country="$iso" --max-jumps=0 --save=/etc/pacman.d/mirrorlist arch --max-delay=21600; then
+    if [[ $(grep -c "Server =" /etc/pacman.d/mirrorlist) -lt 5 ]]; then
+        echo "rate-mirrors returned fewer than 5 mirrors, restoring backup"
+        cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
+    fi
+else
+    echo "rate-mirrors failed, restoring backup mirrorlist"
+    cp /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
 fi
 
 if [ ! -d "/mnt" ]; then
@@ -371,11 +405,14 @@ echo -ne "
 createsubvolumes () {
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
+    # Set @ as the default subvolume so genfstab records subvolid=256 (not 5)
+    # Path form requires btrfs-progs >= 5.6 (standard on Arch rolling)
+    btrfs subvolume set-default /mnt/@
 }
 
 # @description Mount all btrfs subvolumes after root has been mounted.
 mountallsubvol () {
-    mount -o "${MOUNT_OPTIONS}",subvol=@home "${partition3}" /mnt/home
+    mount -o "${MOUNT_OPTIONS}",subvol=@home "${BTRFS_DEVICE}" /mnt/home
 }
 
 # @description BTRFS subvolulme creation and mounting.
@@ -385,8 +422,8 @@ subvolumesetup () {
 # unmount root to remount with subvolume
     umount /mnt
 # mount @ subvolume
-    mount -o "${MOUNT_OPTIONS}",subvol=@ "${partition3}" /mnt
-# make directories home, .snapshots, var, tmp
+    mount -o "${MOUNT_OPTIONS}",subvol=@ "${BTRFS_DEVICE}" /mnt
+# make directories for subvolumes
     mkdir -p /mnt/home
 # mount subvolumes
     mountallsubvol
@@ -404,6 +441,7 @@ if [[ "${FS}" == "btrfs" ]]; then
     mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
     mkfs.btrfs -f "${partition3}"
     mount -t btrfs "${partition3}" /mnt
+    BTRFS_DEVICE="${partition3}"
     subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
     mkfs.fat -F32 -n "EFIBOOT" "${partition2}"
@@ -416,9 +454,10 @@ elif [[ "${FS}" == "luks" ]]; then
 # open luks container and ROOT will be place holder
     echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
-    mkfs.btrfs "${partition3}"
+    mkfs.btrfs /dev/mapper/ROOT
 # create subvolumes for btrfs
-    mount -t btrfs "${partition3}" /mnt
+    mount -t btrfs /dev/mapper/ROOT /mnt
+    BTRFS_DEVICE=/dev/mapper/ROOT
     subvolumesetup
     ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value "${partition3}")
 fi
@@ -446,6 +485,10 @@ echo -ne "
                     Arch Install on Main Drive
 -------------------------------------------------------------------------
 "
+# Pre-seed machine-id so systemd's post-install hook skips entropy-blocking generation
+mkdir -p /mnt/etc
+systemd-machine-id-setup --print > /mnt/etc/machine-id
+
 if [[ ! -d "/sys/firmware/efi" ]]; then
     pacstrap /mnt base base-devel linux-lts linux-firmware --noconfirm --needed
 else
@@ -505,32 +548,22 @@ echo -ne "
 -------------------------------------------------------------------------
 "
 pacman -S --noconfirm --needed pacman-contrib curl terminus-font
-pacman -S --noconfirm --needed reflector rsync grub arch-install-scripts git ntp wget
+pacman -S --noconfirm --needed rsync grub arch-install-scripts git ntp wget
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-nc=$(grep -c ^"cpu cores" /proc/cpuinfo)
-echo -ne "
--------------------------------------------------------------------------
-                    You have " $nc" cores. And
-            changing the makeflags for " $nc" cores. Aswell as
-                changing the compression settings.
--------------------------------------------------------------------------
-"
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -gt 8000000 ]]; then
-sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
-sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
-fi
+NUM_CORES=$(nproc)
+sed -i "s/#MAKEFLAGS=\"-j\"/MAKEFLAGS=\"-j$NUM_CORES\"/g" /etc/makepkg.conf
+sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $NUM_CORES -z -)/g" /etc/makepkg.conf
 echo -ne "
 -------------------------------------------------------------------------
                     Setup Language to US and set locale
 -------------------------------------------------------------------------
 "
-sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sed -i "s/^#${LOCALE}/${LOCALE}/" /etc/locale.gen
 locale-gen
 timedatectl --no-ask-password set-timezone ${TIMEZONE}
-timedatectl --no-ask-password set-ntp 1
-localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_TIME="en_US.UTF-8"
+timedatectl --no-ask-password set-ntp true
+localectl --no-ask-password set-locale LANG="${LOCALE}" LC_TIME="${LOCALE}"
 ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 
 # Set keymaps
@@ -541,9 +574,6 @@ echo "Keymap set to: ${KEYMAP}"
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
 sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
-
-#Add parallel downloading
-sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 
 #Set colors and enable the easter egg
 sed -i 's/^#Color/Color\nILoveCandy/' /etc/pacman.conf
@@ -656,8 +686,6 @@ systemctl disable dhcpcd.service
 echo "  DHCP disabled"
 systemctl enable NetworkManager.service
 echo "  NetworkManager enabled"
-systemctl enable reflector.timer
-echo "  Reflector enabled"
 
 echo -ne "
 -------------------------------------------------------------------------

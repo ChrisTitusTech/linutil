@@ -61,27 +61,29 @@ disable_password_auth() {
     printf "%b\n" "Enter the alias of the host: " 
     read -r host_alias
     printf "\n"
+    # shellcheck disable=SC2029
     ssh "$host_alias" "
-        "$ESCALATION_TOOL" -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
+        ${ESCALATION_TOOL} -S sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^#PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^PubkeyAuthentication no/PubkeyAuthentication yes/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S systemctl restart sshd
     "
     printf "%b\n" "PasswordAuthentication set to no and PubkeyAuthentication set to yes."
 }
 
 enable_password_auth() {
-    printf "%b\n" "Disabling SSH password authentication and enabling key-only login..."
+    printf "%b\n" "Enabling SSH password authentication and disabling key-only login..."
     printf "%b\n" "Enter the alias of the host: "
     read -r host_alias
     printf "\n"
+    # shellcheck disable=SC2029
     ssh "$host_alias" "
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
-        "$ESCALATION_TOOL"  -S systemctl restart sshd
+        ${ESCALATION_TOOL} -S sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S sed -i 's/^PubkeyAuthentication yes/PubkeyAuthentication no/' /etc/ssh/sshd_config &&
+        ${ESCALATION_TOOL} -S systemctl restart sshd
     "
     printf "%b\n" "PasswordAuthentication set to yes and PubkeyAuthentication set to no."
 }
@@ -99,6 +101,7 @@ run_remote_command() {
     read -r host_alias
     printf "%b" "Enter the command to run: " 
     read -r remote_command
+    # shellcheck disable=SC2029
     ssh "$host_alias" "$remote_command"
 }
 
@@ -151,8 +154,33 @@ move_directory_to_remote() {
 remove_system() {
     printf "%b\n" "Enter the alias of the host to remove: "
     read -r host_alias
-    sed -i "/^Host $host_alias/,+3d" ~/.ssh/config
-    printf "%b\n" "Removed $host_alias from SSH configuration."
+    temp_file="$(mktemp)"
+    if awk -v host="$host_alias" '
+        BEGIN {
+            skip = 0
+            removed = 0
+        }
+        /^Host[[:space:]]+/ {
+            if ($2 == host) {
+                skip = 1
+                removed = 1
+                next
+            }
+            skip = 0
+        }
+        !skip { print }
+        END {
+            if (!removed) {
+                exit 1
+            }
+        }
+    ' "$HOME/.ssh/config" > "$temp_file"; then
+        mv "$temp_file" "$HOME/.ssh/config"
+        printf "%b\n" "Removed $host_alias from SSH configuration."
+    else
+        rm -f "$temp_file"
+        printf "%b\n" "Host $host_alias not found in SSH configuration."
+    fi
 }
 
 # Function to view SSH configuration

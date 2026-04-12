@@ -4,121 +4,136 @@ name = "Gaming"
 name = "Emulators"
 
 [[data.entries]]
-name = "Blastem"
-description = "A Genesis emulator. NO Games are included"
-script = "emulators/sega/blastem.sh"
-task_list = "FM"
+name = "Nintendo Emulators"
 
-# [[data.entries]]
-# name = "Yabause"
-# description = "A Sega Saturn emulator"
-# script = "emulators/sega/yabause.sh"
-# task_list = "FM"
-
-[[data.entries]]
+[[data.entries.entries]]
 name = "bsnes"
 description = "Super Nintendo Emulator. NO Games are included"
 script = "emulators/nintendo/bsnes.sh"
 task_list = "FM"
 
-[[data.entries]]
+[[data.entries.entries]]
 name = "Dolphin Emulator"
 description = "GameCube and Wii Emulator. NO Games are included"
 script = "emulators/nintendo/dolphin-emu.sh"
 task_list = "FM"
 
-[[data.entries]]
-name = "Flycast"
-description = "A Dreamcase emulator. NO Games are included"
-script = "emulators/sega/flycast.sh"
-task_list = "FM"
-
-[[data.entries]]
+[[data.entries.entries]]
 name = "Gopher 64"
 description = "N64 Emulator. NO Games are included"
 script = "emulators/nintendo/gopher64.sh"
 task_list = "FM"
 
-[[data.entries]]
-name = "Kronos"
-description = "A Sega Saturn emulator. NO Games are included"
-script = "emulators/sega/kronos.sh"
-task_list = "FM"
-
-[[data.entries]]
+[[data.entries.entries]]
 name = "MelonDS"
 description = "Nintendo DS and DSi Emulator. NO Games are included"
 script = "emulators/nintendo/melonds.sh"
 task_list = "FM"
 
-[[data.entries]]
+[[data.entries.entries]]
 name = "mGBA"
 description = "Nintendo Game Boy Advance Emulator. NO Games are included"
 script = "emulators/nintendo/mgba.sh"
 task_list = "FM"
 
-[[data.entries]]
+[[data.entries.entries]]
 name = "Mupen 64 Plus"
 description = "N64 Emulator. NO Games are included"
 script = "emulators/nintendo/mupen64plus.sh"
 task_list = "FM"
 
-[[data.entries]]
-name = "PCSX2"
-description = "A Playstation 2 emulator. NO Games or Bios' are included"
-script = "emulators/playstation/pcsx2.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "Play!"
-description = "An Experimental Playstation 2 emulator. NO Games or Bios' are included"
-script = "emulators/playstation/play-emu.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "RetroArch Game Emulator"
-description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
-script = "emulators/retroarch.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "RPCS3"
-description = "A Playstation 3 emulator. NO Games or Bios' are included"
-script = "emulators/playstation/rpcs3.sh"
-task_list = "FM"
-
-[[data.entries]]
+[[data.entries.entries]]
 name = "Ryujinx"
 description = "Nintendo Switch emulator. NO Games are included"
 script = "emulators/nintendo/ryujinx.sh"
 task_list = "FM"
 
-# [[data.entries]]
-# name = "PCSX"
-# description = "A Playstation emulator. NO Games or Bios' are included"
-# script = "emulators/playstation/pcsx.sh"
-# task_list = "FM"
-
-[[data.entries]]
+[[data.entries.entries]]
 name = "snes9x"
 description = "Super Nintendo Emulator. NO Games are included"
 script = "emulators/nintendo/snes9x.sh"
 task_list = "FM"
 
 [[data.entries]]
+name = "PlayStation Emulators"
+
+[[data.entries.entries]]
+name = "PCSX2"
+description = "A Playstation 2 emulator. NO Games or Bios' are included"
+script = "emulators/playstation/pcsx2.sh"
+task_list = "FM"
+
+[[data.entries.entries]]
+name = "Play!"
+description = "An Experimental Playstation 2 emulator. NO Games or Bios' are included"
+script = "emulators/playstation/play-emu.sh"
+task_list = "FM"
+
+[[data.entries.entries]]
+name = "RPCS3"
+description = "A Playstation 3 emulator. NO Games or Bios' are included"
+script = "emulators/playstation/rpcs3.sh"
+task_list = "FM"
+
+# [[data.entries.entries]]
+# name = "PCSX"
+# description = "A Playstation emulator. NO Games or Bios' are included"
+# script = "emulators/playstation/pcsx.sh"
+# task_list = "FM"
+
+[[data.entries]]
+name = "Sega Emulators"
+
+[[data.entries.entries]]
+name = "Blastem"
+description = "A Genesis emulator. NO Games are included"
+script = "emulators/sega/blastem.sh"
+task_list = "FM"
+
+# [[data.entries.entries]]
+# name = "Yabause"
+# description = "A Sega Saturn emulator"
+# script = "emulators/sega/yabause.sh"
+# task_list = "FM"
+
+[[data.entries.entries]]
+name = "Flycast"
+description = "A Dreamcase emulator. NO Games are included"
+script = "emulators/sega/flycast.sh"
+task_list = "FM"
+
+[[data.entries.entries]]
+name = "Kronos"
+description = "A Sega Saturn emulator. NO Games are included"
+script = "emulators/sega/kronos.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Multi-System Emulators"
+
+[[data.entries.entries]]
+name = "RetroArch Game Emulator"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
+script = "emulators/retroarch.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "Xbox Emulators"
+
+[[data.entries.entries]]
 name = "XEMU"
 description = "An Original Xbox emulator. NO Games or Bios' are included"
 script = "emulators/xbox/xemu.sh"
 task_list = "FM"
 
-[[data.entries]]
+[[data.entries.entries]]
 name = "Xenia"
 description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
 script = "emulators/xbox/xenia.sh"
 task_list = "FM"
 
 [[data]]
-name = "Related Tools and Setups"
+name = "Tools and Setups"
 
 [[data.entries]]
 name = "Auto CPU Frequency"
@@ -141,9 +156,16 @@ task_list = "FI"
 
 [[data.entries]]
 name = "Gaming Dependencies"
-description = "Run the Gaming Dependencies installer (same script kept under System Setup)."
+description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions."
 script = "../system-setup/gaming-setup.sh"
 task_list = "I"
+
+[[data.entries]]
+name = "General GPU Drivers"
+description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
+script = "../system-setup/gpu-driver.sh"
+task_list = "I"
+multi_select = false
 
 [[data.entries]]
 name = "Nvidia Drivers & Hardware Acceleration"
@@ -156,7 +178,7 @@ name = "Waydroid"
 description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
 script = "../applications-setup/waydroid-setup.sh"
 task_list = "I SS"
-[[data.preconditions]]
+[[data.entries.preconditions]]
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
 values = ["wayland", "Wayland"]
@@ -177,4 +199,3 @@ name = "Fallout 76 INI and Mods"
 description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
 script = "fallout76-titus-mod.sh"
 task_list = "FM"
-
