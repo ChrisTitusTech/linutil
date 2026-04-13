@@ -27,7 +27,7 @@ setupRepos() {
 setDefaultKernel() {
     checkRepo
     if [ "$isInstalled" -ne "0" ] || [ "$isCommented" -ne "0" ]; then
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers
+        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
 
         oldDefaultKernel=$(cat /etc/default/grub | grep GRUB_DEFAULT | awk 'NR==1{print}')
         newDefaultKernel='GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'
