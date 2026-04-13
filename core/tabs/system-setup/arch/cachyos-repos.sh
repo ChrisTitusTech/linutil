@@ -2,13 +2,6 @@
 
 . ../../common-script.sh
 
-CheckCPU() {
-    /lib/ld-linux-x86-64.so.2 --help | grep "$1 (supported, searched)" > /dev/null
-    v4Supported=$?
-    gcc -march=native -Q --help=target 2>&1 | grep 'march' | grep -E '(znver4|znver5)' > /dev/null
-    isAM5=$?
-}
-
 checkRepo() {
     "$ESCALATION_TOOL" cat /etc/pacman.conf | grep -E "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
     isInstalled=$?
@@ -19,7 +12,6 @@ checkRepo() {
 setupRepos() {
     printf "%b\n" "Installing CachyOS repo.."
     checkRepo
-    checkCPU x86-64-v4
 
     curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
     tar xvf cachyos-repo.tar.xz && cd cachyos-repo
