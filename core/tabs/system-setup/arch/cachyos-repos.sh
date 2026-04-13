@@ -3,21 +3,25 @@
 . ../../common-script.sh
 
 checkRepo() {
-    "$ESCALATION_TOOL" cat /etc/pacman.conf | grep -E "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
+    "$ESCALATION_TOOL" cat /etc/pacman.conf | grep "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)" > /dev/null
     isInstalled=$?
+    printf "%b\n" "Installed Status: $isInstalled"
     "$ESCALATION_TOOL" cat /etc/pacman.conf | grep "cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4" | grep -v "#\[" | grep "\[" > /dev/null
     isCommented=$?
 }
 
 setupRepos() {
-    printf "%b\n" "Installing CachyOS repo.."
     checkRepo
-
-    curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
-    tar xvf cachyos-repo.tar.xz && cd cachyos-repo
-    "$ESCALATION_TOOL" ./cachyos-repo.sh
-    cd ../
-    "$ESCALATION_TOOL" rm -rf cachyos-repo*
+    if [ "$isInstalled" -ne "0" ]; then
+        printf "%b\n" "Installing CachyOS repo.."
+        curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+        tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+        "$ESCALATION_TOOL" ./cachyos-repo.sh
+        cd ../
+        "$ESCALATION_TOOL" rm -rf cachyos-repo*
+    else
+        printf "%b\n" "CachyOS repo already installed"
+    fi
 }
 
 setDefaultKernel() {
@@ -51,14 +55,17 @@ resetDefaultKernel() {
 }
 
 removeRepos() {
-    printf "%b\n" "Removing CachyOS repo.."
-
     checkRepo
-    curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
-    tar xvf cachyos-repo.tar.xz && cd cachyos-repo
-    "$ESCALATION_TOOL" ./cachyos-repo.sh --remove
-    cd ../
-    "$ESCALATION_TOOL" rm -rf cachyos-repo*
+    if [ "$isInstalled" -eq "0" ]; then
+        printf "%b\n" "Removing CachyOS repo.."
+        curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+        tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+        "$ESCALATION_TOOL" ./cachyos-repo.sh --remove
+        cd ../
+        "$ESCALATION_TOOL" rm -rf cachyos-repo*
+    else
+        printf "%b\n" "CachyOS repo is not installed"
+    fi
 }
 
 main() {
