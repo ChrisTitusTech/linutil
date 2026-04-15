@@ -264,6 +264,12 @@ task_list = "I"
 name = "PDF Studio Viewer"
 script = "pdf-suites/pdfstudioviewer.sh"
 
+[[data.entries]]
+name = "Zathura"
+description = "Zathura is a minimalist yet highly customizable PDF document viewer with vi-like keybindings. It also supports other file formats through plugins."
+script = "pdf-suites/zathura.sh"
+task_list = "I P FM"
+
 [[data]]
 name = "Web Browsers"
 

@@ -55,6 +55,7 @@ https://github.com/ChrisTitusTech/neovim
 
 
 ### PDF Suites
+- **Zathura**: Zathura is a minimalist yet highly customizable PDF document viewer with vi-like keybindings. It also supports other file formats through plugins.
 
 
 ### Web Browsers
