@@ -151,3 +151,4 @@ Thank you to everyone who has contributed to the development of Linutil. Your ef
 - 2024/09 - Various bash updates and standardization done by [@nnyyxxxx](https://github.com/nnyyxxxx)
 - 2024/09 - Multiple bash script additions done by [@guruswarupa](https://github.com/guruswarupa)
 - 2026/01 - TUI Refresh with Logo by [@Abs313a](https://github.com/Abs313a)
+- 2026/03 - Linutil docs website creation by [@seanh1995](https://github.com/seanh1995)
