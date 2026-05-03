@@ -87,10 +87,8 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
                     return Ok(());
                 }
             }
-            Event::Mouse(mouse_event) => {
-                if !state.handle_mouse(&mouse_event) {
-                    return Ok(());
-                }
+            Event::Mouse(mouse_event) if !state.handle_mouse(&mouse_event) => {
+                return Ok(());
             }
             _ => {}
         }

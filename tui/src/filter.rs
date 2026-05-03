@@ -91,13 +91,9 @@ impl Filter {
         } else {
             self.items.iter().find_map(|item| {
                 let mut item_chars = item.node.name.chars();
-                let mut search_chars = self.search_input.iter();
-                loop {
+                let search_chars = self.search_input.iter();
+                for search_char in search_chars {
                     // Take the next character from search input first, since we don't want to remove an extra character from the item
-                    let Some(search_char) = search_chars.next() else {
-                        break;
-                    };
-
                     // If the item is shorter than the search input, or a character doesn't match, skip this item
                     let item_char = item_chars.next()?;
                     if !item_char.eq_ignore_ascii_case(search_char) {
