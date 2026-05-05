@@ -126,13 +126,11 @@ If you find Linutil helpful, please consider giving it a ⭐️ to show your sup
 
 ## 🎓 Documentation
 
-For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://chris-titus-docs.github.io/linutil-docs/).
+For comprehensive information on how to use Linutil, visit the [Linutil Official Documentation](https://linutil.christitus.com/).
 
 ## 🛠 Contributing
 
 We welcome contributions from the community! Before you start, please review our [Contributing Guidelines](.github/CONTRIBUTING.md) to understand how to make the most effective and efficient contributions.
-
-[Official LinUtil Roadmap](https://chris-titus-docs.github.io/linutil-docs/roadmap/)
 
 Docs are now [here](https://github.com/Chris-Titus-Docs/linutil-docs)
 
@@ -150,3 +148,5 @@ Thank you to everyone who has contributed to the development of Linutil. Your ef
 - 2024/09 - Rust TUI Min/Max, MultiSelection, and Bash additions done by [@jeevithakannan2](https://github.com/jeevithakannan2)
 - 2024/09 - Various bash updates and standardization done by [@nnyyxxxx](https://github.com/nnyyxxxx)
 - 2024/09 - Multiple bash script additions done by [@guruswarupa](https://github.com/guruswarupa)
+- 2026/01 - TUI Refresh with Logo by [@Abs313a](https://github.com/Abs313a)
+- 2026/03 - Linutil docs website creation by [@seanh1995](https://github.com/seanh1995)
