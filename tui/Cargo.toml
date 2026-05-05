@@ -36,6 +36,6 @@ ratatui-image = { version = "10.0.6", default-features = false, features = ["cro
 time = { version = "0.3.47", features = ["formatting", "local-offset", "macros"], default-features = false }
 tree-sitter-bash = "0.25.1"
 tree-sitter-highlight = "0.26.6"
-tui-term = { version = "0.3.1", default-features = false }
+tui-term = { version = "0.3.4", default-features = false }
 unicode-width = { version = "0.2.0", default-features = false }
 vt100-ctt = "0.17.1"
