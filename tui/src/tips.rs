@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::RngExt;
 
 const TIPS: &str = include_str!("../cool_tips.txt");
 
