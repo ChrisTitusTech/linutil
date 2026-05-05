@@ -159,12 +159,15 @@ filesystem () {
 timezone () {
     time_zone="$(curl -sfm 5 https://ipapi.co/timezone)"
     while true; do
-        read -r -p "Detected timezone: '$time_zone'. Press Enter to accept or type a new one: " input
-        TIMEZONE="${input:-$time_zone}"
+        read -r -p "Detected timezone: '$time_zone'. Is this correct? (Y/n) "
+        case "${REPLY:-Y}" in
+            [Yy]* ) TIMEZONE="${time_zone}" ;;
+            [Nn]* ) TIMEZONE="$(tzselect)" ;;
+        esac
         if [[ -f "/usr/share/zoneinfo/${TIMEZONE}" ]]; then
             break
         else
-            echo "ERROR! Timezone '${TIMEZONE}' not found. Please enter a valid timezone (e.g. America/New_York)."
+            echo "ERROR! Timezone: '${TIMEZONE:-${REPLY}}' is incorrect"
         fi
     done
     export TIMEZONE
