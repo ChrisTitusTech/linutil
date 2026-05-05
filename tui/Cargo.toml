@@ -24,7 +24,7 @@ default = ["tips"]
 tips = ["rand"]
 
 [dependencies]
-clap = { version = "4.6.0", features = ["derive"] }
+clap = { version = "4.6.1", features = ["derive"] }
 image = { version = "0.25.10", default-features = false, features = ["ico", "png"] }
 linutil_core = { version = "26.3.5", path = "../core" }
 nix = { version = "0.31.2", features = ["user"] }
