@@ -49,16 +49,16 @@ description = "Valve's fork of Linux Kernel for the SteamDeck"
 script = "arch/linux-neptune.sh"
 task_list = "I PFM K"
 
+[[data.entries.preconditions]]
+matches = true
+data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
+values = ["Valve"]
+
 [[data.entries]]
 name = "Install CachyOS Repository and Kernel"
 description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
 script = "arch/cachyos-repos.sh"
 task_list = "I"
-
-[[data.entries.preconditions]]
-matches = true
-data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
-values = ["Valve"]
 
 [[data.entries]]
 name = "Nvidia Drivers & Hardware Acceleration"
@@ -217,6 +217,13 @@ multi_select = false
 name = "Full System Update"
 description = "This command updates your system to the latest packages available for your distro"
 script = "system-update.sh"
+task_list = "PFM"
+multi_select = false
+
+[[data]]
+name = "Full System Update (Topgrade)"
+description = "This command uses topgrade to update your system packages, configs, and more from various sources"
+script = "system-update-topgrade.sh"
 task_list = "PFM"
 multi_select = false
 

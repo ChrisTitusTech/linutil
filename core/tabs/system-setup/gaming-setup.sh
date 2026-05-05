@@ -39,6 +39,12 @@ installDepend() {
                 libxslt lib32-libxslt cups samba lib32-mesa vulkan-radeon lib32-vulkan-radeon \
                 gamescope mangohud lib32-mangohud gamemode lib32-gamemode"
 
+            if "$PACKAGER" -Qq pipewire-jack >/dev/null 2>&1; then
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lib32-pipewire-jack
+            elif "$PACKAGER" -Qq jack2 >/dev/null 2>&1; then
+                "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm lib32-jack2
+            fi
+
             $AUR_HELPER -S --needed --noconfirm $DEPENDENCIES $DISTRO_DEPS
             ;;
         apt-get | nala)
