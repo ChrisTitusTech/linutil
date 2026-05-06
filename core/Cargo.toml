@@ -12,5 +12,5 @@ ego-tree = "0.11.0"
 include_dir = "0.7.4"
 serde = { version = "1.0.215", features = ["derive"] }
 temp-dir = "0.2.0"
-toml = { version = "0.9.11", features = ["parse", "serde"] }
+toml = { version = "1.1.2", features = ["parse", "serde"] }
 which = "8.0.2"
