@@ -7,7 +7,7 @@ installCursor() {
         printf "%b\n" "${YELLOW}Installing Cursor...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                TEMP_DEB="cursor.deb"
+                TEMP_DEB="./cursor.deb"
 
                 curl -sSLo "$TEMP_DEB" 'https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest'
 
