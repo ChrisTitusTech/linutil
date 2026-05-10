@@ -15,7 +15,7 @@ installOkular() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy okular
                 ;;
-            *)
+            apt-get|nala|zypper|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y okular
                 ;;
             *)
