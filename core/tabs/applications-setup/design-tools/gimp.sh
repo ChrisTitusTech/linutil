@@ -13,10 +13,8 @@ installGIMP() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter gimp
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.gimp.GIMP
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallGIMP() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.gimp.GIMP
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

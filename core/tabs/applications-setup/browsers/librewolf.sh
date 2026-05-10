@@ -28,13 +28,9 @@ installLibreWolf() {
                 printf '%s\n' 'repository=https://github.com/index-0/librewolf-void/releases/latest/download/' | "$ESCALATION_TOOL" tee /etc/xbps.d/20-librewolf.conf > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" -Syu librewolf
                 ;;
-            apk)
-                checkFlatpak
-                flatpak install flathub io.gitlab.librewolf-community
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install flathub --noninteractive io.gitlab.librewolf-community
                 ;;
         esac
     else
@@ -43,6 +39,4 @@ installLibreWolf() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installLibreWolf

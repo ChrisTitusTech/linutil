@@ -16,10 +16,8 @@ installgopher64() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter gopher64
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive io.github.gopher64.gopher64
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive io.github.gopher64.gopher64
 	            ;;
 	    esac
 	else
@@ -41,10 +39,7 @@ uninstallgopher64() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter gopher64
 	            ;;
 	        *)
-	            if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.gopher64.gopher64
-	            fi
-	            exit 1
+	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive io.github.gopher64.gopher64
 	            ;;
 	    esac
 	else
@@ -56,7 +51,7 @@ main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall gopher64${RC}"
     printf "%b\n" "1. ${YELLOW}Install${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
+    printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
         1) installgopher64 ;;
@@ -66,6 +61,5 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main
 

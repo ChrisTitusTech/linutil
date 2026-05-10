@@ -10,8 +10,8 @@ installflycast() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter flycast
 	            ;;
 	        *)
+				checkFlatpak
 	            "$ESCALATION_TOOL" flatpak install --noninteractive org.flycast.Flycast
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -27,8 +27,7 @@ uninstallflycast() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter flycast
 	            ;;
 	        *)
-	        	"$ESCALATION_TOOL" flatpak install --noninteractive opp.flycast.Flycast
-	            exit 1
+	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive opp.flycast.Flycast
 	            ;;
 	    esac
 	else
@@ -40,7 +39,7 @@ main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall flycast${RC}"
     printf "%b\n" "1. ${YELLOW}Install${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
+    printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
         1) installflycast ;;
@@ -50,5 +49,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

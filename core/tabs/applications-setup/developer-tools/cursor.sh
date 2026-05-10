@@ -38,6 +38,4 @@ installCursor() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installCursor

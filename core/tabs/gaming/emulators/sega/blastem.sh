@@ -13,10 +13,8 @@ installblastem() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter blastem
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.retrodev.blastem
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive com.retrodev.blastem
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallblastem() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.retrodev.blastem
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -48,7 +45,7 @@ main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall blastem${RC}"
     printf "%b\n" "1. ${YELLOW}Install${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
+    printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
         1) installblastem ;;
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

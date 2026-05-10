@@ -13,10 +13,8 @@ installPinta() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter pinta
 	        	;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
-	            fi
-	            exit 1
+				checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive com.github.PintaProject.Pinta
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallPinta() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.github.PintaProject.Pinta
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

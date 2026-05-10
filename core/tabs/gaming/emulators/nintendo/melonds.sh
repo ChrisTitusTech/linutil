@@ -10,10 +10,8 @@ installMelonDS() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter melonds-bin
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.kuribo64.melonDS
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive net.kuribo64.melonDS
 	            ;;
 	    esac
 	else
@@ -30,7 +28,6 @@ uninstallMelonDS() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.kuribo64.melonDS
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -42,7 +39,7 @@ main() {
 	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall MelonDS${RC}"
     printf "%b\n" "1. ${YELLOW}Install${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
+    printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
         1) installMelonDS ;;
@@ -52,5 +49,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

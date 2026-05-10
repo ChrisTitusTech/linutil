@@ -13,10 +13,8 @@ installMyPaint() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter mypaint
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.mypaint.MyPaint
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.mypaint.MyPaint
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallMyPaint() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.mypaint.mypaint
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

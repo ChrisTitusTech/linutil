@@ -20,7 +20,7 @@ installMeld() {
                 ;;
             *)
                 checkFlatpak
-                flatpak install -y flathub org.gnome.meld
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub org.gnome.meld
                 ;;
         esac
     else
@@ -29,5 +29,4 @@ installMeld() {
 }
 
 checkEnv
-checkEscalationTool
 installMeld

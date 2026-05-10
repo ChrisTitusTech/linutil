@@ -13,10 +13,8 @@ installBlender() {
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter blender
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.blender.Blender
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.blender.Blender
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallBlender() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.blender.Blender
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

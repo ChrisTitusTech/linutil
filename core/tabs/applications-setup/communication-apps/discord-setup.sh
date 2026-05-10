@@ -8,7 +8,7 @@ installDiscord() {
         case "$PACKAGER" in
             apt-get|nala)
                 curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
-                "$ESCALATION_TOOL" "$PACKAGER" install -y discord.deb
+                "$ESCALATION_TOOL" "$PACKAGER" install -y ./discord.deb
                 "$ESCALATION_TOOL" rm discord.deb
                 ;;
             zypper|eopkg)
@@ -21,13 +21,9 @@ installDiscord() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord
                 ;;
-            apk | xbps-install)
-                checkFlatpak
-                flatpak install -y flathub com.discordapp.Discord
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.discordapp.Discord
                 ;;
         esac
     else
@@ -36,5 +32,4 @@ installDiscord() {
 }
 
 checkEnv
-checkEscalationTool
 installDiscord

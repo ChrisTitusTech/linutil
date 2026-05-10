@@ -10,8 +10,8 @@ installrpcs3() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter rpcs3-bin
 	            ;;
 	        *)
+				checkFlatpak
 	            "$ESCALATION_TOOL" flatpak install --noninteractive net.rpcs3.RPCS3
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -27,8 +27,7 @@ uninstallrpcs3() {
 			    "$AUR_HELPER" -R --noconfirm --cleanafter rpcs3-bin
 	            ;;
 	        *)
-	        	"$ESCALATION_TOOL" flatpak install --noninteractive net.rpcs3.RPCS3
-	            exit 1
+	        	"$ESCALATION_TOOL" flatpak uninstall --noninteractive net.rpcs3.RPCS3
 	            ;;
 	    esac
 	else
@@ -50,5 +49,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

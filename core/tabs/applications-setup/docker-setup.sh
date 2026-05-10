@@ -122,6 +122,5 @@ docker_permission() {
     }
 
 checkEnv
-checkEscalationTool
 install_components
 docker_permission

@@ -11,7 +11,7 @@ installSlack() {
                 ;;
             *)  
                 checkFlatpak
-                flatpak install -y flathub com.slack.Slack
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.slack.Slack
                 ;;
         esac
     else
@@ -20,6 +20,4 @@ installSlack() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installSlack

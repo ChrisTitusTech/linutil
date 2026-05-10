@@ -13,10 +13,8 @@ installScribus() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter scribus
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
-	            fi
-	            exit 1
+				checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive net.scribus.Scribus
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallScribus() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive net.scribus.Scribus
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

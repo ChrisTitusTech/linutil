@@ -34,13 +34,9 @@ installVsCode() {
             eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" -y install vscode
                 ;;
-            apk)
-                checkFlatpak
-                flatpak install -y flathub com.visualstudio.code
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.visualstudio.code
                 ;;
         esac
     else
@@ -49,6 +45,4 @@ installVsCode() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installVsCode 

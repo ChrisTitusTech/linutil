@@ -15,9 +15,12 @@ installThunderBird() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy thunderbird
                 ;;
-            *)
+            apt-get|nala|zypper|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thunderbird 
                 ;;
+            *)
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak --noninteractive org.mozilla.Thunderbird
         esac
     else
         printf "%b\n" "${GREEN}Thunderbird is already installed.${RC}"
@@ -25,5 +28,4 @@ installThunderBird() {
 }
 
 checkEnv
-checkEscalationTool
 installThunderBird

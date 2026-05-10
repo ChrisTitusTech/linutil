@@ -19,7 +19,8 @@ installTelegram() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y telegram
                 ;;
             *)
-                flatpak install flathub --noninteractive org.telegram.desktop 
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install flathub --noninteractive org.telegram.desktop 
                 ;;
         esac
     else
@@ -28,5 +29,4 @@ installTelegram() {
 }
 
 checkEnv
-checkEscalationTool
 installTelegram

@@ -15,8 +15,12 @@ installEvince() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy evince
                 ;;
-            *)
+            apt-get|nala|zypper|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y evince
+                ;;
+            *)
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak --noninteractive org.gnome.Evince
                 ;;
         esac
     else
@@ -25,5 +29,4 @@ installEvince() {
 }
 
 checkEnv
-checkEscalationTool
 installEvince

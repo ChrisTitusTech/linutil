@@ -13,10 +13,8 @@ installRetroArch() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter retroarch retroarch-assets-xmb retroarch-assets-ozone retroarch-assets-glui libretro-core-info
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.libretro.RetroArch
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.libretro.RetroArch
 	            ;;
 	    esac
 	else
@@ -51,7 +49,7 @@ configureRetroArch() {
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter libretro-pcsx2-launcher
 	            ;;
 	        *)
-	            exit 1
+	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.libretro.RetroArch
 	            ;;
 	    esac
 	else
@@ -85,7 +83,7 @@ main() {
     printf "%b\n" "2. ${YELLOW}Install Cores${RC}"
     printf "%b\n" "3. ${YELLOW}Uninstall RetroArch${RC}"
 	printf "%b\n" "4. ${YELLOW}Install RetroArch With Cores${RC}"
-    printf "%b" "Enter your choice [1-3]: "
+    printf "%b" "Enter your choice [1-4]: "
     read -r CHOICE
     case "$CHOICE" in
         1) installRetroArch ;;
@@ -100,5 +98,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

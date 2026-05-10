@@ -21,5 +21,4 @@ installNgrok() {
 }
 
 checkEnv
-checkEscalationTool
 installNgrok

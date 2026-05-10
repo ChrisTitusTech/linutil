@@ -11,7 +11,7 @@ installWpsOffice() {
                 ;;
             *)
                 checkFlatpak
-                flatpak install flathub com.wps.Office
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.wps.Office
                 ;;
         esac
     else
@@ -20,6 +20,4 @@ installWpsOffice() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installWpsOffice

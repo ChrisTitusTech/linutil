@@ -37,6 +37,5 @@ setupAlacrittyConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installAlacritty
 setupAlacrittyConfig

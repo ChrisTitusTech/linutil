@@ -26,13 +26,9 @@ installVsCodium() {
                 printf "%b\n" "[gitlab.com_paulcarroty_vscodium_repo]\nname=download.vscodium.com\nbaseurl=https://download.vscodium.com/rpms/\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg\nmetadata_expire=1h" | "$ESCALATION_TOOL" tee -a /etc/yum.repos.d/vscodium.repo
                 "$ESCALATION_TOOL" "$PACKAGER" install -y codium
                 ;;
-            apk|xbps-install|eopkg)
-                checkFlatpak
-                flatpak install -y flathub com.vscodium.codium
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.vscodium.codium
                 ;;
         esac
     else
@@ -42,6 +38,4 @@ installVsCodium() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installVsCodium

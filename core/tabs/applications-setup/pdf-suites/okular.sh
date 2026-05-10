@@ -18,6 +18,10 @@ installOkular() {
             *)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y okular
                 ;;
+            *)
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak --noninteractive org.kde.okular
+                ::
         esac
     else
         printf "%b\n" "${GREEN}Okular is already installed.${RC}"
@@ -25,5 +29,4 @@ installOkular() {
 }
 
 checkEnv
-checkEscalationTool
 installOkular

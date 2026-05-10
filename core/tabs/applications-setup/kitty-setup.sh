@@ -35,6 +35,5 @@ setupKittyConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installKitty
 setupKittyConfig

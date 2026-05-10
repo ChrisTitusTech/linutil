@@ -32,8 +32,8 @@ installSublime() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y sublime-text
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive com.sublimehq.SublimeText
                 ;;
         esac
     else
@@ -43,5 +43,4 @@ installSublime() {
 }
 
 checkEnv
-checkEscalationTool
 installSublime
