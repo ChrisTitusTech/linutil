@@ -27,7 +27,7 @@ tips = ["rand"]
 clap = { version = "4.6.1", features = ["derive"] }
 image = { version = "0.25.10", default-features = false, features = ["ico", "png"] }
 linutil_core = { version = "26.3.5", path = "../core" }
-nix = { version = "0.31.2", features = ["user"] }
+nix = { version = "0.31.3", features = ["user"] }
 oneshot = { version = "0.2.1", features = ["std"], default-features = false }
 portable-pty = "0.9.0"
 rand = { version = "0.10.1", optional = true }
