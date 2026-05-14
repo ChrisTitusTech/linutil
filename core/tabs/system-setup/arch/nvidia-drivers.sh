@@ -37,9 +37,8 @@ checkNvidiaHardware() {
     esac
 }
 
-checkIntelHardware() {
-    model=$(grep "model name" /proc/cpuinfo | head -n 1 | cut -d ':' -f 2 | cut -c 2-3)
-    [ "$model" -ge 11 ]
+checkIbtSupport() {
+    grep -qw "ibt" /proc/cpuinfo
 }
 
 promptUser() {
@@ -48,24 +47,143 @@ promptUser() {
     [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]
 }
 
-setKernelParam() {
-    PARAMETER="$1"
-
-    if grep -q "$PARAMETER" /etc/default/grub; then
-        printf "%b\n" "${YELLOW}NVIDIA modesetting is already enabled in GRUB.${RC}"
-    else
-        "$ESCALATION_TOOL" sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/ s/\"$/ $PARAMETER\"/" /etc/default/grub
-        printf "%b\n" "${CYAN}Added $PARAMETER to /etc/default/grub.${RC}"
-        "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
+backupConfig() {
+    if [ -f "$1" ] && [ ! -f "$1.linutil.bak" ]; then
+        "$ESCALATION_TOOL" cp "$1" "$1.linutil.bak"
     fi
 }
 
-setupHardwareAcceleration() {
-    if ! command_exists grub-mkconfig; then
-        printf "%b\n" "${RED}Currently hardware acceleration is only available with GRUB.${RC}"
-        return
+updateGrubKernelParam() {
+    parameter="$1"
+    grub_config="/etc/default/grub"
+
+    [ -f "$grub_config" ] || return 1
+
+    if grep -Fq -- "$parameter" "$grub_config"; then
+        printf "%b\n" "${YELLOW}${parameter} is already set in GRUB.${RC}"
+    else
+        backupConfig "$grub_config"
+        if grep -q "^GRUB_CMDLINE_LINUX_DEFAULT=" "$grub_config"; then
+            "$ESCALATION_TOOL" sed -i "/^GRUB_CMDLINE_LINUX_DEFAULT=/ s/\"$/ $parameter\"/" "$grub_config"
+        else
+            printf "GRUB_CMDLINE_LINUX_DEFAULT=\"%s\"\n" "$parameter" | "$ESCALATION_TOOL" tee -a "$grub_config" >/dev/null
+        fi
+        printf "%b\n" "${CYAN}Added ${parameter} to ${grub_config}.${RC}"
     fi
 
+    if command_exists grub-mkconfig && [ -d /boot/grub ]; then
+        "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
+    else
+        printf "%b\n" "${YELLOW}GRUB config updated. Run grub-mkconfig manually if your distro requires it.${RC}"
+    fi
+
+    return 0
+}
+
+updateSystemdBootKernelParam() {
+    parameter="$1"
+    found_entry=false
+    updated_entry=false
+
+    for entry in /boot/loader/entries/*.conf /efi/loader/entries/*.conf; do
+        [ -f "$entry" ] || continue
+        found_entry=true
+
+        if grep -Fq -- "$parameter" "$entry"; then
+            printf "%b\n" "${YELLOW}${parameter} is already set in ${entry}.${RC}"
+            updated_entry=true
+            continue
+        fi
+
+        if grep -q "^options " "$entry"; then
+            backupConfig "$entry"
+            "$ESCALATION_TOOL" sed -i "/^options / s/$/ $parameter/" "$entry"
+            printf "%b\n" "${CYAN}Added ${parameter} to ${entry}.${RC}"
+            updated_entry=true
+        else
+            printf "%b\n" "${YELLOW}Skipped ${entry}: no options line found.${RC}"
+        fi
+    done
+
+    [ "$found_entry" = true ] && [ "$updated_entry" = true ]
+}
+
+updateKernelInstallCmdline() {
+    parameter="$1"
+    cmdline="/etc/kernel/cmdline"
+
+    [ -f "$cmdline" ] || return 1
+
+    if grep -Fq -- "$parameter" "$cmdline"; then
+        printf "%b\n" "${YELLOW}${parameter} is already set in ${cmdline}.${RC}"
+    else
+        backupConfig "$cmdline"
+        "$ESCALATION_TOOL" sed -i "1 s/$/ $parameter/" "$cmdline"
+        printf "%b\n" "${CYAN}Added ${parameter} to ${cmdline}.${RC}"
+        printf "%b\n" "${YELLOW}Regenerate your kernel-install entries or UKIs if your setup requires it.${RC}"
+    fi
+
+    return 0
+}
+
+updateLimineKernelParam() {
+    parameter="$1"
+
+    for limine_config in /boot/limine.conf /boot/limine/limine.conf /boot/EFI/limine/limine.conf /boot/efi/EFI/limine/limine.conf /efi/EFI/limine/limine.conf /etc/limine.conf; do
+        [ -f "$limine_config" ] || continue
+
+        if grep -Fq -- "$parameter" "$limine_config"; then
+            printf "%b\n" "${YELLOW}${parameter} is already set in ${limine_config}.${RC}"
+        elif grep -q "^[[:space:]]*CMDLINE=" "$limine_config"; then
+            backupConfig "$limine_config"
+            "$ESCALATION_TOOL" sed -i "/^[[:space:]]*CMDLINE=/ s/$/ $parameter/" "$limine_config"
+            printf "%b\n" "${CYAN}Added ${parameter} to ${limine_config}.${RC}"
+        else
+            printf "%b\n" "${YELLOW}Skipped ${limine_config}: no CMDLINE entry found.${RC}"
+            return 1
+        fi
+        return 0
+    done
+
+    return 1
+}
+
+updateRefindKernelParam() {
+    parameter="$1"
+
+    for refind_config in /boot/refind_linux.conf /boot/efi/EFI/refind/refind_linux.conf /efi/EFI/refind/refind_linux.conf; do
+        [ -f "$refind_config" ] || continue
+
+        if grep -Fq -- "$parameter" "$refind_config"; then
+            printf "%b\n" "${YELLOW}${parameter} is already set in ${refind_config}.${RC}"
+        else
+            backupConfig "$refind_config"
+            "$ESCALATION_TOOL" sed -i "/^[[:space:]]*#/! s/\"$/ $parameter\"/" "$refind_config"
+            printf "%b\n" "${CYAN}Added ${parameter} to ${refind_config}.${RC}"
+        fi
+
+        return 0
+    done
+
+    return 1
+}
+
+setKernelParam() {
+    parameter="$1"
+
+    if updateGrubKernelParam "$parameter" ||
+        updateSystemdBootKernelParam "$parameter" ||
+        updateKernelInstallCmdline "$parameter" ||
+        updateLimineKernelParam "$parameter" ||
+        updateRefindKernelParam "$parameter"; then
+        return 0
+    fi
+
+    printf "%b\n" "${YELLOW}Could not find a supported bootloader config to add ${parameter}.${RC}"
+    printf "%b\n" "${YELLOW}Add it manually to your kernel command line if your setup requires it.${RC}"
+}
+
+setupHardwareAcceleration() {
     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libva-nvidia-driver
 
     mkdir -p "$HOME/.local/share/linutil"
@@ -109,7 +227,7 @@ installDriver() {
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm nvidia-dkms nvidia-utils
     fi
 
-    if checkIntelHardware; then
+    if checkIbtSupport; then
         setKernelParam "ibt=off"
     fi
 

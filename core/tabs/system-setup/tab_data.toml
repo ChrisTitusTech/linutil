@@ -31,6 +31,12 @@ task_list = "SI D"
 multi_select = false
 
 [[data.entries]]
+name = "DWM-Titus"
+description = "DWM is a dynamic window manager for X.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures DWM and a desktop manager.\nThe list of patches applied can be found in CTT's DWM repository\nhttps://github.com/ChrisTitusTech/dwm-titus"
+script = "arch/dwmtitus-setup.sh"
+task_list = "I PFM SS"
+
+[[data.entries]]
 name = "Hyprland JaKooLit"
 description = "Install JaKooLit's Hyprland configuration"
 script = "arch/hyprland-kool.sh"
