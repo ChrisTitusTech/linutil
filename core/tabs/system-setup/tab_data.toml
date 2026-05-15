@@ -111,6 +111,12 @@ description = "Install JaKooLit's Hyprland configuration"
 script = "debian/hyprland-kool-deb.sh"
 task_list = "I MP"
 
+[[data.entries]]
+name = "Nvidia Drivers"
+description = "Installs NVIDIA drivers from the official NVIDIA repository. Supports open (Turing+) and proprietary kernel modules with Xorg and Wayland."
+script = "debian/nvidia-driver-setup.sh"
+task_list = "I"
+
 [[data]]
 name = "Desktop Environment Setup"
 
@@ -200,6 +206,12 @@ name = "Hyprland JaKooLit"
 description = "Install JaKooLit's Hyprland configuration"
 script = "ubuntu/hyprland-kool-ubuntu24.sh"
 task_list = "I MP"
+
+[[data.entries]]
+name = "Nvidia Drivers"
+description = "Installs NVIDIA drivers from the official NVIDIA repository. Supports open (Turing+) and proprietary kernel modules with Xorg and Wayland."
+script = "debian/nvidia-driver-setup.sh"
+task_list = "I"
 
 [[data.preconditions]]
 matches = true
