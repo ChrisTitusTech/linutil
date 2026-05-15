@@ -97,6 +97,47 @@ description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more ab
 script = "arch/yay-setup.sh"
 task_list = "I"
 
+[[data.entries]]
+name = "Microcode"
+description = "Installs Intel or AMD CPU microcode updates and regenerates initramfs."
+script = "arch/microcode-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Pacman Config"
+description = "Enables Color, ILoveCandy, ParallelDownloads, VerbosePkgLists, multilib in pacman.conf and sets MAKEFLAGS in makepkg.conf."
+script = "arch/pacman-config.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "PipeWire Audio"
+description = "Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio)."
+script = "arch/pipewire-setup.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Zram Swap"
+description = "Configures compressed RAM swap via zram-generator with zstd algorithm."
+script = "arch/zram-setup.sh"
+task_list = "PFM"
+
+[[data.entries]]
+name = "Snapper Snapshots"
+description = "Sets up Snapper with hourly Btrfs snapshots, snap-pac hooks, and GRUB boot menu entries."
+script = "arch/snapshot-setup.sh"
+task_list = "I PFM SS"
+
+[[data.entries.preconditions]]
+matches = true
+data = "command_exists"
+values = ["btrfs"]
+
+[[data.entries]]
+name = "System Maintenance"
+description = "Enables paccache.timer, removes orphan packages, and cleans system journals."
+script = "arch/system-maintenance.sh"
+task_list = "PFM RP"
+
 [[data]]
 name = "Debian"
 
