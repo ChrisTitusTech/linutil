@@ -14,6 +14,30 @@ installramalama() {
 
         case "$PACKAGER" in
             pacman)
+                if ! command_exists docker || ! command_exists podman; then
+                    printf "%b\n" "Ramalama requires Docker or Podman.  Would You like to install one"
+                    printf "%b\n" "1. ${YELLOW}Install Docker${RC}"
+                    printf "%b\n" "2. ${YELLOW}Uninstall Podman${RC}"
+                    printf "%b\n" "3. ${YELLOW}Install Both${RC}"
+                    printf "%b\n" "4. ${YELLOW}Dont install Ramalama${RC}"
+                    printf "%b" "Enter your choice [1-4]: "
+                    read -r CHOICE
+
+                    case "$CHOICE" in
+                        1)  sh ../applications-setup/docker-setup.sh
+                            ;;
+                        2)  sh ../applications-setup/podman-setup.sh
+                            ;;
+                        3)  sh ../applications-setup/docker-setup.sh
+                            sh ../applications-setup/podman-setup.sh
+                            ;;
+                        4)  exit 1
+                            ;;
+                        *)  printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; 
+                            exit 1 ;;
+                    esac
+                fi 
+
                 "$AUR_HELPER" -S --needed --noconfirm --cleanafter ramalama
                 ;;
             apt-get|nala|dnf)
@@ -224,7 +248,7 @@ menu() {
         printf "%b\n" "5) Remove a model"
         printf "%b\n" "6) Exit"
 
-        printf "%b" "${YELLOW}Enter your choice (1-5): ${RC}"
+        printf "%b" "${YELLOW}Enter your choice (1-6): ${RC}"
         read -r choice
 
         case $choice in
@@ -244,23 +268,18 @@ menu() {
 
 main() {
     printf "%b\n" "${YELLOW}Choose to install or uninstall ramalama:${RC}"
-    printf "%b\n" "1. ${YELLOW}Install Ramalama on Docker${RC}"
-    printf "%b\n" "2. ${YELLOW}Install Ramalama on Podman${RC}"
-    printf "%b\n" "3. ${YELLOW}Uninstall Ramalama${RC}"
-    printf "%b\n" "4. ${YELLOW}View Ramalama Options${RC}"
-    printf "%b" "Enter your choice [1-2]: "
+    printf "%b\n" "1. ${YELLOW}Install Ramalama${RC}"
+    printf "%b\n" "2. ${YELLOW}Uninstall Ramalama${RC}"
+    printf "%b\n" "3. ${YELLOW}View Ramalama Options${RC}"
+    printf "%b" "Enter your choice [1-3]: "
     read -r CHOICE
 
     case "$CHOICE" in
-        1) ../applications-setup/docker-setup.sh 
-            installramalama
+        1) installramalama
             ;;
-        2) ../applications-setup/podman-setup.sh 
-            installramalama
+        2) uninstallramalama
             ;;
-        3) uninstallramalama
-            ;;
-        4) menu
+        3) menu
             ;;
         *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
     esac
