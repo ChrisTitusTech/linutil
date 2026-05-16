@@ -1,0 +1,289 @@
+#!/bin/sh -e
+
+. ../common-script.sh
+. ../common-service-script.sh
+
+installramalama() {
+    clear
+    printf "%b\n" "${YELLOW}Checking if ramalama is already installed...${RC}"
+
+    if command_exists ramalama; then
+        printf "%b\n" "${GREEN}ramalama is already installed.${RC}"
+    else
+        printf "%b\n" "${YELLOW}Installing ramalama...${RC}"
+
+        case "$PACKAGER" in
+            pacman)
+                if ! command_exists docker || ! command_exists podman; then
+                    printf "%b\n" "Ramalama requires Docker or Podman.  Would You like to install one"
+                    printf "%b\n" "1. ${YELLOW}Install Docker${RC}"
+                    printf "%b\n" "2. ${YELLOW}Uninstall Podman${RC}"
+                    printf "%b\n" "3. ${YELLOW}Install Both${RC}"
+                    printf "%b\n" "4. ${YELLOW}Dont install Ramalama${RC}"
+                    printf "%b" "Enter your choice [1-4]: "
+                    read -r CHOICE
+
+                    case "$CHOICE" in
+                        1)  sh ../applications-setup/docker-setup.sh
+                            ;;
+                        2)  sh ../applications-setup/podman-setup.sh
+                            ;;
+                        3)  sh ../applications-setup/docker-setup.sh
+                            sh ../applications-setup/podman-setup.sh
+                            ;;
+                        4)  exit 1
+                            ;;
+                        *)  printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; 
+                            exit 1 ;;
+                    esac
+                fi 
+
+                "$AUR_HELPER" -S --needed --noconfirm --cleanafter ramalama
+                ;;
+            apt-get|nala|dnf)
+                curl -fsSL https://ramalama.ai/install.sh | "$ESCALATION_TOOL" bash
+                "$ESCALATION_TOOL" startService ramalama 
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
+    fi
+}
+
+uninstallramalama() {
+    clear
+    printf "%b\n" "${YELLOW}Checking if ramalama is already installed...${RC}"
+
+    if command_exists ramalama; then
+        printf "%b\n" "${YELLOW}Installing ramalama...${RC}"
+
+        case "$PACKAGER" in
+            pacman)
+                "$AUR_HELPER" -Rns --noconfirm --cleanafter ramalama
+                "$ESCALATION_TOOL" rm -rf .local/share/ramalama/ /usr/local/bin/ramalama
+                ;;
+            dnf)
+                "$ESCALATION_TOOL" "$PACKAGER" remove -y ramalama
+                "$ESCALATION_TOOL" rm -rf .local/share/ramalama/ /usr/local/bin/ramalama
+                ;;
+            apt-get|nala)
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
+                ;;
+        esac
+    else
+        printf "%b\n" "${GREEN}ramalama is not installed.${RC}"
+    fi
+}
+
+display_models() {
+    clear
+    printf "%b\n" "${RED}Available Models${RC}"
+    printf "%b\n" "1. Llama 3.1 - 8B (4.7GB)"
+    printf "%b\n" "2. Llama 3.1 - 70B (40GB)"
+    printf "%b\n" "3. Llama 3.1 - 405B (231GB)"
+    printf "%b\n" "4. Phi 3 Mini - 3.8B (2.3GB)"
+    printf "%b\n" "5. Phi 3 Medium - 14B (7.9GB)"
+    printf "%b\n" "6. Gemma 2 - 2B (1.6GB)"
+    printf "%b\n" "7. Gemma 2 - 9B (5.5GB)"
+    printf "%b\n" "8. Gemma 2 - 27B (16GB)"
+    printf "%b\n" "9. Mistral - 7B (4.1GB)"
+    printf "%b\n" "10. Moondream 2 - 1.4B (829MB)"
+    printf "%b\n" "11. Neural Chat - 7B (4.1GB)"
+    printf "%b\n" "12. Starling - 7B (4.1GB)"
+    printf "%b\n" "13. Code Llama - 7B (3.8GB)"
+    printf "%b\n" "14. Llama 2 Uncensored - 7B (3.8GB)"
+    printf "%b\n" "15. LLaVA - 7B (4.5GB)"
+    printf "%b\n" "16. Solar - 10.7B (6.1GB)"
+}
+
+# Function to select model based on user input
+select_model() {
+    choice="$1"
+    case $choice in
+        1) printf "%b\n" "llama3.1";;
+        2) printf "%b\n" "llama3.1:70b";;
+        3) printf "%b\n" "llama3.1:405b";;
+        4) printf "%b\n" "phi3";;
+        5) printf "%b\n" "phi3:medium";;
+        6) printf "%b\n" "gemma2:2b";;
+        7) printf "%b\n" "gemma2";;
+        8) printf "%b\n" "gemma2:27b";;
+        9) printf "%b\n" "mistral";;
+        10) printf "%b\n" "moondream";;
+        11) printf "%b\n" "neural-chat";;
+        12) printf "%b\n" "starling-lm";;
+        13) printf "%b\n" "codellama";;
+        14) printf "%b\n" "llama2-uncensored";;
+        15) printf "%b\n" "llava";;
+        16) printf "%b\n" "solar";;
+        *) printf "%b\n" "$choice";;
+    esac
+}
+
+list_models() {
+    clear
+    printf "%b\n" "${YELLOW}Listing all models available on your system...${RC}"
+    ramalama list
+}
+
+
+show_model_info() {
+    clear
+    list_models
+    printf "%b" "Enter the name of the model you want to show information for (e.g., llama3.1): "
+    read -r model_name
+
+    printf "%b\n" "${YELLOW}Showing information for model '$model_name'...${RC}"
+    ramalama show "$model_name"
+}
+
+run_model() {
+    clear
+    display_models
+
+    printf "%b\n" "${GREEN}Installed Models${RC}"
+    installed_models=$(ramalama list)
+    printf "%b\n" "${installed_models}"
+
+    printf "%b\n" "${YELLOW}Custom Models${RC}"
+    custom_models=$(ramalama list | grep 'custom-model-prefix')
+    printf "%b\n" "${custom_models}"
+
+    printf "%b" "Select a model to run: "
+    printf "%b" "Enter the number corresponding to the model or enter the name of a custom model: "
+
+    read -r model_choice
+
+    model=$(select_model "$model_choice")
+
+    printf "%b\n" "${YELLOW}Running the model: $model...${RC}"
+    ramalama run "$model"
+}
+
+create_model() {
+    clear
+    printf "%b\n" "${YELLOW}Let's create a new model in Ramalama!${RC}"
+    display_models
+
+    # Prompt for base model
+    printf "%b" "Enter the base model (e.g. '13' for codellama): "
+    read -r base_model
+
+    model=$(select_model "$base_model")
+
+    printf "%b\n" "${YELLOW}Running the model: $model...${RC}"
+    ramalama pull "$model"
+
+    # Prompt for custom model name
+    printf "%b" "Enter a name for the new customized model: "
+    read -r custom_model_name
+
+    # Prompt for temperature setting
+    printf "%b" "Enter the desired temperature (higher values are more creative, lower values are more coherent, e.g., 1): "
+    read -r temperature
+
+    if [ -z "$temperature" ]; then
+        temperature=${temperature:-1}
+    fi
+
+    # Prompt for system message
+    printf "%b" "Enter the system message for the model customization (e.g., 'You are Mario from Super Mario Bros. Answer as Mario, the assistant, only.'): "
+    read -r system_message
+
+    # Create the Modelfile
+    printf "%b\n" "${YELLOW}Creating the Modelfile...${RC}"
+    cat << EOF > Modelfile
+FROM $base_model
+
+# set the temperature to $temperature
+PARAMETER temperature $temperature
+
+# set the system message
+SYSTEM """
+$system_message
+"""
+EOF
+
+    # Create the model in ramalama
+    printf "%b\n" "${YELLOW}Creating the model in Ramalama...${RC}"
+    ramalama create "$custom_model_name" -f Modelfile
+    printf "%b\n" "${GREEN}Model '$custom_model_name' created successfully.${RC}"
+}
+
+# Function to remove a model
+remove_model() {
+    clear
+    printf "%b\n" "${GREEN}Installed Models${RC}"
+    installed_models=$(ramalama list)
+    printf "%b\n" "${installed_models}"
+
+    printf "%b" "Please select a model to remove: "
+    printf "%b" "Enter the name of the model you want to remove: "
+
+    read -r model_to_remove
+
+    if echo "$installed_models" | grep -q "$model_to_remove"; then
+        printf "%b\n" "${YELLOW}Removing the model: $model_to_remove...${RC}"
+        ramalama rm "$model_to_remove"
+        printf "%b\n" "${GREEN}Model '$model_to_remove' has been removed.${RC}"
+    else
+        printf "%b\n" "${RED}Model '$model_to_remove' is not installed. Exiting.${RC}"
+        exit 1
+    fi
+}
+
+menu() {
+    while true; do
+        clear
+        printf "%b\n" "${YELLOW}Please select an option:${RC}"
+        printf "%b\n" "1) List all models"
+        printf "%b\n" "2) Show model information"
+        printf "%b\n" "3) Create a new model"
+        printf "%b\n" "4) Run a model"
+        printf "%b\n" "5) Remove a model"
+        printf "%b\n" "6) Exit"
+
+        printf "%b" "${YELLOW}Enter your choice (1-6): ${RC}"
+        read -r choice
+
+        case $choice in
+            1) list_models ;;
+            2) show_model_info ;;
+            3) create_model ;;
+            4) run_model ;;
+            5) remove_model;;
+            6) printf "%b\n" "${GREEN}Exiting...${RC}"; exit 0 ;;
+            *) printf "%b\n" "${RED}Invalid choice. Please try again.${RC}" ;;
+        esac
+
+        printf "%b\n" "${YELLOW}Press Enter to continue...${RC}"
+        read -r _
+    done
+}
+
+main() {
+    printf "%b\n" "${YELLOW}Choose to install or uninstall ramalama:${RC}"
+    printf "%b\n" "1. ${YELLOW}Install Ramalama${RC}"
+    printf "%b\n" "2. ${YELLOW}Uninstall Ramalama${RC}"
+    printf "%b\n" "3. ${YELLOW}View Ramalama Options${RC}"
+    printf "%b" "Enter your choice [1-3]: "
+    read -r CHOICE
+
+    case "$CHOICE" in
+        1) installramalama
+            ;;
+        2) uninstallramalama
+            ;;
+        3) menu
+            ;;
+        *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
+    esac
+}
+
+checkEnv
+main
