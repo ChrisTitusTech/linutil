@@ -10,10 +10,8 @@ installbsnes() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter bsnes-hd
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive dev.bsnes.bsnes
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive dev.bsnes.bsnes
 	            ;;
 	    esac
 	else
@@ -30,7 +28,6 @@ uninstallbsnes() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive dev.bsnes.bsnes
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -52,5 +49,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

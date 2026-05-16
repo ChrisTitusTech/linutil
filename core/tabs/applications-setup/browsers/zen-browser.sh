@@ -11,7 +11,7 @@ installZenBrowser() {
             ;;
         *)
             checkFlatpak
-            flatpak install -y flathub io.github.zen_browser.zen
+            "$ESCALATION_TOOL" flatpak install --noninteractive flathub io.github.zen_browser.zen
             ;;
         esac
     else
@@ -20,6 +20,4 @@ installZenBrowser() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installZenBrowser

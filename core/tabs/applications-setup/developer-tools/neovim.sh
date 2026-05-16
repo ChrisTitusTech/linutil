@@ -21,10 +21,7 @@ installNeovim() {
             "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm neovim ripgrep fzf python-virtualenv luarocks go shellcheck git
             ;;
         apt-get|nala)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y ripgrep fd-find python3-venv luarocks golang-go shellcheck git
-            curl -sSLo /tmp/nvim.appimage https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-            chmod u+x /tmp/nvim.appimage
-            "$ESCALATION_TOOL" mv /tmp/nvim.appimage /usr/local/bin/nvim
+            "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fd-find python3-venv luarocks golang shellcheck git
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf python3-virtualenv luarocks golang ShellCheck git
@@ -42,8 +39,8 @@ installNeovim() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y neovim ripgrep fzf virtualenv luarocks golang shellcheck git
             ;;
         *)
-            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-            exit 1
+            checkFlatpak
+            "$ESCALATION_TOOL" flatpak install --noninteractive io.neovim.nvim
             ;;
     esac
     fi
@@ -64,7 +61,6 @@ linkNeovimConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installNeovim
 cloneNeovim
 backupNeovimConfig

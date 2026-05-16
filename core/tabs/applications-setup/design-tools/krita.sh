@@ -13,10 +13,8 @@ installKrita() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter krita
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.kde.krita
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallKrita() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.kde.krita
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

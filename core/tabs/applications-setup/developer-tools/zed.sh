@@ -27,9 +27,9 @@ installZed() {
                 printf "%b" "Choose an option: "
                 read -r choice
                 case "$choice" in
-                    1)
-                        checkFlatpak
-                        flatpak install -y flathub dev.zed.Zed
+                    1)  
+                        checkFlatpak      
+                        "$ESCALATION_TOOL" flatpak install --noninteractive flathub dev.zed.Zed
                         ;;
                     2)
                         curl -f https://zed.dev/install.sh | sh
@@ -51,5 +51,4 @@ installZed() {
 }
 
 checkEnv
-clear
 installZed

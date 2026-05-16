@@ -10,8 +10,8 @@ installWaterfox() {
 		        "$AUR_HELPER" -S --needed --noconfirm waterfox-bin
                 ;;
             *)
-		        checkFlatpak
-                flatpak install -y flathub net.waterfox.waterfox
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub net.waterfox.waterfox
                 ;;
         esac
     else
@@ -20,6 +20,4 @@ installWaterfox() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installWaterfox

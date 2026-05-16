@@ -53,6 +53,4 @@ installThrorium() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installThrorium

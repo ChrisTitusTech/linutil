@@ -11,7 +11,7 @@ installZapZap() {
         ;;
       *)
         checkFlatpak
-        flatpak install flathub com.rtosta.zapzap
+        "$ESCALATION_TOOL" flatpak install --noninteractive flathub com.rtosta.zapzap
         ;;
     esac
   else

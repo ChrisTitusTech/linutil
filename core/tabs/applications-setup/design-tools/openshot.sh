@@ -13,10 +13,8 @@ installOpenShot() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter openshot
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.openshot.OpenShot
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallOpenShot() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.openshot.OpenShot
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

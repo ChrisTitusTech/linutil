@@ -79,6 +79,4 @@ installLinutil() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installLinutil

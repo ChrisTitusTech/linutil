@@ -13,10 +13,8 @@ installOlive() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter olive
 	        	;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.olivevideoeditor.Olive
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.olivevideoeditor.Olive
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallOlive() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.olivevideoeditor.Olive
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

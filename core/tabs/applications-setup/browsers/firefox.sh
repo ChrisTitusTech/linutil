@@ -27,8 +27,8 @@ installFirefox() {
                 "$ESCALATION_TOOL" "$PACKAGER" add firefox
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive org.mozilla.firefox
                 ;;
         esac
     else
@@ -37,5 +37,4 @@ installFirefox() {
 }
 
 checkEnv
-checkEscalationTool
 installFirefox

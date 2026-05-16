@@ -10,10 +10,8 @@ installTenacity() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter tenacity
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
-	            fi
-	            exit 1
+				checkFlatpak
+				"$ESCALATION_TOOL" flatpak install --noninteractive org.tenacityaudio.Tenacity
 	            ;;
 	    esac
 	else
@@ -30,7 +28,6 @@ uninstallTenacity() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.tenacityaudio.Tenacity
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -52,5 +49,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

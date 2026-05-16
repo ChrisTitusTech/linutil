@@ -13,10 +13,8 @@ installInkscape() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter inkscape
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.inkscape.Inkscape
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallInkscape() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.inkscape.Inkscape
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

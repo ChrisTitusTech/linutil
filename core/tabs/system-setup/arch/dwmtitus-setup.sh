@@ -171,7 +171,6 @@ setupDisplayManager() {
 }
 
 checkEnv
-checkEscalationTool
 setupDisplayManager
 setupDWM
 makeDWM

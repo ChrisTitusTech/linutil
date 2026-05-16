@@ -17,10 +17,8 @@ installObsStudio() {
 	        	"$AUR_HELPER" -S --needed --noconfirm --cleanafter obs-studio
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive com.obsproject.Studio
 	            ;;
 	    esac
 	else
@@ -40,7 +38,6 @@ uninstallObsStudio() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -62,5 +59,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

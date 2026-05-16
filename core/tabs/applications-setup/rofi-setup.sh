@@ -40,6 +40,5 @@ setupRofiConfig() {
 }
 
 checkEnv
-checkEscalationTool
 installRofi
 setupRofiConfig

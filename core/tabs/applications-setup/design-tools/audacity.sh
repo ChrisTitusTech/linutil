@@ -13,10 +13,8 @@ installAudacity() {
 				"$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm --cleanafter audacity
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.audacityteam.Audacity
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallAudacity() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.audacityteam.Audacity
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

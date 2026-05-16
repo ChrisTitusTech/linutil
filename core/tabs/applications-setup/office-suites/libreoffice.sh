@@ -9,10 +9,6 @@ installLibreOffice() {
             apt-get|nala)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y libreoffice-core
                 ;;
-            zypper|dnf)
-                checkFlatpak
-                flatpak install -y flathub org.libreoffice.LibreOffice
-                ;;
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm libreoffice-fresh
                 ;;
@@ -26,8 +22,8 @@ installLibreOffice() {
                 "$ESCALATION_TOOL" "$PACKAGER" -y install libreoffice
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak --noninteractive org.libreoffice.LibreOffice
                 ;;
         esac
     else
@@ -36,5 +32,4 @@ installLibreOffice() {
 }
 
 checkEnv
-checkEscalationTool
 installLibreOffice

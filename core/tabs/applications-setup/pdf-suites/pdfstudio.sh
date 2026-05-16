@@ -19,5 +19,4 @@ installPdfstudio() {
 }
 
 checkEnv
-checkEscalationTool
 installPdfstudio

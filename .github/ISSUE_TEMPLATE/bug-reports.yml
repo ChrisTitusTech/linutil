@@ -42,7 +42,6 @@ body:
         - Hyprland
         - i3
         - Other
-        - None
     validations:
       required: true
   - type: input
@@ -60,7 +59,6 @@ body:
       options:
         - X11
         - Wayland
-        - None
     validations:
       required: true
   - type: input

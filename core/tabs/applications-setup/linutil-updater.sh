@@ -49,6 +49,4 @@ updateLinutil() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 updateLinutil

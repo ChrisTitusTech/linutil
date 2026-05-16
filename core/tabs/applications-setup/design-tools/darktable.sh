@@ -13,10 +13,8 @@ installDarktable() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter darktable
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.darktable.Darktable
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallDarktable() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.darktable.Darktable
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main

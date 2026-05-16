@@ -31,8 +31,8 @@ installVivaldi() {
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm vivaldi
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive com.vivaldi.Vivaldi
                 ;;
         esac
     else
@@ -41,5 +41,4 @@ installVivaldi() {
 }
 
 checkEnv
-checkEscalationTool
 installVivaldi

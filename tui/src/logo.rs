@@ -37,9 +37,9 @@ impl Logo {
         let image_size = rgba.dimensions();
 
         let mut picker = Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
-        picker.set_background_color([0, 0, 0, 0]);
+        picker.set_background_color(Some([0, 0, 0, 0]));
         let font_size = picker.font_size();
-
+        let font_size = (font_size.width, font_size.height);
         let renderer = if picker.protocol_type() == ProtocolType::Halfblocks {
             Renderer::Blocks
         } else {
@@ -229,8 +229,9 @@ impl Logo {
             Ok(picker) => picker,
             Err(_) => return,
         };
-        picker.set_background_color([0, 0, 0, 0]);
+        picker.set_background_color(Some([0, 0, 0, 0]));
         let new_font_size = picker.font_size();
+        let new_font_size = (new_font_size.width, new_font_size.height);
         let protocol_type = picker.protocol_type();
 
         if protocol_type == ProtocolType::Halfblocks {

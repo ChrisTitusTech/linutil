@@ -15,8 +15,12 @@ installLynx() {
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy lynx
                 ;;
-            *)
+            apt-get|nala|zypper|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
+                ;;
+            *)
+                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+                exit 1
                 ;;
         esac
     else
@@ -25,5 +29,4 @@ installLynx() {
 }
 
 checkEnv
-checkEscalationTool
 installLynx

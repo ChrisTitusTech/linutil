@@ -13,10 +13,8 @@ installHandbrake() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter handbrake
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive fr.handbrake.ghb
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallHandbrake() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive fr.handbrake.ghb
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -57,5 +54,4 @@ main() {
     esac
 }
 checkEnv
-checkEscalationTool
 main

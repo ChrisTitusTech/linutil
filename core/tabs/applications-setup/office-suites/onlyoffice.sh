@@ -11,16 +11,12 @@ installOnlyOffice() {
       "$ESCALATION_TOOL" "$PACKAGER" install -y ./onlyoffice-desktopeditors_amd64.deb
       "$ESCALATION_TOOL" rm ./onlyoffice-desktopeditors_amd64.deb
       ;;
-    zypper | dnf | xbps-install | eopkg | apk)
-      checkFlatpak
-      "$ESCALATION_TOOL" flatpak install -y flathub org.onlyoffice.desktopeditors
-      ;;
     pacman)
       "$AUR_HELPER" -S --needed --noconfirm onlyoffice-bin
       ;;
     *)
-      printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-      exit 1
+      checkFlatpak
+      "$ESCALATION_TOOL" flatpak --noninteractive org.onlyoffice.desktopeditors
       ;;
     esac
   else
@@ -29,6 +25,4 @@ installOnlyOffice() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installOnlyOffice

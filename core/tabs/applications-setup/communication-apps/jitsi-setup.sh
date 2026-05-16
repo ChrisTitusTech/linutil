@@ -21,13 +21,9 @@ installJitsi() {
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y jitsi-meet
                 ;;
-            apk)
-                checkFlatpak
-                flatpak install flathub org.jitsi.jitsi-meet
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub org.jitsi.jitsi-meet
                 ;;
         esac
     else
@@ -36,6 +32,4 @@ installJitsi() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installJitsi

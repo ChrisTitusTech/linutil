@@ -19,8 +19,8 @@ installTorBrowser() {
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy torbrowser-launcher
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ${PACKAGER}${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install flathub --noninteractive org.torproject.torbrowser-launcher
                 ;;
         esac
     else
@@ -29,6 +29,5 @@ installTorBrowser() {
 }
 
 checkEnv
-checkEscalationTool
 installTorBrowser
 

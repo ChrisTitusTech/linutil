@@ -25,8 +25,8 @@ installChrome() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive com.google.Chrome
                 ;;
         esac
     else
@@ -35,6 +35,4 @@ installChrome() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installChrome

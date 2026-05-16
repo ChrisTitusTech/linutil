@@ -27,8 +27,8 @@ installGithubDesktop() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y github-desktop
                 ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive io.github.shiftey.Desktop
                 ;;
         esac
     else
@@ -37,6 +37,4 @@ installGithubDesktop() {
 }
 
 checkEnv
-checkEscalationTool
-checkAURHelper
 installGithubDesktop

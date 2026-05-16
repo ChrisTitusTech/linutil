@@ -19,20 +19,12 @@ installSignal() {
             pacman)
                 "$ESCALATION_TOOL" "$PACKAGER" -S --noconfirm signal-desktop
                 ;;
-            dnf)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
-                ;;
             xbps-install)
                 "$ESCALATION_TOOL" "$PACKAGER" -Sy Signal-Desktop
                 ;;   
-            apk)
-                checkFlatpak
-                flatpak install -y flathub org.signal.Signal
-                ;;
             *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub org.signal.Signal
                 ;;
         esac
     else
@@ -41,5 +33,4 @@ installSignal() {
 }
 
 checkEnv
-checkEscalationTool
 installSignal

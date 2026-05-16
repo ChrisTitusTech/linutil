@@ -15,8 +15,12 @@ if ! command_exists chromium; then
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy chromium
             ;;
-        *)
+        apt-get|nala|zypper|dnf|eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
+            ;;
+        *)
+            checkFlatpak
+            "$ESCALATION_TOOL" flatpak install --noninteractive org.chromium.Chromium
             ;;
     esac
 else
@@ -25,5 +29,4 @@ fi
 }
 
 checkEnv
-checkEscalationTool
 installChromium

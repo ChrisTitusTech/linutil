@@ -13,10 +13,8 @@ installArdour() {
 			    "$AUR_HELPER" -S --needed --noconfirm --cleanafter ardour
 	            ;;
 	        *)
-	        	if command_exists flatpak; then
-	            	"$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
-	            fi
-	            exit 1
+	        	checkFlatpak
+	            "$ESCALATION_TOOL" flatpak install --noninteractive org.ardour.Ardour
 	            ;;
 	    esac
 	else
@@ -36,7 +34,6 @@ uninstallArdour() {
 	            ;;
 	        *)
 	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.ardour.Ardour
-	            exit 1
 	            ;;
 	    esac
 	else
@@ -58,5 +55,4 @@ main() {
 }
 
 checkEnv
-checkEscalationTool
 main
