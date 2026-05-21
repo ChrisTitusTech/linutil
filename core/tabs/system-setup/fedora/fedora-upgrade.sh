@@ -9,19 +9,27 @@ update() {
     printf "%b\n" "${YELLOW}Make sure your system is fully updated; if not, update it first and reboot once.${RC}"
     printf "%b\n" "${CYAN}Your current Fedora version is $current_version.${RC}"
     printf "%b\n" "${CYAN}The next available version is $next_version.${RC}"
-    
-    printf "%b\n" "${YELLOW}Do you want to update to $next_version? (y/n): ${RC}"  
+
+    printf "%b\n" "${YELLOW}Do you want to update to $next_version? (y/n): ${RC}"
     read -r response
-    
+
     case "$response" in
         y|Y)
             printf "%b\n" "${CYAN}Preparing to update to $next_version...${RC}"
-        
+
+            # WSL cannot run the offline boot phase that dnf system-upgrade reboot
+            # depends on; use distro-sync as a live equivalent instead.
+            if grep -qi microsoft /proc/version 2>/dev/null; then
+                printf "%b\n" "${YELLOW}WSL detected: using live distro-sync instead of offline reboot upgrade.${RC}"
+                "$ESCALATION_TOOL" "$PACKAGER" --releasever="$next_version" --setopt=deltarpm=false distro-sync -y
+                return
+            fi
+
             if ! "$ESCALATION_TOOL" "$PACKAGER" install dnf-plugin-system-upgrade -y; then
                 printf "%b\n" "${RED}Failed to install dnf-plugin-system-upgrade.${RC}"
                 exit 1
             fi
-        
+
             if ! "$ESCALATION_TOOL" "$PACKAGER" system-upgrade download --releasever="$next_version" -y ; then
                 printf "%b\n" "${RED}Failed to download the upgrade packages.${RC}"
                 exit 1
@@ -48,10 +56,10 @@ update() {
 
 post_upgrade() {
     printf "%b\n" "${YELLOW}Running post-upgrade tasks...${RC}"
-    
+
     case "$PACKAGER" in
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" autoremove  
+            "$ESCALATION_TOOL" "$PACKAGER" autoremove
             "$ESCALATION_TOOL" "$PACKAGER" distro-sync -y
             ;;
         *)
