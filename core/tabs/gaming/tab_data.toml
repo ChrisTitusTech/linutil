@@ -4,6 +4,15 @@ name = "Gaming"
 name = "Emulators"
 
 [[data.entries]]
+name = "Multi-System Emulators"
+
+[[data.entries.entries]]
+name = "RetroArch Game Emulator"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
+script = "emulators/retroarch.sh"
+task_list = "FM"
+
+[[data.entries]]
 name = "Nintendo Emulators"
 
 [[data.entries.entries]]
@@ -106,15 +115,6 @@ task_list = "FM"
 name = "Kronos"
 description = "A Sega Saturn emulator. NO Games are included"
 script = "emulators/sega/kronos.sh"
-task_list = "FM"
-
-[[data.entries]]
-name = "Multi-System Emulators"
-
-[[data.entries.entries]]
-name = "RetroArch Game Emulator"
-description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
-script = "emulators/retroarch.sh"
 task_list = "FM"
 
 [[data.entries]]
