@@ -1,7 +1,6 @@
 use std::fs;
-
-use linutil_core::Command;
-
+use linutil_core::{Command, ListNode, ego_tree::NodeRef};
+use std::rc::Rc;
 use crate::{path, DynError};
 
 pub const USER_GUIDE: &str = "content/userguide/walkthrough.md";
@@ -13,42 +12,35 @@ pub fn userguide() -> Result<String, DynError> {
     let tabs = linutil_core::get_tabs(false);
 
     for tab in tabs {
-        #[cfg(debug_assertions)]
-        println!("Tab: {}", tab.name);
-
-        md.push_str(&format!("\n## {}\n\n", tab.name));
-
-        for entry in tab.tree {
-            if entry.command == Command::None {
-                #[cfg(debug_assertions)]
-                println!("  Directory: {}", entry.name);
-
-                if entry.name != "root" {
-                    md.push_str(&format!("\n### {}\n\n", entry.name));
-                }
-
-                /* let current_dir = &entry.name;
-
-                if *current_dir != "root".to_string() {
-                    md.push_str(&format!(
-                        "\n<details><summary>{}</summary>\n\n",
-                        current_dir
-                    ));
-                } */ // Commenting this for now, might be a good idea later
-            } else if !entry.description.is_empty() {
-                #[cfg(debug_assertions)]
-                println!("    Entry: {}", entry.name);
-                #[cfg(debug_assertions)]
-                println!("      Description: {}", entry.description);
-
-                md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
-            } /* else {
-                  md.push_str(&format!("- **{}**\n", entry.name));
-              } */ // https://github.com/ChrisTitusTech/linutil/pull/753
-        }
+        md.push_str(&format!("\n## {}\n", tab.name));
+        generate_node_docs(tab.tree.root(), &mut md, 0);
     }
 
     Ok(md)
+}
+
+fn generate_node_docs(node: NodeRef<Rc<ListNode>>, md: &mut String, depth: usize) {
+    let val = node.value();
+    
+    if val.name != "root" {
+        if val.command == Command::None {
+            // It's a directory/category
+            let header_level = match depth {
+                1 => "###",
+                2 => "####",
+                3 => "#####",
+                _ => "######",
+            };
+            md.push_str(&format!("\n{} {}\n\n", header_level, val.name));
+        } else if !val.description.is_empty() {
+            // It's a command with a description
+            md.push_str(&format!("- **{}**: {}\n", val.name, val.description));
+        }
+    }
+
+    for child in node.children() {
+        generate_node_docs(child, md, depth + 1);
+    }
 }
 
 pub fn write(file: &str, data: &str) {

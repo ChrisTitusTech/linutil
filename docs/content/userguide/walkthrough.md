@@ -3,230 +3,260 @@
 
 ## Applications Setup
 
-
 ### Communication Apps
 
-- **Discord**: Discord is a versatile communication platform for gamers and communities, offering voice, video, and text chat features.
-- **Jitsi**: Jitsi Meet is an open-source video conferencing tool that allows users to host and join secure meetings directly from their web browsers without the need for downloads.
-- **Signal**: Signal is a privacy-focused messaging app that provides end-to-end encryption for secure text, voice, and video communication.
-- **Slack**: Slack is a collaboration platform designed for team communication, featuring channels, direct messaging, file sharing, and integrations with various productivity tools.
-- **Telegram**: Telegram is a cloud-based messaging app known for its speed and security, offering features like group chats, channels, and end-to-end encrypted calls.
-- **Thunderbird**: Thunderbird is a free, open-source email client that offers powerful features like customizable email management, a built-in calendar, and extensive add-ons for enhanced functionality.
-- **ZapZap**: ZapZap is an open source whatsapp desktop client for Linux users developed by rafatosta.
-- **Zoom**: Zoom is a widely-used video conferencing platform that allows users to host virtual meetings, webinars, and online collaboration with features like screen sharing and recording.
+- **Discord**: Cross-platform voice, video, and text communication service.
+- **Jitsi**: Open-source, browser-based video conferencing.
+- **Signal**: Encrypted, privacy-focused messaging and voice/video calls.
+- **Slack**: Team collaboration platform with channels and integrations.
+- **Telegram**: Cloud-based messaging app focused on speed and security.
+- **Thunderbird**: Full-featured open-source email, calendar, and contact manager.
+- **ZapZap**: Open-source WhatsApp desktop client for Linux.
+- **Zoom**: Video conferencing and online collaboration platform.
 
 ### Design Tools
 
-- **Ardour**: Ardour is a free and open-source digital audio workstation and hard disk recorder.
-- **Audacity**: Audacity is a free and open-source digital audio editor and recording application software.
-- **Blender**: Blender is a free and open-source 3D computer graphics software tool set.
-- **Darktable**: Darktable is a free and open-source photography application and raw developer.
-- **GNU Image Manipulation Program (GIMP)**: GIMP is a free and open-source raster graphics editor. It is commonly used for photo retouching, image editing, free-hand drawing, and converting between different image file formats.
-- **Handbrake**: HandBrake is a free and open-source transcoder for digital video files.
-- **Inkscape**: Inkscape is a free and open-source software vector graphics editor.
-- **Krita**: Krita is a free and open-source raster graphics editor designed primarily for digital art and 2D animation.
-- **MyPaint**: MyPaint is a free and open-source raster graphics editor for digital painting.
-- **Natron**: Natron is a powerful, free, and open-source VFX compositing application geared towards digital post-production work.
-- **OBS Studio**: OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application.
-- **Olive**: Olive is a free and open-source cross-platform non-linear video editing application.
-- **OpenShot**: OpenShot Video Editor is a free and open-source video editor.
-- **Pinta**: Pinta is an open-source, cross-platform bitmap image drawing and editing program inspired by Paint.NET.
-- **Scribus**: Scribus is free and open-source desktop publishing software available for most desktop operating systems.
-- **Synfig Studio**: Synfig Studio is a free and open-source vector-based 2D animation software.
-- **Tenacity**: Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder.
+- **Ardour**: Professional digital audio workstation (DAW) for recording and mixing.
+- **Audacity**: Multi-track audio editor and recorder.
+- **Blender**: 3D creation suite for modeling, animation, and rendering.
+- **Darktable**: Open-source photography workflow application and raw developer.
+- **GNU Image Manipulation Program (GIMP)**: Powerful raster graphics editor for image retouching and authoring.
+- **Handbrake**: Open-source video transcoder for converting video between formats.
+- **Inkscape**: Professional vector graphics editor using the SVG format.
+- **Krita**: Digital painting and 2D animation software.
+- **MyPaint**: Fast and easy-to-use digital painting tool.
+- **Natron**: Node-based compositing software for visual effects.
+- **OBS Studio**: Software for video recording and live streaming.
+- **Olive**: Professional non-linear video editor.
+- **OpenShot**: Easy-to-use, open-source video editor.
+- **Pinta**: Simple drawing and editing program inspired by Paint.NET.
+- **Scribus**: Professional desktop publishing and page layout software.
+- **Synfig Studio**: Vector-based 2D animation software.
+- **Tenacity**: Privacy-respecting multi-track audio editor/recorder.
 
 ### Developer Tools
 
-- **Cursor**: Next-generation AI-powered code editor built on VS Code, designed for enhanced productivity with integrated AI assistance.
-- **Github Desktop**: GitHub Desktop is a user-friendly application that simplifies the process of managing Git repositories and interacting with GitHub, providing a graphical interface for tasks like committing, branching, and syncing changes.
-- **JetBrains Toolbox**: JetBrains Toolbox is a collection of tools and an app that help developers work with JetBrains products.
-- **Meld**: Meld is a visual diff and merge tool that helps compare files, directories, and version-controlled projects.
-- **Neovim**: Neovim is a refactor, and sometimes redactor, in the tradition of Vim.
-It is not a rewrite but a continuation and extension of Vim.
-This command configures neovim from CTT's neovim configuration.
-https://github.com/ChrisTitusTech/neovim
-- **Ngrok**: Ngrok is a tool that creates secure, temporary tunnels to expose local servers to the internet for testing and development.
-- **Sublime Text**: Sublime Text is a fast, lightweight, and customizable text editor known for its simplicity, powerful features, and wide range of plugins for various programming languages.
-- **VS Code**: Visual Studio Code (VS Code) is a lightweight, open-source code editor with built-in support for debugging, version control, and extensions for various programming languages and frameworks.
-- **VS Codium**: VSCodium is a free, open-source version of Visual Studio Code (VS Code) that removes Microsoft-specific telemetry and branding.
-- **Zed**: Zed is a next-generation code editor written in rust, designed for high-performance collaboration with humans and AI.
+- **Cursor**: AI-powered code editor built on VS Code.
+- **Github Desktop**: Graphical interface for managing Git repositories.
+- **JetBrains Toolbox**: Manage JetBrains IDEs and projects.
+- **Meld**: Visual diff and merge tool for files and directories.
+- **Neovim**: Highly extensible text editor configured with CTT's neovim setup.
+- **Ngrok**: Expose local servers to the internet via secure tunnels.
+- **Sublime Text**: Fast and sophisticated text editor for code and prose.
+- **VS Code**: Lightweight but powerful source code editor from Microsoft.
+- **VS Codium**: Community-driven, telemetry-free distribution of VS Code.
+- **Zed**: High-performance, collaborative code editor written in Rust.
 
 ### Office Suites
 
+- **FreeOffice**: Complete office suite with Word, Excel, and PowerPoint compatibility.
+- **LibreOffice**: Powerful, free and open-source personal productivity suite.
+- **OnlyOffice**: Online and desktop office suite with high MS Office compatibility.
+- **WPS Office**: Fast, lightweight office suite with advanced features.
 
 ### PDF Suites
 
+- **Evince**: Document viewer for multiple document formats (PDF, PostScript, etc.).
+- **Okular**: Universal document viewer with support for advanced features.
+- **PDF Studio**: Commercial PDF editor with a wide range of features.
+- **PDF Studio Viewer**: Free PDF viewer for Windows, Mac, and Linux.
 
 ### Web Browsers
 
-- **Brave**: Brave is a free and open-source web browser developed by Brave Software, Inc. based on the Chromium web browser.
-- **Chromium**: Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser.
-- **Google Chrome**: Google Chrome is a fast, secure, and free web browser, built for the modern web.
-- **LibreWolf**: LibreWolf is a fork of Firefox, focused on privacy, security, and freedom.
-- **Lynx**: Lynx is a highly configurable text-based web browser for use on cursor-addressable character cell terminals.
-- **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
-- **Thorium**: Thorium is a Chromium-based browser focused on privacy and performance.
-- **Tor Browser**: Tor Browser is a free and open-source firefox-based web browser designed for anonymity and censorship circumvention.
-- **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
-- **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
-- **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
-- **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
-- **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
-- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
-- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **DWM-Titus**: DWM is a dynamic window manager for X.
-It manages windows in tiled, monocle and floating layouts.
-All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
-This command installs and configures DWM and a desktop manager.
-The list of patches applied can be found in CTT's DWM repository
-https://github.com/ChrisTitusTech/dwm-titus
-- **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
-- **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
-- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
-- **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
-- **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
-- **Linutil Installer**: Installs a distro-specific Linutil package locally.
-- **Linutil Updater**: Updates your local Linutil crate installation.
-- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
-- **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
-- **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
+- **Brave**: Privacy-focused browser that blocks ads and trackers by default.
+- **Chromium**: Open-source browser project that forms the basis for Chrome.
+- **Google Chrome**: Fast, secure web browser built by Google.
+- **LibreWolf**: A fork of Firefox focused on privacy and security.
+- **Lynx**: Classic text-based web browser for the terminal.
+- **Mozilla Firefox**: Extensible, open-source web browser from Mozilla.
+- **Thorium**: Optimized Chromium fork for maximum performance.
+- **Tor Browser**: Browser designed for anonymity and privacy via the Tor network.
+- **Vivaldi**: Feature-rich browser with extreme customizability.
+- **waterfox**: Privacy-conscious browser based on Firefox.
+- **Zen Browser**: Modern, privacy-focused browser built for speed.
+
+### Essential Utilities
+
+- **Alacritty**: GPU-accelerated terminal emulator focused on performance.
+- **Android Debloater**: Remove bloatware and unnecessary apps from Android devices.
+- **Bash Prompt**: Configures .bashrc with CTT's mybash setup for an enhanced shell.
+- **Docker**: Platform for developing, shipping, and running applications in containers.
+- **Fastfetch**: System information tool configured with CTT's mybash theme.
+- **Flatpak / Flathub**: Universal package management for Linux via Flathub.
+- **Ghostty**: Modern terminal emulator utilizing embedded web technologies.
+- **Grub Theme**: Installs ChrisTitusTech's Top 5 bootloader themes.
+- **Kitty**: GPU-accelerated, feature-rich terminal emulator.
+- **Linutil Installer**: Installs Linutil as a native package for your distribution.
+- **Linutil Updater**: Updates the locally installed Linutil package.
+- **Podman**: Daemon-less container engine for developing and running OCI containers.
+- **Podman-compose**: Tool for defining and running multi-container applications with Podman.
+- **Rofi**: Window switcher and application launcher configured with CTT's DWM theme.
+- **ZSH Prompt**: Installs and configures the Z shell with an enhanced prompt.
 
 ## Gaming
-
 
 ### Emulators
 
 
-### Nintendo Emulators
+#### Multi-System Emulators
 
-- **bsnes**: Super Nintendo Emulator. NO Games are included
-- **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
-- **Gopher 64**: N64 Emulator. NO Games are included
-- **MelonDS**: Nintendo DS and DSi Emulator. NO Games are included
-- **mGBA**: Nintendo Game Boy Advance Emulator. NO Games are included
-- **Mupen 64 Plus**: N64 Emulator. NO Games are included
-- **Ryujinx**: Nintendo Switch emulator. NO Games are included
-- **snes9x**: Super Nintendo Emulator. NO Games are included
+- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios included.
 
-### PlayStation Emulators
+#### Nintendo Emulators
 
-- **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
-- **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
-- **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
+- **bsnes**: Super Nintendo emulator. NO Games included.
+- **Dolphin Emulator**: GameCube and Wii emulator. NO Games included.
+- **Gopher 64**: N64 emulator. NO Games included.
+- **MelonDS**: Nintendo DS and DSi emulator. NO Games included.
+- **mGBA**: Nintendo Game Boy Advance emulator. NO Games included.
+- **Mupen 64 Plus**: N64 emulator. NO Games included.
+- **Ryujinx**: Nintendo Switch emulator. NO Games included.
+- **snes9x**: Super Nintendo emulator. NO Games included.
 
-### Sega Emulators
+#### PlayStation Emulators
 
-- **Blastem**: A Genesis emulator. NO Games are included
-- **Flycast**: A Dreamcase emulator. NO Games are included
-- **Kronos**: A Sega Saturn emulator. NO Games are included
+- **PCSX2**: Playstation 2 emulator. NO Games or Bios included.
+- **Play!**: Experimental Playstation 2 emulator. NO Games or Bios included.
+- **RPCS3**: Playstation 3 emulator. NO Games or Bios included.
 
-### Multi-System Emulators
+#### Sega Emulators
 
-- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+- **Blastem**: Genesis emulator. NO Games included.
+- **Flycast**: Dreamcast emulator. NO Games included.
+- **Kronos**: Sega Saturn emulator. NO Games included.
 
-### Xbox Emulators
+#### Xbox Emulators
 
-- **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
-- **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
+- **XEMU**: Original Xbox emulator. NO Games or Bios included.
+- **Xenia**: Experimental Xbox 360 emulator. NO Games or Bios included.
 
 ### Tools and Setups
 
-- **Auto CPU Frequency**: Automatic CPU speed & power optimizer.
-https://github.com/AdnanHodzic/auto-cpufreq
-- **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
-- **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
-- **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions.
-- **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
-- **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
-- **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
-- **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
-- **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
-- **Fallout 76 INI and Mods**: Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks.
+- **Auto CPU Frequency**: Automatic CPU speed & power optimizer for Linux.
+- **Auto Mount Drive**: Automate the process of mounting drives on system startup.
+- **Bottles**: Run Windows software and games on Linux with ease.
+- **Gaming Dependencies**: Install necessary gaming dependencies across various Linux distributions.
+- **General GPU Drivers**: Detect and install recommended GPU driver stacks.
+- **Nvidia Drivers & Hardware Acceleration**: Arch-specific NVIDIA driver installer and hardware acceleration setup.
+- **Waydroid**: Run Android applications and games in a container on Linux.
+
+### Game-Specific Mods
+
+- **Arc Raiders Titus Mods**: Optimized game configurations for Arc Raiders, including VRR and performance tweaks.
+- **Diablo II Resurrected Loot Filter**: Loot filter for D2R that highlights high-value items.
+- **Fallout 76 INI and Mods**: Custom configurations and performance mods for Fallout 76 via Steam.
+- **Starfield Titus INI and Mods**: Performance-focused custom configurations for Starfield via Steam.
 
 ## Security
 
-- **FirewallD Firewall Baselines (CTT)**: Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes
-- **UFW Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
+### Firewall Baselines
+
+- **FirewallD Firewall Baselines (CTT)**: Apply CTT's recommended baseline security rules for FirewallD.
+- **UFW Firewall Baselines (CTT)**: Install and configure UFW with CTT's recommended security rules.
 
 ## System Setup
 
-
 ### Alpine
 
-- **Alpine Update**: Upgrades Alpine Linux to either latest stable or edge repositories
+- **Alpine Update**: Upgrade Alpine Linux to the latest stable or edge repositories.
 
 ### Arch
 
-- **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
-- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
-- **Install Chaotic-AUR Repository**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
-- **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
-- **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
-- **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
-- **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
-- **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
-- **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Arch Server Setup**: Minimal Arch Linux server setup.
+- **DWM-Titus**: Install and configure CTT's customized Dynamic Window Manager (DWM) setup.
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration and desktop environment.
+- **Install CachyOS Repository and Kernel**: Add CachyOS repositories and performance-optimized kernels to Arch Linux.
+- **Install Chaotic-AUR Repository**: Add the Chaotic-AUR repository for prebuilt AUR packages.
+- **Linux Neptune for SteamDeck**: Install Valve's Neptune Linux kernel fork for the Steam Deck.
+- **Nvidia Drivers & Hardware Acceleration**: Install and configure NVIDIA drivers with hardware acceleration support.
+- **Omarchy Rice by DHH**: Simplified Hyprland configuration based on DHH's setup.
+- **Paru AUR Helper**: Install Paru, a feature-rich AUR helper written in Rust.
+- **Virtualization**: Configure QEMU, Libvirt, and Virt-Manager for system virtualization.
+- **Yay AUR Helper**: Install Yay, a popular Go-based AUR helper.
 
 ### Debian
 
-- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration for Debian systems.
 
 ### Desktop Environment Setup
 
-- **Install Desktop Environment**: This script allows you to install various desktop environments (GNOME, KDE, XFCE, Cinnamon, MATE, Budgie, LXQt, LXDE) and window managers (i3, Sway, DWM, Awesome, BSPWM, Openbox, Fluxbox) using your distro's package manager. The script provides an interactive menu to select your preferred desktop environment or window manager, and handles the installation process automatically.
-- **Uninstall Desktop Environment**: This script allows you to uninstall desktop environments and window managers that were previously installed. It provides an interactive menu to select which desktop environment or window manager to remove, and handles the uninstallation process automatically.
+- **Install Desktop Environment**: Interactive menu to install various desktop environments and window managers.
+- **Uninstall Desktop Environment**: Interactive menu to remove previously installed desktop environments.
 
 ### Fedora
 
-- **Btrfs Assistant, Snapper Config, grub-btrfs**: Installs Btrfs Assistant, Snapper, dnf snapper plugin and takes the first root(/) and /home snapshots. Enables snapper-timeline and snapper-cleanup services. Installs Grub-Btrfs. Notice: To perform a system recovery via grub-btrfs, perform a restore operation with Btrfs Assistant GUI after booting into the snapshot. Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately.
-- **Configure DNF**: Optimizes DNF for parallel downloads
-- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
-- **Multimedia Codecs**: This script is designed to install multimedia codecs, and to ensure RPM Fusion repositories are installed.
-- **Nvidia Proprietary Drivers**: This script is designed to download the proprietary NVIDIA drivers in Fedora.
-- **RPM Fusion**: RPM Fusion provides software that the Fedora Project or Red Hat doesn't want to ship. That software is provided as precompiled RPMs for all current Fedora versions and current Red Hat Enterprise Linux or clones versions; you can use the RPM Fusion repositories with tools like yum and PackageKit. For more information visit: https://rpmfusion.org/
-- **Upgrade to a New Fedora Release**: Upgrades system to the next Fedora release
-- **Virtualization**: Enables Virtualization through dnf
+- **Btrfs Assistant, Snapper Config, grub-btrfs**: Configure Btrfs snapshots, Snapper, and Grub-Btrfs for system recovery.
+- **Configure DNF**: Optimize DNF configuration for faster parallel downloads.
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration for Fedora.
+- **Multimedia Codecs**: Install essential multimedia codecs and RPM Fusion repositories.
+- **Nvidia Proprietary Drivers**: Install proprietary NVIDIA drivers on Fedora.
+- **RPM Fusion**: Enable RPM Fusion repositories for additional software support.
+- **Upgrade to a New Fedora Release**: Perform a system upgrade to the next major Fedora release.
+- **Virtualization**: Enable and configure system virtualization via DNF.
 
 ### Ubuntu
 
-- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
-- **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
-- **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
-- **Full System Update**: This command updates your system to the latest packages available for your distro
-- **Global Theme**: This script is designed to handle the installation and configuration of global theming
-- **Remove Snaps**: This script is designed to remove snap
-- **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
+- **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration for Ubuntu 24.04+.
+
+### General Maintenance
+
+- **Build Prerequisites**: Install common build tools and software dependencies.
+- **Full System Cleanup**: Remove unnecessary packages, old caches, and temporary files.
+- **Full System Update**: Update all system packages to their latest versions.
+- **Full System Update (Topgrade)**: Perform a comprehensive system update using Topgrade.
+- **Global Theme**: Install and apply global system theming configurations.
+- **Remove Snaps**: Completely remove Snapd and all installed Snap packages.
+- **TTY Fonts**: Set the default TTY font to high-visibility Terminus 32 Bold.
 
 ## Utilities
 
-
 ### Monitor Control
 
-- **Auto Detect Displays**: This script is designed to detect and apply recommended configuration for monitors connected with your system
-- **Change Orientation**: This script is designed to change the orientation of monitors in your system
-- **Disable Monitor**: This script is designed to disable a monitor in your system
-- **Duplicate Displays**: This script is designed to duplicate display among multi-monitor setup in your system
-- **Enable Monitor**: This script is designed to enable a monitor in your system
-- **Extend Displays**: This script is designed to extend display among multi-monitor setup in your system
-- **Manage Arrangement**: This script is designed to arrange monitors in multi-monitor setup in your system
-- **Reset Scaling**: This script is designed to reset scaling of a monitor in your system
-- **Scale Monitors**: This script is designed to change the scaling of monitors in your system
-- **Set Brightness**: This script is designed to change the Brightness of monitors connected to your system
-- **Set Primary Monitor**: This script is designed to set a Primary monitor in your system
-- **Set Resolution**: This script is designed to change the resolution of monitors connected to your system
+- **Auto Detect Displays**: Automatically detect and configure connected monitors.
+- **Change Orientation**: Rotate monitor orientation (normal, left, right, inverted).
+- **Disable Monitor**: Turn off a specific monitor in a multi-display setup.
+- **Duplicate Displays**: Mirror the primary display across all connected monitors.
+- **Enable Monitor**: Turn on a specific monitor that was previously disabled.
+- **Extend Displays**: Extend the desktop across multiple monitors.
+- **Manage Arrangement**: Configure the physical layout and positioning of monitors.
+- **Reset Scaling**: Restore default (100%) scaling for a specific monitor.
+- **Scale Monitors**: Adjust display scaling for better visibility on high-resolution screens.
+- **Set Brightness**: Adjust the software brightness levels of connected monitors.
+- **Set Primary Monitor**: Define which monitor should act as the primary display.
+- **Set Resolution**: Change the display resolution for connected monitors.
 
 ### Printers
 
-- **CUPS**: This script will install the CUPS system, required for most printer drivers on Linux.
-- **Epson printer drivers**: This script will install the Epson printer drivers.
-- **HP printer drivers**: This script will install HP printer drivers.
+- **CUPS**: Install and configure the Common UNIX Printing System (CUPS).
+- **Epson printer drivers**: Install printer drivers specifically for Epson devices.
+- **HP printer drivers**: Install HP Linux Imaging and Printing (HPLIP) drivers.
 
 ### User Account Manager
 
-- **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
-- **Ollama**: This utility is designed to manage ollama in your system
-- **Service Manager**: This utility is designed to manage services in your system
-- **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
-- **WiFi Manager**: This utility is designed to manage wifi in your system
+- **Add User**: Create a new user account on the local system.
+- **Add User To Groups**: Assign an existing user to additional system groups.
+- **Change Password**: Update the login password for a specific user.
+- **Delete User**: Permanently remove a user account from the system.
+- **Remove User From Groups**: Revoke a user's membership from specific system groups.
+
+### System Management
+
+- **Auto Login**: Enable automatic login for a specific user on system boot.
+- **Bluetooth Manager**: Control Bluetooth power state and pair new devices.
+- **Numlock on Startup**: Force Num Lock to be enabled at system startup.
+- **Service Manager**: Interactive utility to start, stop, and enable system services.
+- **US Locale Setup**: Configure US UTF-8 locale and fix directory naming conventions.
+- **WiFi Manager**: Manage wireless network connections and credentials.
+
+### Tools & Maintenance
+
+- **Bootable USB Creator**: Create a bootable Linux USB drive from an ISO image.
+- **Crypto tool**: Simple utility for encrypting and decrypting files.
+- **Timeshift Backup**: Configure system snapshots and backups via Timeshift.
+
+### AI & Development
+
+- **Ollama**: Install and manage Ollama for running large language models locally.
+- **Ranalama**: Manage Ramalama for efficient AI model execution.
+- **SSH Commands**: Common SSH management tasks and configurations.
+- **SSH Samba**: Setup and configure SSH and Samba for file sharing.

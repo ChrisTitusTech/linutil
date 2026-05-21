@@ -16,63 +16,62 @@ values = [":0", ":1", ":2", ":3", ":4", ":5", ":6", ":7", ":8", ":9"]
 
 [[data.entries]]
 name = "Auto Detect Displays"
-description = "This script is designed to detect and apply recommended configuration for monitors connected with your system"
+description = "Automatically detect and configure connected monitors."
 script = "monitor-control/auto_detect_displays.sh"
 
 [[data.entries]]
 name = "Change Orientation"
-description = "This script is designed to change the orientation of monitors in your system"
+description = "Rotate monitor orientation (normal, left, right, inverted)."
 script = "monitor-control/change_orientation.sh"
 
 [[data.entries]]
 name = "Disable Monitor"
-description = "This script is designed to disable a monitor in your system"
+description = "Turn off a specific monitor in a multi-display setup."
 script = "monitor-control/disable_monitor.sh"
 
 [[data.entries]]
 name = "Duplicate Displays"
-description = "This script is designed to duplicate display among multi-monitor setup in your system"
+description = "Mirror the primary display across all connected monitors."
 script = "monitor-control/duplicate_displays.sh"
 
 [[data.entries]]
 name = "Enable Monitor"
-description = "This script is designed to enable a monitor in your system"
+description = "Turn on a specific monitor that was previously disabled."
 script = "monitor-control/enable_monitor.sh"
 
 [[data.entries]]
 name = "Extend Displays"
-description = "This script is designed to extend display among multi-monitor setup in your system"
+description = "Extend the desktop across multiple monitors."
 script = "monitor-control/extend_displays.sh"
-
 
 [[data.entries]]
 name = "Manage Arrangement"
-description = "This script is designed to arrange monitors in multi-monitor setup in your system"
+description = "Configure the physical layout and positioning of monitors."
 script = "monitor-control/manage_arrangement.sh"
 
 [[data.entries]]
 name = "Reset Scaling"
-description = "This script is designed to reset scaling of a monitor in your system"
+description = "Restore default (100%) scaling for a specific monitor."
 script = "monitor-control/reset_scaling.sh"
 
 [[data.entries]]
 name = "Scale Monitors"
-description = "This script is designed to change the scaling of monitors in your system"
+description = "Adjust display scaling for better visibility on high-resolution screens."
 script = "monitor-control/scale_monitor.sh"
 
 [[data.entries]]
 name = "Set Brightness"
+description = "Adjust the software brightness levels of connected monitors."
 script = "monitor-control/set_brightness.sh"
-description = "This script is designed to change the Brightness of monitors connected to your system"
 
 [[data.entries]]
 name = "Set Primary Monitor"
-description = "This script is designed to set a Primary monitor in your system"
+description = "Define which monitor should act as the primary display."
 script = "monitor-control/set_primary_monitor.sh"
 
 [[data.entries]]
 name = "Set Resolution"
-description = "This script is designed to change the resolution of monitors connected to your system"
+description = "Change the display resolution for connected monitors."
 script = "monitor-control/set_resolutions.sh"
 
 [[data]]
@@ -80,20 +79,20 @@ name = "Printers"
 
 [[data.entries]]
 name = "CUPS"
+description = "Install and configure the Common UNIX Printing System (CUPS)."
 script = "printers/install-cups.sh"
-description = "This script will install the CUPS system, required for most printer drivers on Linux."
 task_list = "I"
 
 [[data.entries]]
 name = "Epson printer drivers"
+description = "Install printer drivers specifically for Epson devices."
 script = "printers/install-epson-printer-drivers.sh"
-description = "This script will install the Epson printer drivers."
 task_list = "I"
 
 [[data.entries]]
 name = "HP printer drivers"
+description = "Install HP Linux Imaging and Printing (HPLIP) drivers."
 script = "printers/install-hp-printer-drivers.sh"
-description = "This script will install HP printer drivers."
 task_list = "I"
 
 [[data]]
@@ -102,98 +101,118 @@ multi_select = false
 
 [[data.entries]]
 name = "Add User"
+description = "Create a new user account on the local system."
 script = "user-account-manager/add_user.sh"
 
 [[data.entries]]
 name = "Add User To Groups"
+description = "Assign an existing user to additional system groups."
 script = "user-account-manager/add_to_group.sh"
 
 [[data.entries]]
 name = "Change Password"
+description = "Update the login password for a specific user."
 script = "user-account-manager/change_password.sh"
 
 [[data.entries]]
 name = "Delete User"
+description = "Permanently remove a user account from the system."
 script = "user-account-manager/delete_user.sh"
 
 [[data.entries]]
 name = "Remove User From Groups"
+description = "Revoke a user's membership from specific system groups."
 script = "user-account-manager/remove_from_group.sh"
 
 [[data]]
+name = "System Management"
+
+[[data.entries]]
 name = "Auto Login"
+description = "Enable automatic login for a specific user on system boot."
 script = "auto-login.sh"
 task_list = "DE setup"
 
-[[data]]
+[[data.entries]]
 name = "Bluetooth Manager"
-description = "This utility is designed to manage bluetooth in your system"
+description = "Control Bluetooth power state and pair new devices."
 script = "bluetooth-control.sh"
 task_list = "I SS"
 multi_select = false
 
-[[data]]
-name = "Bootable USB Creator"
-script = "create-bootable-usb.sh"
-task_list = "D"
-
-[[data]]
-name = "Crypto tool"
-script = "encrypt_decrypt_tool.sh"
-task_list = "I FM"
-
-[[data]]
+[[data.entries]]
 name = "Numlock on Startup"
-description = "This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME"
+description = "Force Num Lock to be enabled at system startup."
 script = "numlock.sh"
 task_list = "PFM SS"
 
-[[data]]
-name = "Ollama"
-description = "This utility is designed to manage ollama in your system"
-script = "ollama.sh"
-task_list = "I SS"
-
-[[data]]
-name = "Ranalama"
-description = "This utility is designed to manage ramalama in your system"
-script = "ramalama.sh"
-task_list = "I SS"
-
-[[data]]
+[[data.entries]]
 name = "Service Manager"
-description = "This utility is designed to manage services in your system"
+description = "Interactive utility to start, stop, and enable system services."
 script = "service-control.sh"
 task_list = "I PFM SS"
 
-[[data]]
-name = "SSH Commands"
-script = "ssh.sh"
-task_list = "I FM SS"
+[[data.entries]]
+name = "US Locale Setup"
+description = "Configure US UTF-8 locale and fix directory naming conventions."
+script = "locale-us-setup.sh"
+task_list = "FM"
+
+[[data.entries]]
+name = "WiFi Manager"
+description = "Manage wireless network connections and credentials."
+script = "wifi-control.sh"
+task_list = "I SS"
 
 [[data]]
-name = "SSH Samba"
-script = "samba-ssh-setup.sh"
-task_list = "I SS PFM"
+name = "Tools & Maintenance"
 
-[[data]]
+[[data.entries]]
+name = "Bootable USB Creator"
+description = "Create a bootable Linux USB drive from an ISO image."
+script = "create-bootable-usb.sh"
+task_list = "D"
+
+[[data.entries]]
+name = "Crypto tool"
+description = "Simple utility for encrypting and decrypting files."
+script = "encrypt_decrypt_tool.sh"
+task_list = "I FM"
+
+[[data.entries]]
 name = "Timeshift Backup"
+description = "Configure system snapshots and backups via Timeshift."
 script = "timeshift.sh"
 task_list = "I"
 
-[[data.preconditions]]
+[[data.entries.preconditions]]
 matches = false
 data = "command_exists"
 values = [ "dnf" ]
 
 [[data]]
-name = "US Locale Setup"
-description = "This fixes US UTF-8 Locale and Folder listings"
-script = "locale-us-setup.sh"
-task_list = "FM"
+name = "AI & Development"
 
-[[data]]
-name = "WiFi Manager"
-description = "This utility is designed to manage wifi in your system"
-script = "wifi-control.sh"
+[[data.entries]]
+name = "Ollama"
+description = "Install and manage Ollama for running large language models locally."
+script = "ollama.sh"
 task_list = "I SS"
+
+[[data.entries]]
+name = "Ranalama"
+description = "Manage Ramalama for efficient AI model execution."
+script = "ramalama.sh"
+task_list = "I SS"
+
+[[data.entries]]
+name = "SSH Commands"
+description = "Common SSH management tasks and configurations."
+script = "ssh.sh"
+task_list = "I FM SS"
+
+[[data.entries]]
+name = "SSH Samba"
+description = "Setup and configure SSH and Samba for file sharing."
+script = "samba-ssh-setup.sh"
+task_list = "I SS PFM"

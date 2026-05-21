@@ -8,7 +8,7 @@ name = "Multi-System Emulators"
 
 [[data.entries.entries]]
 name = "RetroArch Game Emulator"
-description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios included."
 script = "emulators/retroarch.sh"
 task_list = "FM"
 
@@ -17,49 +17,49 @@ name = "Nintendo Emulators"
 
 [[data.entries.entries]]
 name = "bsnes"
-description = "Super Nintendo Emulator. NO Games are included"
+description = "Super Nintendo emulator. NO Games included."
 script = "emulators/nintendo/bsnes.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Dolphin Emulator"
-description = "GameCube and Wii Emulator. NO Games are included"
+description = "GameCube and Wii emulator. NO Games included."
 script = "emulators/nintendo/dolphin-emu.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Gopher 64"
-description = "N64 Emulator. NO Games are included"
+description = "N64 emulator. NO Games included."
 script = "emulators/nintendo/gopher64.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "MelonDS"
-description = "Nintendo DS and DSi Emulator. NO Games are included"
+description = "Nintendo DS and DSi emulator. NO Games included."
 script = "emulators/nintendo/melonds.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "mGBA"
-description = "Nintendo Game Boy Advance Emulator. NO Games are included"
+description = "Nintendo Game Boy Advance emulator. NO Games included."
 script = "emulators/nintendo/mgba.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Mupen 64 Plus"
-description = "N64 Emulator. NO Games are included"
+description = "N64 emulator. NO Games included."
 script = "emulators/nintendo/mupen64plus.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Ryujinx"
-description = "Nintendo Switch emulator. NO Games are included"
+description = "Nintendo Switch emulator. NO Games included."
 script = "emulators/nintendo/ryujinx.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "snes9x"
-description = "Super Nintendo Emulator. NO Games are included"
+description = "Super Nintendo emulator. NO Games included."
 script = "emulators/nintendo/snes9x.sh"
 task_list = "FM"
 
@@ -68,52 +68,40 @@ name = "PlayStation Emulators"
 
 [[data.entries.entries]]
 name = "PCSX2"
-description = "A Playstation 2 emulator. NO Games or Bios' are included"
+description = "Playstation 2 emulator. NO Games or Bios included."
 script = "emulators/playstation/pcsx2.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Play!"
-description = "An Experimental Playstation 2 emulator. NO Games or Bios' are included"
+description = "Experimental Playstation 2 emulator. NO Games or Bios included."
 script = "emulators/playstation/play-emu.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "RPCS3"
-description = "A Playstation 3 emulator. NO Games or Bios' are included"
+description = "Playstation 3 emulator. NO Games or Bios included."
 script = "emulators/playstation/rpcs3.sh"
 task_list = "FM"
-
-# [[data.entries.entries]]
-# name = "PCSX"
-# description = "A Playstation emulator. NO Games or Bios' are included"
-# script = "emulators/playstation/pcsx.sh"
-# task_list = "FM"
 
 [[data.entries]]
 name = "Sega Emulators"
 
 [[data.entries.entries]]
 name = "Blastem"
-description = "A Genesis emulator. NO Games are included"
+description = "Genesis emulator. NO Games included."
 script = "emulators/sega/blastem.sh"
 task_list = "FM"
 
-# [[data.entries.entries]]
-# name = "Yabause"
-# description = "A Sega Saturn emulator"
-# script = "emulators/sega/yabause.sh"
-# task_list = "FM"
-
 [[data.entries.entries]]
 name = "Flycast"
-description = "A Dreamcase emulator. NO Games are included"
+description = "Dreamcast emulator. NO Games included."
 script = "emulators/sega/flycast.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Kronos"
-description = "A Sega Saturn emulator. NO Games are included"
+description = "Sega Saturn emulator. NO Games included."
 script = "emulators/sega/kronos.sh"
 task_list = "FM"
 
@@ -122,13 +110,13 @@ name = "Xbox Emulators"
 
 [[data.entries.entries]]
 name = "XEMU"
-description = "An Original Xbox emulator. NO Games or Bios' are included"
+description = "Original Xbox emulator. NO Games or Bios included."
 script = "emulators/xbox/xemu.sh"
 task_list = "FM"
 
 [[data.entries.entries]]
 name = "Xenia"
-description = "An Experimental Xbox 360 emulator. NO Games or Bios' are included"
+description = "Experimental Xbox 360 emulator. NO Games or Bios included."
 script = "emulators/xbox/xenia.sh"
 task_list = "FM"
 
@@ -137,45 +125,45 @@ name = "Tools and Setups"
 
 [[data.entries]]
 name = "Auto CPU Frequency"
-description = "Automatic CPU speed & power optimizer.\nhttps://github.com/AdnanHodzic/auto-cpufreq"
+description = "Automatic CPU speed & power optimizer for Linux."
 script = "../applications-setup/auto-cpufreq.sh"
 task_list = "I SS"
 
 [[data.entries]]
 name = "Auto Mount Drive"
-description = "This utility is designed to help with automating the process of mounting a drive on to your system."
+description = "Automate the process of mounting drives on system startup."
 script = "../utils/auto-mount.sh"
 task_list = "PFM"
 multi_select = false
 
 [[data.entries]]
 name = "Bottles"
-description = "Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications."
+description = "Run Windows software and games on Linux with ease."
 script = "../applications-setup/bottles-setup.sh"
 task_list = "FI"
 
 [[data.entries]]
 name = "Gaming Dependencies"
-description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions."
+description = "Install necessary gaming dependencies across various Linux distributions."
 script = "../system-setup/gaming-setup.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "General GPU Drivers"
-description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
+description = "Detect and install recommended GPU driver stacks."
 script = "../system-setup/gpu-driver.sh"
 task_list = "I"
 multi_select = false
 
 [[data.entries]]
 name = "Nvidia Drivers & Hardware Acceleration"
-description = "Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch)."
+description = "Arch-specific NVIDIA driver installer and hardware acceleration setup."
 script = "../system-setup/arch/nvidia-drivers.sh"
 task_list = "I"
 
 [[data.entries]]
 name = "Waydroid"
-description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
+description = "Run Android applications and games in a container on Linux."
 script = "../applications-setup/waydroid-setup.sh"
 task_list = "I SS"
 [[data.entries.preconditions]]
@@ -183,25 +171,28 @@ matches = true
 data = { environment = "XDG_SESSION_TYPE" }
 values = ["wayland", "Wayland"]
 [[data]]
+name = "Game-Specific Mods"
+
+[[data.entries]]
 name = "Arc Raiders Titus Mods"
-description = "Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations."
+description = "Optimized game configurations for Arc Raiders, including VRR and performance tweaks."
 script = "arc-raiders-mod.sh"
 task_list = "FM"
 
-[[data]]
+[[data.entries]]
 name = "Diablo II Resurrected Loot Filter"
-description = "Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt"
+description = "Loot filter for D2R that highlights high-value items."
 script = "diablo2-titus-mod.sh"
 task_list = "FM"
 
-[[data]]
+[[data.entries]]
 name = "Fallout 76 INI and Mods"
-description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
+description = "Custom configurations and performance mods for Fallout 76 via Steam."
 script = "fallout76-titus-mod.sh"
 task_list = "FM"
 
-[[data]]
+[[data.entries]]
 name = "Starfield Titus INI and Mods"
-description = "Installs custom Starfield mods from ChrisTitusTech/starfield-config via steam."
+description = "Performance-focused custom configurations for Starfield via Steam."
 script = "starfield-titus-mod.sh"
 task_list = "FM"

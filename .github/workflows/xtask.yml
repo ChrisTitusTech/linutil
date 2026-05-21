@@ -1,61 +1,54 @@
 name: XTask Checks
-permissions:
-  contents: read
 
 on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'xtask/**'
+      - 'core/tabs/**'
+      - 'docs/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
   pull_request:
     paths:
-      - "xtask"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - ".cargo"
-      - "core/tabs"
-      - "docs"
-  push:
-    paths:
-      - "xtask"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - ".cargo"
-      - "core/tabs"
-      - "docs"
+      - 'xtask/**'
+      - 'core/tabs/**'
+      - 'docs/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   docgen:
-    name: DocGen
+    name: DocGen Verification
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v5
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Cargo registry
+      - name: Cache Cargo
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-registry-
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Cache Cargo index
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-index-
-
-      - name: Run cargo xtask docgen
+      - name: Generate Documentation
         run: cargo xtask docgen
 
-      - name: Check uncommitted documentation changes
+      - name: Verify Documentation Status
         run: |
-          if [[ -n $(git status --porcelain docs) ]]; then
-            echo "Please run 'cargo xtask docgen' and commit the changes.";
-            git --no-pager diff docs/generated;
-            exit 1;
+          if ! git diff --exit-code docs; then
+            echo "::error::Documentation is out of date. Please run 'cargo xtask docgen' locally and commit the changes."
+            exit 1
           fi
