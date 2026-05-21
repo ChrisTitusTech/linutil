@@ -77,7 +77,7 @@ Tools for monitor management, printer setup, Bluetooth, WiFi, service management
 
 ### Gaming
 
-Install gaming dependencies, emulators, and game-specific optimizations.
+Install gaming dependencies, game launchers, emulators, and game-specific optimizations.
 
 **[Read the Features Guide →](features/)**
 

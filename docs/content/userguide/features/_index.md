@@ -32,6 +32,19 @@ An alternative to UFW, FirewallD is the default firewall manager on Fedora and R
 
 Installs the libraries and tools needed to run games on Linux across different distributions (Steam, Wine, DXVK, Vulkan drivers, etc.).
 
+### Game Launchers
+
+The Gaming tab includes a **Game Launchers** section for managing common launchers with an interactive Install, Uninstall, or Abort prompt.
+
+| Launcher | Behavior |
+|----------|----------|
+| Steam | Uses native packages on Arch-based systems; uses Flatpak on several other distros where native availability is less consistent |
+| Lutris | Uses the native package manager on supported distros |
+| RetroArch | Uses native packages where available, with Flatpak fallback for selected distros |
+| Heroic | Uses Flatpak on non-Arch systems; on Arch-based systems builds `heroic-games-launcher-bin` directly from AUR |
+
+On NixOS, these entries print declarative configuration guidance instead of modifying the system imperatively.
+
 ### Emulators
 
 | Emulator | Console |

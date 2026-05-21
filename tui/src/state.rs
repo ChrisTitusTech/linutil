@@ -176,7 +176,7 @@ impl AppState {
     }
 
     fn spawn_confirmprompt(&mut self) {
-        if self.skip_confirmation {
+        if self.skip_confirmation || self.should_skip_confirmation_for_selection() {
             self.handle_confirm_command();
         } else {
             let cmd_names: Vec<_> = self
@@ -191,6 +191,27 @@ impl AppState {
                 CONFIRM_PROMPT_FLOAT_SIZE,
                 CONFIRM_PROMPT_FLOAT_SIZE,
             ));
+        }
+    }
+
+    fn should_skip_confirmation_for_selection(&self) -> bool {
+        !self.selected_commands.is_empty()
+            && self
+                .selected_commands
+                .iter()
+                .all(|node| self.should_skip_confirmation_for_command(&node.command))
+    }
+
+    fn should_skip_confirmation_for_command(&self, command: &Command) -> bool {
+        match command {
+            Command::LocalFile { file, .. } => {
+                let path = file.to_string_lossy();
+                path.ends_with("/gaming/steam-launcher.sh")
+                    || path.ends_with("/gaming/lutris-launcher.sh")
+                    || path.ends_with("/gaming/retroarch-launcher.sh")
+                    || path.ends_with("/gaming/heroic-launcher.sh")
+            }
+            _ => false,
         }
     }
 
