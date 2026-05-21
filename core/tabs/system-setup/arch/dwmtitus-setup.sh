@@ -20,10 +20,12 @@ install_dwm_titus() {
         }
     else
         printf "%b\n" "${YELLOW}Updating dwm-titus repository...${RC}"
-        cd "$DWM_DIR" && git pull || {
+        if cd "$DWM_DIR" && git pull; then
+            :
+        else
             printf "%b\n" "${RED}Failed to update dwm-titus${RC}"
             return 1
-        }
+        fi
     fi
     
     # Run the upstream install script
