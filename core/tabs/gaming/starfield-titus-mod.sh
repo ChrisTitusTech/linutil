@@ -44,11 +44,23 @@ clone_git_repo() {
         printf "%b\n" "${YELLOW}Warning: No directory found in repository.${RC}"
     fi
 
-    cp -f "$common_path/Starfield.exe" "$common_path/Starfield-STOCK.exe" || {
-        printf "%b\n" "${RED}Failed to backup original executable.${RC}"
+    stock_size_min_bytes=94371840 # 90 MiB
+    starfield_exe_size=$(wc -c < "$common_path/Starfield.exe" 2>/dev/null) || {
+        printf "%b\n" "${RED}Failed to read Starfield.exe size.${RC}"
         rm -rf "$tmp_dir"
         return 1
     }
+
+    if [ "$starfield_exe_size" -gt "$stock_size_min_bytes" ]; then
+        printf "%b\n" "${RED}Overwriting Starfield-STOCK.exe: New Starfield EXE detected.${RC}"
+        rm -rf "$tmp_dir"
+        cp -f "$common_path/Starfield.exe" "$common_path/Starfield-STOCK.exe" || {
+            printf "%b\n" "${RED}Failed to backup Starfield Stock executable.${RC}"
+            rm -rf "$tmp_dir"
+            return 1
+        }
+    fi
+   
 
     cp -f "$common_path/sfse_loader.exe" "$common_path/Starfield.exe" || {
         printf "%b\n" "${RED}Failed to replace executable with mod loader.${RC}"
