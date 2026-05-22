@@ -44,6 +44,12 @@ task_list = "I MP"
 multi_select = false
 
 [[data.entries]]
+name = "Install CachyOS Repository and Kernel"
+description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
+script = "arch/cachyos-repos.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Install Chaotic-AUR Repository"
 description = "Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/"
 script = "arch/chaotic-aur-setup.sh"
@@ -59,12 +65,6 @@ task_list = "I PFM K"
 matches = true
 data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
 values = ["Valve"]
-
-[[data.entries]]
-name = "Install CachyOS Repository and Kernel"
-description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
-script = "arch/cachyos-repos.sh"
-task_list = "I"
 
 [[data.entries]]
 name = "Nvidia Drivers & Hardware Acceleration"

@@ -1038,7 +1038,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_core"
-version = "26.3.5"
+version = "26.5.21"
 dependencies = [
  "ego-tree",
  "include_dir",
@@ -1050,7 +1050,7 @@ dependencies = [
 
 [[package]]
 name = "linutil_tui"
-version = "26.3.5"
+version = "26.5.21"
 dependencies = [
  "clap",
  "image",
@@ -2870,7 +2870,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "26.3.5"
+version = "26.5.21"
 dependencies = [
  "linutil_core",
 ]

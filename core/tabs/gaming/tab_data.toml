@@ -4,6 +4,15 @@ name = "Gaming"
 name = "Emulators"
 
 [[data.entries]]
+name = "Multi-System Emulators"
+
+[[data.entries.entries]]
+name = "RetroArch Game Emulator"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
+script = "emulators/retroarch.sh"
+task_list = "FM"
+
+[[data.entries]]
 name = "Nintendo Emulators"
 
 [[data.entries.entries]]
@@ -109,15 +118,6 @@ script = "emulators/sega/kronos.sh"
 task_list = "FM"
 
 [[data.entries]]
-name = "Multi-System Emulators"
-
-[[data.entries.entries]]
-name = "RetroArch Game Emulator"
-description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
-script = "emulators/retroarch.sh"
-task_list = "FM"
-
-[[data.entries]]
 name = "Xbox Emulators"
 
 [[data.entries.entries]]
@@ -198,4 +198,10 @@ task_list = "FM"
 name = "Fallout 76 INI and Mods"
 description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
 script = "fallout76-titus-mod.sh"
+task_list = "FM"
+
+[[data]]
+name = "Starfield Titus INI and Mods"
+description = "Installs custom Starfield mods from ChrisTitusTech/starfield-config via steam."
+script = "starfield-titus-mod.sh"
 task_list = "FM"
