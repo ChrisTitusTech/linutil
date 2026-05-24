@@ -54,29 +54,38 @@ installFont() {
     fi
 }
 
+_install_pkg() {
+    case "$PACKAGER" in
+        pacman) "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$1" ;;
+        apk)    "$ESCALATION_TOOL" "$PACKAGER" add "$1" ;;
+        xbps-install) "$ESCALATION_TOOL" "$PACKAGER" -Sy "$1" ;;
+        *)      "$ESCALATION_TOOL" "$PACKAGER" install -y "$1" ;;
+    esac
+}
+
 installStarshipAndFzf() {
-    if command_exists starship; then
+    if ! command_exists starship; then
+        printf "%b\n" "${YELLOW}Installing Starship...${RC}"
+        _install_pkg starship 2>/dev/null || {
+            printf "%b\n" "${YELLOW}Package manager install failed, using curl...${RC}"
+            curl -sSL https://starship.rs/install.sh | "$ESCALATION_TOOL" sh || {
+                printf "%b\n" "${RED}Failed to install starship!${RC}"
+                exit 1
+            }
+        }
+    else
         printf "%b\n" "${GREEN}Starship already installed${RC}"
-        return
     fi
 
-    if [ "$PACKAGER" = "eopkg" ]; then
-        "$ESCALATION_TOOL" "$PACKAGER" install -y starship || {
-            printf "%b\n" "${RED}Failed to install starship with Solus!${RC}"
-            exit 1
+    if ! command_exists fzf; then
+        printf "%b\n" "${YELLOW}Installing fzf...${RC}"
+        _install_pkg fzf 2>/dev/null || {
+            printf "%b\n" "${YELLOW}Package manager install failed, using git...${RC}"
+            git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+            "$ESCALATION_TOOL" ~/.fzf/install
         }
     else
-        curl -sSL https://starship.rs/install.sh | "$ESCALATION_TOOL" sh || {
-            printf "%b\n" "${RED}Failed to install starship!${RC}"
-            exit 1
-        }
-    fi
-
-    if command_exists fzf; then
         printf "%b\n" "${GREEN}Fzf already installed${RC}"
-    else
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-        "$ESCALATION_TOOL" ~/.fzf/install
     fi
 }
 
@@ -86,10 +95,14 @@ installZoxide() {
         return
     fi
 
-    if ! curl -sSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
-        printf "%b\n" "${RED}Something went wrong during zoxide install!${RC}"
-        exit 1
-    fi
+    printf "%b\n" "${YELLOW}Installing Zoxide...${RC}"
+    _install_pkg zoxide 2>/dev/null || {
+        printf "%b\n" "${YELLOW}Package manager install failed, using curl...${RC}"
+        if ! curl -sSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+            printf "%b\n" "${RED}Something went wrong during zoxide install!${RC}"
+            exit 1
+        fi
+    }
 }
 
 linkConfig() {
