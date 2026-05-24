@@ -14,5 +14,4 @@ installPipewire() {
 }
 
 checkEnv
-checkEscalationTool
 installPipewire

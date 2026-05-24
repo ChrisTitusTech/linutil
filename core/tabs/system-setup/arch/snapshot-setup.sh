@@ -17,10 +17,24 @@ checkBtrfs() {
 setupSnapper() {
     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm snapper snap-pac grub-btrfs
 
-    if [ -d "/.snapshots" ] && mountpoint -q "/.snapshots"; then
-        "$ESCALATION_TOOL" umount /.snapshots 2>/dev/null || true
+    if [ -f "/etc/snapper/configs/root" ]; then
+        printf "%s\n" "${RED}Error: Existing Snapper 'root' configuration detected. Aborting.${RC}" >&2
+        exit 1
     fi
-    "$ESCALATION_TOOL" rm -rf /.snapshots 2>/dev/null || true
+
+    if mountpoint -q "/.snapshots"; then
+        printf "%s\n" "${RED}Error: /.snapshots is actively mounted. Aborting.${RC}" >&2
+        exit 1
+    fi
+
+    if [ -d "/.snapshots" ]; then
+        if "$ESCALATION_TOOL" rmdir "/.snapshots" 2>/dev/null; then
+            printf "%s\n" "${GREEN}Removed empty /.snapshots directory.${RC}"
+        else
+            printf "%s\n" "${RED}Error: /.snapshots exists and is not empty or could not be removed. Aborting to avoid data loss.${RC}" >&2
+            exit 1
+        fi
+    fi
 
     "$ESCALATION_TOOL" snapper -c root create-config /
 
@@ -33,6 +47,5 @@ setupSnapper() {
 }
 
 checkEnv
-checkEscalationTool
 checkBtrfs
 setupSnapper

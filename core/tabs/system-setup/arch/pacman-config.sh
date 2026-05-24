@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 configurePacman() {
-    local conf="/etc/pacman.conf"
+    conf="/etc/pacman.conf"
 
     if [ ! -f "$conf" ]; then
         printf "%b\n" "${RED}${conf} not found.${RC}"
@@ -24,8 +24,7 @@ configurePacman() {
 }
 
 configureMakepkg() {
-    local conf="/etc/makepkg.conf"
-    local cores
+    conf="/etc/makepkg.conf"
 
     cores=$(nproc)
     "$ESCALATION_TOOL" sed -i "s/^#MAKEFLAGS=\"-j[0-9]*\"/MAKEFLAGS=\"-j${cores}\"/" "$conf"
@@ -38,6 +37,5 @@ configureMakepkg() {
 }
 
 checkEnv
-checkEscalationTool
 configurePacman
 configureMakepkg

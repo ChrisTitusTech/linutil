@@ -12,12 +12,11 @@ setupPaccache() {
 }
 
 removeOrphans() {
-    local orphans
     orphans=$(pacman -Qtdq 2>/dev/null || true)
     if [ -n "$orphans" ]; then
         printf "%b\n" "${YELLOW}Removing orphan packages...${RC}"
         printf "%s\n" "$orphans"
-        "$ESCALATION_TOOL" "$PACKAGER" -Rns --noconfirm $orphans 2>/dev/null || true
+        printf "%s\n" "$orphans" | "$ESCALATION_TOOL" xargs "$PACKAGER" -Rns --noconfirm 2>/dev/null || true
     else
         printf "%b\n" "${GREEN}No orphan packages found.${RC}"
     fi
@@ -30,7 +29,6 @@ cleanJournal() {
 
 printf "%b\n" "${YELLOW}Arch System Maintenance${RC}"
 checkEnv
-checkEscalationTool
 setupPaccache
 removeOrphans
 cleanJournal
