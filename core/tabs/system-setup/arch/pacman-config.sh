@@ -16,7 +16,7 @@ configurePacman() {
     "$ESCALATION_TOOL" sed -i 's/^#ParallelDownloads/ParallelDownloads/' "$conf"
     if ! grep -q "^ParallelDownloads" "$conf"; then
         printf "%b\n" "${YELLOW}Adding ParallelDownloads...${RC}"
-        "$ESCALATION_TOOL" sed -i '/^#ParallelDownloads/a ParallelDownloads = 5' "$conf"
+        "$ESCALATION_TOOL" sed -i '/^#ParallelDownloads/a ParallelDownloads = 20' "$conf"
     fi
     "$ESCALATION_TOOL" sed -i "/\[multilib\]/,/Include/"'s/^#//' "$conf"
 
