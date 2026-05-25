@@ -9,12 +9,14 @@ installPipewirePkgs() {
             ;;
         apt-get|nala)
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulse wireplumber pipewire-audio-client-libraries 2>/dev/null || \
-            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulse wireplumber
+            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulse wireplumber pipewire-jack pipewire-audio-client-libraries 2>/dev/null || \
+            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulse wireplumber pipewire-jack
             ;;
+
         dnf)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulse wireplumber pipewire-jack-audio-connection-kit
+            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire pipewire-pulseaudio wireplumber pipewire-jack-audio-connection-kit
             ;;
+
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" --non-interactive install pipewire pipewire-pulse wireplumber pipewire-jack
             ;;
