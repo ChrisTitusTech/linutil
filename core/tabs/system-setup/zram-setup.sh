@@ -27,7 +27,8 @@ installZramPkg() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y zram-generator
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y zram-generator
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER. Install zram-generator manually.${RC}"
+            exit 1
             ;;
     esac
 }

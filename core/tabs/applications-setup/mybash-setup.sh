@@ -59,7 +59,8 @@ _install_pkg() {
         pacman) "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm "$1" ;;
         apk)    "$ESCALATION_TOOL" "$PACKAGER" add "$1" ;;
         xbps-install) "$ESCALATION_TOOL" "$PACKAGER" -Sy "$1" ;;
-        *)      "$ESCALATION_TOOL" "$PACKAGER" install -y "$1" ;;
+        dnf|apt-get|nala|zypper|eopkg) "$ESCALATION_TOOL" "$PACKAGER" install -y "$1" ;;
+        *)      printf "%b\n" "${YELLOW}Unsupported package manager, falling back to manual install...${RC}" && return 1 ;;
     esac
 }
 

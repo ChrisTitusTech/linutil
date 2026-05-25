@@ -28,7 +28,8 @@ installPipewirePkgs() {
             "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire wireplumber
             ;;
         *)
-            "$ESCALATION_TOOL" "$PACKAGER" install -y pipewire wireplumber
+            printf "%b\n" "${RED}Unsupported package manager: $PACKAGER. Install pipewire and wireplumber manually.${RC}"
+            exit 1
             ;;
     esac
 }
