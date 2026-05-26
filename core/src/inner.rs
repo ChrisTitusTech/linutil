@@ -140,7 +140,9 @@ impl Entry {
                         SystemDataType::CommandExists => values
                             .iter()
                             .all(|command| which::which(command).is_ok() == *matches),
-                        SystemDataType::FileExists => values.iter().all(|p| Path::new(p).is_file()),
+                        SystemDataType::FileExists => {
+                            values.iter().all(|p| Path::new(p).is_file() == *matches)
+                        }
                     }
                 },
             )
@@ -246,7 +248,10 @@ fn get_shebang(script_path: &Path, validate: bool) -> Option<(String, Vec<String
         return default_executable();
     }
 
-    let first_line = reader.lines().next().unwrap().unwrap();
+    let first_line = match reader.lines().next() {
+        Some(Ok(line)) => line,
+        _ => return default_executable(),
+    };
 
     let mut parts = first_line.split_whitespace();
 
