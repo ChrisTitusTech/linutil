@@ -10,8 +10,14 @@ installDepend() {
             if ! command_exists yay; then
                 printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
-                cd /opt && "$ESCALATION_TOOL" git clone https://aur.archlinux.org/yay-bin.git && "$ESCALATION_TOOL" chown -R "$USER": ./yay-bin
+
+                TMP_BUILD_DIR=$(mktemp -d)
+                cd "$TMP_BUILD_DIR"
+                git clone https://aur.archlinux.org/yay-bin.git
                 cd yay-bin && makepkg --noconfirm -si
+
+                cd - >/dev/null
+                rm -rf "$TMP_BUILD_DIR"
                 printf "%b\n" "${GREEN}Yay installed${RC}"
             else
                 printf "%b\n" "${GREEN}Aur helper already installed${RC}"
