@@ -210,6 +210,8 @@ impl AppState {
                     || path.ends_with("/gaming/lutris-launcher.sh")
                     || path.ends_with("/gaming/retroarch-launcher.sh")
                     || path.ends_with("/gaming/heroic-launcher.sh")
+                    || path.ends_with("/gaming/protonplus.sh")
+                    || path.ends_with("/gaming/protonup-qt.sh")
             }
             _ => false,
         }

@@ -32,6 +32,15 @@ An alternative to UFW, FirewallD is the default firewall manager on Fedora and R
 
 Installs the libraries and tools needed to run games on Linux across different distributions (Steam, Wine, DXVK, Vulkan drivers, etc.).
 
+### Proton Compatibility Tools
+
+The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Setups**. Both entries use an interactive Install, Uninstall, or Abort prompt and prefer Flathub Flatpak packages:
+
+| Tool | Flatpak ID |
+|------|------------|
+| ProtonPlus | `com.vysp3r.ProtonPlus` |
+| ProtonUp-Qt | `net.davidotek.pupgui2` |
+
 ### Game Launchers
 
 The Gaming tab includes a **Game Launchers** section for managing common launchers with an interactive Install, Uninstall, or Abort prompt.

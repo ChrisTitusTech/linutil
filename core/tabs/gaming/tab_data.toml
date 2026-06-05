@@ -152,6 +152,18 @@ script = "../system-setup/gaming-setup.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ProtonPlus"
+description = "Manage ProtonPlus installation with Flatpak."
+script = "protonplus.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "ProtonUp-Qt"
+description = "Manage ProtonUp-Qt installation with Flatpak."
+script = "protonup-qt.sh"
+task_list = "FI"
+
+[[data.entries]]
 name = "General GPU Drivers"
 description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
 script = "../system-setup/gpu-driver.sh"
