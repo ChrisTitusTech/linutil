@@ -37,6 +37,12 @@ script = "arch/dwmtitus-setup.sh"
 task_list = "I PFM SS"
 
 [[data.entries]]
+name = "Mango-Titus"
+description = "Mango is a dynamic window manager for Wayland.\nIt manages windows in tiled, monocle and floating layouts.\nAll of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.\nThis command installs and configures MangoWM and a desktop manager.\nThe list of patches applied can be found in CTT's Mango repository\nhttps://github.com/ChrisTitusTech/mango-titus"
+script = "arch/mango-titus.sh"
+task_list = "I PFM SS"
+
+[[data.entries]]
 name = "Hyprland JaKooLit"
 description = "Install JaKooLit's Hyprland configuration"
 script = "arch/hyprland-kool.sh"
