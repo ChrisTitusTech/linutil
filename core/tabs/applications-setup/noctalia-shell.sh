@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+# shellcheck disable=SC2016
+#
 . ../common-script.sh
 . ../common-service-script.sh
 

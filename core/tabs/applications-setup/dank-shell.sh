@@ -25,6 +25,7 @@ uninstallDank() {
                 ;;
             apt-get|nala|dnf|zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y dms
+                ;;
             *)
                 printf "%b\n" "${RED}Unsupported Package Manager: $PACKAGER${RC}"
                 ;;
