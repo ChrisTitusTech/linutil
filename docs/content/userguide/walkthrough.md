@@ -127,8 +127,8 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Gaming Dependencies**: Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers.
-- **ProtonPlus**: Manage ProtonPlus installation with Flatpak.
-- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with Flatpak.
+- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
+- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.

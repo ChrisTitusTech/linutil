@@ -34,7 +34,7 @@ Installs the libraries and tools needed to run games on Linux across different d
 
 ### Proton Compatibility Tools
 
-The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Setups**. Both entries use an interactive Install, Uninstall, or Abort prompt and prefer Flathub Flatpak packages:
+The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Setups**. Both entries use an interactive Install, Uninstall, or Abort prompt, try native packages first, and fall back to Flathub Flatpak packages:
 
 | Tool | Flatpak ID |
 |------|------------|

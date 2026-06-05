@@ -153,13 +153,13 @@ task_list = "I"
 
 [[data.entries]]
 name = "ProtonPlus"
-description = "Manage ProtonPlus installation with Flatpak."
+description = "Manage ProtonPlus installation with native packages first and Flatpak fallback."
 script = "protonplus.sh"
 task_list = "FI"
 
 [[data.entries]]
 name = "ProtonUp-Qt"
-description = "Manage ProtonUp-Qt installation with Flatpak."
+description = "Manage ProtonUp-Qt installation with native packages first and Flatpak fallback."
 script = "protonup-qt.sh"
 task_list = "FI"
 
