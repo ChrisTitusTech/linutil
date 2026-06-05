@@ -17,6 +17,8 @@ install_mango_titus() {
         esac
     fi
 
+    installDank
+
     MANGO_DIR="$HOME/.config/mango/"
 
     # Create directory if needed
@@ -56,6 +58,18 @@ uninstall_mango_titus() {
     else
         printf "%b\n" "${YELLOW}MangoWM is not installed${RC}"
     fi
+}
+
+installDank() {
+    printf "%b\n" "${YELLOW}Installing Dank...${RC}"
+
+    if ! command_exists dms; then
+        curl -fsSL https://install.danklinux.com | sh
+    else
+        printf "%b\n" "${GREEN}Dank already installed${RC}"
+    fi
+
+    printf "%b\n" "${GREEN}Dank installation complete${RC}"
 }
 
 main() {
