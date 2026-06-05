@@ -12,7 +12,7 @@ install_mango_titus() {
                 "$AUR_HELPER" -S --needed --noconfirm --cleanafter mangowm
                 ;;
             *)
-                printf "${GREEN}Unsupported Package Manager: $PACKAGER${RC}"
+                printf "%b\n" "${GREEN}Unsupported Package Manager: $PACKAGER${RC}"
                 ;;
         esac
     fi
@@ -54,7 +54,7 @@ uninstall_mango_titus() {
             sudo rm -rf "$HOME/.confg/mango"
         fi
     else
-        printf "${YELLOW}MangoWM is not installed${RC}"
+        printf "%b\n" "${YELLOW}MangoWM is not installed${RC}"
     fi
 }
 
