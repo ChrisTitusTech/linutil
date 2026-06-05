@@ -126,7 +126,7 @@ https://github.com/ChrisTitusTech/neovim
 https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
-- **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions.
+- **Gaming Dependencies**: Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers.
 - **ProtonPlus**: Manage ProtonPlus installation with Flatpak.
 - **ProtonUp-Qt**: Manage ProtonUp-Qt installation with Flatpak.
 - **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
@@ -235,6 +235,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
+- **Ranalama**: This utility is designed to manage ramalama in your system
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system

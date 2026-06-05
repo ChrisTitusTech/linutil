@@ -30,7 +30,7 @@ An alternative to UFW, FirewallD is the default firewall manager on Fedora and R
 
 ### Gaming Dependencies
 
-Installs the libraries and tools needed to run games on Linux across different distributions (Steam, Wine, DXVK, Vulkan drivers, etc.).
+Installs the libraries and tools needed to run games on Linux across different distributions, such as Wine, Vulkan support, MangoHud, GameMode, and related runtime dependencies. Steam and Lutris are managed separately from the **Game Launchers** section.
 
 ### Proton Compatibility Tools
 

@@ -147,7 +147,7 @@ task_list = "FI"
 
 [[data.entries]]
 name = "Gaming Dependencies"
-description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions."
+description = "Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers."
 script = "../system-setup/gaming-setup.sh"
 task_list = "I"
 

@@ -156,38 +156,11 @@ installDepend() {
 installAdditionalDepend() {
     case "$PACKAGER" in
         pacman)
-            DISTRO_DEPS='steam lutris goverlay'
-            run_install_step "Install additional gaming apps" \
+            DISTRO_DEPS='goverlay'
+            run_install_step "Install additional gaming utilities" \
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get | nala)
-            printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            lutris_url=$(curl -s https://api.github.com/repos/lutris/lutris/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
-            
-            if [ -n "$lutris_url" ]; then
-                printf "%b\n" "${YELLOW}Downloading latest Lutris from GitHub...${RC}"
-                run_install_step "Download latest Lutris package" curl -sSLo lutris.deb "$lutris_url"
-                run_install_step "Install downloaded Lutris package" "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris.deb
-                rm lutris.deb
-                run_install_step "Refresh package indexes" "$ESCALATION_TOOL" "$PACKAGER" update
-                run_install_step "Install Lutris from repositories" "$ESCALATION_TOOL" "$PACKAGER" install -y lutris
-            fi
-
-            printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
-            printf "%b\n" "${YELLOW}Installing steam...${RC}"
-            run_install_step "Install Steam" "$ESCALATION_TOOL" "$PACKAGER" install -y steam
-            ;;
-        dnf)
-            DISTRO_DEPS='steam lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
-            ;;
-        zypper)
-            DISTRO_DEPS='lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
-            ;;
-        eopkg)
-            DISTRO_DEPS='steam lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
+        apt-get | nala | dnf | zypper | eopkg)
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
