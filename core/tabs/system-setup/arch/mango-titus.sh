@@ -47,7 +47,7 @@ uninstall_mango_titus() {
 
     if command_exists mango; then
 
-        $"AUR_HELPER" -Rns --noconfirm --cleanafter mangowm
+        "$AUR_HELPER" -Rns --noconfirm --cleanafter mangowm
 
         MANGO_DIR="$HOME/.config/mango/"
         if [ -d "$MANGO_DIR" ]; then
