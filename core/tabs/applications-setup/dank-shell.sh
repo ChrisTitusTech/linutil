@@ -23,6 +23,8 @@ uninstallDank() {
             pacman)
                 "$AUR_HELPER" -Rns --noconfirm --cleanafter dms-shell greetd-dms-greeter-git
                 ;;
+            apt-get|nala|dnf|zypper)
+                "$ESCALATION_TOOL" "$PACKAGER" remove -y dms
             *)
                 printf "%b\n" "${RED}Unsupported Package Manager: $PACKAGER${RC}"
                 ;;
