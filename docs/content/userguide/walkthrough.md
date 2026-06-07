@@ -60,6 +60,7 @@ https://github.com/ChrisTitusTech/neovim
 ### Web Browsers
 
 - **Brave**: Brave is a free and open-source web browser developed by Brave Software, Inc. based on the Chromium web browser.
+- **Brave Origin**: Brave Origin is a standalone version of the Brave browser for creators and artists, providing new revenue streams and community features.
 - **Chromium**: Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser.
 - **Google Chrome**: Google Chrome is a fast, secure, and free web browser, built for the modern web.
 - **LibreWolf**: LibreWolf is a fork of Firefox, focused on privacy, security, and freedom.
@@ -74,12 +75,6 @@ https://github.com/ChrisTitusTech/neovim
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **DWM-Titus**: DWM is a dynamic window manager for X.
-It manages windows in tiled, monocle and floating layouts.
-All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
-This command installs and configures DWM and a desktop manager.
-The list of patches applied can be found in CTT's DWM repository
-https://github.com/ChrisTitusTech/dwm-titus
 - **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
 - **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
 - **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
@@ -159,14 +154,26 @@ https://github.com/AdnanHodzic/auto-cpufreq
 ### Arch
 
 - **Arch Server Setup**: This command installs a minimal arch server setup under 5 minutes.
+- **DWM-Titus**: DWM is a dynamic window manager for X.
+It manages windows in tiled, monocle and floating layouts.
+All of the layouts can be applied dynamically, optimising the environment for the application in use and the task performed.
+This command installs and configures DWM and a desktop manager.
+The list of patches applied can be found in CTT's DWM repository
+https://github.com/ChrisTitusTech/dwm-titus
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Install Chaotic-AUR Repository**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
+- **Install CachyOS Repository and Kernel**: To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures.
 - **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Pacman Config**: Enables Color, ILoveCandy, ParallelDownloads, VerbosePkgLists, multilib in pacman.conf and sets MAKEFLAGS in makepkg.conf.
+- **PipeWire Audio**: Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio).
+- **Zram Swap**: Configures compressed RAM swap via zram-generator with zstd algorithm.
+- **Snapper Snapshots**: Sets up Snapper with hourly Btrfs snapshots, snap-pac hooks, and GRUB boot menu entries.
+- **System Maintenance**: Enables paccache.timer, removes orphan packages, and cleans system journals.
 
 ### Debian
 
@@ -194,6 +201,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
+- **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
