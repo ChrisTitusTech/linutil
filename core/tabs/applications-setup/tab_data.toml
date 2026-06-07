@@ -274,6 +274,12 @@ script = "browsers/brave.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Brave Origin"
+description = "Brave Origin is a standalone version of the Brave browser for creators and artists, providing new revenue streams and community features."
+script = "browsers/brave-origin.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Chromium"
 description = "Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser."
 script = "browsers/chromium.sh"
