@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. ../../common-script.sh
+. ../common-script.sh
 
 installShelly() {
 	printf "%b\n" "${YELLOW}Installing Shelly...${RC}"

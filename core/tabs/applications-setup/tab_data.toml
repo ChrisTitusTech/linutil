@@ -428,6 +428,17 @@ script = "rofi-setup.sh"
 task_list = "I FM"
 
 [[data]]
+name = "Shelly"
+description = "Shelly is a modern, visual, and intuitive interface for your Arch Linux system. Not just a wrapper, but a native ground-up experience."
+script = "shelly-setup.sh"
+task_list = "I SS"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["pacman"]
+
+[[data]]
 name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
