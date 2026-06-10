@@ -47,7 +47,7 @@ The **System Setup** section contains distro-specific and general configuration 
 | Hyprland (JaKooLit) | Install JaKooLit's Hyprland configuration |
 | Full System Cleanup | Remove unused packages, clear cache, empty trash |
 | Full System Update | Update all packages to the latest available |
-| Gaming Dependencies | Install gaming dependencies across distros |
+| Gaming Dependencies | Install gaming runtime dependencies across distros |
 | Global Theme | Install and configure a global desktop theme |
 | Remove Snaps | Remove Snap and prevent it from reinstalling |
 | Build Prerequisites | Install software build dependencies |
@@ -83,7 +83,7 @@ These scripts work across all distributions:
 |--------|-------------|
 | Full System Update | Update all packages using your distro's package manager |
 | Full System Cleanup | Clear package caches, temp files, and trash |
-| Gaming Dependencies | Install dependencies needed for gaming on Linux |
+| Gaming Dependencies | Install runtime dependencies needed for gaming on Linux |
 | Build Prerequisites | Install common software build dependencies |
 
 > [!TIP]
