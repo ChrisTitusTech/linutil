@@ -40,12 +40,25 @@ run_install_step() {
     step_name="$1"
     shift
     step_output=$(mktemp)
+    step_dir=$(mktemp -d)
+    step_pipe="$step_dir/output.pipe"
+    mkfifo "$step_pipe"
 
-    if "$@" > "$step_output" 2>&1; then
-        cat "$step_output"
+    printf "%b\n" "${CYAN}[RUNNING]${RC} ${step_name}"
+    tee "$step_output" < "$step_pipe" &
+    tee_pid=$!
+
+    set +e
+    "$@" > "$step_pipe" 2>&1
+    step_status=$?
+    wait "$tee_pid"
+    set -e
+
+    rm -rf "$step_dir"
+
+    if [ "$step_status" -eq 0 ]; then
         printf "%b\n" "${GREEN}[OK]${RC} ${step_name}"
     else
-        cat "$step_output"
         printf "%b\n" "${YELLOW}[FAILED]${RC} ${step_name}"
         record_step_failure "$step_name" "$step_output"
     fi
