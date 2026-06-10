@@ -94,7 +94,7 @@ installDepend() {
                 if ! grep -q "^\s*\[lib32\]" /etc/pacman.conf; then
                     echo "[lib32]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                    run_install_step "Refresh packages after enabling lib32" "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                    run_install_step "Refresh packages after enabling lib32" "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm
                 else
                     printf "%b\n" "${GREEN}lib32 is already enabled.${RC}"
                 fi
@@ -103,7 +103,7 @@ installDepend() {
                 if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                     echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                    run_install_step "Refresh packages after enabling multilib" "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                    run_install_step "Refresh packages after enabling multilib" "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm
                 else
                     printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
                 fi
