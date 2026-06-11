@@ -86,7 +86,7 @@ installZoxide() {
         return
     fi
 
-    if ! curl -sSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+    if ! curl -sSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/refs/heads/main/install.sh | sh; then
         printf "%b\n" "${RED}Something went wrong during zoxide install!${RC}"
         exit 1
     fi
