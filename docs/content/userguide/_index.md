@@ -13,7 +13,7 @@ Linutil is a distro-agnostic toolbox designed to simplify everyday Linux tasks. 
 - **System Setup**: Configure your distro with optimized settings and tools
 - **Security**: Apply firewall baselines and harden your system
 - **Utilities**: Manage monitors, printers, Bluetooth, WiFi, and more
-- **Gaming**: Set up gaming dependencies and emulators
+- **Gaming**: Set up gaming dependencies, game launchers, emulators, and game-specific optimizations
 
 ## Who Should Use Linutil?
 
@@ -77,7 +77,7 @@ Tools for monitor management, printer setup, Bluetooth, WiFi, service management
 
 ### Gaming
 
-Install gaming dependencies, emulators, and game-specific optimizations.
+Install gaming dependencies, manage game launchers, add emulators, and apply game-specific optimizations.
 
 **[Read the Features Guide →](features/)**
 
