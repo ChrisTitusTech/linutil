@@ -10,8 +10,15 @@ installDepend() {
             if ! command_exists paru; then
                 printf "%b\n" "${YELLOW}Installing paru as AUR helper...${RC}"
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
-                cd /opt && "$ESCALATION_TOOL" git clone https://aur.archlinux.org/paru-bin.git && "$ESCALATION_TOOL" chown -R "$USER": ./paru-bin
-                cd paru-bin && makepkg --noconfirm -si
+                TMP_BUILD_DIR=$(mktemp -d)
+                trap 'rm -rf "$TMP_BUILD_DIR"' 0
+                git clone https://aur.archlinux.org/paru-bin.git "$TMP_BUILD_DIR/paru-bin"
+                (
+                    cd "$TMP_BUILD_DIR/paru-bin"
+                    makepkg --noconfirm -si
+                )
+                rm -rf "$TMP_BUILD_DIR"
+                trap - 0
                 printf "%b\n" "${GREEN}Paru installed${RC}"
             else
                 printf "%b\n" "${GREEN}Paru already installed${RC}"
