@@ -11,6 +11,11 @@ themeinstall(){
     git clone "https://github.com/ChrisTitusTech/Top-5-Bootloader-Themes"
     cd "Top-5-Bootloader-Themes"
     "$ESCALATION_TOOL" ./install.sh
+    if command -v grub-mkconfig >/dev/null 2>&1; then
+        "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
+    elif command -v grub2-mkconfig >/dev/null 2>&1; then
+        "$ESCALATION_TOOL" grub2-mkconfig -o /boot/grub2/grub.cfg
+    fi
 }
 
 checkEnv

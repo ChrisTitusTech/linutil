@@ -20,7 +20,7 @@ installWaydroid() {
                     "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm dkms
                 fi
 
-                installed_kernels=$("$PACKAGER" -Q | grep -E '^linux(| |-rt|-rt-lts|-hardened|-zen|-lts)[^-headers]' | cut -d ' ' -f 1)
+                installed_kernels=$("$PACKAGER" -Q | grep '^linux' | grep -v '\-headers' | grep -v '\-firmware' | cut -d ' ' -f 1)
                 for kernel in $installed_kernels; do
                     header="${kernel}-headers"
                     printf "%b\n" "${CYAN}Installing headers for $kernel...${RC}"
