@@ -203,6 +203,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
+- **Enable SSD TRIM**: Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
 - **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
