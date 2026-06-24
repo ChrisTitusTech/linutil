@@ -536,6 +536,21 @@ fi
 
 gpu_type=$(lspci | grep -E "VGA|3D|Display")
 
+select_nvidia_driver() {
+    if echo "${gpu_type}" | grep -qE "NVIDIA|GeForce"; then
+        echo ""
+        echo "NVIDIA GPU detected. Select driver:"
+        options=("nvidia-lts (proprietary)" "nouveau (open-source, skip nvidia-lts)")
+        select_option "${options[@]}"
+        case $? in
+            0) NVIDIA_DRIVER="nvidia-lts" ;;
+            1) NVIDIA_DRIVER="" ;;
+        esac
+        export NVIDIA_DRIVER
+    fi
+}
+select_nvidia_driver
+
 arch-chroot /mnt /bin/bash -c "KEYMAP='${KEYMAP}' /bin/bash" <<EOF
 
 echo -ne "
@@ -608,8 +623,12 @@ echo -ne "
 "
 # Graphics Drivers find and install
 if echo "${gpu_type}" | grep -E "NVIDIA|GeForce"; then
-    echo "Installing NVIDIA drivers: nvidia-lts"
-    pacman -S --noconfirm --needed nvidia-lts
+    if [ -n "${NVIDIA_DRIVER}" ]; then
+        echo "Installing NVIDIA drivers: ${NVIDIA_DRIVER}"
+        pacman -S --noconfirm --needed "${NVIDIA_DRIVER}"
+    else
+        echo "Skipping proprietary NVIDIA driver. Using kernel nouveau + modesetting."
+    fi
 elif echo "${gpu_type}" | grep 'VGA' | grep -E "Radeon|AMD"; then
     echo "Installing AMD drivers: xf86-video-amdgpu"
     pacman -S --noconfirm --needed xf86-video-amdgpu
