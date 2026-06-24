@@ -3,5 +3,5 @@ extend-exclude = ["tui/cool_tips.txt"]
 
 [default]
 extend-ignore-identifiers-re = [
-    "ratatui",
+    "(?i)ratatui",
 ]
