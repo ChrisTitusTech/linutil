@@ -57,35 +57,38 @@ checkArch() {
 }
 
 checkAURHelper() {
-    if [ "$PACKAGER" = "pacman" ] && [ -z "$AUR_HELPER_CHECKED" ]; then
-        AUR_HELPERS="yay paru"
-        for helper in ${AUR_HELPERS}; do
-            if command_exists "${helper}"; then
-                AUR_HELPER=${helper}
-                printf "${CYAN}Using ${helper} as AUR helper${RC}\n"
+    ## Check & Install AUR helper
+    if [ "$PACKAGER" = "pacman" ]; then
+        if [ -z "$AUR_HELPER_CHECKED" ]; then
+            AUR_HELPERS="yay paru"
+            for helper in ${AUR_HELPERS}; do
+                if command_exists "${helper}"; then
+                    AUR_HELPER=${helper}
+                    printf "%b\n" "${CYAN}Using ${helper} as AUR helper${RC}"
+                    AUR_HELPER_CHECKED=true
+                    return 0
+                fi
+            done
+
+            printf "%b\n" "${YELLOW}Installing yay as AUR helper...${RC}"
+            "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
+            TMP_BUILD_DIR=$(mktemp -d)
+            trap 'rm -rf "$TMP_BUILD_DIR"' 0
+            git clone https://aur.archlinux.org/yay-bin.git "$TMP_BUILD_DIR/yay-bin"
+            (
+                cd "$TMP_BUILD_DIR/yay-bin"
+                makepkg --noconfirm -si
+            )
+            rm -rf "$TMP_BUILD_DIR"
+            trap - 0
+
+            if command_exists yay; then
+                AUR_HELPER="yay"
                 AUR_HELPER_CHECKED=true
-                return 0
+            else
+                printf "%b\n" "${RED}Failed to install AUR helper.${RC}"
+                exit 1
             fi
-        done
-
-        printf "${YELLOW}Installing yay as AUR helper...${RC}\n"
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm base-devel git
-        
-        TMP_BUILD_DIR=$(mktemp -d)
-        cd "$TMP_BUILD_DIR"
-        git clone https://aur.archlinux.org/yay-bin.git
-        cd yay-bin && makepkg --noconfirm -si
-
-        
-        cd - >/dev/null
-        rm -rf "$TMP_BUILD_DIR"
-
-        if command_exists yay; then
-            AUR_HELPER="yay"
-            AUR_HELPER_CHECKED=true
-        else
-            printf "${RED}Failed to install AUR helper.${RC}\n"
-            exit 1
         fi
     fi
 }
