@@ -92,6 +92,10 @@ https://github.com/ChrisTitusTech/neovim
 ### Emulators
 
 
+### Multi-System Emulators
+
+- **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+
 ### Nintendo Emulators
 
 - **bsnes**: Super Nintendo Emulator. NO Games are included
@@ -166,9 +170,9 @@ This command installs and configures DWM and a desktop manager.
 The list of patches applied can be found in CTT's DWM repository
 https://github.com/ChrisTitusTech/dwm-titus
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
+- **Install CachyOS Repository and Kernel**: To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures.
 - **Install Chaotic-AUR Repository**: Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
-- **Install CachyOS Repository and Kernel**: To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures.
 - **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
