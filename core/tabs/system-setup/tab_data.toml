@@ -213,6 +213,18 @@ script = "compile-setup.sh"
 task_list = "I"
 
 [[data]]
+name = "Enable SSD TRIM"
+description = "Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM"
+script = "fstrim-setup.sh"
+task_list = "D I SS"
+multi_select = false
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "systemctl" ]
+
+[[data]]
 name = "Full System Cleanup"
 description = "This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash."
 script = "system-cleanup.sh"

@@ -130,10 +130,19 @@ https://github.com/ChrisTitusTech/neovim
 https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
-- **Gaming Dependencies**: This script is designed to handle the installation of gaming dependencies across different Linux distributions.
+- **Gaming Dependencies**: Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers.
+- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
+- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
+
+### Game Launchers
+
+- **Steam**: Manage Steam launcher installation with Install, Uninstall, or Abort actions.
+- **Lutris**: Manage Lutris launcher installation with Install, Uninstall, or Abort actions.
+- **RetroArch**: Manage RetroArch launcher installation with Install, Uninstall, or Abort actions.
+- **Heroic**: Manage Heroic launcher installation with Install, Uninstall, or Abort actions.
 - **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
 - **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
 - **Fallout 76 INI and Mods**: Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks.
@@ -194,6 +203,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
 - **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
+- **Enable SSD TRIM**: Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM
 - **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
 - **Full System Update**: This command updates your system to the latest packages available for your distro
 - **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources

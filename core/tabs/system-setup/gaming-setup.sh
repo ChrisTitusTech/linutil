@@ -40,12 +40,25 @@ run_install_step() {
     step_name="$1"
     shift
     step_output=$(mktemp)
+    step_dir=$(mktemp -d)
+    step_pipe="$step_dir/output.pipe"
+    mkfifo "$step_pipe"
 
-    if "$@" > "$step_output" 2>&1; then
-        cat "$step_output"
+    printf "%b\n" "${CYAN}[RUNNING]${RC} ${step_name}"
+    tee "$step_output" < "$step_pipe" &
+    tee_pid=$!
+
+    set +e
+    "$@" > "$step_pipe" 2>&1
+    step_status=$?
+    wait "$tee_pid"
+    set -e
+
+    rm -rf "$step_dir"
+
+    if [ "$step_status" -eq 0 ]; then
         printf "%b\n" "${GREEN}[OK]${RC} ${step_name}"
     else
-        cat "$step_output"
         printf "%b\n" "${YELLOW}[FAILED]${RC} ${step_name}"
         record_step_failure "$step_name" "$step_output"
     fi
@@ -81,7 +94,7 @@ installDepend() {
                 if ! grep -q "^\s*\[lib32\]" /etc/pacman.conf; then
                     echo "[lib32]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                    run_install_step "Refresh packages after enabling lib32" "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                    run_install_step "Refresh packages after enabling lib32" "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm
                 else
                     printf "%b\n" "${GREEN}lib32 is already enabled.${RC}"
                 fi
@@ -90,7 +103,7 @@ installDepend() {
                 if ! grep -q "^\s*\[multilib\]" /etc/pacman.conf; then
                     echo "[multilib]" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
                     echo "Include = /etc/pacman.d/mirrorlist" | "$ESCALATION_TOOL" tee -a /etc/pacman.conf
-                    run_install_step "Refresh packages after enabling multilib" "$ESCALATION_TOOL" "$PACKAGER" -Syu
+                    run_install_step "Refresh packages after enabling multilib" "$ESCALATION_TOOL" "$PACKAGER" -Sy --noconfirm
                 else
                     printf "%b\n" "${GREEN}Multilib is already enabled.${RC}"
                 fi
@@ -120,12 +133,11 @@ installDepend() {
         apt-get | nala)
             run_install_step "Enable i386 architecture" "$ESCALATION_TOOL" dpkg --add-architecture i386
             run_install_step "Refresh package indexes" "$ESCALATION_TOOL" "$PACKAGER" update
-            
+
             run_install_step "Install base dependencies" "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
-            
+
             DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine32:i386"
             apt-cache show software-properties-common >/dev/null 2>&1 && DISTRO_DEPS="$DISTRO_DEPS software-properties-common"
-            
             run_install_step "Install distro-specific dependencies" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         dnf)
@@ -144,7 +156,6 @@ installDepend() {
             ;;
         eopkg)
             DISTRO_DEPS="libgnutls libgtk-2 libgtk-3 pulseaudio alsa-lib alsa-plugins giflib libpng openal-soft libxcomposite libxinerama ncurses vulkan ocl-icd libva gst-plugins-base sdl2 v4l-utils sqlite3"
-
             run_install_step "Install base and distro-specific dependencies" \
                 "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $DISTRO_DEPS
             ;;
@@ -158,38 +169,11 @@ installDepend() {
 installAdditionalDepend() {
     case "$PACKAGER" in
         pacman)
-            DISTRO_DEPS='steam lutris goverlay'
-            run_install_step "Install additional gaming apps" \
+            DISTRO_DEPS='goverlay'
+            run_install_step "Install additional gaming utilities" \
                 "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm $DISTRO_DEPS
             ;;
-        apt-get | nala)
-            printf "%b\n" "${YELLOW}Installing Lutris...${RC}"
-            lutris_url=$(curl -s https://api.github.com/repos/lutris/lutris/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
-            
-            if [ -n "$lutris_url" ]; then
-                printf "%b\n" "${YELLOW}Downloading latest Lutris from GitHub...${RC}"
-                run_install_step "Download latest Lutris package" curl -sSLo lutris.deb "$lutris_url"
-                run_install_step "Install downloaded Lutris package" "$ESCALATION_TOOL" "$PACKAGER" install -y ./lutris.deb
-                rm lutris.deb
-                run_install_step "Refresh package indexes" "$ESCALATION_TOOL" "$PACKAGER" update
-                run_install_step "Install Lutris from repositories" "$ESCALATION_TOOL" "$PACKAGER" install -y lutris
-            fi
-
-            printf "%b\n" "${GREEN}Lutris Installation complete.${RC}"
-            printf "%b\n" "${YELLOW}Installing steam...${RC}"
-            run_install_step "Install Steam" "$ESCALATION_TOOL" "$PACKAGER" install -y steam
-            ;;
-        dnf)
-            DISTRO_DEPS='steam lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
-            ;;
-        zypper)
-            DISTRO_DEPS='lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" -n install $DISTRO_DEPS
-            ;;
-        eopkg)
-            DISTRO_DEPS='steam lutris'
-            run_install_step "Install additional gaming apps" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
+        apt-get | nala | dnf | zypper | eopkg)
             ;;
         *)
             printf "%b\n" "${RED}Unsupported package manager ${PACKAGER}${RC}"
