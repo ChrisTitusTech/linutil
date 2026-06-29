@@ -441,12 +441,12 @@ task_list = "I FM"
 
 [[data]]
 name = "Dank Shell"
-description = ""
+description = "DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop"
 script = "dank-shell.sh"
 task_list = "I FM"
 
 [[data]]
 name = "Noctalia Shell"
-description = ""
+description = "Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI."
 script = "noctalia-shell.sh"
 task_list = "I FM"
