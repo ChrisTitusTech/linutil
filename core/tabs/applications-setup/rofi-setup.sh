@@ -41,4 +41,5 @@ setupRofiConfig() {
 
 checkEnv
 installRofi
-setupRofiConfig
+# Commented out in case Chris remembers that he deleted Rofi config and will recover that
+#setupRofiConfig
