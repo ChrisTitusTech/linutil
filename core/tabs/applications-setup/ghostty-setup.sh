@@ -36,4 +36,5 @@ setupGhosttyConfig() {
 
 checkEnv
 installGhostty
-setupGhosttyConfig
+# This will be left, but commented in case Chris will decide to recover his ghostty config
+# setupGhosttyConfig
