@@ -28,14 +28,10 @@ EOF
 }
 
 installFirefox() {
-    if [ "$DTYPE" = "ubuntu" ]; then
-        if command_exists snap && snap list firefox 2>/dev/null | grep -q firefox; then
-            printf "%b\n" "${YELLOW}Removing Snap Firefox...${RC}"
-            "$ESCALATION_TOOL" snap remove firefox
-        fi
-        if command_exists firefox; then
-            "$ESCALATION_TOOL" "$PACKAGER" purge -y firefox 2>/dev/null || true
-        fi
+    if [ "$DTYPE" = "ubuntu" ] && command_exists snap && snap list firefox 2>/dev/null | grep -q firefox; then
+        printf "%b\n" "${YELLOW}Removing Snap Firefox...${RC}"
+        "$ESCALATION_TOOL" snap remove firefox
+        "$ESCALATION_TOOL" "$PACKAGER" purge -y firefox 2>/dev/null || true
     fi
     if ! command_exists firefox; then
         printf "%b\n" "${YELLOW}Installing Mozilla Firefox...${RC}"

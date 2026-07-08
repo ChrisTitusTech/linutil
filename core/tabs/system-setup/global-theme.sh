@@ -450,21 +450,11 @@ resetPantheon() {
 }
 
 resetSway() {
-    rm -f "$HOME/.config/sway/config" 2>/dev/null || true
-    if [ -f /etc/sway/config ]; then
-        mkdir -p "$HOME/.config/sway"
-        cp /etc/sway/config "$HOME/.config/sway/" 2>/dev/null || true
-    fi
-    printf "%b\n" "${GREEN}Sway config reset.${RC}"
+    printf "%b\n" "${YELLOW}Theme reset not supported for Sway — config contains keybindings and session settings. Skipping.${RC}"
 }
 
 resetHyprland() {
-    rm -f "$HOME/.config/hypr/hyprland.conf" 2>/dev/null || true
-    if [ -f /usr/share/hyprland/hyprland.conf ]; then
-        mkdir -p "$HOME/.config/hypr"
-        cp /usr/share/hyprland/hyprland.conf "$HOME/.config/hypr/" 2>/dev/null || true
-    fi
-    printf "%b\n" "${GREEN}Hyprland config reset.${RC}"
+    printf "%b\n" "${YELLOW}Theme reset not supported for Hyprland — config contains keybindings and session settings. Skipping.${RC}"
 }
 
 resetWMCommon() {
