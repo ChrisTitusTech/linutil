@@ -243,7 +243,7 @@ detectDE() {
         *Pantheon*|*pantheon*) DE=pantheon ;;
         *Sway*|*sway*) DE=sway ;;
         *Hyprland*|*hyprland*) DE=hyprland ;;
-        *i3*|*i3wm*) DE=i3 ;;
+        *i3*) DE=i3 ;;
         *Enlightenment*|*enlightenment*) DE=enlightenment ;;
         *Openbox*|*openbox*) DE=openbox ;;
         *bspwm*) DE=bspwm ;;
