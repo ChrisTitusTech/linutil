@@ -15,7 +15,14 @@ if ! command_exists chromium; then
         xbps-install)
             "$ESCALATION_TOOL" "$PACKAGER" -Sy chromium
             ;;
-        apt-get|nala|zypper|dnf|eopkg)
+        apt-get|nala)
+            if [ "$DTYPE" = "ubuntu" ] && command_exists snap; then
+                "$ESCALATION_TOOL" snap install chromium
+            else
+                "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
+            fi
+            ;;
+        zypper|dnf|eopkg)
             "$ESCALATION_TOOL" "$PACKAGER" install -y chromium
             ;;
         *)

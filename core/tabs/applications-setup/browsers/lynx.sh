@@ -18,10 +18,10 @@ installLynx() {
             apt-get|nala|zypper|dnf|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y lynx
                 ;;
-            *)
-                printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
-                exit 1
-                ;;
+        *)
+            printf "%b\n" "${RED}Unsupported package manager: ""$PACKAGER""${RC}"
+            exit 1
+            ;;
         esac
     else
         printf "%b\n" "${GREEN}Lynx TUI Browser is already installed.${RC}"

@@ -179,6 +179,15 @@ checkCurrentDirectoryWritable() {
     fi
 }
 
+checkSnap() {
+    if ! command_exists snap; then
+        printf "%b\n" "${YELLOW}Snap is not available on this system.${RC}"
+        return 1
+    fi
+    printf "%b\n" "${CYAN}Snap is available${RC}"
+    return 0
+}
+
 checkDistro() {
     DTYPE="unknown"  # Default to unknown
     # Use /etc/os-release for modern distro identification
