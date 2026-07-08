@@ -7,12 +7,16 @@ installVivaldi() {
         printf "%b\n" "${YELLOW}Installing Vivaldi...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
+            if [ "$DTYPE" = "ubuntu" ] && command_exists snap; then
+                "$ESCALATION_TOOL" snap install vivaldi
+            else
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
                 "$ESCALATION_TOOL" curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor | sudo dd of=/usr/share/keyrings/vivaldi-browser.gpg
                 "$ESCALATION_TOOL" echo "deb [signed-by=/usr/share/keyrings/vivaldi-browser.gpg arch=$(dpkg --print-architecture)] https://repo.vivaldi.com/archive/deb/ stable main" | sudo dd of=/etc/apt/sources.list.d/vivaldi-archive.list
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y vivaldi-stable
-                ;;
+            fi
+            ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y dnf-plugins-core
                 dnf_version=$(dnf --version | head -n 1 | cut -d '.' -f 1)

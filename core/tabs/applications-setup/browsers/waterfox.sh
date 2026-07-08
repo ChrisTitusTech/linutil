@@ -6,6 +6,10 @@ installWaterfox() {
     if ! command_exists net.waterfox.waterfox && ! command_exists waterfox; then
         printf "%b\n" "${YELLOW}Installing waterfox...${RC}"
         case "$PACKAGER" in
+            apt-get|nala)
+                checkFlatpak
+                "$ESCALATION_TOOL" flatpak install --noninteractive flathub net.waterfox.waterfox
+                ;;
             pacman)
 		        "$AUR_HELPER" -S --needed --noconfirm waterfox-bin
                 ;;

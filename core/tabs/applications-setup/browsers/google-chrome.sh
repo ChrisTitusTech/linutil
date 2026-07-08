@@ -7,9 +7,10 @@ installChrome() {
         printf "%b\n" "${YELLOW}Installing Google Chrome...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-                "$ESCALATION_TOOL" "$PACKAGER" install -y ./google-chrome-stable_current_amd64.deb
-                "$ESCALATION_TOOL" rm ./google-chrome-stable_current_amd64.deb
+                "$ESCALATION_TOOL" "$PACKAGER" install -y wget ca-certificates
+                wget -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+                "$ESCALATION_TOOL" "$PACKAGER" install -y /tmp/google-chrome.deb
+                rm -f /tmp/google-chrome.deb
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" addrepo http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
@@ -39,13 +40,13 @@ uninstallChrome() {
         printf "%b\n" "${YELLOW}Uninstalling Google Chrome...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome
+                "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome-stable
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive uninstall google-chrome-stable
                 ;;
             pacman)
-                "$AUR_HELPER" -Rns --needed --noconfirm google-chrome
+                "$AUR_HELPER" -Rns --noconfirm google-chrome
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
@@ -55,38 +56,29 @@ uninstallChrome() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}Google Chrome Browser is already installed.${RC}"
+        printf "%b\n" "${GREEN}Google Chrome Browser is not installed.${RC}"
     fi
 }
 
 removeLocalAI() {
-    # Set Chrome AI path
     CHROME_USER_DIR="$HOME/.config/google-chrome"
-
-    # Path where Chrome AI model is stored
     AI_MODEL_DIR="$CHROME_USER_DIR/AI"
 
-    # Remove AI model if it exists
     if [ -d "$AI_MODEL_DIR" ]; then
-        echo "Removing existing Chrome AI model..."
+        printf "%b\n" "${YELLOW}Removing existing Chrome AI model...${RC}"
         rm -rf "$AI_MODEL_DIR"
-        echo "Removed AI model."
+        printf "%b\n" "${GREEN}AI model removed.${RC}"
     else
-        echo "No AI model found at $AI_MODEL_DIR"
+        printf "%b\n" "${GREEN}No AI model found.${RC}"
     fi
 
-    # Prevent re-download
-    # Create an empty directory and make it read-only
-    echo "Creating read-only placeholder to block AI download..."
     mkdir -p "$AI_MODEL_DIR"
     chmod 000 "$AI_MODEL_DIR"
-
-    echo "Chrome AI model removed and blocked from redownloading."
+    printf "%b\n" "${YELLOW}AI download blocked (read-only placeholder created).${RC}"
 }
 
-
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Chrome${RC}"
+    printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Chrome${RC}"
     printf "%b\n" "1. ${YELLOW}Install Chrome${RC}"
     printf "%b\n" "2. ${YELLOW}Uninstall Chrome${RC}"
     printf "%b\n" "3. ${YELLOW}Remove Local AI (Prevents Chrome From Reinstalling)${RC}"

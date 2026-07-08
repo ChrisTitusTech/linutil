@@ -2,13 +2,13 @@
 
 . ../../common-script.sh
 
-installThrorium() {
+installThorium() {
     if ! command_exists thorium-browser; then
         printf "%b\n" "${YELLOW}Installing Thorium Browser...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
                 "$ESCALATION_TOOL" rm -fv /etc/apt/sources.list.d/thorium.list
-                "$ESCALATION_TOOL" curl http://dl.thorium.rocks/debian/dists/stable/thorium.list -o /etc/apt/sources.list.d/thorium.list
+                "$ESCALATION_TOOL" wget --no-hsts -P /etc/apt/sources.list.d/ http://dl.thorium.rocks/debian/dists/stable/thorium.list
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y thorium-browser
                 ;;
@@ -53,4 +53,4 @@ installThrorium() {
 }
 
 checkEnv
-installThrorium
+installThorium
