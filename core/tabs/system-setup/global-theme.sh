@@ -197,6 +197,9 @@ successOutput() {
 
 applyDarkTheme() {
     applyTheming
+    case "$XDG_CURRENT_DESKTOP" in
+        KDE) return ;;
+    esac
     install_theme_tools
     configure_gtk2
     configure_gtk3
@@ -462,12 +465,7 @@ resetWMCommon() {
 }
 
 resetOpenbox() {
-    rm -f "$HOME/.config/openbox/rc.xml" 2>/dev/null || true
-    if [ -f /etc/xdg/openbox/rc.xml ]; then
-        mkdir -p "$HOME/.config/openbox"
-        cp /etc/xdg/openbox/rc.xml "$HOME/.config/openbox/" 2>/dev/null || true
-    fi
-    printf "%b\n" "${GREEN}Openbox config reset.${RC}"
+    printf "%b\n" "${YELLOW}Theme reset not supported for Openbox — config contains keybindings and session settings. Skipping.${RC}"
 }
 
 resetEnlightenment() {
