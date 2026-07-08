@@ -11,8 +11,8 @@ installVivaldi() {
                 "$ESCALATION_TOOL" snap install vivaldi
             else
                 "$ESCALATION_TOOL" "$PACKAGER" install -y curl
-                "$ESCALATION_TOOL" curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor | sudo dd of=/usr/share/keyrings/vivaldi-browser.gpg
-                "$ESCALATION_TOOL" echo "deb [signed-by=/usr/share/keyrings/vivaldi-browser.gpg arch=$(dpkg --print-architecture)] https://repo.vivaldi.com/archive/deb/ stable main" | sudo dd of=/etc/apt/sources.list.d/vivaldi-archive.list
+                curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor | "$ESCALATION_TOOL" dd of=/usr/share/keyrings/vivaldi-browser.gpg
+                "$ESCALATION_TOOL" sh -c "echo 'deb [signed-by=/usr/share/keyrings/vivaldi-browser.gpg arch=$(dpkg --print-architecture)] https://repo.vivaldi.com/archive/deb/ stable main' > /etc/apt/sources.list.d/vivaldi-archive.list"
                 "$ESCALATION_TOOL" "$PACKAGER" update
                 "$ESCALATION_TOOL" "$PACKAGER" install -y vivaldi-stable
             fi
