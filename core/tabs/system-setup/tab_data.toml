@@ -250,6 +250,7 @@ name = "Global Theme"
 description = "This script is designed to handle the installation and configuration of global theming"
 script = "global-theme.sh"
 task_list = "I PFM"
+multi_select = false
 
 [[data]]
 name = "Remove Snaps"

@@ -536,8 +536,8 @@ cleanThemeEnv() {
             sed -i '/^export GTK_THEME/d; /^export QT_QPA_PLATFORMTHEME/d' "$f" 2>/dev/null || true
         fi
     done
-    if command_exists sudo; then
-        sudo sed -i '/^QT_QPA_PLATFORMTHEME=/d; /^GTK_THEME=/d' /etc/environment 2>/dev/null || true
+    if command_exists "$ESCALATION_TOOL"; then
+        "$ESCALATION_TOOL" sed -i '/^QT_QPA_PLATFORMTHEME=/d; /^GTK_THEME=/d' /etc/environment 2>/dev/null || true
     fi
     printf "%b\n" "${GREEN}Theme environment variables cleaned.${RC}"
 }
