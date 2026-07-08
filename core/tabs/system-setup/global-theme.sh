@@ -468,14 +468,7 @@ resetHyprland() {
 }
 
 resetWMCommon() {
-    for wm_dir in i3 bspwm qtile dwm; do
-        rm -f "$HOME/.config/$wm_dir/config" "$HOME/.config/$wm_dir/theme" 2>/dev/null || true
-    done
-    if [ -f /etc/i3/config ]; then
-        mkdir -p "$HOME/.config/i3"
-        cp /etc/i3/config "$HOME/.config/i3/" 2>/dev/null || true
-    fi
-    printf "%b\n" "${GREEN}WM configs reset.${RC}"
+    printf "%b\n" "${YELLOW}No theme reset available for tiling WMs — config files contain keybindings and session settings, not just theme. Skipping.${RC}"
 }
 
 resetOpenbox() {
