@@ -4,6 +4,15 @@ name = "Gaming"
 name = "Emulators"
 
 [[data.entries]]
+name = "Multi-System Emulators"
+
+[[data.entries.entries]]
+name = "RetroArch Game Emulator"
+description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
+script = "emulators/retroarch.sh"
+task_list = "FM"
+
+[[data.entries]]
 name = "Nintendo Emulators"
 
 [[data.entries.entries]]
@@ -109,15 +118,6 @@ script = "emulators/sega/kronos.sh"
 task_list = "FM"
 
 [[data.entries]]
-name = "Multi-System Emulators"
-
-[[data.entries.entries]]
-name = "RetroArch Game Emulator"
-description = "Frontend for emulators, game engines and media players. NO Games or Bios' are included"
-script = "emulators/retroarch.sh"
-task_list = "FM"
-
-[[data.entries]]
 name = "Xbox Emulators"
 
 [[data.entries.entries]]
@@ -156,9 +156,21 @@ task_list = "FI"
 
 [[data.entries]]
 name = "Gaming Dependencies"
-description = "This script is designed to handle the installation of gaming dependencies across different Linux distributions."
+description = "Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers."
 script = "../system-setup/gaming-setup.sh"
 task_list = "I"
+
+[[data.entries]]
+name = "ProtonPlus"
+description = "Manage ProtonPlus installation with native packages first and Flatpak fallback."
+script = "protonplus.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "ProtonUp-Qt"
+description = "Manage ProtonUp-Qt installation with native packages first and Flatpak fallback."
+script = "protonup-qt.sh"
+task_list = "FI"
 
 [[data.entries]]
 name = "General GPU Drivers"
@@ -182,6 +194,34 @@ task_list = "I SS"
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
 values = ["wayland", "Wayland"]
+
+[[data]]
+name = "Game Launchers"
+
+[[data.entries]]
+name = "Steam"
+description = "Manage Steam launcher installation with Install, Uninstall, or Abort actions."
+script = "steam-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "Lutris"
+description = "Manage Lutris launcher installation with Install, Uninstall, or Abort actions."
+script = "lutris-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "RetroArch"
+description = "Manage RetroArch launcher installation with Install, Uninstall, or Abort actions."
+script = "retroarch-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "Heroic"
+description = "Manage Heroic launcher installation with Install, Uninstall, or Abort actions."
+script = "heroic-launcher.sh"
+task_list = "FI"
+
 [[data]]
 name = "Arc Raiders Titus Mods"
 description = "Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations."
@@ -198,4 +238,10 @@ task_list = "FM"
 name = "Fallout 76 INI and Mods"
 description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
 script = "fallout76-titus-mod.sh"
+task_list = "FM"
+
+[[data]]
+name = "Starfield Titus INI and Mods"
+description = "Installs custom Starfield mods from ChrisTitusTech/starfield-config via steam."
+script = "starfield-titus-mod.sh"
 task_list = "FM"

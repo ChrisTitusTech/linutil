@@ -44,6 +44,12 @@ task_list = "I MP"
 multi_select = false
 
 [[data.entries]]
+name = "Install CachyOS Repository and Kernel"
+description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
+script = "arch/cachyos-repos.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "Install Chaotic-AUR Repository"
 description = "Chaotic-AUR provides prebuilt binaries for popular AUR packages, saving compilation time. To know more visit: https://aur.chaotic.cx/"
 script = "arch/chaotic-aur-setup.sh"
@@ -59,12 +65,6 @@ task_list = "I PFM K"
 matches = true
 data = { containing_file = "/sys/devices/virtual/dmi/id/board_vendor" }
 values = ["Valve"]
-
-[[data.entries]]
-name = "Install CachyOS Repository and Kernel"
-description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
-script = "arch/cachyos-repos.sh"
-task_list = "I"
 
 [[data.entries]]
 name = "Nvidia Drivers & Hardware Acceleration"
@@ -246,6 +246,18 @@ name = "Build Prerequisites"
 description = "This script is designed to handle the installation of various software dependencies across different Linux distributions"
 script = "compile-setup.sh"
 task_list = "I"
+
+[[data]]
+name = "Enable SSD TRIM"
+description = "Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM"
+script = "fstrim-setup.sh"
+task_list = "D I SS"
+multi_select = false
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "systemctl" ]
 
 [[data]]
 name = "Full System Cleanup"

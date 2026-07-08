@@ -155,6 +155,12 @@ script = "ollama.sh"
 task_list = "I SS"
 
 [[data]]
+name = "Ranalama"
+description = "This utility is designed to manage ramalama in your system"
+script = "ramalama.sh"
+task_list = "I SS"
+
+[[data]]
 name = "Service Manager"
 description = "This utility is designed to manage services in your system"
 script = "service-control.sh"
