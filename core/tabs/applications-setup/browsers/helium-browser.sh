@@ -30,7 +30,6 @@ installHeliumBrowser() {
 }
 
 uninstallHeliumBrowser() {
-  if command_exists Helium && commands_exists helium; then
   if command_exists Helium || command_exists helium; then
     printf "%b\n" "${YELLOW}Removing Helium Browser...${RC}"
     case "$PACKAGER" in
@@ -38,7 +37,7 @@ uninstallHeliumBrowser() {
       "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm --needed helium-browser-bin
       ;;
     dnf)
-      "$ESCALATION_TOOL" "$PACKAGER" uninstall helium-bin
+      "$ESCALATION_TOOL" "$PACKAGER" remove -y helium-bin
       "$ESCALATION_TOOL" "$PACKAGER" copr disable imput/helium
       ;;
     nala | apt-get)
