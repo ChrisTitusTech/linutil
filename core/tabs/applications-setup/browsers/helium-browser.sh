@@ -31,6 +31,7 @@ installHeliumBrowser() {
 
 uninstallHeliumBrowser() {
   if command_exists Helium && commands_exists helium; then
+  if command_exists Helium || command_exists helium; then
     printf "%b\n" "${YELLOW}Removing Helium Browser...${RC}"
     case "$PACKAGER" in
     pacman)
