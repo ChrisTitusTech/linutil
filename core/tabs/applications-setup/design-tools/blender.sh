@@ -48,7 +48,7 @@ main() {
     printf "%b" "Enter your choice [1-2]: "
     read -r CHOICE
     case "$CHOICE" in
-        1) installBender ;;
+        1) installBlender ;;
         2) uninstallBlender ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
     esac

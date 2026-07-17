@@ -7,9 +7,12 @@ installDiscord() {
         printf "%b\n" "${YELLOW}Installing Discord...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                curl -Lo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
+                # Ensure the downloaded .deb is removed even on failure under `set -e`.
+                trap 'rm -f discord.deb' EXIT
+                curl -fLo discord.deb "https://discord.com/api/download?platform=linux&format=deb"
                 "$ESCALATION_TOOL" "$PACKAGER" install -y ./discord.deb
-                "$ESCALATION_TOOL" rm discord.deb
+                rm -f discord.deb
+                trap - EXIT
                 ;;
             zypper|eopkg)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y discord

@@ -29,8 +29,6 @@ ask_for_host_details() {
         printf "%b\n" "    HostName $host"
         printf "%b\n" "    User $user"
         printf "%b\n" "    IdentityFile ~/.ssh/id_rsa"
-        printf "%b\n" "    StrictHostKeyChecking no"
-        printf "%b\n" "    UserKnownHostsFile=/dev/null"
     } >> ~/.ssh/config
     printf "%b\n" "Host $host_alias added successfully."
 }
