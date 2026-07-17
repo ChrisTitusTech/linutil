@@ -41,8 +41,10 @@ uninstallHeliumBrowser() {
       "$ESCALATION_TOOL" "$PACKAGER" copr disable imput/helium
       ;;
     nala | apt-get)
-      [[ -f "/usr/share/keyrings/helium.gpg" ]] && rm "/usr/share/keyrings/helium.gpg"
-      [[ -f "/etc/apt/sources.list.d/helium.list" ]] && rm "/etc/apt/sources.list.d/helium.list"
+      [ -f "/usr/share/keyrings/helium.gpg" ] && "$ESCALATION_TOOL" rm "/usr/share/keyrings/helium.gpg"
+      [ -f "/etc/apt/sources.list.d/helium.list" ] && "$ESCALATION_TOOL" rm "/etc/apt/sources.list.d/helium.list"
+      "$ESCALATION_TOOL" "$PACKAGER" update
+      "$ESCALATION_TOOL" "$PACKAGER" purge -y helium-bin
       ;;
     esac
   else
