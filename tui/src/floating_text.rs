@@ -52,13 +52,11 @@ impl<'a> FloatingText<'a> {
 
     pub fn from_command(command: &Command, title: &str, wrap_words: bool) -> Self {
         let src = match command {
-            Command::Raw(cmd) => Some(cmd.clone()),
+            Command::Raw(cmd) => cmd.clone(),
             Command::LocalFile { file, .. } => std::fs::read_to_string(file)
-                .map_err(|_| format!("File not found: {file:?}"))
-                .ok(),
-            Command::None => None,
-        }
-        .unwrap();
+                .unwrap_or_else(|e| format!("<preview unavailable for {}: {e}>", file.display())),
+            Command::None => String::from("<no preview available>"),
+        };
 
         let processed_text = Self::get_highlighted_string(&src).unwrap_or_else(|| Text::from(src));
 
