@@ -107,7 +107,7 @@ task_list = "FM"
 
 [[data.entries.entries]]
 name = "Flycast"
-description = "A Dreamcase emulator. NO Games are included"
+description = "A Dreamcast emulator. NO Games are included"
 script = "emulators/sega/flycast.sh"
 task_list = "FM"
 
