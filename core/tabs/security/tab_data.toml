@@ -11,6 +11,13 @@ matches = true
 data = "command_exists"
 values = [ "firewall-cmd" ]
 [[data]]
+name = "Lynis Security Audit"
+description = "Install Lynis when needed, run an elevated system security audit with live results, then optionally remove Lynis."
+script = "lynis-audit.sh"
+task_list = "I MP RP"
+multi_select = false
+
+[[data]]
 name = "UFW Firewall Baselines (CTT)"
 description = "Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes"
 script = "ufw-baselines.sh"
@@ -20,4 +27,3 @@ task_list = "I SS"
 matches = false
 data = "command_exists"
 values = [ "firewall-cmd" ]
-
