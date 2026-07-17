@@ -45,7 +45,7 @@ impl ConfirmPrompt {
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll + self.inner_area_height < self.names.len() - 1 {
+        if self.scroll + self.inner_area_height < self.names.len().saturating_sub(1) {
             self.scroll += 1;
         }
     }

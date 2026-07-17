@@ -80,6 +80,7 @@ startAndEnableService() {
             ;;
         sv)
             enableService "$1"
+            startService "$1"
             ;;
     esac
 }

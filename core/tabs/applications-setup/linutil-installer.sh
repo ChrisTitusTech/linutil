@@ -5,10 +5,12 @@
 install_extra() {
     printf "%b\n" "${YELLOW}Installing the manpage...${RC}"
     "$ESCALATION_TOOL" mkdir -p /usr/share/man/man1
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
+    # -f makes curl exit non-zero on HTTP errors so a 404/5xx body is not written
+    # as the manpage; -sSL keeps the curl quiet but shows the error if it fails.
+    curl -fsSL 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/man/linutil.1' | "$ESCALATION_TOOL" tee '/usr/share/man/man1/linutil.1' > /dev/null
     printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
     "$ESCALATION_TOOL" mkdir -p /usr/share/applications
-    curl 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
+    curl -fsSL 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
     printf "%b\n" "${GREEN}Done.${RC}"
 }
 
