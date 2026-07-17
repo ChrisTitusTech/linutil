@@ -34,7 +34,7 @@ uninstallHeliumBrowser() {
     printf "%b\n" "${YELLOW}Removing Helium Browser...${RC}"
     case "$PACKAGER" in
     pacman)
-      "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm --needed helium-browser-bin
+      "$ESCALATION_TOOL" "$PACKAGER" -R --noconfirm helium-browser-bin
       ;;
     dnf)
       "$ESCALATION_TOOL" "$PACKAGER" remove -y helium-bin
