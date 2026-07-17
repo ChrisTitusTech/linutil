@@ -97,7 +97,11 @@ checkEscalationTool() {
     ## Check for escalation tools.
     if [ -z "$ESCALATION_TOOL_CHECKED" ]; then
         if [ "$(id -u)" = "0" ]; then
-            ESCALATION_TOOL="eval"
+            # `env` runs the given command with the current environment without
+            # re-tokenizing its arguments, unlike `eval` which would re-parse
+            # quoting/globs and enable injection on paths containing spaces or
+            # shell metacharacters.
+            ESCALATION_TOOL="env"
             ESCALATION_TOOL_CHECKED=true
             printf "%b\n" "${CYAN}Running as root, no escalation needed${RC}"
             return 0
@@ -155,16 +159,21 @@ checkPackageManager() {
 checkSuperUser() {
     ## Check SuperUser Group
     SUPERUSERGROUP='wheel sudo root'
+    USER_GROUPS=$(id -nG)
     for sug in ${SUPERUSERGROUP}; do
-        if groups | grep -q "${sug}"; then
-            SUGROUP=${sug}
-            printf "%b\n" "${CYAN}Super user group ${SUGROUP}${RC}"
-            break
-        fi
+        # Match whole-word group names; unanchored grep would match e.g.
+        # `wheelchair`, `rooted`, or `sudoers` as the privileged group.
+        case " ${USER_GROUPS} " in
+            *" ${sug} "*)
+                SUGROUP=${sug}
+                printf "%b\n" "${CYAN}Super user group ${SUGROUP}${RC}"
+                break
+                ;;
+        esac
     done
 
-    ## Check if member of the sudo group.
-    if ! groups | grep -q "${SUGROUP}"; then
+    ## Fail fast if not a member of any super-user group.
+    if [ -z "$SUGROUP" ]; then
         printf "%b\n" "${RED}You need to be a member of the sudo group to run me!${RC}"
         exit 1
     fi

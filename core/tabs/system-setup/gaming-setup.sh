@@ -133,11 +133,11 @@ installDepend() {
         apt-get | nala)
             run_install_step "Enable i386 architecture" "$ESCALATION_TOOL" dpkg --add-architecture i386
             run_install_step "Refresh package indexes" "$ESCALATION_TOOL" "$PACKAGER" update
-            
+
             run_install_step "Install base dependencies" "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES
-            
+
             DISTRO_DEPS="libasound2-plugins:i386 libsdl2-2.0-0:i386 libdbus-1-3:i386 libsqlite3-0:i386 wine32:i386"
-            apt-cache show software-properties-common >/dev/null 2>&1 && DISTRO_DEPS="$DISTRO_DEPS software-properties-common"        
+            apt-cache show software-properties-common >/dev/null 2>&1 && DISTRO_DEPS="$DISTRO_DEPS software-properties-common"
             run_install_step "Install distro-specific dependencies" "$ESCALATION_TOOL" "$PACKAGER" install -y $DISTRO_DEPS
             ;;
         dnf)

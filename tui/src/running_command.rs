@@ -304,15 +304,15 @@ impl RunningCommand {
     }
 
     fn screen(&mut self, size: Size) -> Screen {
-        // Resize the emulated pty
-        self.pty_master
-            .resize(PtySize {
-                rows: size.height,
-                cols: size.width,
-                pixel_width: 0,
-                pixel_height: 0,
-            })
-            .unwrap();
+        // Resize the emulated pty; ignore failures (e.g., pty already closed
+        // after the child exited, or zero-dimension target on extreme resizes)
+        // since the screen still renders from the existing buffer.
+        let _ = self.pty_master.resize(PtySize {
+            rows: size.height,
+            cols: size.width,
+            pixel_width: 0,
+            pixel_height: 0,
+        });
 
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
@@ -340,9 +340,17 @@ impl RunningCommand {
 
     /// Send SIGHUB signal, *not* SIGKILL or SIGTERM, to the child process
     pub fn kill_child(&mut self) {
-        if !self.is_finished() {
-            let mut killer = self.child_killer.take().unwrap().recv().unwrap();
-            killer.kill().unwrap();
+        if self.is_finished() {
+            return;
+        }
+        let Some(rx) = self.child_killer.take() else {
+            // Already consumed by a prior kill_child call.
+            return;
+        };
+        // recv can fail if the spawning thread panicked (e.g., spawn_command
+        // failed); in that case the child never existed, so there's nothing to kill.
+        if let Ok(mut killer) = rx.recv() {
+            let _ = killer.kill();
         }
     }
 
