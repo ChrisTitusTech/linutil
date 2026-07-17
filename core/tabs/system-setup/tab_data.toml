@@ -80,28 +80,16 @@ task_list = "I MP"
 multi_select = false
 
 [[data.entries]]
-name = "Paru AUR Helper"
-description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
-script = "arch/paru-setup.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Virtualization"
-description = "QEMU, Libvirt, Virt-Manager installation and configuration."
-script = "arch/virtualization.sh"
-task_list = "FM I SS RP"
-
-[[data.entries]]
-name = "Yay AUR Helper"
-description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
-script = "arch/yay-setup.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "Pacman Config"
 description = "Enables Color, ILoveCandy, ParallelDownloads, VerbosePkgLists, multilib in pacman.conf and sets MAKEFLAGS in makepkg.conf."
 script = "arch/pacman-config.sh"
 task_list = "PFM"
+
+[[data.entries]]
+name = "Paru AUR Helper"
+description = "Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
+script = "arch/paru-setup.sh"
+task_list = "I"
 
 [[data.entries]]
 name = "Snapper Snapshots"
@@ -119,6 +107,18 @@ name = "System Maintenance"
 description = "Enables paccache.timer, removes orphan packages, and cleans system journals."
 script = "arch/system-maintenance.sh"
 task_list = "PFM RP"
+
+[[data.entries]]
+name = "Virtualization"
+description = "QEMU, Libvirt, Virt-Manager installation and configuration."
+script = "arch/virtualization.sh"
+task_list = "FM I SS RP"
+
+[[data.entries]]
+name = "Yay AUR Helper"
+description = "Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers"
+script = "arch/yay-setup.sh"
+task_list = "I"
 
 [[data]]
 name = "Debian"
@@ -275,6 +275,12 @@ script = "global-theme.sh"
 task_list = "I PFM"
 
 [[data]]
+name = "PipeWire Audio"
+description = "Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio)."
+script = "pipewire-setup.sh"
+task_list = "I"
+
+[[data]]
 name = "Remove Snaps"
 description = "This script is designed to remove snap"
 script = "remove-snaps.sh"
@@ -285,12 +291,6 @@ name = "TTY Fonts"
 description = "This Script will set the default TTY font to Terminus size 32 Bold"
 script = "terminus-tty.sh"
 task_list = "I PFM"
-
-[[data]]
-name = "PipeWire Audio"
-description = "Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio)."
-script = "pipewire-setup.sh"
-task_list = "I"
 
 [[data]]
 name = "Zram Swap"

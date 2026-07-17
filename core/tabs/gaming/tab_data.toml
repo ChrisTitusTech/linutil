@@ -133,6 +133,33 @@ script = "emulators/xbox/xenia.sh"
 task_list = "FM"
 
 [[data]]
+name = "Game Launchers"
+
+[[data.entries]]
+name = "Heroic"
+description = "Manage Heroic launcher installation with Install, Uninstall, or Abort actions."
+script = "heroic-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "Lutris"
+description = "Manage Lutris launcher installation with Install, Uninstall, or Abort actions."
+script = "lutris-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "RetroArch"
+description = "Manage RetroArch launcher installation with Install, Uninstall, or Abort actions."
+script = "retroarch-launcher.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "Steam"
+description = "Manage Steam launcher installation with Install, Uninstall, or Abort actions."
+script = "steam-launcher.sh"
+task_list = "FI"
+
+[[data]]
 name = "Tools and Setups"
 
 [[data.entries]]
@@ -161,18 +188,6 @@ script = "../system-setup/gaming-setup.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "ProtonPlus"
-description = "Manage ProtonPlus installation with native packages first and Flatpak fallback."
-script = "protonplus.sh"
-task_list = "FI"
-
-[[data.entries]]
-name = "ProtonUp-Qt"
-description = "Manage ProtonUp-Qt installation with native packages first and Flatpak fallback."
-script = "protonup-qt.sh"
-task_list = "FI"
-
-[[data.entries]]
 name = "General GPU Drivers"
 description = "Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance."
 script = "../system-setup/gpu-driver.sh"
@@ -186,6 +201,18 @@ script = "../system-setup/arch/nvidia-drivers.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "ProtonPlus"
+description = "Manage ProtonPlus installation with native packages first and Flatpak fallback."
+script = "protonplus.sh"
+task_list = "FI"
+
+[[data.entries]]
+name = "ProtonUp-Qt"
+description = "Manage ProtonUp-Qt installation with native packages first and Flatpak fallback."
+script = "protonup-qt.sh"
+task_list = "FI"
+
+[[data.entries]]
 name = "Waydroid"
 description = "Waydroid is an emulator that allows you to run Android apps and games on Linux."
 script = "../applications-setup/waydroid-setup.sh"
@@ -194,33 +221,6 @@ task_list = "I SS"
 matches = true
 data = { environment = "XDG_SESSION_TYPE" }
 values = ["wayland", "Wayland"]
-
-[[data]]
-name = "Game Launchers"
-
-[[data.entries]]
-name = "Steam"
-description = "Manage Steam launcher installation with Install, Uninstall, or Abort actions."
-script = "steam-launcher.sh"
-task_list = "FI"
-
-[[data.entries]]
-name = "Lutris"
-description = "Manage Lutris launcher installation with Install, Uninstall, or Abort actions."
-script = "lutris-launcher.sh"
-task_list = "FI"
-
-[[data.entries]]
-name = "RetroArch"
-description = "Manage RetroArch launcher installation with Install, Uninstall, or Abort actions."
-script = "retroarch-launcher.sh"
-task_list = "FI"
-
-[[data.entries]]
-name = "Heroic"
-description = "Manage Heroic launcher installation with Install, Uninstall, or Abort actions."
-script = "heroic-launcher.sh"
-task_list = "FI"
 
 [[data]]
 name = "Arc Raiders Titus Mods"

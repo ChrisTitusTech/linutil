@@ -358,6 +358,12 @@ script = "mybash-setup.sh"
 task_list = "I FM"
 
 [[data]]
+name = "Dank Shell"
+description = "DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop"
+script = "dank-shell.sh"
+task_list = "I FM"
+
+[[data]]
 name = "Docker"
 description = "Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "docker-setup.sh"
@@ -416,6 +422,11 @@ data = "command_exists"
 values = ["linutil"]
 
 [[data]]
+name = "Noctalia Shell"
+description = "Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI."
+script = "noctalia-shell.sh"
+task_list = "I FM"
+[[data]]
 name = "Podman"
 description = "Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers."
 script = "podman-setup.sh"
@@ -450,14 +461,3 @@ description = "The Z shell is a Unix shell that can be used as an interactive lo
 script = "zsh-setup.sh"
 task_list = "I FM"
 
-[[data]]
-name = "Dank Shell"
-description = "DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop"
-script = "dank-shell.sh"
-task_list = "I FM"
-
-[[data]]
-name = "Noctalia Shell"
-description = "Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI."
-script = "noctalia-shell.sh"
-task_list = "I FM"
