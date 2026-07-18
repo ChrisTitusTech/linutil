@@ -36,7 +36,7 @@ installRPMFusion() {
 installRPMFusionTainted() {
     case "$PACKAGER" in
         dnf)
-            if [ ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1 ] || [ ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1 ]; then
+            if ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1 || ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1; then
                 printf "%b\n" "${YELLOW}Do you want to install tainted repositories? [y/N]: ${RC}"
                 read -r install_tainted
 
