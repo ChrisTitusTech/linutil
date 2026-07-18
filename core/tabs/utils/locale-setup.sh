@@ -13,6 +13,7 @@ get_suggested_locale() {
         uk) echo "en_GB.UTF-8" ;;
         ca) echo "en_CA.UTF-8" ;;
         cf) echo "fr_CA.UTF-8" ;;
+        cn) echo "zh_CN.UTF-8" ;;
         by) echo "be_BY.UTF-8" ;;
         cz) echo "cs_CZ.UTF-8" ;;
         de) echo "de_DE.UTF-8" ;;
@@ -26,11 +27,14 @@ get_suggested_locale() {
         hu) echo "hu_HU.UTF-8" ;;
         il) echo "he_IL.UTF-8" ;;
         it) echo "it_IT.UTF-8" ;;
+        jp) echo "ja_JP.UTF-8" ;;
+        kr) echo "ko_KR.UTF-8" ;;
         lt) echo "lt_LT.UTF-8" ;;
         lv) echo "lv_LV.UTF-8" ;;
         mk) echo "mk_MK.UTF-8" ;;
         nl) echo "nl_NL.UTF-8" ;;
         no) echo "nb_NO.UTF-8" ;;
+        ph) echo "en_PH.UTF-8" ;;
         pl) echo "pl_PL.UTF-8" ;;
         ro) echo "ro_RO.UTF-8" ;;
         ru) echo "ru_RU.UTF-8" ;;
