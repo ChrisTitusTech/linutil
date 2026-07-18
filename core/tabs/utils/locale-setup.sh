@@ -54,13 +54,9 @@ setLocale() {
         suggested_locale=$(get_suggested_locale "$iso")
 
         while true; do
-            read -r -p "Detected locale: '$suggested_locale'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " input
-
-            if [ -z "$input" ]; then
-                LOCALE="$suggested_locale"
-            else
-                LOCALE="$input"
-            fi
+            printf "Detected locale: '%s'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " "$suggested_locale"
+            read -r input
+            LOCALE="${input:-$suggested_locale}"
 
             case "$LOCALE" in
                 *_**)
@@ -79,7 +75,7 @@ setLocale() {
         echo "LC_ALL=${LOCALE}" | "$ESCALATION_TOOL" tee -a /etc/environment
         echo "$LOCALE UTF-8" | "$ESCALATION_TOOL" tee -a /etc/locale.gen
         echo "LANG=$LOCALE" | "$ESCALATION_TOOL" tee -a /etc/locale.conf
-        "$ESCALATION_TOOL" locale-gen $LOCALE
+        "$ESCALATION_TOOL" locale-gen "$LOCALE"
     fi
 }
 
