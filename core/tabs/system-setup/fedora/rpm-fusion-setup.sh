@@ -3,6 +3,7 @@
 . ../../common-script.sh
 
 # https://rpmfusion.org/Configuration
+FEDORA_VERSION=$(rpm -E %fedora)
 
 installRPMFusion() {
     case "$PACKAGER" in
@@ -14,8 +15,7 @@ installRPMFusion() {
                     "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
                     "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 
-                fedora_version=$(rpm -E %fedora)
-                if [ "$fedora_version" -ge 41 ]; then
+                if [ "$FEDORA_VERSION" -ge 41 ]; then
                     "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt fedora-cisco-openh264.enabled=1
                 else
                     "$ESCALATION_TOOL" "$PACKAGER" config-manager --enable fedora-cisco-openh264
@@ -36,7 +36,7 @@ installRPMFusion() {
 installRPMFusionTainted() {
     case "$PACKAGER" in
         dnf)
-            if ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1 || ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1; then
+            if ! rpm -q "rpmfusion-free-release-tainted" >/dev/null 2>&1 || ! rpm -q "rpmfusion-nonfree-release-tainted" >/dev/null 2>&1; then
                 printf "%b\n" "${YELLOW}Do you want to install tainted repositories? [y/N]: ${RC}"
                 read -r install_tainted
 
@@ -45,7 +45,7 @@ installRPMFusionTainted() {
                         printf "%b\n" "${YELLOW}Installing RPM Fusion tainted repositories...${RC}"
                         "$ESCALATION_TOOL" "$PACKAGER" install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted
 
-                        if [ "$fedora_version" -ge 41 ]; then
+                        if [ "$FEDORA_VERSION" -ge 41 ]; then
                             "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt rpmfusion-free-tainted.enabled=1
                             "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt rpmfusion-nonfree-tainted.enabled=1
                         else
