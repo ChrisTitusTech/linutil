@@ -15,4 +15,4 @@ jobs:
       - run: git fetch origin ${{ github.base_ref }}
 
       - name: Run spellcheck
-        uses: crate-ci/typos@v1.26.0
+        uses: crate-ci/typos@v1.48.0
