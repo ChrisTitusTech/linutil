@@ -9,41 +9,41 @@ get_suggested_locale() {
 
     # Use case statement to map keys to values (POSIX standard)
     case "$key" in
-        us) echo "en_US.UTF-8" ;;
-        uk) echo "en_GB.UTF-8" ;;
-        ca) echo "en_CA.UTF-8" ;;
-        cf) echo "fr_CA.UTF-8" ;;
-        cn) echo "zh_CN.UTF-8" ;;
-        by) echo "be_BY.UTF-8" ;;
-        cz) echo "cs_CZ.UTF-8" ;;
-        de) echo "de_DE.UTF-8" ;;
-        dk) echo "da_DK.UTF-8" ;;
-        es) echo "es_ES.UTF-8" ;;
-        et) echo "et_EE.UTF-8" ;;
-        fa) echo "fa_IR.UTF-8" ;;
-        fi) echo "fi_FI.UTF-8" ;;
-        fr) echo "fr_FR.UTF-8" ;;
-        gr) echo "el_GR.UTF-8" ;;
-        hu) echo "hu_HU.UTF-8" ;;
-        il) echo "he_IL.UTF-8" ;;
-        it) echo "it_IT.UTF-8" ;;
-        jp) echo "ja_JP.UTF-8" ;;
-        kr) echo "ko_KR.UTF-8" ;;
-        lt) echo "lt_LT.UTF-8" ;;
-        lv) echo "lv_LV.UTF-8" ;;
-        mk) echo "mk_MK.UTF-8" ;;
-        nl) echo "nl_NL.UTF-8" ;;
-        no) echo "nb_NO.UTF-8" ;;
-        ph) echo "en_PH.UTF-8" ;;
-        pl) echo "pl_PL.UTF-8" ;;
-        ro) echo "ro_RO.UTF-8" ;;
-        ru) echo "ru_RU.UTF-8" ;;
-        se) echo "sv_SE.UTF-8" ;;
-        sg) echo "de_CH.UTF-8" ;;
-        si) echo "sl_SI.UTF-8" ;;
-        tr) echo "tr_TR.UTF-8" ;;
-        ua) echo "uk_UA.UTF-8" ;;
-        *) echo "$default_locale" ;; # Default fallback
+        us) printf "%b" "en_US.UTF-8" ;;
+        ca) printf "%b" "en_CA.UTF-8" ;;
+        cn) printf "%b" "zh_CN.UTF-8" ;;
+        by) printf "%b" "be_BY.UTF-8" ;;
+        ch) printf "%b" "de_CH.UTF-8" ;;
+        cz) printf "%b" "cs_CZ.UTF-8" ;;
+        de) printf "%b" "de_DE.UTF-8" ;;
+        dk) printf "%b" "da_DK.UTF-8" ;;
+        es) printf "%b" "es_ES.UTF-8" ;;
+        et) printf "%b" "et_EE.UTF-8" ;;
+        fa) printf "%b" "fa_IR.UTF-8" ;;
+        fi) printf "%b" "fi_FI.UTF-8" ;;
+        fr) printf "%b" "fr_FR.UTF-8" ;;
+        gb) printf "%b" "en_GB.UTF-8" ;;
+        gr) printf "%b" "el_GR.UTF-8" ;;
+        hu) printf "%b" "hu_HU.UTF-8" ;;
+        il) printf "%b" "he_IL.UTF-8" ;;
+        it) printf "%b" "it_IT.UTF-8" ;;
+        jp) printf "%b" "ja_JP.UTF-8" ;;
+        kr) printf "%b" "ko_KR.UTF-8" ;;
+        lt) printf "%b" "lt_LT.UTF-8" ;;
+        lv) printf "%b" "lv_LV.UTF-8" ;;
+        mk) printf "%b" "mk_MK.UTF-8" ;;
+        nl) printf "%b" "nl_NL.UTF-8" ;;
+        no) printf "%b" "nb_NO.UTF-8" ;;
+        ph) printf "%b" "en_PH.UTF-8" ;;
+        pl) printf "%b" "pl_PL.UTF-8" ;;
+        ro) printf "%b" "ro_RO.UTF-8" ;;
+        ru) printf "%b" "ru_RU.UTF-8" ;;
+        se) printf "%b" "sv_SE.UTF-8" ;;
+        sg) printf "%b" "en_SG.UTF-8" ;;
+        si) printf "%b" "sl_SI.UTF-8" ;;
+        tr) printf "%b" "tr_TR.UTF-8" ;;
+        ua) printf "%b" "uk_UA.UTF-8" ;;
+        *) printf "%b" "$default_locale" ;; # Default fallback
     esac
 }
 
@@ -59,17 +59,12 @@ setLocale() {
             LOCALE="${input:-$suggested_locale}"
 
             case "$LOCALE" in
-                *_**)
-                    # Check 2: Must end with .UTF-8
-                    if echo "$LOCALE" | grep -qE '\.UTF-8$'; then
-                        # Found a likely valid locale format
-                        break
-                    fi
-                    ;;
+                *[![:alnum:]_.@-]*|'') ;;
+                *.UTF-8) break ;;
             esac
 
             # If we reach here, the validation failed
-            echo "ERROR! Locale '$LOCALE' does not look valid. Please enter a locale like en_US.UTF-8."
+            printf "ERROR! Locale '%s' does not look valid. Please enter a locale like en_US.UTF-8." "${LOCALE}"
         done
 
         if grep -q '^LC_ALL=' /etc/environment 2>/dev/null; then
@@ -87,7 +82,7 @@ setLocale() {
         fi
         "$ESCALATION_TOOL" locale-gen "${LOCALE}"
     else
-        echo "ERROR! locale-gen not found; cannot generate locales on this system."
+        printf "%b\n" "ERROR! locale-gen not found; cannot generate locales on this system."
         exit 1
     fi
 }
