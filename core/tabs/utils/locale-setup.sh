@@ -50,8 +50,8 @@ get_suggested_locale() {
 setLocale() {
     if command_exists locale-gen; then
 
-        iso=$(curl ifconfig.io/country_code | tr '[:upper:]' '[:lower:]')
-        suggested_locale=$(get_suggested_locale "$iso")
+        iso=$(curl -4fsSL --max-time 5 https://ifconfig.io/country_code 2>/dev/null | tr '[:upper:]' '[:lower:]') || iso="us"
+        suggested_locale=$(get_suggested_locale "${iso}")
 
         while true; do
             printf "Detected locale: '%s'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " "$suggested_locale"
@@ -72,10 +72,23 @@ setLocale() {
             echo "ERROR! Locale '$LOCALE' does not look valid. Please enter a locale like en_US.UTF-8."
         done
 
-        echo "LC_ALL=${LOCALE}" | "$ESCALATION_TOOL" tee -a /etc/environment
-        echo "$LOCALE UTF-8" | "$ESCALATION_TOOL" tee -a /etc/locale.gen
-        echo "LANG=$LOCALE" | "$ESCALATION_TOOL" tee -a /etc/locale.conf
-        "$ESCALATION_TOOL" locale-gen "$LOCALE"
+        if grep -q '^LC_ALL=' /etc/environment 2>/dev/null; then
+            "$ESCALATION_TOOL" sed -i "s/^LC_ALL=.*/LC_ALL=${LOCALE}/" /etc/environment
+        else
+            printf 'LC_ALL=%s\n' "$LOCALE" | "$ESCALATION_TOOL" tee -a /etc/environment >/dev/null
+        fi
+        if ! grep -qxF "${LOCALE} UTF-8" /etc/locale.gen 2>/dev/null; then
+            printf '%s UTF-8\n' "$LOCALE" | "$ESCALATION_TOOL" tee -a /etc/locale.gen >/dev/null
+        fi
+        if grep -q '^LANG=' /etc/locale.conf 2>/dev/null; then
+            "$ESCALATION_TOOL" sed -i "s/^LANG=.*/LANG=${LOCALE}/" /etc/locale.conf
+        else
+            printf 'LANG=%s\n' "$LOCALE" | "$ESCALATION_TOOL" tee -a /etc/locale.conf >/dev/null
+        fi
+        "$ESCALATION_TOOL" locale-gen "${LOCALE}"
+    else
+        echo "ERROR! locale-gen not found; cannot generate locales on this system."
+        exit 1
     fi
 }
 

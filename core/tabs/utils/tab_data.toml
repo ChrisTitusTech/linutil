@@ -152,7 +152,7 @@ task_list = "PFM SS"
 name = "Locale Setup"
 description = "This allows the user to set their locale"
 script = "locale-setup.sh"
-task_list = "FM"
+task_list = "PFM"
 
 [[data]]
 name = "Ollama"
