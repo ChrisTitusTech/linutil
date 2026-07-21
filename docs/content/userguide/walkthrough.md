@@ -244,6 +244,7 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
+- **Locale Setup**: This allows the user to set their locale
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Ranalama**: This utility is designed to manage ramalama in your system
 - **Service Manager**: This utility is designed to manage services in your system

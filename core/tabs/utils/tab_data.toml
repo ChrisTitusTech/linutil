@@ -149,6 +149,17 @@ script = "numlock.sh"
 task_list = "PFM SS"
 
 [[data]]
+name = "Locale Setup"
+description = "This allows the user to set their locale"
+script = "locale-setup.sh"
+task_list = "PFM"
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = [ "locale-gen" ]
+
+[[data]]
 name = "Ollama"
 description = "This utility is designed to manage ollama in your system"
 script = "ollama.sh"
