@@ -292,6 +292,12 @@ script = "browsers/google-chrome.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Trivalent"
+description = "A security-focused, Chromium-based browser for desktop Linux inspired by Vanadium. Intended for use in secureblue. (Works best in Fedpra / it's spinoffs.)"
+script = "browsers/trivalent.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "LibreWolf"
 description = "LibreWolf is a fork of Firefox, focused on privacy, security, and freedom."
 script = "browsers/librewolf.sh"
@@ -466,4 +472,3 @@ name = "ZSH Prompt"
 description = "The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration."
 script = "zsh-setup.sh"
 task_list = "I FM"
-
