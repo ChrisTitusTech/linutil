@@ -225,7 +225,7 @@ find_game_config() {
 		;;
 	*)
 		printf "%b\n" "${YELLOW}Multiple EverQuest Legends configurations were found:${RC}"
-		nl -ba "$CANDIDATES_FILE"
+		nl -b a "$CANDIDATES_FILE"
 		printf "%s" "Select the configuration to update [1-$candidate_count]: "
 		read -r selection
 		case "$selection" in
