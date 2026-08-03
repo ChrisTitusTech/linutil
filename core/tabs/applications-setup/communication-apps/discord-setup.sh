@@ -42,6 +42,7 @@ installVesktop() {
                 case "$ARCH" in
                     x86_64) VESKTOP_DEB_URL="https://vencord.dev/download/vesktop/amd64/deb" ;;
                     aarch64) VESKTOP_DEB_URL="https://vencord.dev/download/vesktop/arm64/deb" ;;
+                    *) printf "%b\n" "${RED}Unsupported architecture for Vesktop: $ARCH${RC}" && exit 1 ;;
                 esac
                 # Ensure the downloaded .deb is removed even on failure under `set -e`.
                 trap 'rm -f vesktop.deb' EXIT
@@ -57,6 +58,7 @@ installVesktop() {
                 case "$ARCH" in
                     x86_64) VESKTOP_RPM_URL="https://vencord.dev/download/vesktop/amd64/rpm" ;;
                     aarch64) VESKTOP_RPM_URL="https://vencord.dev/download/vesktop/arm64/rpm" ;;
+                    *) printf "%b\n" "${RED}Unsupported architecture for Vesktop: $ARCH${RC}" && exit 1 ;;
                 esac
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$VESKTOP_RPM_URL"
                 ;;
@@ -79,11 +81,8 @@ installEquibop() {
                 case "$ARCH" in
                     x86_64) EQUIBOP_DEB_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*_amd64\.deb' | head -n1) ;;
                     aarch64) EQUIBOP_DEB_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*_arm64\.deb' | head -n1) ;;
+                    *) printf "%b\n" "${RED}Unsupported architecture for Equibop: $ARCH${RC}" && exit 1 ;;
                 esac
-                if [ -z "$EQUIBOP_DEB_URL" ]; then
-                    printf "%b\n" "${RED}Failed to find an Equibop deb package for $ARCH${RC}"
-                    exit 1
-                fi
                 # Ensure the downloaded .deb is removed even on failure under `set -e`.
                 trap 'rm -f equibop.deb' EXIT
                 curl -fLo equibop.deb "$EQUIBOP_DEB_URL"
@@ -99,11 +98,8 @@ installEquibop() {
                 case "$ARCH" in
                     x86_64) EQUIBOP_RPM_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*\.x86_64\.rpm' | head -n1) ;;
                     aarch64) EQUIBOP_RPM_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*\.aarch64\.rpm' | head -n1) ;;
+                    *) printf "%b\n" "${RED}Unsupported architecture for Equibop: $ARCH${RC}" && exit 1 ;;
                 esac
-                if [ -z "$EQUIBOP_RPM_URL" ]; then
-                    printf "%b\n" "${RED}Failed to find an Equibop rpm package for $ARCH${RC}"
-                    exit 1
-                fi
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$EQUIBOP_RPM_URL"
                 ;;
             *)
@@ -121,7 +117,7 @@ main() {
     printf "%b\n" "${YELLOW}Choose a fork of Discord to install:${RC}"
     printf "%b\n" "${YELLOW}1) Vanilla Discord${RC}"
     printf "%b\n" "${YELLOW}2) Vesktop (Discord with plugins)${RC}"
-    printf "%b\n" "${YELLOW}3) Equicord  (Vesktop with more plugins)${RC}"
+    printf "%b\n" "${YELLOW}3) Equibop (Vesktop with more plugins)${RC}"
     printf "%b" "Enter your choice [1-3]: "
     read -r choice
 
