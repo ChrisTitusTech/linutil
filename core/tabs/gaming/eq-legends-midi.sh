@@ -46,12 +46,16 @@ check_requirements() {
 	command_exists python3 || fail "Python 3 is required by the native Lutris installation."
 	command_exists pgrep || fail "pgrep is required to ensure the Wine prefix is not in use."
 	command_exists sha256sum || fail "sha256sum is required to verify the downloaded SoundFont."
+	command_exists flock || fail "flock is required by the FluidSynth lifecycle hooks."
+	command_exists ps || fail "ps is required by the FluidSynth lifecycle hooks."
+	command_exists stat || fail "stat is required by the FluidSynth lifecycle hooks."
+	command_exists curl || fail "curl is required to download the SoundFont."
 
 	if ! python3 -c 'import yaml' >/dev/null 2>&1; then
 		fail "The Python YAML module used by Lutris is missing. Reinstall native Lutris, then retry."
 	fi
 
-	if command_exists pgrep && pgrep -u "$(id -u)" -f '(^|/)lutris([[:space:]]|$)' >/dev/null 2>&1; then
+	if pgrep -u "$(id -u)" -f '(^|/)lutris([[:space:]]|$)' >/dev/null 2>&1; then
 		fail "Close Lutris before applying the EverQuest Legends MIDI fix."
 	fi
 
@@ -97,7 +101,7 @@ PYTHON
 }
 
 check_wine_prefix_idle() {
-	if pgrep -u "$(id -u)" -f '(^|/)(wineserver|winedevice|eqgame)([.]exe)?([[:space:]]|$)' >/dev/null 2>&1; then
+	if pgrep -u "$(id -u)" -f '(^|[\\/])(wineserver(64)?|winedevice([.]exe)?|eqgame([.]exe)?)([[:space:]]|$)' >/dev/null 2>&1; then
 		fail "Close all Wine applications before updating the EverQuest Legends MIDI mapper."
 	fi
 }
@@ -336,6 +340,7 @@ install_dependencies() {
 		return 0
 	fi
 
+	checkEnv
 	printf "%b\n" "${YELLOW}Installing FluidSynth and ALSA MIDI tools...${RC}"
 	case "$PACKAGER" in
 	pacman)
@@ -386,7 +391,7 @@ install_soundfont() {
 	DOWNLOAD_TMP=$(mktemp "$SOUNDFONT_DIR/.eq-legends-midi.XXXXXX")
 
 	printf "%b\n" "${YELLOW}Downloading the 177 MiB SC-55 SoundFont...${RC}"
-	curl --fail --location --retry 3 --continue-at - --output "$DOWNLOAD_TMP" "$SOUNDFONT_URL"
+	curl --fail --location --retry 3 --output "$DOWNLOAD_TMP" "$SOUNDFONT_URL"
 
 	verify_soundfont "$DOWNLOAD_TMP" || fail "The downloaded SC-55 SoundFont failed checksum verification."
 	chmod 0644 "$DOWNLOAD_TMP"
@@ -398,6 +403,28 @@ install_soundfont() {
 copy_hook() {
 	source_hook="$1"
 	target_hook="$2"
+	target_backup="$target_hook.linutil-eq-midi.bak"
+
+	[ ! -L "$target_hook" ] || fail "Refusing symbolic-link hook path: $target_hook"
+	if [ -e "$target_hook" ]; then
+		[ -f "$target_hook" ] || fail "Refusing non-file hook path: $target_hook"
+		source_checksum=$(sha256sum "$source_hook")
+		source_checksum=${source_checksum%% *}
+		target_checksum=$(sha256sum "$target_hook")
+		target_checksum=${target_checksum%% *}
+		if [ "$source_checksum" = "$target_checksum" ]; then
+			chmod 0755 "$target_hook"
+			return 0
+		fi
+
+		[ ! -L "$target_backup" ] || fail "Refusing symbolic-link hook backup path: $target_backup"
+		if [ ! -e "$target_backup" ]; then
+			cp -p "$target_hook" "$target_backup"
+			printf "%b\n" "${CYAN}Original hook backup: $target_backup${RC}"
+		elif [ ! -f "$target_backup" ]; then
+			fail "Refusing non-file hook backup path: $target_backup"
+		fi
+	fi
 
 	HOOK_TMP=$(mktemp "$HOOK_DIR/.eq-legends-midi-hook.XXXXXX")
 	cp "$source_hook" "$HOOK_TMP"
@@ -413,7 +440,6 @@ install_hooks() {
 }
 
 main() {
-	checkEnv
 	check_requirements
 	find_game_config
 	find_wine_prefix
@@ -422,6 +448,7 @@ main() {
 	install_dependencies
 	install_soundfont
 	install_hooks
+	check_wine_prefix_idle
 	configure_midi_mapper
 	edit_lutris_config apply
 

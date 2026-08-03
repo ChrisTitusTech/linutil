@@ -244,7 +244,7 @@ multi_select = false
 [[data.preconditions]]
 matches = true
 data = "command_exists"
-values = ["lutris", "python3"]
+values = ["curl", "flock", "lutris", "pgrep", "ps", "python3", "sha256sum", "stat"]
 
 [[data]]
 name = "Fallout 76 INI and Mods"
