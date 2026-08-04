@@ -48,6 +48,7 @@ check_lutris_idle() {
 }
 
 check_requirements() {
+	command_exists apk && fail "Alpine Linux and other apk-based distributions are not supported by this fix."
 	command_exists lutris || fail "Native Lutris is required. Flatpak Lutris is not supported by this fix."
 	command_exists python3 || fail "Python 3 is required by the native Lutris installation."
 	command_exists pgrep || fail "pgrep is required to ensure the Wine prefix is not in use."
@@ -376,7 +377,7 @@ install_dependencies() {
 		"$ESCALATION_TOOL" "$PACKAGER" -n install fluidsynth alsa-utils
 		;;
 	apk)
-		"$ESCALATION_TOOL" "$PACKAGER" add fluidsynth alsa-utils
+		fail "Alpine Linux and other apk-based distributions are not supported by this fix."
 		;;
 	xbps-install)
 		"$ESCALATION_TOOL" "$PACKAGER" -Sy fluidsynth alsa-utils
@@ -489,6 +490,7 @@ main() {
 	check_lutris_idle
 	edit_lutris_config prepare
 	check_lutris_idle
+	find_wine_prefix
 	check_wine_prefix_idle
 	configure_midi_mapper
 	edit_lutris_config apply

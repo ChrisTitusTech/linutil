@@ -246,6 +246,11 @@ matches = true
 data = "command_exists"
 values = ["curl", "flock", "lutris", "pgrep", "ps", "python3", "sha256sum", "stat"]
 
+[[data.preconditions]]
+matches = false
+data = "command_exists"
+values = ["apk"]
+
 [[data]]
 name = "Fallout 76 INI and Mods"
 description = "Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks."
