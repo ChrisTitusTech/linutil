@@ -76,6 +76,7 @@ check_requirements() {
 	command_exists pgrep || fail "pgrep is required to ensure the Wine prefix is not in use."
 	command_exists sha256sum || fail "sha256sum is required to verify the downloaded SoundFont."
 	command_exists flock || fail "flock is required by the FluidSynth lifecycle hooks."
+	command_exists mkfifo || fail "mkfifo is required by the FluidSynth lifecycle hooks."
 	command_exists ps || fail "ps is required by the FluidSynth lifecycle hooks."
 	command_exists stat || fail "stat is required by the FluidSynth lifecycle hooks."
 	command_exists curl || fail "curl is required to download the SoundFont."
