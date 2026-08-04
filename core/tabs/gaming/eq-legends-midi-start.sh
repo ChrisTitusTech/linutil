@@ -13,6 +13,7 @@ fi
 STATE_DIR="$STATE_HOME/linutil"
 PID_FILE="$RUNTIME_DIR/fluidsynth.pid"
 LOCK_FILE="$RUNTIME_DIR/state.lock"
+SHELL_FIFO="$RUNTIME_DIR/fluidsynth.stdin"
 PENDING_DIR="$RUNTIME_DIR/pending"
 LOG_FILE="$STATE_DIR/eq-legends-midi.log"
 STOP_HOOK="$HOOK_DIR/eq-midi-stop.sh"
@@ -90,6 +91,20 @@ acquire_lock() {
 	flock -w 15 9 || fail "timed out waiting for the FluidSynth lifecycle lock"
 }
 
+remove_shell_fifo() {
+	[ ! -L "$SHELL_FIFO" ] || fail "runtime input path is unsafe: $SHELL_FIFO"
+	if [ -e "$SHELL_FIFO" ]; then
+		[ -p "$SHELL_FIFO" ] || fail "runtime input path is not a FIFO: $SHELL_FIFO"
+		rm -f "$SHELL_FIFO"
+	fi
+}
+
+prepare_shell_fifo() {
+	remove_shell_fifo
+	mkfifo -m 0600 "$SHELL_FIFO"
+	exec 8<>"$SHELL_FIFO"
+}
+
 stop_child_process() {
 	child_pid="$1"
 	kill "$child_pid" 2>/dev/null || true
@@ -152,6 +167,7 @@ fi
 command -v fluidsynth >/dev/null 2>&1 || fail "fluidsynth is not installed"
 command -v aconnect >/dev/null 2>&1 || fail "aconnect is not installed"
 command -v nohup >/dev/null 2>&1 || fail "nohup is not installed"
+command -v mkfifo >/dev/null 2>&1 || fail "mkfifo is not installed"
 command -v ps >/dev/null 2>&1 || fail "ps is not installed"
 [ -f "$SOUNDFONT" ] || fail "SoundFont not found: $SOUNDFONT"
 
@@ -198,6 +214,7 @@ if [ -n "$owned_pid" ]; then
 		kill -KILL "$owned_pid" 2>/dev/null || true
 	fi
 	rm -f "$PID_FILE"
+	remove_shell_fifo
 	fail "an owned FluidSynth process is running without a MIDI port; see $LOG_FILE"
 fi
 
@@ -218,13 +235,16 @@ fi
 
 [ -n "$audio_driver" ] || fail "no supported PipeWire, PulseAudio, or ALSA audio driver is available"
 
-nohup fluidsynth -i -a "$audio_driver" -m alsa_seq \
+prepare_shell_fifo
+nohup fluidsynth -a "$audio_driver" -m alsa_seq \
 	-o "midi.alsa_seq.id=$MIDI_CLIENT_NAME" \
 	-o "midi.portname=$MIDI_PORT_NAME" \
-	"$SOUNDFONT" 9>&- >"$LOG_FILE" 2>&1 &
+	"$SOUNDFONT" <&8 9>&- >"$LOG_FILE" 2>&1 &
 fluidsynth_pid=$!
+exec 8>&-
 fluidsynth_start_time=$(process_start_time "$fluidsynth_pid") || {
 	stop_child_process "$fluidsynth_pid"
+	remove_shell_fifo
 	fail "unable to record the FluidSynth process identity; see $LOG_FILE"
 }
 printf "%s\n%s\n" "$fluidsynth_pid" "$fluidsynth_start_time" >"$PID_FILE"
@@ -238,6 +258,7 @@ while [ "$attempt" -lt 10 ]; do
 
 	if ! owned_process_is_running "$fluidsynth_pid" "$fluidsynth_start_time"; then
 		rm -f "$PID_FILE"
+		remove_shell_fifo
 		tail -n 20 "$LOG_FILE" >&2 || true
 		fail "FluidSynth exited before its MIDI port became ready"
 	fi
@@ -248,4 +269,5 @@ done
 
 stop_child_process "$fluidsynth_pid"
 rm -f "$PID_FILE"
+remove_shell_fifo
 fail "FluidSynth started but its MIDI port did not become ready; see $LOG_FILE"

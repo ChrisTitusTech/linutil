@@ -7,6 +7,7 @@ else
 fi
 PID_FILE="$RUNTIME_DIR/fluidsynth.pid"
 LOCK_FILE="$RUNTIME_DIR/state.lock"
+SHELL_FIFO="$RUNTIME_DIR/fluidsynth.stdin"
 PENDING_DIR="$RUNTIME_DIR/pending"
 
 umask 077
@@ -89,6 +90,14 @@ acquire_lock() {
 	flock -w 15 9 || fail "timed out waiting for the FluidSynth lifecycle lock"
 }
 
+remove_shell_fifo() {
+	[ ! -L "$SHELL_FIFO" ] || fail "runtime input path is unsafe: $SHELL_FIFO"
+	if [ -e "$SHELL_FIFO" ]; then
+		[ -p "$SHELL_FIFO" ] || fail "runtime input path is not a FIFO: $SHELL_FIFO"
+		rm -f "$SHELL_FIFO"
+	fi
+}
+
 [ -e "$RUNTIME_DIR" ] || exit 0
 command -v flock >/dev/null 2>&1 || fail "flock is not installed"
 command -v pgrep >/dev/null 2>&1 || fail "pgrep is not installed"
@@ -102,6 +111,7 @@ runtime_owner=$(stat -c '%u' -- "$RUNTIME_DIR" 2>/dev/null) || fail "unable to i
 
 acquire_lock
 [ -f "$PID_FILE" ] || {
+	remove_shell_fifo
 	exit 0
 }
 
@@ -110,12 +120,14 @@ fluidsynth_start_time=$(sed -n '2p' "$PID_FILE")
 case "$fluidsynth_pid:$fluidsynth_start_time" in
 *[!0-9:]* | :* | *:)
 	rm -f "$PID_FILE"
+	remove_shell_fifo
 	exit 0
 	;;
 esac
 
 if ! process_matches_start_time "$fluidsynth_pid" "$fluidsynth_start_time"; then
 	rm -f "$PID_FILE"
+	remove_shell_fifo
 	exit 0
 fi
 
@@ -123,6 +135,7 @@ process_name=$(ps -p "$fluidsynth_pid" -o comm= 2>/dev/null | tr -d '[:space:]' 
 if [ "$process_name" != "fluidsynth" ]; then
 	printf "%s\n" "eq-legends-midi: refusing to stop unrelated process $fluidsynth_pid" >&2
 	rm -f "$PID_FILE"
+	remove_shell_fifo
 	exit 1
 fi
 
@@ -146,3 +159,4 @@ if owned_process_is_running "$fluidsynth_pid" "$fluidsynth_start_time"; then
 fi
 
 rm -f "$PID_FILE"
+remove_shell_fifo
