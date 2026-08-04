@@ -47,6 +47,15 @@ owned_process_is_running() {
 	[ "$process_name" = "fluidsynth" ]
 }
 
+active_game_count() {
+	game_pids=$(pgrep -u "$(id -u)" -f '(^|[\\/])eqgame[.]exe([[:space:]]|$)' || true)
+	if [ -z "$game_pids" ]; then
+		printf "%s\n" 0
+	else
+		printf "%s\n" "$game_pids" | wc -l | tr -d '[:space:]'
+	fi
+}
+
 acquire_lock() {
 	[ ! -L "$LOCK_FILE" ] || fail "runtime lock path is unsafe: $LOCK_FILE"
 	[ ! -e "$LOCK_FILE" ] || [ -f "$LOCK_FILE" ] || fail "runtime lock path is not a file: $LOCK_FILE"
@@ -57,6 +66,7 @@ acquire_lock() {
 
 [ -e "$RUNTIME_DIR" ] || exit 0
 command -v flock >/dev/null 2>&1 || fail "flock is not installed"
+command -v pgrep >/dev/null 2>&1 || fail "pgrep is not installed"
 command -v ps >/dev/null 2>&1 || fail "ps is not installed"
 command -v stat >/dev/null 2>&1 || fail "stat is not installed"
 [ -d "$RUNTIME_DIR" ] && [ ! -L "$RUNTIME_DIR" ] || fail "runtime path is unsafe: $RUNTIME_DIR"
@@ -90,17 +100,9 @@ if [ "$process_name" != "fluidsynth" ]; then
 	exit 1
 fi
 
-launch_count=1
-if [ -f "$REFCOUNT_FILE" ]; then
-	launch_count=$(sed -n '1p' "$REFCOUNT_FILE")
-	case "$launch_count" in
-	'' | *[!0-9]*) fail "invalid launch count in $REFCOUNT_FILE" ;;
-	esac
-	[ "$launch_count" -gt 0 ] || fail "invalid launch count in $REFCOUNT_FILE"
-fi
-
-if [ "$launch_count" -gt 1 ]; then
-	printf "%s\n" $((launch_count - 1)) >"$REFCOUNT_FILE"
+launch_count=$(active_game_count)
+if [ "$launch_count" -gt 0 ]; then
+	printf "%s\n" "$launch_count" >"$REFCOUNT_FILE"
 	exit 0
 fi
 rm -f "$REFCOUNT_FILE"

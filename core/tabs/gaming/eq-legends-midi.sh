@@ -184,6 +184,10 @@ if updated_text == registry_text:
     raise SystemExit(0)
 
 try:
+    if backup_path.is_symlink():
+        raise OSError(f"Refusing symbolic-link backup path: {backup_path}")
+    if backup_path.exists() and not backup_path.is_file():
+        raise OSError(f"Backup path is not a file: {backup_path}")
     if not backup_path.exists():
         shutil.copy2(registry_path, backup_path)
     descriptor, temp_name = tempfile.mkstemp(
@@ -259,6 +263,10 @@ import yaml
 action, config_name, start_hook, stop_hook = sys.argv[1:]
 config_path = Path(config_name)
 
+if config_path.is_symlink():
+    print(f"Refusing symbolic-link Lutris configuration: {config_path}", file=sys.stderr)
+    raise SystemExit(1)
+
 try:
     with config_path.open("r", encoding="utf-8") as config_file:
         config = yaml.safe_load(config_file) or {}
@@ -290,19 +298,9 @@ for key, desired_value in desired_hooks.items():
         )
         raise SystemExit(1)
 
-if action == "check":
-    raise SystemExit(0)
-if action != "apply":
+if action not in ("check", "prepare", "apply"):
     print(f"Unknown configuration action: {action}", file=sys.stderr)
     raise SystemExit(1)
-
-backup_path = config_path.with_name(config_path.name + ".linutil-eq-midi.bak")
-if not backup_path.exists():
-    try:
-        shutil.copy2(config_path, backup_path)
-    except OSError as error:
-        print(f"Unable to back up {config_path}: {error}", file=sys.stderr)
-        raise SystemExit(1)
 
 system.update(desired_hooks)
 system["prelaunch_wait"] = True
@@ -310,6 +308,15 @@ config["system"] = system
 
 temp_name = None
 try:
+    if action in ("prepare", "apply"):
+        backup_path = config_path.with_name(config_path.name + ".linutil-eq-midi.bak")
+        if backup_path.is_symlink():
+            raise OSError(f"Refusing symbolic-link backup path: {backup_path}")
+        if backup_path.exists() and not backup_path.is_file():
+            raise OSError(f"Backup path is not a file: {backup_path}")
+        if not backup_path.exists():
+            shutil.copy2(config_path, backup_path)
+
     descriptor, temp_name = tempfile.mkstemp(
         prefix=config_path.name + ".", suffix=".tmp", dir=config_path.parent
     )
@@ -321,7 +328,16 @@ try:
             default_flow_style=False,
             sort_keys=False,
         )
+        temp_file.flush()
+        os.fsync(temp_file.fileno())
     os.chmod(temp_name, stat.S_IMODE(config_path.stat().st_mode))
+    if action in ("check", "prepare"):
+        os.unlink(temp_name)
+        temp_name = None
+        raise SystemExit(0)
+
+    if config_path.is_symlink():
+        raise OSError(f"Refusing symbolic-link Lutris configuration: {config_path}")
     os.replace(temp_name, config_path)
 except (OSError, yaml.YAMLError) as error:
     if temp_name:
@@ -449,6 +465,7 @@ main() {
 	install_soundfont
 	install_hooks
 	check_wine_prefix_idle
+	edit_lutris_config prepare
 	configure_midi_mapper
 	edit_lutris_config apply
 

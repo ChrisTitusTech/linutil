@@ -56,6 +56,15 @@ owned_process_is_running() {
 	[ "$process_name" = "fluidsynth" ]
 }
 
+active_game_count() {
+	game_pids=$(pgrep -u "$(id -u)" -f '(^|[\\/])eqgame[.]exe([[:space:]]|$)' || true)
+	if [ -z "$game_pids" ]; then
+		printf "%s\n" 0
+	else
+		printf "%s\n" "$game_pids" | wc -l | tr -d '[:space:]'
+	fi
+}
+
 ensure_runtime_dir() {
 	if mkdir -m 0700 "$RUNTIME_DIR" 2>/dev/null; then
 		return 0
@@ -75,16 +84,6 @@ acquire_lock() {
 	flock -w 15 9 || fail "timed out waiting for the FluidSynth lifecycle lock"
 }
 
-read_launch_count() {
-	LAUNCH_COUNT=0
-	[ -f "$REFCOUNT_FILE" ] || return 0
-	LAUNCH_COUNT=$(sed -n '1p' "$REFCOUNT_FILE")
-	case "$LAUNCH_COUNT" in
-	'' | *[!0-9]*) fail "invalid launch count in $REFCOUNT_FILE" ;;
-	esac
-	[ "$LAUNCH_COUNT" -gt 0 ] || fail "invalid launch count in $REFCOUNT_FILE"
-}
-
 write_launch_count() {
 	printf "%s\n" "$1" >"$REFCOUNT_FILE"
 }
@@ -93,6 +92,7 @@ command -v fluidsynth >/dev/null 2>&1 || fail "fluidsynth is not installed"
 command -v aconnect >/dev/null 2>&1 || fail "aconnect is not installed"
 command -v flock >/dev/null 2>&1 || fail "flock is not installed"
 command -v nohup >/dev/null 2>&1 || fail "nohup is not installed"
+command -v pgrep >/dev/null 2>&1 || fail "pgrep is not installed"
 command -v ps >/dev/null 2>&1 || fail "ps is not installed"
 command -v stat >/dev/null 2>&1 || fail "stat is not installed"
 [ -f "$SOUNDFONT" ] || fail "SoundFont not found: $SOUNDFONT"
@@ -124,10 +124,7 @@ fi
 
 if aconnect -l 2>/dev/null | grep -q "client [0-9][0-9]*: '$MIDI_CLIENT_NAME'"; then
 	[ -n "$owned_pid" ] || fail "an unmanaged $MIDI_CLIENT_NAME MIDI client is already running"
-	read_launch_count
-	if [ "$LAUNCH_COUNT" -eq 0 ]; then
-		LAUNCH_COUNT=1
-	fi
+	LAUNCH_COUNT=$(active_game_count)
 	write_launch_count $((LAUNCH_COUNT + 1))
 	exit 0
 fi
@@ -180,7 +177,8 @@ printf "%s\n%s\n" "$fluidsynth_pid" "$fluidsynth_start_time" >"$PID_FILE"
 attempt=0
 while [ "$attempt" -lt 10 ]; do
 	if aconnect -l 2>/dev/null | grep -q "client [0-9][0-9]*: '$MIDI_CLIENT_NAME'"; then
-		write_launch_count 1
+		LAUNCH_COUNT=$(active_game_count)
+		write_launch_count $((LAUNCH_COUNT + 1))
 		exit 0
 	fi
 
