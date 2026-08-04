@@ -15,7 +15,8 @@ CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
 HOOK_DIR="$DATA_HOME/lutris/scripts"
 SOUNDFONT_DIR="$DATA_HOME/sounds/sf2"
 SOUNDFONT_PATH="$SOUNDFONT_DIR/$SOUNDFONT_NAME"
-LUTRIS_GAMES_DIR="$CONFIG_HOME/lutris/games"
+LUTRIS_DATA_GAMES_DIR="$DATA_HOME/lutris/games"
+LUTRIS_CONFIG_GAMES_DIR="$CONFIG_HOME/lutris/games"
 START_HOOK="$HOOK_DIR/eq-midi-start.sh"
 STOP_HOOK="$HOOK_DIR/eq-midi-stop.sh"
 MIDI_CLIENT_NAME="EQ-Legends"
@@ -26,6 +27,7 @@ DOWNLOAD_TMP=""
 HOOK_TMP=""
 CONFIG_PATH=""
 PREFIX_PATH=""
+PYTHON_BIN=""
 
 cleanup() {
 	[ -z "$CANDIDATES_FILE" ] || rm -f "$CANDIDATES_FILE"
@@ -47,10 +49,30 @@ check_lutris_idle() {
 	fi
 }
 
+select_python() {
+	lutris_path=$(command -v lutris)
+	lutris_python=$(sed -n '1s/^#!//p' "$lutris_path")
+	path_python=$(command -v python3 2>/dev/null || true)
+
+	for python_candidate in "$lutris_python" "$path_python" /usr/bin/python3; do
+		[ -n "$python_candidate" ] || continue
+		case "$python_candidate" in
+		*[[:space:]]*) continue ;;
+		esac
+		[ -x "$python_candidate" ] || continue
+		if "$python_candidate" -c 'import yaml' >/dev/null 2>&1; then
+			PYTHON_BIN="$python_candidate"
+			return 0
+		fi
+	done
+
+	fail "The Python YAML module used by Lutris is missing. Install your distribution's PyYAML package or reinstall native Lutris, then retry."
+}
+
 check_requirements() {
 	command_exists apk && fail "Alpine Linux and other apk-based distributions are not supported by this fix."
 	command_exists lutris || fail "Native Lutris is required. Flatpak Lutris is not supported by this fix."
-	command_exists python3 || fail "Python 3 is required by the native Lutris installation."
+	select_python
 	command_exists pgrep || fail "pgrep is required to ensure the Wine prefix is not in use."
 	command_exists sha256sum || fail "sha256sum is required to verify the downloaded SoundFont."
 	command_exists flock || fail "flock is required by the FluidSynth lifecycle hooks."
@@ -58,18 +80,16 @@ check_requirements() {
 	command_exists stat || fail "stat is required by the FluidSynth lifecycle hooks."
 	command_exists curl || fail "curl is required to download the SoundFont."
 
-	if ! python3 -c 'import yaml' >/dev/null 2>&1; then
-		fail "The Python YAML module used by Lutris is missing. Reinstall native Lutris, then retry."
-	fi
-
 	check_lutris_idle
 
-	[ -d "$LUTRIS_GAMES_DIR" ] || fail "No native Lutris game configuration directory was found at $LUTRIS_GAMES_DIR."
+	if [ ! -d "$LUTRIS_DATA_GAMES_DIR" ] && [ ! -d "$LUTRIS_CONFIG_GAMES_DIR" ]; then
+		fail "No native Lutris game configuration directory was found at $LUTRIS_DATA_GAMES_DIR or $LUTRIS_CONFIG_GAMES_DIR."
+	fi
 }
 
 find_wine_prefix() {
 	PREFIX_PATH=$(
-		python3 - "$CONFIG_PATH" <<'PYTHON'
+		"$PYTHON_BIN" - "$CONFIG_PATH" <<'PYTHON'
 import os
 import sys
 from pathlib import Path
@@ -112,7 +132,7 @@ check_wine_prefix_idle() {
 }
 
 configure_midi_mapper() {
-	python3 - "$PREFIX_PATH" "$MIDI_DEVICE_NAME" <<'PYTHON'
+	"$PYTHON_BIN" - "$PREFIX_PATH" "$MIDI_DEVICE_NAME" <<'PYTHON'
 import os
 import re
 import shutil
@@ -221,12 +241,10 @@ PYTHON
 find_game_config() {
 	CANDIDATES_FILE=$(mktemp)
 
-	for config_file in "$LUTRIS_GAMES_DIR"/*.yml "$LUTRIS_GAMES_DIR"/*.yaml; do
-		[ -f "$config_file" ] || continue
-		if grep -qi "EverQuest Legends" "$config_file" && grep -q "LaunchPad.exe" "$config_file"; then
-			printf "%s\n" "$config_file" >>"$CANDIDATES_FILE"
-		fi
-	done
+	find_game_candidates "$LUTRIS_DATA_GAMES_DIR"
+	if [ "$LUTRIS_CONFIG_GAMES_DIR" != "$LUTRIS_DATA_GAMES_DIR" ]; then
+		find_game_candidates "$LUTRIS_CONFIG_GAMES_DIR"
+	fi
 
 	candidate_count=$(wc -l <"$CANDIDATES_FILE" | tr -d '[:space:]')
 	case "$candidate_count" in
@@ -252,10 +270,22 @@ find_game_config() {
 	printf "%b\n" "${CYAN}Using Lutris configuration: $CONFIG_PATH${RC}"
 }
 
+find_game_candidates() {
+	games_dir="$1"
+	[ -d "$games_dir" ] || return 0
+
+	for config_file in "$games_dir"/*.yml "$games_dir"/*.yaml; do
+		[ -f "$config_file" ] || continue
+		if grep -qi "EverQuest Legends" "$config_file" && grep -q "LaunchPad.exe" "$config_file"; then
+			printf "%s\n" "$config_file" >>"$CANDIDATES_FILE"
+		fi
+	done
+}
+
 edit_lutris_config() {
 	action="$1"
 
-	python3 - "$action" "$CONFIG_PATH" "$START_HOOK" "$STOP_HOOK" <<'PYTHON'
+	"$PYTHON_BIN" - "$action" "$CONFIG_PATH" "$START_HOOK" "$STOP_HOOK" <<'PYTHON'
 import os
 import shutil
 import stat
