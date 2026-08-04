@@ -68,7 +68,7 @@ pending_launch_count() {
 		watcher_start_time=$(sed -n '3p' "$pending_token")
 		case "$watcher_pid:$watcher_start_time" in
 		*[!0-9:]* | :* | *:)
-			pending_count=$((pending_count + 1))
+			rm -f "$pending_token"
 			continue
 			;;
 		esac
