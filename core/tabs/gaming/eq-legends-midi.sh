@@ -41,6 +41,12 @@ fail() {
 	exit 1
 }
 
+check_lutris_idle() {
+	if pgrep -u "$(id -u)" -f '(^|/)lutris([[:space:]]|$)' >/dev/null 2>&1; then
+		fail "Close Lutris before applying the EverQuest Legends MIDI fix."
+	fi
+}
+
 check_requirements() {
 	command_exists lutris || fail "Native Lutris is required. Flatpak Lutris is not supported by this fix."
 	command_exists python3 || fail "Python 3 is required by the native Lutris installation."
@@ -55,9 +61,7 @@ check_requirements() {
 		fail "The Python YAML module used by Lutris is missing. Reinstall native Lutris, then retry."
 	fi
 
-	if pgrep -u "$(id -u)" -f '(^|/)lutris([[:space:]]|$)' >/dev/null 2>&1; then
-		fail "Close Lutris before applying the EverQuest Legends MIDI fix."
-	fi
+	check_lutris_idle
 
 	[ -d "$LUTRIS_GAMES_DIR" ] || fail "No native Lutris game configuration directory was found at $LUTRIS_GAMES_DIR."
 }
@@ -416,7 +420,7 @@ install_soundfont() {
 	printf "%b\n" "${GREEN}SC-55 SoundFont installed and verified.${RC}"
 }
 
-copy_hook() {
+prepare_hook_target() {
 	source_hook="$1"
 	target_hook="$2"
 	target_backup="$target_hook.linutil-eq-midi.bak"
@@ -429,7 +433,6 @@ copy_hook() {
 		target_checksum=$(sha256sum "$target_hook")
 		target_checksum=${target_checksum%% *}
 		if [ "$source_checksum" = "$target_checksum" ]; then
-			chmod 0755 "$target_hook"
 			return 0
 		fi
 
@@ -439,6 +442,22 @@ copy_hook() {
 			printf "%b\n" "${CYAN}Original hook backup: $target_backup${RC}"
 		elif [ ! -f "$target_backup" ]; then
 			fail "Refusing non-file hook backup path: $target_backup"
+		fi
+	fi
+}
+
+copy_hook() {
+	source_hook="$1"
+	target_hook="$2"
+
+	if [ -f "$target_hook" ]; then
+		source_checksum=$(sha256sum "$source_hook")
+		source_checksum=${source_checksum%% *}
+		target_checksum=$(sha256sum "$target_hook")
+		target_checksum=${target_checksum%% *}
+		if [ "$source_checksum" = "$target_checksum" ]; then
+			chmod 0755 "$target_hook"
+			return 0
 		fi
 	fi
 
@@ -451,6 +470,8 @@ copy_hook() {
 
 install_hooks() {
 	mkdir -p "$HOOK_DIR"
+	prepare_hook_target "$SCRIPT_DIR/eq-legends-midi-start.sh" "$START_HOOK"
+	prepare_hook_target "$SCRIPT_DIR/eq-legends-midi-stop.sh" "$STOP_HOOK"
 	copy_hook "$SCRIPT_DIR/eq-legends-midi-start.sh" "$START_HOOK"
 	copy_hook "$SCRIPT_DIR/eq-legends-midi-stop.sh" "$STOP_HOOK"
 }
@@ -465,7 +486,10 @@ main() {
 	install_soundfont
 	install_hooks
 	check_wine_prefix_idle
+	check_lutris_idle
 	edit_lutris_config prepare
+	check_lutris_idle
+	check_wine_prefix_idle
 	configure_midi_mapper
 	edit_lutris_config apply
 

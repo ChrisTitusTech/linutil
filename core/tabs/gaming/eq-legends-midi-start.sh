@@ -12,11 +12,13 @@ else
 fi
 STATE_DIR="$STATE_HOME/linutil"
 PID_FILE="$RUNTIME_DIR/fluidsynth.pid"
-REFCOUNT_FILE="$RUNTIME_DIR/launch-count"
 LOCK_FILE="$RUNTIME_DIR/state.lock"
+PENDING_DIR="$RUNTIME_DIR/pending"
 LOG_FILE="$STATE_DIR/eq-legends-midi.log"
+STOP_HOOK="$HOOK_DIR/eq-midi-stop.sh"
 MIDI_CLIENT_NAME="EQ-Legends"
 MIDI_PORT_NAME="EQ-Legends"
+PENDING_TIMEOUT=60
 
 umask 077
 
@@ -56,13 +58,17 @@ owned_process_is_running() {
 	[ "$process_name" = "fluidsynth" ]
 }
 
-active_game_count() {
-	game_pids=$(pgrep -u "$(id -u)" -f '(^|[\\/])eqgame[.]exe([[:space:]]|$)' || true)
-	if [ -z "$game_pids" ]; then
-		printf "%s\n" 0
-	else
-		printf "%s\n" "$game_pids" | wc -l | tr -d '[:space:]'
-	fi
+managed_game_count() {
+	managed_count=0
+	game_pids=$(pgrep -u "$(id -u)" -f '(^|[\\/])([Ll]aunch[Pp]ad|eqgame)[.]exe([[:space:]]|$)' || true)
+	# Candidate PIDs are newline-delimited decimal values from pgrep.
+	# shellcheck disable=SC2086
+	for game_pid in $game_pids; do
+		if [ -r "/proc/$game_pid/environ" ] && tr '\000' '\n' <"/proc/$game_pid/environ" | grep -Fqx "WINEPREFIX=$WINEPREFIX"; then
+			managed_count=$((managed_count + 1))
+		fi
+	done
+	printf "%s\n" "$managed_count"
 }
 
 ensure_runtime_dir() {
@@ -84,17 +90,69 @@ acquire_lock() {
 	flock -w 15 9 || fail "timed out waiting for the FluidSynth lifecycle lock"
 }
 
-write_launch_count() {
-	printf "%s\n" "$1" >"$REFCOUNT_FILE"
+stop_child_process() {
+	child_pid="$1"
+	kill "$child_pid" 2>/dev/null || true
+	stop_attempt=0
+	while kill -0 "$child_pid" 2>/dev/null && [ "$stop_attempt" -lt 5 ]; do
+		stop_attempt=$((stop_attempt + 1))
+		sleep 1
+	done
+	if kill -0 "$child_pid" 2>/dev/null; then
+		kill -KILL "$child_pid" 2>/dev/null || true
+	fi
+	wait "$child_pid" 2>/dev/null || true
 }
+
+register_pending_launch() {
+	mkdir -p "$PENDING_DIR"
+	chmod 0700 "$PENDING_DIR"
+	pending_token=$(mktemp "$PENDING_DIR/launch.XXXXXX")
+	nohup "$0" --watch-pending "$pending_token" </dev/null >>"$LOG_FILE" 2>&1 9>&- &
+	watcher_pid=$!
+	watcher_start_time=$(process_start_time "$watcher_pid") || {
+		stop_child_process "$watcher_pid"
+		rm -f "$pending_token"
+		fail "unable to record the pending-launch watcher identity"
+	}
+	printf "%s\n%s\n%s\n" "$WINEPREFIX" "$watcher_pid" "$watcher_start_time" >"$pending_token"
+}
+
+watch_pending_launch() {
+	pending_token="$1"
+	case "$pending_token" in
+	"$PENDING_DIR"/launch.*) ;;
+	*) fail "invalid pending-launch token: $pending_token" ;;
+	esac
+
+	sleep "$PENDING_TIMEOUT"
+	while [ "$(managed_game_count)" -gt 0 ]; do
+		sleep 5
+	done
+
+	acquire_lock
+	rm -f "$pending_token"
+	exec 9>&-
+	"$STOP_HOOK" >/dev/null 2>&1 || true
+}
+
+command -v flock >/dev/null 2>&1 || fail "flock is not installed"
+command -v pgrep >/dev/null 2>&1 || fail "pgrep is not installed"
+command -v stat >/dev/null 2>&1 || fail "stat is not installed"
+# Lutris passes the configured Wine environment to both lifecycle hooks.
+[ -n "${WINEPREFIX:-}" ] || fail "WINEPREFIX was not provided by Lutris"
+
+if [ "${1:-}" = "--watch-pending" ]; then
+	[ "$#" -eq 2 ] || fail "invalid pending-launch watcher arguments"
+	ensure_runtime_dir
+	watch_pending_launch "$2"
+	exit 0
+fi
 
 command -v fluidsynth >/dev/null 2>&1 || fail "fluidsynth is not installed"
 command -v aconnect >/dev/null 2>&1 || fail "aconnect is not installed"
-command -v flock >/dev/null 2>&1 || fail "flock is not installed"
 command -v nohup >/dev/null 2>&1 || fail "nohup is not installed"
-command -v pgrep >/dev/null 2>&1 || fail "pgrep is not installed"
 command -v ps >/dev/null 2>&1 || fail "ps is not installed"
-command -v stat >/dev/null 2>&1 || fail "stat is not installed"
 [ -f "$SOUNDFONT" ] || fail "SoundFont not found: $SOUNDFONT"
 
 ensure_runtime_dir
@@ -124,8 +182,7 @@ fi
 
 if aconnect -l 2>/dev/null | grep -q "client [0-9][0-9]*: '$MIDI_CLIENT_NAME'"; then
 	[ -n "$owned_pid" ] || fail "an unmanaged $MIDI_CLIENT_NAME MIDI client is already running"
-	LAUNCH_COUNT=$(active_game_count)
-	write_launch_count $((LAUNCH_COUNT + 1))
+	register_pending_launch
 	exit 0
 fi
 
@@ -140,10 +197,9 @@ if [ -n "$owned_pid" ]; then
 	if owned_process_is_running "$owned_pid" "$owned_start_time"; then
 		kill -KILL "$owned_pid" 2>/dev/null || true
 	fi
-	rm -f "$PID_FILE" "$REFCOUNT_FILE"
+	rm -f "$PID_FILE"
 	fail "an owned FluidSynth process is running without a MIDI port; see $LOG_FILE"
 fi
-rm -f "$REFCOUNT_FILE"
 
 audio_drivers=$(fluidsynth -a help 2>&1 || true)
 midi_drivers=$(fluidsynth -m help 2>&1 || true)
@@ -168,8 +224,7 @@ nohup fluidsynth -i -a "$audio_driver" -m alsa_seq \
 	"$SOUNDFONT" 9>&- >"$LOG_FILE" 2>&1 &
 fluidsynth_pid=$!
 fluidsynth_start_time=$(process_start_time "$fluidsynth_pid") || {
-	kill "$fluidsynth_pid" 2>/dev/null || true
-	wait "$fluidsynth_pid" 2>/dev/null || true
+	stop_child_process "$fluidsynth_pid"
 	fail "unable to record the FluidSynth process identity; see $LOG_FILE"
 }
 printf "%s\n%s\n" "$fluidsynth_pid" "$fluidsynth_start_time" >"$PID_FILE"
@@ -177,13 +232,12 @@ printf "%s\n%s\n" "$fluidsynth_pid" "$fluidsynth_start_time" >"$PID_FILE"
 attempt=0
 while [ "$attempt" -lt 10 ]; do
 	if aconnect -l 2>/dev/null | grep -q "client [0-9][0-9]*: '$MIDI_CLIENT_NAME'"; then
-		LAUNCH_COUNT=$(active_game_count)
-		write_launch_count $((LAUNCH_COUNT + 1))
+		register_pending_launch
 		exit 0
 	fi
 
 	if ! owned_process_is_running "$fluidsynth_pid" "$fluidsynth_start_time"; then
-		rm -f "$PID_FILE" "$REFCOUNT_FILE"
+		rm -f "$PID_FILE"
 		tail -n 20 "$LOG_FILE" >&2 || true
 		fail "FluidSynth exited before its MIDI port became ready"
 	fi
@@ -192,9 +246,6 @@ while [ "$attempt" -lt 10 ]; do
 	sleep 1
 done
 
-if owned_process_is_running "$fluidsynth_pid" "$fluidsynth_start_time"; then
-	kill "$fluidsynth_pid" 2>/dev/null || true
-fi
-wait "$fluidsynth_pid" 2>/dev/null || true
-rm -f "$PID_FILE" "$REFCOUNT_FILE"
+stop_child_process "$fluidsynth_pid"
+rm -f "$PID_FILE"
 fail "FluidSynth started but its MIDI port did not become ready; see $LOG_FILE"
