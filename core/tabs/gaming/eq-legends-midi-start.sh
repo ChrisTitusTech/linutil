@@ -101,8 +101,10 @@ remove_shell_fifo() {
 
 prepare_shell_fifo() {
 	remove_shell_fifo
+	trap 'remove_shell_fifo' 0
 	mkfifo -m 0600 "$SHELL_FIFO"
 	exec 8<>"$SHELL_FIFO"
+	trap - 0
 }
 
 stop_child_process() {
