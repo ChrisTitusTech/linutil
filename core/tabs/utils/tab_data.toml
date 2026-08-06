@@ -166,7 +166,7 @@ script = "ollama.sh"
 task_list = "I SS"
 
 [[data]]
-name = "Ranalama"
+name = "Ramalama"
 description = "This utility is designed to manage ramalama in your system"
 script = "ramalama.sh"
 task_list = "I SS"
