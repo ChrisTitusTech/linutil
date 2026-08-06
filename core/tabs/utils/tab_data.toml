@@ -143,21 +143,21 @@ script = "encrypt_decrypt_tool.sh"
 task_list = "I FM"
 
 [[data]]
-name = "Numlock on Startup"
-description = "This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME"
-script = "numlock.sh"
-task_list = "PFM SS"
-
-[[data]]
 name = "Locale Setup"
 description = "This allows the user to set their locale"
 script = "locale-setup.sh"
-task_list = "PFM"
+task_list = "FM"
 
 [[data.preconditions]]
 matches = true
 data = "command_exists"
 values = [ "locale-gen" ]
+
+[[data]]
+name = "Numlock on Startup"
+description = "This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME"
+script = "numlock.sh"
+task_list = "PFM SS"
 
 [[data]]
 name = "Ollama"
