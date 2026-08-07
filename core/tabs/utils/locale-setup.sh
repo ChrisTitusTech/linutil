@@ -4,10 +4,11 @@
 setLocale() {
     if command_exists locale-gen; then
         iso=$(curl -4fsSL --max-time 5 https://ifconfig.io/country_code 2>/dev/null) || iso="US"
-        suggested_locales=$(ls /usr/share/i18n/locales/ | grep -i "$iso" || true)
+        supported_locales=$(awk '$2 == "UTF-8" { print $1 }' /usr/share/i18n/SUPPORTED)
+        suggested_locales=$(printf '%s\n' "$supported_locales" | grep -iE "(^|_)${iso}([.@]|$)" || true)
 
         if [ -z "$suggested_locales" ]; then
-            suggested_locales=$(ls /usr/share/i18n/locales/)
+            suggested_locales=$supported_locales
         fi
 
         printf "%s\n" "Suggested locales based on your location ($iso):"
@@ -32,7 +33,7 @@ setLocale() {
                     continue
                 fi
 
-                if [ -f "/usr/share/i18n/locales/$custom_locale" ]; then
+                if [ "$custom_locale" = "C.UTF-8" ] || printf '%s\n' "$supported_locales" | grep -qxF "$custom_locale"; then
                     LOCALE="$custom_locale"
                 else
                     printf "%s\n" "'$custom_locale' is not a recognized locale. Please try again."
@@ -40,7 +41,7 @@ setLocale() {
             done
         else
             case "$choice" in
-                ''|*[!0-9]*)
+                ''|0|*[!0-9]*)
                     printf "%s\n" "Invalid selection."
                     exit 1
                     ;;
