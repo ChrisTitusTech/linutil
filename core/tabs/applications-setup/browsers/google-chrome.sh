@@ -21,7 +21,12 @@ installChrome() {
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" install -y fedora-workstation-repositories
-                "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
+                fedora_version=$(rpm -E %fedora)
+                if [ "$fedora_version" -ge 41 ]; then
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager setopt google-chrome.enabled=1
+                else
+                    "$ESCALATION_TOOL" "$PACKAGER" config-manager --set-enabled google-chrome
+                fi
                 "$ESCALATION_TOOL" "$PACKAGER" install -y google-chrome-stable
                 ;;
             *)
