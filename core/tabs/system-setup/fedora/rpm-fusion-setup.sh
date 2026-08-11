@@ -12,7 +12,7 @@ installRPMFusion() {
                 printf "%b\n" "${YELLOW}Installing RPM Fusion...${RC}"
 
                 "$ESCALATION_TOOL" "$PACKAGER" install -y \
-                    "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$FEDORA_VERSION).noarch.rpm" \
+                    "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$FEDORA_VERSION.noarch.rpm" \
                     "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$FEDORA_VERSION.noarch.rpm"
 
                 if [ "$FEDORA_VERSION" -ge 41 ]; then
