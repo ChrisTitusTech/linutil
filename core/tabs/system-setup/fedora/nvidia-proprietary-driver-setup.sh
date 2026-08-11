@@ -18,7 +18,12 @@ checkRepo() {
     printf "%b\n" "${YELLOW}Nvidia non-free repository is not enabled. Enabling now...${RC}"
 
     # Enable the repository
-    "$ESCALATION_TOOL" dnf config-manager --set-enabled "$REPO_ID"
+    fedora_version=$(rpm -E %fedora)
+    if [ "$fedora_version" -ge 41 ]; then
+        "$ESCALATION_TOOL" dnf config-manager setopt "${REPO_ID}.enabled=1"
+    else
+        "$ESCALATION_TOOL" dnf config-manager --set-enabled "$REPO_ID"
+    fi
 
     # Refreshing repository list
     "$ESCALATION_TOOL" dnf makecache
