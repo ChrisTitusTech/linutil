@@ -4,7 +4,7 @@
 
 installObsStudio() {
 	printf "%b\n" "${YELLOW}Installing OBS Studio...${RC}"
-	if ! command_exists obs-studio; then
+	if ! command_exists com.obsproject.Studio && ! command_exists obs-studio; then
 	    case "$PACKAGER" in
 	        apt-get|nala)
 				"$ESCALATION_TOOL" "$PACKAGER" install -y v4l2loopback-dkms obs-studio
@@ -36,10 +36,9 @@ uninstallObsStudio() {
 	        pacman)
 			    "$AUR_HELPER" -R --noconfirm --cleanafter obs-studio
 	            ;;
-	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
-	            ;;
 	    esac
+	elif command_exists com.obsproject.Studio; then
+	    "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.obsproject.Studio
 	else
 		printf "%b\n" "${GREEN}OBS Studio is not installed.${RC}"
 	fi

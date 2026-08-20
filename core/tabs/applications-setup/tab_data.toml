@@ -194,6 +194,7 @@ name = "OBS Studio"
 description = "OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application."
 script = "desktop-utils/obs-studio.sh"
 task_list = "I"
+multi_select = false
 
 [[data.entries]]
 name = "Obsidian"
