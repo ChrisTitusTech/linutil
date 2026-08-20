@@ -115,12 +115,6 @@ script = "design-tools/natron.sh"
 task_list = "I"
 
 [[data.entries]]
-name = "OBS Studio"
-description = "OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application."
-script = "design-tools/obs-studio.sh"
-task_list = "I"
-
-[[data.entries]]
 name = "Olive"
 description = "Olive is a free and open-source cross-platform non-linear video editing application."
 script = "design-tools/olive.sh"
@@ -154,6 +148,57 @@ task_list = "I"
 name = "Tenacity"
 description = "Tenacity is an easy-to-use, cross-platform multi-track audio editor/recorder."
 script = "design-tools/tenacity.sh"
+task_list = "I"
+
+[[data]]
+name = "Desktop Utilities"
+
+[[data.entries]]
+name = "Bitwarden"
+description = "Bitwarden is a free and open-source password management service that helps users securely store and manage their passwords, credentials, and sensitive information across devices."
+script = "desktop-utils/bitwarden.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Ente Auth"
+description = "Ente Auth is a free and open-source authentication application that provides secure and convenient access to various online services and platforms."
+script = "desktop-utils/ente-auth.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Flameshot"
+description = "Flameshot is a free and open-source screenshot software that allows users to capture, annotate, and edit screenshots with a variety of tools and features."
+script = "desktop-utils/flameshot.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "LocalSend"
+description = "LocalSend is a free and open-source file transfer application that allows users to send files between devices on the same local network similar to Apple's AirDrop." 
+script = "desktop-utils/localsend.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "MPV"
+description = "MPV is a free and open-source media player that supports a wide range of video and audio formats, providing a simple and efficient playback experience."
+script = "desktop-utils/mpv.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Nextcloud Desktop"
+description = "Nextcloud is a free and open-source alternative to Dropbox, Google Drive, and OneDrive that allows users to host their own cloud storage and file synchronization service. Provides a desktop client"
+script = "desktop-utils/nextcloud.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "OBS Studio"
+description = "OBS Studio is a free and open-source, cross-platform screencasting and live streaming software application."
+script = "desktop-utils/obs-studio.sh"
+task_list = "I"
+
+[[data.entries]]
+name = "Obsidian"
+description = "Obsidian is a popular note-taking application that allows users to create and organize notes in a markdown format, with features like backlinks, graph view, and plugins for enhanced functionality."
+script = "desktop-utils/obsidian.sh"
 task_list = "I"
 
 [[data]]
