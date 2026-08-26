@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installEnteAuth() {
-    if ! command_exists io.ente.auth && ! command_exists EnteAuth; then
+    if ! command_exists io.ente.auth && ! command_exists enteauth; then
         printf "%b\n" "${YELLOW}Installing Ente Auth...${RC}"
         # Ente publishes all apps (auth, photos, locker, ...) in one repo, tagged e.g. "auth-v4.4.25".
         latest_tag=$(curl -sL "https://api.github.com/repos/ente-io/ente/releases?per_page=100" |
@@ -18,7 +18,7 @@ installEnteAuth() {
         case "$PACKAGER" in
             apt-get|nala)
                 case "$ARCH" in
-                    x86_64) EnteAuth_DEB_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*_x86_64\.deb' | head -n1) ;;
+                    x86_64) EnteAuth_DEB_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*-x86_64\.deb' | head -n1) ;;
                     *) printf "%b\n" "${RED}Unsupported architecture for Ente Auth: $ARCH${RC}" && exit 1 ;;
                 esac
                 # Ensure the downloaded .deb is removed even on failure under `set -e`.
@@ -30,7 +30,7 @@ installEnteAuth() {
                 ;;
             dnf)
                 case "$ARCH" in
-                    x86_64) EnteAuth_RPM_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*_x86_64\.rpm' | head -n1) ;;
+                    x86_64) EnteAuth_RPM_URL=$(printf '%s' "$latest_release" | grep -o 'https://[^"]*-x86_64\.rpm' | head -n1) ;;
                     *) printf "%b\n" "${RED}Unsupported architecture for Ente Auth: $ARCH${RC}" && exit 1 ;;
                 esac
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "$EnteAuth_RPM_URL"
