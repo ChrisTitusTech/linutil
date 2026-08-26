@@ -20,6 +20,7 @@ installDepend() {
             ;;
         apt-get|nala)
             COMPILEDEPS='build-essential'
+            DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
