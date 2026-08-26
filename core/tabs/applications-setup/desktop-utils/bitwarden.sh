@@ -3,7 +3,7 @@
 . ../../common-script.sh
 
 installBitwarden() {
-    if ! command_exists com.bitwarden.desktop && ! command_exists bitwarden-desktop; then
+    if ! command_exists com.bitwarden.desktop && ! command_exists bitwarden && ! command_exists bitwarden-desktop; then
         printf "%b\n" "${YELLOW}Installing Bitwarden...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -18,7 +18,7 @@ installBitwarden() {
                 "$ESCALATION_TOOL" "$PACKAGER" install -y "https://bitwarden.com/download/?app=desktop&platform=linux&variant=rpm"
                 ;;
             pacman)
-                "$AUR_HELPER" -S --needed --noconfirm bitwarden
+                "$AUR_HELPER" -S --needed --noconfirm bitwarden-bin
                 ;;
             *)
                 checkFlatpak
