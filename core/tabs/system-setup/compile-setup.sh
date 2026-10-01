@@ -21,6 +21,10 @@ installDepend() {
         apt-get|nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
+            TLDR_CANDIDATE=$(apt-cache policy tldr | awk '/Candidate:/ {print $2}')
+            if [ -z "$TLDR_CANDIDATE" ] || [ "$TLDR_CANDIDATE" = "(none)" ]; then
+                DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
+            fi
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
