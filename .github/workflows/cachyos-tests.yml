@@ -1,0 +1,20 @@
+name: CachyOS Script Tests
+
+on:
+  pull_request:
+    paths:
+      - 'core/tabs/system-setup/arch/cachyos-repos.sh'
+      - 'tests/test_cachyos_repos.py'
+      - '.github/workflows/cachyos-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cachyos-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run isolated shell regression tests
+        run: python3 -B -m unittest discover -s tests -p 'test_cachyos_repos.py' -v
