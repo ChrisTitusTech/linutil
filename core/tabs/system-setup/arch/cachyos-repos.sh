@@ -3,48 +3,65 @@
 . ../../common-script.sh
 
 checkRepo() {
-    isInstalled=$(cat /etc/pacman.conf | grep "(cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4)")
-    isCommented=$(cat /etc/pacman.conf | grep "cachyos\|cachyos-v3\|cachyos-core-v3\|cachyos-extra-v3\|cachyos-testing-v3\|cachyos-v4\|cachyos-core-v4\|cachyos-extra-v4\|cachyos-znver4\|cachyos-core-znver4\|cachyos-extra-znver4" | grep -v "#\[" | grep "\[")
+    hasConfiguredRepos=false
+    hasActiveRepos=false
+    repoSection='\[cachyos(-[[:alnum:]-]+)?\][[:space:]]*(#.*)?$'
+    if grep -Eq "^[[:space:]]*#?[[:space:]]*${repoSection}" /etc/pacman.conf; then
+        hasConfiguredRepos=true
+    fi
+    if grep -Eq "^[[:space:]]*${repoSection}" /etc/pacman.conf; then
+        hasActiveRepos=true
+    fi
+}
+
+checkGrub() {
+    if ! command_exists grub-mkconfig || [ ! -f /etc/default/grub ] || [ ! -d /boot/grub ]; then
+        printf "%b\n" "${RED}Changing the default kernel requires GRUB. Other bootloaders, including Limine and systemd-boot, are not supported by this action.${RC}"
+        return 1
+    fi
+    if ! grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
+        printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
+        return 1
+    fi
 }
 
 setupRepos() {
     checkRepo
-    if [ -z "$isInstalled" ]; then
+    if [ "$hasActiveRepos" = false ]; then
         printf "%b\n" "Installing CachyOS repo.."
-        curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
-        tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+        curl -f https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+        tar xvf cachyos-repo.tar.xz
+        cd cachyos-repo
         "$ESCALATION_TOOL" ./cachyos-repo.sh
         cd ../
-        "$ESCALATION_TOOL" rm -rf cachyos-repo*
+        "$ESCALATION_TOOL" rm -rf cachyos-repo cachyos-repo.tar.xz
     else
-        printf "%b\n" "CachyOS repo already installed"
+        printf "%b\n" "CachyOS repos already configured"
     fi
 }
 
 setDefaultKernel() {
     checkRepo
-    if [ ! -z "$isInstalled" ] && [ ! -z "$isCommented" ]; then
+    if [ "$hasActiveRepos" = true ]; then
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
 
-        oldDefaultKernel=$(cat /etc/default/grub | grep GRUB_DEFAULT | awk 'NR==1{print}')
         newDefaultKernel='GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'
 
-        "$ESCALATION_TOOL" sed -i "s/${oldDefaultKernel}/${newDefaultKernel}/g" /etc/default/grub ||
-
+        "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/${newDefaultKernel}/" /etc/default/grub
         "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
     else
-        printf "%b\n" "CachyOS repos are not installed.  Please install before Installing Kernel"
+        printf "%b\n" "CachyOS repos are not enabled. Install or enable them in /etc/pacman.conf before installing the kernel."
+        return 1
     fi
 }
 
 resetDefaultKernel() {
-    oldDefaultKernel=$(cat /etc/default/grub | grep GRUB_DEFAULT | awk 'NR==1{print}')
+    oldDefaultKernel=$(awk '/^GRUB_DEFAULT=/{print; exit}' /etc/default/grub)
 
-    if "$oldDefaultKernel" -eq "GRUB_DEFAULT=\"Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts\""; then
+    if [ "$oldDefaultKernel" = 'GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"' ]; then
         newDefaultKernel="GRUB_DEFAULT=0"
 
-        "$ESCALATION_TOOL" sed -i "s/${oldDefaultKernel}/${newDefaultKernel}/g" /etc/default/grub ||
-
+        "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/${newDefaultKernel}/" /etc/default/grub
         "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg
     else
         printf "%b\n" "CachyOS is not the default kernel"
@@ -53,13 +70,14 @@ resetDefaultKernel() {
 
 removeRepos() {
     checkRepo
-    if [ ! -z "$isInstalled" ]; then
+    if [ "$hasConfiguredRepos" = true ]; then
         printf "%b\n" "Removing CachyOS repo.."
-        curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
-        tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+        curl -f https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+        tar xvf cachyos-repo.tar.xz
+        cd cachyos-repo
         "$ESCALATION_TOOL" ./cachyos-repo.sh --remove
         cd ../
-        "$ESCALATION_TOOL" rm -rf cachyos-repo*
+        "$ESCALATION_TOOL" rm -rf cachyos-repo cachyos-repo.tar.xz
     else
         printf "%b\n" "CachyOS repo is not installed"
     fi
@@ -75,6 +93,10 @@ main() {
     printf "%b" "Enter your choice [1-5]: "
     read -r CHOICE
     case "$CHOICE" in
+        2|3|4|5) checkGrub ;;
+    esac
+    checkEnv
+    case "$CHOICE" in
         1) setupRepos ;;
         2) setDefaultKernel ;;
         3) setupRepos
@@ -86,5 +108,4 @@ main() {
     esac
 }
 
-checkEnv
 main
