@@ -157,6 +157,7 @@ https://github.com/AdnanHodzic/auto-cpufreq
 
 - **FirewallD Firewall Baselines (CTT)**: Configure FirewallD with CTT's recommended baseline rules for improved system security. For more information visit: https://christitus.com/linux-security-mistakes
 - **Lynis Security Audit**: Install Lynis when needed, run an elevated system security audit with live results, then optionally remove Lynis.
+- **rkhunter Rootkit Scan**: Install rkhunter when needed, update its data files, run an elevated rootkit and local security scan, save the log to your home directory, then optionally remove rkhunter.
 - **UFW Firewall Baselines (CTT)**: Developed to ease iptables firewall configuration, UFW provides a user friendly way to create an IPv4 or IPv6 host-based firewall. This command installs UFW and configures UFW based on CTT's recommended rules. For more information visit: https://christitus.com/linux-security-mistakes
 
 ## System Setup
