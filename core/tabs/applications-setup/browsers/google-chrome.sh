@@ -40,7 +40,7 @@ installChrome() {
 }
 
 uninstallChrome() {
-    if command_exists google-chrome; then
+    if command_exists google-chrome || command_exists google-chrome-stable; then
         printf "%b\n" "${YELLOW}Uninstalling Google Chrome...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -50,7 +50,7 @@ uninstallChrome() {
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive uninstall google-chrome-stable
                 ;;
             pacman)
-                "$AUR_HELPER" -Rns --needed --noconfirm google-chrome
+                "$AUR_HELPER" -Rns --noconfirm google-chrome
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
@@ -60,7 +60,7 @@ uninstallChrome() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}Google Chrome Browser is already installed.${RC}"
+        printf "%b\n" "${GREEN}Google Chrome Browser is not installed.${RC}"
     fi
 }
 
