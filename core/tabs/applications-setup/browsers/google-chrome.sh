@@ -2,8 +2,12 @@
 
 . ../../common-script.sh
 
+checkChromeInstalled() {
+    command_exists google-chrome || command_exists google-chrome-stable || command_exists com.google.Chrome
+}
+
 installChrome() {
-    if ! command_exists google-chrome; then
+    if ! checkChromeInstalled; then
         printf "%b\n" "${YELLOW}Installing Google Chrome...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
@@ -40,17 +44,17 @@ installChrome() {
 }
 
 uninstallChrome() {
-    if command_exists google-chrome; then
+    if checkChromeInstalled; then
         printf "%b\n" "${YELLOW}Uninstalling Google Chrome...${RC}"
         case "$PACKAGER" in
             apt-get|nala)
-                "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome
+                "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome-stable
                 ;;
             zypper)
                 "$ESCALATION_TOOL" "$PACKAGER" --non-interactive uninstall google-chrome-stable
                 ;;
             pacman)
-                "$AUR_HELPER" -Rns --needed --noconfirm google-chrome
+                "$AUR_HELPER" -Rns --noconfirm google-chrome
                 ;;
             dnf)
                 "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
@@ -60,7 +64,7 @@ uninstallChrome() {
                 ;;
         esac
     else
-        printf "%b\n" "${GREEN}Google Chrome Browser is already installed.${RC}"
+        printf "%b\n" "${GREEN}Google Chrome Browser is not installed.${RC}"
     fi
 }
 

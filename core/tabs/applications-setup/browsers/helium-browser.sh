@@ -2,8 +2,12 @@
 
 . ../../common-script.sh
 
+checkHeliumInstalled() {
+  command_exists helium-browser || command_exists helium || command_exists Helium
+}
+
 installHeliumBrowser() {
-  if ! command_exists Helium && ! command_exists helium; then
+  if ! checkHeliumInstalled; then
     printf "%b\n" "${YELLOW}Installing Helium Browser...${RC}"
     case "$PACKAGER" in
     pacman)
@@ -30,7 +34,7 @@ installHeliumBrowser() {
 }
 
 uninstallHeliumBrowser() {
-  if command_exists Helium || command_exists helium; then
+  if checkHeliumInstalled; then
     printf "%b\n" "${YELLOW}Removing Helium Browser...${RC}"
     case "$PACKAGER" in
     pacman)
