@@ -7,11 +7,34 @@ checkChromeInstalled() {
 }
 
 uninstallChromeFlatpak() {
+    printf "%b\n" "${YELLOW}Uninstalling Flatpak Google Chrome...${RC}"
     if flatpak info --user com.google.Chrome >/dev/null 2>&1; then
         flatpak uninstall --user --noninteractive com.google.Chrome
     else
         "$ESCALATION_TOOL" flatpak uninstall --system --noninteractive com.google.Chrome
     fi
+}
+
+uninstallChromeNative() {
+    printf "%b\n" "${YELLOW}Uninstalling native Google Chrome...${RC}"
+    case "$PACKAGER" in
+        apt-get|nala)
+            "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome-stable
+            ;;
+        zypper)
+            "$ESCALATION_TOOL" "$PACKAGER" --non-interactive uninstall google-chrome-stable
+            ;;
+        pacman)
+            "$AUR_HELPER" -Rns --noconfirm google-chrome
+            ;;
+        dnf)
+            "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
+            ;;
+        *)
+            printf "%b\n" "${RED}Native Google Chrome uninstall is not supported for ${PACKAGER}.${RC}"
+            return 1
+            ;;
+    esac
 }
 
 installChrome() {
@@ -52,29 +75,32 @@ installChrome() {
 }
 
 uninstallChrome() {
-    if checkChromeInstalled; then
-        printf "%b\n" "${YELLOW}Uninstalling Google Chrome...${RC}"
-        if ! command_exists google-chrome && ! command_exists google-chrome-stable && command_exists com.google.Chrome; then
-            uninstallChromeFlatpak
-        else
-            case "$PACKAGER" in
-                apt-get|nala)
-                    "$ESCALATION_TOOL" "$PACKAGER" purge --autoremove -y google-chrome-stable
-                    ;;
-                zypper)
-                    "$ESCALATION_TOOL" "$PACKAGER" --non-interactive uninstall google-chrome-stable
-                    ;;
-                pacman)
-                    "$AUR_HELPER" -Rns --noconfirm google-chrome
-                    ;;
-                dnf)
-                    "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
-                    ;;
-                *)
-                    uninstallChromeFlatpak
-                    ;;
-            esac
-        fi
+    native_installed=false
+    flatpak_installed=false
+    if command_exists google-chrome || command_exists google-chrome-stable; then
+        native_installed=true
+    fi
+    if command_exists com.google.Chrome; then
+        flatpak_installed=true
+    fi
+
+    if [ "$native_installed" = true ] && [ "$flatpak_installed" = true ]; then
+        printf "%b\n" "${YELLOW}Both native and Flatpak Google Chrome are installed. Which one do you want to uninstall?${RC}"
+        printf "%b\n" "1. Native Google Chrome"
+        printf "%b\n" "2. Flatpak Google Chrome"
+        printf "%b\n" "3. Cancel"
+        printf "%b" "Enter your choice [1-3]: "
+        read -r uninstall_choice
+        case "$uninstall_choice" in
+            1) uninstallChromeNative ;;
+            2) uninstallChromeFlatpak ;;
+            3) printf "%b\n" "${GREEN}Uninstall cancelled.${RC}" ;;
+            *) printf "%b\n" "${RED}Invalid choice.${RC}"; return 1 ;;
+        esac
+    elif [ "$native_installed" = true ]; then
+        uninstallChromeNative
+    elif [ "$flatpak_installed" = true ]; then
+        uninstallChromeFlatpak
     else
         printf "%b\n" "${GREEN}Google Chrome Browser is not installed.${RC}"
     fi
