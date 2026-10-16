@@ -6,6 +6,14 @@ checkChromeInstalled() {
     command_exists google-chrome || command_exists google-chrome-stable || command_exists com.google.Chrome
 }
 
+uninstallChromeFlatpak() {
+    if flatpak info --user com.google.Chrome >/dev/null 2>&1; then
+        flatpak uninstall --user --noninteractive com.google.Chrome
+    else
+        "$ESCALATION_TOOL" flatpak uninstall --system --noninteractive com.google.Chrome
+    fi
+}
+
 installChrome() {
     if ! checkChromeInstalled; then
         printf "%b\n" "${YELLOW}Installing Google Chrome...${RC}"
@@ -47,7 +55,7 @@ uninstallChrome() {
     if checkChromeInstalled; then
         printf "%b\n" "${YELLOW}Uninstalling Google Chrome...${RC}"
         if ! command_exists google-chrome && ! command_exists google-chrome-stable && command_exists com.google.Chrome; then
-            "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.google.Chrome
+            uninstallChromeFlatpak
         else
             case "$PACKAGER" in
                 apt-get|nala)
@@ -63,7 +71,7 @@ uninstallChrome() {
                     "$ESCALATION_TOOL" "$PACKAGER" remove -y google-chrome-stable
                     ;;
                 *)
-                    "$ESCALATION_TOOL" flatpak uninstall --noninteractive com.google.Chrome
+                    uninstallChromeFlatpak
                     ;;
             esac
         fi
