@@ -110,6 +110,8 @@ Shortcuts are lowercase only. Press `?` for the full list inside Linutil.
 
 While a command runs, `Ctrl+C` cancels it, and pressing it again escalates until the command stops. The window stays open until then. Other keys, including `Esc`, go to the command. After it finishes, `l` saves the log and any other key closes the window. Keys pressed in the moment the result appears are ignored, so keys typed ahead can't hide it.
 
+If a script ends but leaves background work running, Linutil waits 2 seconds, then says so and shows the script's exit status. `Ctrl+C` still tries to stop that work, and `Ctrl+D` leaves the window. Other keys don't close it, and it shows the final result if the work ends. Leaving closes the terminal connection, which may affect the background work: some programs keep running and others stop.
+
 ### Menu Structure
 
 Linutil is organized into these main categories:

@@ -30,9 +30,13 @@ use vt100_ctt::{Parser, Screen};
 #[cfg(unix)]
 use nix::{
     errno::Errno,
+    poll::{poll, PollFd, PollFlags},
     sys::signal::{kill, Signal},
     unistd::{getsid, Pid},
 };
+
+#[cfg(unix)]
+use std::os::fd::{AsFd, BorrowedFd};
 
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
@@ -50,7 +54,12 @@ pub struct RunningCommand {
     /// Why the last kill_child could not signal every process
     cancel_error: Option<&'static str>,
     /// A join handle for the thread that reads command output and sends it to the main thread
-    reader_thread: JoinHandle<()>,
+    reader_thread: Option<JoinHandle<()>>,
+    reader_stop: Arc<AtomicBool>,
+    /// First observation of the script leader exiting.
+    leader_done_at: OnceLock<Instant>,
+    /// Set once the process group is gone: its number can be reused after that.
+    group_gone: AtomicBool,
     /// Virtual terminal (pty) handle, used for resizing the pty
     pty_master: Box<dyn MasterPty + Send>,
     /// Used for sending keys to the emulated terminal
@@ -61,11 +70,18 @@ pub struct RunningCommand {
     scroll_offset: usize,
     /// When the result was first drawn, moved on by each key that came too soon to close it
     result_quiet_since: Option<Instant>,
+    /// Whether the last rendered result warned about lingering work.
+    result_background: Option<bool>,
 }
 
 /// How long keys must pause before one can close a result: long enough that
 /// the key is a reaction to it, not one typed ahead or a held key repeating.
 pub(crate) const RESULT_KEY_PAUSE: Duration = Duration::from_millis(300);
+
+const LINGER_LIMIT: Duration = Duration::from_secs(2);
+
+/// Why Ctrl-C cannot stop what only holds the terminal, from its own session.
+const OTHER_SESSION: &str = "it runs in another session";
 
 impl FloatContent for RunningCommand {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
@@ -93,7 +109,16 @@ impl FloatContent for RunningCommand {
         } else {
             // Display a block with the command's exit status
             let is_invalid = self.check_invalid_choice();
-            let (title_line, border_color) = if self.get_exit_status().success() && !is_invalid {
+            let background = self.background_work_remains();
+            let (title_line, border_color) = if background {
+                (
+                    Line::styled(
+                        " Script ended; background work remains ",
+                        Style::default().fg(Color::Yellow).bold(),
+                    ),
+                    Color::Yellow,
+                )
+            } else if self.get_exit_status().success() && !is_invalid {
                 (
                     Line::styled(" Success ", Style::default().fg(theme.tab_color()).bold()),
                     Color::Green,
@@ -105,7 +130,12 @@ impl FloatContent for RunningCommand {
                 )
             };
 
-            let log_path = if let Some(log_path) = &self.log_path {
+            let log_path = if background {
+                Line::styled(
+                    self.background_hint(),
+                    Style::default().fg(theme.unfocused_color()),
+                )
+            } else if let Some(log_path) = &self.log_path {
                 Line::styled(
                     format!(" Log saved: {log_path} "),
                     Style::default().fg(theme.unfocused_color()),
@@ -173,6 +203,9 @@ impl FloatContent for RunningCommand {
         if self.is_finished() {
             match key.code {
                 KeyCode::Char('c' | 'C') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                    if self.background_work_remains() {
+                        self.kill_child();
+                    }
                     return false;
                 }
                 KeyCode::PageUp => {
@@ -188,6 +221,11 @@ impl FloatContent for RunningCommand {
                         self.log_path = Some(log_path);
                     }
                     return false;
+                }
+                _ if self.background_work_remains() => {
+                    return matches!(key.code, KeyCode::Char('d' | 'D'))
+                        && key.modifiers.contains(KeyModifiers::CONTROL)
+                        && self.key_closes_result(Instant::now());
                 }
                 _ => return self.key_closes_result(Instant::now()),
             }
@@ -212,36 +250,17 @@ impl FloatContent for RunningCommand {
     }
 
     fn is_finished(&self) -> bool {
-        // First check if the main command thread has finished
-        if let Some(command_thread) = &self.command_thread {
-            if !command_thread.is_finished() {
-                return false;
-            }
-        }
-
-        // On Unix, verify that no child processes remain in the process group
-        #[cfg(unix)]
-        {
-            let pid = self.child_pid.load(Ordering::Acquire);
-            if pid != 0 {
-                let pgid = Pid::from_raw(-(pid as i32));
-                // Signal 0 tests if any process in the process group is still alive
-                if process_group_alive(kill(pgid, None)) {
-                    return false;
-                }
-            }
-        }
-
-        // Verify the reader thread has finished draining output into the buffer
-        if !self.reader_thread.is_finished() {
+        if !self.leader_exited() {
             return false;
         }
-
-        true
+        let done = self.leader_done_at.get_or_init(Instant::now);
+        !self.background_work_remains() || done.elapsed() >= LINGER_LIMIT
     }
 
     fn result_pending(&self) -> bool {
-        self.is_finished() && self.result_quiet_since.is_none()
+        self.is_finished()
+            && (self.result_quiet_since.is_none()
+                || self.result_background != Some(self.background_work_remains()))
     }
 }
 pub static TERMINAL_UPDATED: AtomicBool = AtomicBool::new(true);
@@ -292,6 +311,12 @@ fn process_group_alive(probe: nix::Result<()>) -> bool {
     probe != Err(Errno::ESRCH)
 }
 
+/// Linux reports a terminal with no writers left as EIO, not as end of file.
+#[cfg(unix)]
+fn terminal_closed(error: &std::io::Error) -> bool {
+    error.raw_os_error() == Some(Errno::EIO as i32)
+}
+
 /// The bullet before "Done!"/"Failed!". The Linux console font has no `●`.
 fn status_marker() -> &'static str {
     static MARKER: OnceLock<&'static str> = OnceLock::new();
@@ -306,6 +331,31 @@ fn status_marker() -> &'static str {
 }
 
 impl RunningCommand {
+    fn leader_exited(&self) -> bool {
+        self.command_thread
+            .as_ref()
+            .is_none_or(JoinHandle::is_finished)
+    }
+
+    /// Remaining work is tracked separately from the leader's result so that
+    /// a timeout never makes cancellation errors look like a successful stop.
+    fn background_work_remains(&self) -> bool {
+        #[cfg(unix)]
+        if !self.group_gone.load(Ordering::Acquire) {
+            let pid = self.child_pid.load(Ordering::Acquire);
+            if pid != 0 {
+                if process_group_alive(kill(Pid::from_raw(-(pid as i32)), None)) {
+                    return true;
+                }
+                self.group_gone.store(true, Ordering::Release);
+            }
+        }
+        !self
+            .reader_thread
+            .as_ref()
+            .is_none_or(JoinHandle::is_finished)
+    }
+
     pub fn new(commands: &[&Command]) -> Self {
         let pty_system = NativePtySystem::default();
 
@@ -346,7 +396,17 @@ impl RunningCommand {
             child.wait().unwrap()
         });
 
-        let mut reader = pair.master.try_clone_reader().unwrap(); // This is a reader, this is where we
+        // Own the reader descriptor, so polling it stays safe even when the
+        // command window is dropped. No nonblocking flags affect the writer.
+        #[cfg(unix)]
+        let mut reader = {
+            // SAFETY: pair.master owns this descriptor throughout the clone.
+            let fd = unsafe { BorrowedFd::borrow_raw(pair.master.as_raw_fd().unwrap()) };
+            File::from(fd.try_clone_to_owned().unwrap())
+        };
+        #[cfg(not(unix))]
+        let mut reader = pair.master.try_clone_reader().unwrap();
+        let reader_stop = Arc::new(AtomicBool::new(false));
 
         // A buffer, shared between the thread that reads the command output, and the main tread.
         // The main thread only reads the contents
@@ -355,11 +415,21 @@ impl RunningCommand {
         let reader_handle = {
             // Arc is just a reference, so we can create an owned copy without any problem
             let command_buffer = command_buffer.clone();
+            let reader_stop = reader_stop.clone();
             // The closure below moves all variables used into it, so we can no longer use them,
             // that's why command_buffer.clone(), because we need to use command_buffer later
             std::thread::spawn(move || {
                 let mut buf = [0u8; 8192];
-                loop {
+                while !reader_stop.load(Ordering::Acquire) {
+                    #[cfg(unix)]
+                    {
+                        let mut fds = [PollFd::new(reader.as_fd(), PollFlags::POLLIN)];
+                        match poll(&mut fds, 100u16) {
+                            Ok(0) | Err(Errno::EINTR) => continue,
+                            Err(_) => break,
+                            Ok(_) => {}
+                        }
+                    }
                     match reader.read(&mut buf) {
                         Ok(size) => {
                             if size == 0 {
@@ -372,6 +442,8 @@ impl RunningCommand {
                             TERMINAL_UPDATED.store(true, Ordering::Release);
                             // The mutex is closed here automatically
                         }
+                        #[cfg(unix)]
+                        Err(e) if terminal_closed(&e) => break,
                         Err(e) => {
                             eprintln!("Error reading from terminal: {e}");
                             break;
@@ -391,13 +463,17 @@ impl RunningCommand {
             child_pid,
             kill_count: 0,
             cancel_error: None,
-            reader_thread: reader_handle,
+            reader_thread: Some(reader_handle),
+            reader_stop,
+            leader_done_at: OnceLock::new(),
+            group_gone: AtomicBool::new(false),
             pty_master: pair.master,
             writer,
             status: None,
             log_path: None,
             scroll_offset: 0,
             result_quiet_since: None,
+            result_background: None,
         }
     }
 
@@ -415,6 +491,16 @@ impl RunningCommand {
         .to_string()
     }
 
+    /// The footer while background work remains, short enough for the narrowest
+    /// dashboard. The title and the output already say that work may continue.
+    fn background_hint(&self) -> String {
+        let hint = match self.cancel_error {
+            Some(error) => format!("Not stopped: {error}"),
+            None => self.cancel_hint().trim().to_string(),
+        };
+        format!(" {hint} · Ctrl-D to leave ")
+    }
+
     /// Only the exit status counts: the output may mention "invalid" for
     /// unrelated reasons, e.g. a failing tool's "invalid option".
     fn check_invalid_choice(&mut self) -> bool {
@@ -424,6 +510,10 @@ impl RunningCommand {
     /// A key can arrive before the frame showing the result, and queued or held
     /// keys right after it. None of them may close a result nobody could read.
     fn key_closes_result(&mut self, now: Instant) -> bool {
+        // The frame on screen may be a warning about work that has since ended.
+        if self.result_pending() {
+            return false;
+        }
         let Some(quiet_since) = &mut self.result_quiet_since else {
             return false;
         };
@@ -444,14 +534,28 @@ impl RunningCommand {
             } else {
                 ("31", "Failed!")
             };
+            let background = self.background_work_remains();
+            let (color, message) = if background {
+                (
+                    "33",
+                    format!(
+                        "Script exited with status {}. Background work remains.\r\n\
+                         Ctrl-C to stop it; Ctrl-D to leave (work may continue).",
+                        self.get_exit_status().exit_code()
+                    ),
+                )
+            } else {
+                (color, format!("{status} Press any key to close . . ."))
+            };
             let msg = format!(
-                "\r\n\x1b[1;{color}m{} {status} Press any key to close . . .\x1b[0m\r\n",
+                "\r\n\x1b[1;{color}m{} {message}\x1b[0m\r\n",
                 status_marker()
             );
             if let Ok(mut mutex) = self.buffer.lock() {
                 mutex.extend_from_slice(msg.as_bytes());
             }
             self.result_quiet_since = Some(Instant::now());
+            self.result_background = Some(background);
             TERMINAL_UPDATED.store(true, Ordering::Release);
         }
 
@@ -491,7 +595,7 @@ impl RunningCommand {
 
     /// Signal child process and process group to terminate
     pub fn kill_child(&mut self) {
-        if self.is_finished() {
+        if self.leader_exited() && !self.background_work_remains() {
             return;
         }
 
@@ -506,6 +610,17 @@ impl RunningCommand {
         }
 
         let pid = self.child_pid.load(Ordering::Acquire);
+
+        // What is left holds only the terminal, from a session of its own. The
+        // command's IDs cannot reach it and may now belong to something else.
+        #[cfg(unix)]
+        if pid != 0
+            && self.group_gone.load(Ordering::Acquire)
+            && Self::session_processes(pid).is_empty()
+        {
+            self.cancel_error = Some(OTHER_SESSION);
+            return;
+        }
 
         #[cfg(unix)]
         if pid != 0 {
@@ -551,31 +666,29 @@ impl RunningCommand {
             .find(|error| *error != Errno::ESRCH)
     }
 
+    /// The processes of a session, other than its leader.
+    #[cfg(unix)]
+    fn session_processes(session_pid: u32) -> Vec<Pid> {
+        let Ok(entries) = std::fs::read_dir("/proc") else {
+            return Vec::new();
+        };
+        entries
+            .flatten()
+            .filter_map(|entry| entry.file_name().to_str()?.parse::<i32>().ok())
+            .filter(|&p| p > 1 && p != session_pid as i32)
+            .map(Pid::from_raw)
+            .filter(|&p| getsid(Some(p)).is_ok_and(|sid| sid.as_raw() == session_pid as i32))
+            .collect()
+    }
+
     /// Signal the rest of the session. A permission error is returned: a group
     /// signal that reached some processes succeeds without saying so.
     #[cfg(unix)]
     fn kill_session_processes(&self, session_pid: u32, signal: Signal) -> Option<Errno> {
-        let Ok(entries) = std::fs::read_dir("/proc") else {
-            return None;
-        };
         let mut denied = None;
-        for entry in entries.flatten() {
-            let file_name = entry.file_name();
-            let Some(name_str) = file_name.to_str() else {
-                continue;
-            };
-            let Ok(p) = name_str.parse::<i32>() else {
-                continue;
-            };
-            if p <= 1 || p == session_pid as i32 {
-                continue;
-            }
-            if let Ok(sid) = getsid(Some(Pid::from_raw(p))) {
-                if sid.as_raw() == session_pid as i32
-                    && kill(Pid::from_raw(p), signal) == Err(Errno::EPERM)
-                {
-                    denied = Some(Errno::EPERM);
-                }
+        for process in Self::session_processes(session_pid) {
+            if kill(process, signal) == Err(Errno::EPERM) {
+                denied = Some(Errno::EPERM);
             }
         }
         denied
@@ -649,12 +762,28 @@ impl RunningCommand {
     }
 }
 
+impl Drop for RunningCommand {
+    fn drop(&mut self) {
+        self.reader_stop.store(true, Ordering::Release);
+        // Unix readers poll with a timeout, so a child keeping the PTY open
+        // cannot strand a reader thread after the user leaves the window.
+        #[cfg(unix)]
+        if let Some(reader) = self.reader_thread.take() {
+            let _ = reader.join();
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn ctrl_c() -> KeyEvent {
         KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)
+    }
+
+    fn ctrl_d() -> KeyEvent {
+        KeyEvent::new(KeyCode::Char('d'), KeyModifiers::CONTROL)
     }
 
     fn wait_until_finished(running: &RunningCommand) {
@@ -820,6 +949,7 @@ mod tests {
         wait_until_finished(&running);
         let drawn = Instant::now();
         running.result_quiet_since = Some(drawn);
+        running.result_background = Some(false);
         (running, drawn)
     }
 
@@ -866,6 +996,289 @@ mod tests {
         running.result_quiet_since = Some(drawn + Duration::from_secs(3600));
         let key = KeyEvent::new(KeyCode::Char('x'), KeyModifiers::NONE);
         assert!(!running.handle_key_event(&key));
+    }
+
+    const SCREEN: Size = Size {
+        width: 80,
+        height: 24,
+    };
+
+    fn wait_until(mut condition: impl FnMut() -> bool) {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !condition() {
+            assert!(Instant::now() < deadline, "Timed out");
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    }
+
+    /// A background process started by a test. It is stopped when the test ends,
+    /// even on a failed assertion, and its unique `sleep` length makes sure
+    /// that nothing else is ever signalled.
+    struct OwnedProcess {
+        marker: &'static str,
+        pid_file: std::path::PathBuf,
+    }
+
+    impl OwnedProcess {
+        fn new(marker: &'static str) -> Self {
+            let name = format!("linutil-test-{}-{marker}", std::process::id());
+            Self {
+                marker,
+                pid_file: std::env::temp_dir().join(name),
+            }
+        }
+
+        /// The script line that leaves this process behind. It ignores hangup,
+        /// or the terminal's hangup at the end of the script would stop it.
+        fn script(&self, launcher: &str) -> String {
+            format!(
+                "trap '' HUP; {launcher} sleep {} & echo $! > '{}'",
+                self.marker,
+                self.pid_file.display()
+            )
+        }
+
+        fn pid(&self) -> Option<Pid> {
+            let pid = std::fs::read_to_string(&self.pid_file).ok()?;
+            Some(Pid::from_raw(pid.trim().parse().ok()?))
+        }
+
+        fn is_running(&self) -> bool {
+            self.pid().is_some_and(|pid| {
+                std::fs::read(format!("/proc/{pid}/cmdline"))
+                    .is_ok_and(|cmdline| String::from_utf8_lossy(&cmdline).contains(self.marker))
+            })
+        }
+
+        fn stop(&self) {
+            if self.is_running() {
+                let _ = kill(self.pid().unwrap(), Signal::SIGKILL);
+            }
+        }
+    }
+
+    impl Drop for OwnedProcess {
+        fn drop(&mut self) {
+            self.stop();
+            let _ = std::fs::remove_file(&self.pid_file);
+        }
+    }
+
+    /// Runs a script that leaves work behind, until the script itself has ended.
+    fn start_lingering(script: String) -> RunningCommand {
+        let command = Command::Raw(script);
+        let running = RunningCommand::new(&[&command]);
+        wait_until(|| running.leader_exited());
+        running
+    }
+
+    /// One test waits for the real grace period. The others skip it.
+    fn end_grace_period(running: &RunningCommand) {
+        running
+            .leader_done_at
+            .set(Instant::now() - LINGER_LIMIT)
+            .unwrap();
+    }
+
+    #[test]
+    fn test_lingering_work_gets_a_warning_and_only_ctrl_d_leaves() {
+        let fixture = OwnedProcess::new("61.0731");
+        let mut running = start_lingering(format!("{}; exit 7", fixture.script("")));
+
+        // The window holds on to the script for the grace period only
+        let started = Instant::now();
+        assert!(!running.is_finished());
+        wait_until(|| running.is_finished());
+        assert!(started.elapsed() >= LINGER_LIMIT);
+        assert!(fixture.is_running());
+
+        // Nothing leaves before the warning has been drawn
+        assert!(running.result_pending());
+        assert!(!running.handle_key_event(&ctrl_d()));
+
+        let contents = running.screen(SCREEN).contents();
+        assert!(contents.contains("status 7"), "{contents}");
+        assert!(contents.contains("Background work remains"), "{contents}");
+        assert!(!contents.contains("Failed!"), "{contents}");
+        assert!(!contents.contains("Press any key"), "{contents}");
+        assert!(!running.result_pending());
+
+        // Ordinary keys never leave, however late they come
+        std::thread::sleep(RESULT_KEY_PAUSE);
+        for code in [
+            KeyCode::Esc,
+            KeyCode::Enter,
+            KeyCode::Char('q'),
+            KeyCode::Char('d'),
+        ] {
+            assert!(!running.handle_key_event(&KeyEvent::new(code, KeyModifiers::NONE)));
+        }
+
+        // Ctrl-D follows the same pause as any key that closes a result
+        running.result_quiet_since = Some(Instant::now() + Duration::from_secs(3600));
+        assert!(!running.handle_key_event(&ctrl_d()));
+        std::thread::sleep(RESULT_KEY_PAUSE);
+        assert!(running.handle_key_event(&ctrl_d()));
+        assert!(fixture.is_running());
+    }
+
+    #[test]
+    fn test_ctrl_c_still_stops_lingering_work_after_the_grace_period() {
+        let fixture = OwnedProcess::new("61.0732");
+        let mut running = start_lingering(fixture.script(""));
+        end_grace_period(&running);
+        assert!(running.is_finished());
+        assert!(running
+            .screen(SCREEN)
+            .contents()
+            .contains("Background work remains"));
+
+        // A background job of a non-interactive shell ignores SIGINT
+        assert!(!running.handle_key_event(&ctrl_c()));
+        assert!(running.cancel_hint().contains("to terminate"));
+        assert!(!running.handle_key_event(&ctrl_c()));
+        wait_until(|| !fixture.is_running());
+
+        wait_until(|| !running.background_work_remains());
+        assert!(running.result_pending());
+        let contents = running.screen(SCREEN).contents();
+        assert!(contents.contains("Done! Press any key"), "{contents}");
+    }
+
+    #[test]
+    fn test_key_cannot_close_a_final_result_behind_an_old_warning() {
+        let fixture = OwnedProcess::new("61.0733");
+        let mut running = start_lingering(fixture.script(""));
+        end_grace_period(&running);
+        running.screen(SCREEN);
+        assert_eq!(running.result_background, Some(true));
+
+        // The warning has been up long enough for a key to close a result
+        std::thread::sleep(RESULT_KEY_PAUSE);
+        fixture.stop();
+        wait_until(|| !running.background_work_remains());
+
+        let key = KeyEvent::new(KeyCode::Char('x'), KeyModifiers::NONE);
+        assert!(running.result_pending());
+        assert!(!running.handle_key_event(&key));
+
+        let contents = running.screen(SCREEN).contents();
+        assert!(contents.contains("Background work remains"), "{contents}");
+        assert!(contents.contains("Done! Press any key"), "{contents}");
+        assert_eq!(running.result_background, Some(false));
+        assert!(!running.result_pending());
+
+        std::thread::sleep(RESULT_KEY_PAUSE);
+        assert!(running.handle_key_event(&key));
+    }
+
+    #[test]
+    fn test_leaving_releases_the_reader_and_leaves_a_hangup_proof_job_alone() {
+        let fixture = OwnedProcess::new("61.0734");
+        let mut running = start_lingering(fixture.script(""));
+        end_grace_period(&running);
+        running.screen(SCREEN);
+
+        let buffer = Arc::downgrade(&running.buffer);
+        drop(running);
+        assert!(buffer.upgrade().is_none(), "The reader kept the buffer");
+
+        // Closing the terminal sends its hangup at once
+        std::thread::sleep(Duration::from_millis(200));
+        assert!(fixture.is_running());
+    }
+
+    #[test]
+    fn test_process_in_another_session_gets_a_warning_and_is_never_signalled() {
+        let fixture = OwnedProcess::new("61.0735");
+        let mut running = start_lingering(fixture.script("setsid"));
+        end_grace_period(&running);
+
+        // Only the terminal connects it to the command now
+        wait_until(|| {
+            fixture
+                .pid()
+                .is_some_and(|pid| getsid(Some(pid)) == Ok(pid))
+        });
+        wait_until(|| {
+            running.background_work_remains();
+            running.group_gone.load(Ordering::Acquire)
+        });
+        assert!(running.background_work_remains());
+        assert!(running.is_finished());
+        assert!(running
+            .screen(SCREEN)
+            .contents()
+            .contains("Background work remains"));
+
+        // The command's IDs are free and may be reused: Ctrl-C says so instead
+        assert!(!running.handle_key_event(&ctrl_c()));
+        assert_eq!(running.kill_count, 0);
+        let hint = running.cancel_hint();
+        assert!(hint.contains("Not stopped: it runs in another"), "{hint}");
+        assert!(fixture.is_running());
+
+        std::thread::sleep(RESULT_KEY_PAUSE);
+        assert!(running.handle_key_event(&ctrl_d()));
+        let buffer = Arc::downgrade(&running.buffer);
+        drop(running);
+        assert!(buffer.upgrade().is_none(), "The reader kept the buffer");
+    }
+
+    #[test]
+    fn test_a_group_seen_gone_is_not_probed_again() {
+        let (running, _) = drawn_result();
+        assert!(!running.background_work_remains());
+        assert!(running.group_gone.load(Ordering::Acquire));
+
+        // This process's own group answers a probe, as a reused number would
+        let reused = nix::unistd::getpgrp().as_raw() as u32;
+        running.child_pid.store(reused, Ordering::Release);
+        assert!(!running.background_work_remains());
+    }
+
+    #[test]
+    fn test_refused_signal_stays_visible_on_the_warning() {
+        use crate::{float::Float, theme::Theme};
+        use ratatui::{backend::TestBackend, buffer::Cell, Terminal};
+
+        let fixture = OwnedProcess::new("61.0736");
+        let running = start_lingering(fixture.script(""));
+        end_grace_period(&running);
+        let mut float = Float::new(Box::new(running), 75, 95).with_horizontal_inset(3);
+
+        // The narrowest dashboard. Needs no root: a refused signal only leaves this
+        let mut terminal = Terminal::new(TestBackend::new(90, 25)).unwrap();
+        for error in [Errno::EPERM.desc(), OTHER_SESSION] {
+            float.content.cancel_error = Some(error);
+            terminal
+                .draw(|frame| float.draw(frame, frame.area(), &Theme::Default))
+                .unwrap();
+            let rendered: String = terminal
+                .backend()
+                .buffer()
+                .content
+                .iter()
+                .map(Cell::symbol)
+                .collect();
+            assert!(rendered.contains(" Script ended; background work remains "));
+            assert!(
+                rendered.contains(&format!(" Not stopped: {error} ")),
+                "{rendered}"
+            );
+            assert!(rendered.contains(" Ctrl-D to leave "), "{rendered}");
+        }
+    }
+
+    #[test]
+    fn test_only_eio_means_the_terminal_closed() {
+        use std::io::Error;
+        assert!(terminal_closed(&Error::from_raw_os_error(
+            Errno::EIO as i32
+        )));
+        assert!(!terminal_closed(&Error::from_raw_os_error(
+            Errno::EBADF as i32
+        )));
     }
 
     #[test]

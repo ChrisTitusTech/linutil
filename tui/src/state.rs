@@ -1141,6 +1141,7 @@ impl AppState {
                 "Finished command",
                 &[
                     ("any key", "Close"),
+                    ("ctrl+d", "Leave while background work remains"),
                     ("l", "Save log; pageup/pagedown scrolls"),
                 ],
             ),
