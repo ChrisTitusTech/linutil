@@ -118,3 +118,9 @@ On NixOS, these entries print declarative configuration guidance instead of modi
 | Auto Mount Drive | Automate mounting a drive at startup |
 | Ollama | Manage Ollama (local AI model runner) |
 | US Locale Setup | Fix US UTF-8 locale and folder listings |
+
+## Themes
+
+Press `t` to switch between the dark themes: Linutil, Nord, Tokyo Night, One Dark, Monochrome, Lucent-Orng, GitHub, Material and Flexoki. Linutil starts with the Linutil theme each time. To start with another one, use `--theme`, for example `linutil --theme tokyo-night`.
+
+Themes need a truecolor terminal. On the Linux console and other terminals with fewer colours, Linutil keeps its basic colours and `t` shows a short note. If your terminal cannot draw the normal logo, `--theme compatible` selects the plain logo and basic colours.

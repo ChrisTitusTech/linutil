@@ -1,5 +1,6 @@
 mod cli;
 mod confirmation;
+mod dashboard;
 mod filter;
 mod float;
 mod floating_text;
@@ -7,6 +8,8 @@ mod hint;
 mod logo;
 mod root;
 mod running_command;
+mod script_preview;
+mod stars;
 mod state;
 mod system_info;
 mod theme;
@@ -66,11 +69,11 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
     loop {
         // Wait for an event
         if !event::poll(Duration::from_millis(10))? {
-            if TERMINAL_UPDATED
+            let terminal_updated = TERMINAL_UPDATED
                 .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
-                .is_ok()
-            {
-                terminal.draw(|frame| state.draw(frame)).unwrap();
+                .is_ok();
+            if terminal_updated || state.needs_animation_frame() {
+                terminal.draw(|frame| state.draw(frame))?;
             }
             continue;
         }
@@ -92,6 +95,6 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
             }
             _ => {}
         }
-        terminal.draw(|frame| state.draw(frame)).unwrap();
+        terminal.draw(|frame| state.draw(frame))?;
     }
 }

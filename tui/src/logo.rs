@@ -1,262 +1,350 @@
 use crate::theme::Theme;
 use image::{imageops::FilterType, RgbaImage};
 use ratatui::{prelude::*, widgets::Paragraph};
-use ratatui_image::{
-    picker::{Picker, ProtocolType},
-    protocol::StatefulProtocol,
-    Resize, StatefulImage,
-};
 
-const LOGO_TEXT_GAP: u16 = 0;
-const LOGO_ALPHA_CUTOFF: u8 = 10;
-const LOGO_SCALE_NUM: u32 = 70;
-const LOGO_SCALE_DEN: u32 = 100;
+const LOGO_BLACK_CUTOFF: u8 = 48;
 
-enum Renderer {
-    Protocol {
-        protocol: Box<StatefulProtocol>,
-        resize: Resize,
-    },
-    Blocks,
-}
-
+/// A fitted text logo. Rendering stays in the terminal buffer so its colors and
+/// background behave like the rest of the dashboard, without protocol queries.
 pub struct Logo {
-    renderer: Renderer,
     rgba: RgbaImage,
-    font_size: (u16, u16),
-    image_size: (u32, u32),
-    cached_size: (u16, u16),
+    cached_key: Option<(u16, u16, Color)>,
     cached_lines: Vec<Line<'static>>,
-    last_area_size: (u16, u16),
 }
 
 impl Logo {
     pub fn load() -> Option<Self> {
-        let dyn_image = image::load_from_memory(include_bytes!("../assets/ctt_logo.png")).ok()?;
-        let rgba = dyn_image.to_rgba8();
-        let image_size = rgba.dimensions();
-
-        let mut picker = Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
-        picker.set_background_color(Some([0, 0, 0, 0]));
-        let font_size = picker.font_size();
-        let font_size = (font_size.width, font_size.height);
-        let renderer = if picker.protocol_type() == ProtocolType::Halfblocks {
-            Renderer::Blocks
-        } else {
-            let protocol =
-                Box::new(picker.new_resize_protocol(image::DynamicImage::ImageRgba8(rgba.clone())));
-            Renderer::Protocol {
-                protocol,
-                resize: Resize::Scale(Some(FilterType::Triangle)),
-            }
-        };
-
+        let rgba = image::load_from_memory(include_bytes!("../assets/ctt_logo.png"))
+            .ok()?
+            .to_rgba8();
         Some(Self {
-            renderer,
             rgba,
-            font_size,
-            image_size,
-            cached_size: (0, 0),
+            cached_key: None,
             cached_lines: Vec::new(),
-            last_area_size: (0, 0),
         })
     }
 
-    pub fn area_height_for_width(&self, width: u16, max_height: u16) -> u16 {
-        if width == 0 || max_height == 0 {
-            return 0;
-        }
-
-        let scaled_width = self.scaled_width(width);
-        let max_image_height = max_height.saturating_sub(LOGO_TEXT_GAP + 1);
-        if max_image_height == 0 {
-            return max_height.min(1);
-        }
-
-        let mut image_height = self.rows_for_width(scaled_width);
-        if image_height > max_image_height {
-            image_height = max_image_height;
-        }
-
-        image_height + LOGO_TEXT_GAP + 1
-    }
-
     pub fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        if area.height == 0 || area.width == 0 {
+        let area = area.intersection(frame.area());
+        if area.is_empty() {
             return;
         }
-
-        self.refresh_protocol_if_needed(area);
-
-        let max_image_height = area.height.saturating_sub(LOGO_TEXT_GAP + 1);
-        let (draw_width, draw_height) = self.draw_size(area.width, max_image_height);
-
-        if draw_width > 0 && draw_height > 0 {
-            let centered_x = area.x + area.width.saturating_sub(draw_width) / 2;
-            let max_x = area.x + area.width.saturating_sub(draw_width);
-            let image_x = centered_x.min(max_x);
-            let image_area = Rect::new(image_x, area.y, draw_width, draw_height);
-            let mut use_blocks = matches!(self.renderer, Renderer::Blocks);
-
-            if !use_blocks {
-                if let Renderer::Protocol { protocol, resize } = &mut self.renderer {
-                    let widget =
-                        StatefulImage::<StatefulProtocol>::default().resize(resize.clone());
-                    frame.render_stateful_widget(widget, image_area, protocol.as_mut());
-                    if let Some(result) = protocol.last_encoding_result() {
-                        if result.is_err() {
-                            use_blocks = true;
-                        }
-                    }
-                }
+        let (width, height) = self.draw_size(area.width, area.height.saturating_sub(1));
+        if width > 0 && height > 0 {
+            let key = (width, height, theme.bg());
+            if self.cached_key != Some(key) {
+                self.cached_lines = if let Color::Rgb(r, g, b) = theme.bg() {
+                    self.sextant_lines(width, height, [r, g, b])
+                } else {
+                    self.ascii_lines(width, height, theme)
+                };
+                self.cached_key = Some(key);
             }
-
-            if use_blocks {
-                self.renderer = Renderer::Blocks;
-                self.render_blocks(frame, image_area);
-            }
-        }
-
-        let text_y = if draw_height > 0 {
-            area.y + draw_height + LOGO_TEXT_GAP
-        } else {
-            area.y
-        };
-        if text_y < area.y + area.height {
-            let text_area = Rect::new(area.x, text_y, area.width, 1);
-            let label = Line::styled(
-                format!("Linutil V{}", env!("CARGO_PKG_VERSION")),
-                Style::default().fg(theme.tab_color()).bold(),
+            let image_area = Rect::new(
+                area.x + (area.width - width) / 2,
+                area.y + area.height - height - 1,
+                width,
+                height,
             );
-            let text = Paragraph::new(label).alignment(Alignment::Center);
-            frame.render_widget(text, text_area);
+            frame.render_widget(
+                Paragraph::new(Text::from(self.cached_lines.clone())),
+                image_area,
+            );
         }
+        let caption = format!("Linutil v{}", env!("CARGO_PKG_VERSION"));
+        let caption_area = if width as usize >= Line::from(caption.as_str()).width() {
+            Rect::new(
+                area.x + (area.width - width) / 2,
+                area.bottom() - 1,
+                width,
+                1,
+            )
+        } else {
+            Rect::new(area.x, area.bottom() - 1, area.width, 1)
+        };
+        frame.render_widget(
+            Paragraph::new(Line::styled(
+                caption,
+                Style::default().fg(theme.tab_color()).bg(theme.bg()).bold(),
+            ))
+            .alignment(Alignment::Center),
+            caption_area,
+        );
     }
 
+    // Terminal cells are approximately 8 by 16 pixels. Fit the complete logo
+    // above the version caption, keeping its aspect ratio at all sizes.
     fn draw_size(&self, width: u16, max_height: u16) -> (u16, u16) {
         if width == 0 || max_height == 0 {
             return (0, 0);
         }
-
-        let scaled_width = self.scaled_width(width);
-        let mut draw_width = scaled_width;
-        let mut draw_height = self.rows_for_width(draw_width);
-        if draw_height > max_height {
-            draw_height = max_height;
-            draw_width = self.width_for_height(draw_height).min(scaled_width);
+        let image_width = u64::from(self.rgba.width());
+        let image_height = u64::from(self.rgba.height());
+        let height = (image_height * u64::from(width)).div_ceil(image_width * 2);
+        if height <= u64::from(max_height) {
+            (width, height.max(1) as u16)
+        } else {
+            let fitted_width = (image_width * u64::from(max_height) * 2).div_ceil(image_height);
+            (fitted_width.clamp(1, u64::from(width)) as u16, max_height)
         }
-
-        (draw_width, draw_height)
     }
 
-    fn rows_for_width(&self, width: u16) -> u16 {
-        if width == 0 || self.image_size.0 == 0 || self.font_size.0 == 0 || self.font_size.1 == 0 {
-            return 0;
-        }
-
-        let pixel_width = u64::from(width) * u64::from(self.font_size.0);
-        let scaled_pixel_height =
-            u64::from(self.image_size.1) * pixel_width / u64::from(self.image_size.0);
-        let row_height = u64::from(self.font_size.1);
-        let rows = scaled_pixel_height.div_ceil(row_height);
-
-        rows.min(u64::from(u16::MAX)) as u16
+    fn ascii_lines(&self, width: u16, height: u16, theme: &Theme) -> Vec<Line<'static>> {
+        let image = image::imageops::resize(
+            &self.rgba,
+            u32::from(width),
+            u32::from(height),
+            FilterType::Triangle,
+        );
+        (0..height)
+            .map(|y| {
+                Line::from(
+                    (0..width)
+                        .map(|x| {
+                            let pixel = image.get_pixel(u32::from(x), u32::from(y)).0;
+                            let visible = pixel[3] >= 10
+                                && pixel[..3].iter().copied().max().unwrap_or(0)
+                                    >= LOGO_BLACK_CUTOFF;
+                            let color = if pixel[2] > pixel[0].saturating_add(20) {
+                                theme.focused_color()
+                            } else {
+                                theme.cmd_color()
+                            };
+                            Span::styled(
+                                if visible { "#" } else { " " },
+                                Style::default().fg(color).bg(theme.bg()),
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect()
     }
 
-    fn width_for_height(&self, height: u16) -> u16 {
-        if height == 0 || self.image_size.1 == 0 || self.font_size.0 == 0 || self.font_size.1 == 0 {
-            return 0;
-        }
-
-        let pixel_height = u64::from(height) * u64::from(self.font_size.1);
-        let scaled_pixel_width =
-            u64::from(self.image_size.0) * pixel_height / u64::from(self.image_size.1);
-        let col_width = u64::from(self.font_size.0);
-        let cols = scaled_pixel_width.div_ceil(col_width);
-
-        cols.min(u64::from(u16::MAX)) as u16
-    }
-
-    fn render_blocks(&mut self, frame: &mut Frame, area: Rect) {
-        if area.width == 0 || area.height == 0 {
-            return;
-        }
-
-        let size = (area.width, area.height);
-        if self.cached_size != size {
-            self.cached_size = size;
-            self.cached_lines.clear();
-
-            let resized = image::imageops::resize(
-                &self.rgba,
-                area.width as u32,
-                area.height as u32,
-                FilterType::Triangle,
-            );
-
-            for y in 0..area.height {
-                let mut spans = Vec::with_capacity(area.width as usize);
-                for x in 0..area.width {
-                    let pixel = resized.get_pixel(x as u32, y as u32).0;
-                    if pixel[3] < LOGO_ALPHA_CUTOFF {
-                        spans.push(Span::raw(" "));
-                    } else {
-                        spans.push(Span::styled(
-                            "#",
-                            Style::default().fg(Color::Rgb(pixel[0], pixel[1], pixel[2])),
-                        ));
-                    }
-                }
-                self.cached_lines.push(Line::from(spans));
+    fn sextant_lines(&self, width: u16, height: u16, bg: [u8; 3]) -> Vec<Line<'static>> {
+        let mut source = self.rgba.clone();
+        for pixel in source.pixels_mut() {
+            let peak = pixel.0[..3].iter().copied().max().unwrap_or(0);
+            if peak <= 36 {
+                pixel.0[3] = 0;
+            } else if peak < 68 {
+                pixel.0[3] = (u16::from(pixel.0[3]) * u16::from(peak - 36) / 32) as u8;
             }
         }
-
-        frame.render_widget(Paragraph::new(Text::from(self.cached_lines.clone())), area);
-    }
-
-    fn refresh_protocol_if_needed(&mut self, area: Rect) {
-        let area_size = (area.width, area.height);
-        if self.last_area_size == area_size {
-            return;
-        }
-        self.last_area_size = area_size;
-
-        if !matches!(self.renderer, Renderer::Protocol { .. }) {
-            return;
-        }
-
-        let mut picker = match Picker::from_query_stdio() {
-            Ok(picker) => picker,
-            Err(_) => return,
+        // The approved study fits the two wings independently. The source is
+        // the same embedded asset; these crops remove its outer black margins.
+        let left = image::imageops::crop_imm(&source, 35, 25, 357, 838).to_image();
+        let right = image::imageops::crop_imm(&source, 430, 25, 357, 838).to_image();
+        let left = image::imageops::resize(
+            &left,
+            u32::from(width),
+            u32::from(height) * 3,
+            FilterType::CatmullRom,
+        );
+        let right = image::imageops::resize(
+            &right,
+            u32::from(width),
+            u32::from(height) * 3,
+            FilterType::CatmullRom,
+        );
+        let sample = |x: u16, y: u16| -> [[u8; 3]; 6] {
+            std::array::from_fn(|i| {
+                let sub_x = u32::from(x) * 2 + (i % 2) as u32;
+                let sub_y = u32::from(y) * 3 + (i / 2) as u32;
+                let pixel = if sub_x < u32::from(width) {
+                    left.get_pixel(sub_x, sub_y)
+                } else {
+                    right.get_pixel(sub_x - u32::from(width), sub_y)
+                };
+                std::array::from_fn(|channel| {
+                    let alpha = u32::from(pixel.0[3]);
+                    ((u32::from(pixel.0[channel]) * alpha
+                        + u32::from(bg[channel]) * (255 - alpha)
+                        + 127)
+                        / 255) as u8
+                })
+            })
         };
-        picker.set_background_color(Some([0, 0, 0, 0]));
-        let new_font_size = picker.font_size();
-        let new_font_size = (new_font_size.width, new_font_size.height);
-        let protocol_type = picker.protocol_type();
+        (0..height)
+            .map(|y| {
+                let mut row = vec![Span::raw(" "); usize::from(width)];
+                for x in 0..width / 2 {
+                    let mirror_x = width - 1 - x;
+                    let points = sample(x, y);
+                    let (mut mask, mut foreground, mut background) = best_partition(&points, bg);
+                    let carve = width.is_multiple_of(2) && x == width / 2 - 1 && y + 2 < height;
+                    if carve {
+                        mask &= 0b010101;
+                        foreground = mean(&points, mask, true, bg);
+                        background = bg;
+                    }
+                    row[usize::from(x)] = sextant_span(mask, foreground, background);
+                    let mirror_mask = ((mask & 0b010101) << 1) | ((mask & 0b101010) >> 1);
+                    let mirror_points = sample(mirror_x, y);
+                    let mirror_fg = mean(&mirror_points, mirror_mask, true, bg);
+                    let mirror_bg = if carve || mirror_mask == 0 || mirror_mask == 63 {
+                        bg
+                    } else {
+                        mean(&mirror_points, mirror_mask, false, bg)
+                    };
+                    row[usize::from(mirror_x)] = sextant_span(mirror_mask, mirror_fg, mirror_bg);
+                }
+                if !width.is_multiple_of(2) {
+                    let x = width / 2;
+                    let (mut mask, foreground, background) = best_partition(&sample(x, y), bg);
+                    if y + 2 < height {
+                        row[usize::from(x)] = sextant_span(0, bg, bg);
+                    } else {
+                        for bit in (0..6).step_by(2) {
+                            if mask & (3 << bit) != 0 {
+                                mask |= 3 << bit;
+                            }
+                        }
+                        row[usize::from(x)] = sextant_span(mask, foreground, background);
+                    }
+                }
+                Line::from(row)
+            })
+            .collect()
+    }
+}
 
-        if protocol_type == ProtocolType::Halfblocks {
-            self.renderer = Renderer::Blocks;
-            self.font_size = new_font_size;
-            self.cached_size = (0, 0);
-            return;
+fn mean(points: &[[u8; 3]; 6], mask: u8, selected: bool, bg: [u8; 3]) -> [u8; 3] {
+    let count = (0..6)
+        .filter(|i| (mask & (1 << i) != 0) == selected)
+        .count() as u32;
+    if count == 0 {
+        return bg;
+    }
+    std::array::from_fn(|channel| {
+        let total: u32 = points
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| (mask & (1 << i) != 0) == selected)
+            .map(|(_, point)| u32::from(point[channel]))
+            .sum();
+        ((total + count / 2) / count) as u8
+    })
+}
+
+fn best_partition(points: &[[u8; 3]; 6], bg: [u8; 3]) -> (u8, [u8; 3], [u8; 3]) {
+    let low_contrast = (0..3).all(|channel| {
+        let min = points.iter().map(|p| p[channel]).min().unwrap_or(0);
+        let max = points.iter().map(|p| p[channel]).max().unwrap_or(0);
+        max - min <= 18
+    });
+    if low_contrast {
+        let average = mean(points, 63, true, bg);
+        if average.iter().zip(bg).all(|(a, b)| a.abs_diff(b) <= 3) {
+            return (0, bg, bg);
         }
+        return (63, average, bg);
+    }
+    let mut best = (u64::MAX, 0, bg, bg);
+    for mask in 1..32 {
+        let foreground = mean(points, mask, true, bg);
+        let background = mean(points, mask, false, bg);
+        let error = points
+            .iter()
+            .enumerate()
+            .map(|(i, point)| {
+                let color = if mask & (1 << i) != 0 {
+                    foreground
+                } else {
+                    background
+                };
+                point
+                    .iter()
+                    .zip(color)
+                    .map(|(a, b)| i64::from(*a).abs_diff(i64::from(b)).pow(2))
+                    .sum::<u64>()
+            })
+            .sum();
+        if error < best.0 {
+            best = (error, mask, foreground, background);
+        }
+    }
+    let (_, mut mask, mut foreground, mut background) = best;
+    if background.iter().map(|c| u16::from(*c)).sum::<u16>()
+        > foreground.iter().map(|c| u16::from(*c)).sum::<u16>()
+    {
+        mask = !mask & 63;
+        std::mem::swap(&mut foreground, &mut background);
+    }
+    (mask, foreground, background)
+}
 
-        if self.font_size != new_font_size {
-            self.font_size = new_font_size;
-            self.renderer = Renderer::Protocol {
-                protocol: Box::new(
-                    picker.new_resize_protocol(image::DynamicImage::ImageRgba8(self.rgba.clone())),
-                ),
-                resize: Resize::Scale(Some(FilterType::Triangle)),
-            };
+fn sextant_span(mask: u8, foreground: [u8; 3], background: [u8; 3]) -> Span<'static> {
+    let symbol = match mask {
+        0 => ' ',
+        21 => '▌',
+        42 => '▐',
+        63 => '█',
+        _ => char::from_u32(
+            0x1fb00 + u32::from(mask - 1 - u8::from(mask > 21) - u8::from(mask > 42)),
+        )
+        .unwrap_or(' '),
+    };
+    Span::styled(
+        symbol.to_string(),
+        Style::default()
+            .fg(Color::Rgb(foreground[0], foreground[1], foreground[2]))
+            .bg(Color::Rgb(background[0], background[1], background[2])),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ratatui::{backend::TestBackend, Terminal};
+
+    #[test]
+    fn fits_odd_even_and_tiny_areas_without_overwriting_neighbors() {
+        let mut logo = Logo::load().unwrap();
+        for (width, height) in [(29, 11), (28, 10), (3, 2), (1, 1), (0, 0)] {
+            let mut terminal = Terminal::new(TestBackend::new(40, 16)).unwrap();
+            let area = Rect::new(2, 2, width, height);
+            terminal
+                .draw(|frame| logo.draw(frame, area, &Theme::Compatible))
+                .unwrap();
+            let buffer = terminal.backend().buffer();
+            for y in 0..16 {
+                for x in 0..40 {
+                    if !area.contains(Position::new(x, y)) {
+                        assert_eq!(buffer[(x, y)].symbol(), " ");
+                    }
+                }
+            }
+            if width > 0 && height > 1 {
+                assert!(logo
+                    .cached_lines
+                    .iter()
+                    .all(|line| line.width() <= usize::from(width)));
+            }
         }
     }
 
-    fn scaled_width(&self, width: u16) -> u16 {
-        if width == 0 {
-            return 0;
+    #[test]
+    fn logo_blends_into_the_theme_background() {
+        let logo = Logo::load().unwrap();
+        let lines = logo.sextant_lines(28, 10, [0x2e, 0x34, 0x40]);
+        let spans = || lines.iter().flat_map(|line| &line.spans);
+        assert!(spans().all(|span| span.style.bg != Some(Color::Rgb(0x16, 0x16, 0x16))));
+        assert!(spans().any(|span| span.style.bg == Some(Color::Rgb(0x2e, 0x34, 0x40))));
+    }
+
+    #[test]
+    fn sextants_have_mirrored_center_channel() {
+        let logo = Logo::load().unwrap();
+        for width in [27, 28] {
+            let lines = logo.sextant_lines(width, 10, [0x16, 0x16, 0x16]);
+            assert_eq!(lines.len(), 10);
+            assert!(lines.iter().all(|line| line.width() == usize::from(width)));
+            if width % 2 == 1 {
+                assert!(lines[..8]
+                    .iter()
+                    .all(|line| line.spans[usize::from(width / 2)].content == " "));
+            }
         }
-        let scaled = (u32::from(width) * LOGO_SCALE_NUM + (LOGO_SCALE_DEN / 2)) / LOGO_SCALE_DEN;
-        scaled.clamp(1, u16::MAX as u32) as u16
     }
 }
