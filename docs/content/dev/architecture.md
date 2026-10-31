@@ -216,8 +216,8 @@ When a user selects a command and confirms it:
 4. A **reader thread** reads output from the PTY master and writes it into a shared `Arc<Mutex<Vec<u8>>>` buffer
 5. An **atomic flag** (`TERMINAL_UPDATED`) is set when new output arrives, triggering a TUI redraw
 6. The PTY output is decoded by a `vt100` parser and rendered as a `PseudoTerminal` widget (from `tui-term`) inside a floating window
-7. The user can scroll up/down to review output, or press `Ctrl-C` to kill the process
-8. When the process exits, the floating window title changes to `SUCCESS` (green) or `FAILED` (red)
+7. The user can scroll with `PageUp`/`PageDown`; other keys, including `Esc`, go to the command. `Ctrl-C` cancels it, and each further press escalates: SIGINT, then SIGTERM, then SIGKILL. The window stays open until the command has ended. If a signal is refused, the footer says why and the window keeps showing the command as running.
+8. When the process exits, the window title changes to `Success` (green) or `Fail` (red), and the output ends with `Done!`, `Failed!` or, for exit status 64 (`invalidChoice` in `common-script.sh`), `Invalid!`. A key closes the window only after that result has been drawn and keys have paused for 300 ms, so keys typed ahead or a held key can't close it unread.
 
 Using a real PTY (instead of piped stdio) means scripts that use terminal colors, interactive prompts, or check `isatty()` work correctly.
 

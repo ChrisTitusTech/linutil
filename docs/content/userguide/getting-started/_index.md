@@ -89,15 +89,26 @@ Once Linutil launches, you'll see a tree-style menu on the left and a descriptio
 
 ### Keyboard Shortcuts
 
+Shortcuts are lowercase only. Press `?` for the full list inside Linutil.
+
 | Key | Action |
 |-----|--------|
-| `↑` / `↓` or `j` / `k` | Move up/down in the list |
-| `Enter` or `→` | Select / expand item |
-| `←` | Collapse / go back |
-| `Space` | Multi-select an item |
-| `/` | Search/filter items |
-| `q` or `Escape` | Quit / go back |
-| `t` | Toggle multi-select mode |
+| `↑` / `↓` or `k` / `j` | Move up/down in the list |
+| `Enter` or `→` | Open a folder / run a command |
+| `←` or `h` | Go to the parent folder |
+| `Tab` / `Shift+Tab` | Next / previous category |
+| `1`–`9` | Jump to a category |
+| `/` | Search |
+| `p` | Script preview (`p` or `Esc` closes it) |
+| `d` | Command description (`d` or `Esc` closes it) |
+| `v` | Multi-selection mode |
+| `Space` | Select a command in multi-selection mode |
+| `t` | Next theme |
+| `s` | Toggle the stars |
+| `?` | Help (`?` or `Esc` closes it) |
+| `q` or `Ctrl+C` | Quit Linutil |
+
+While a command runs, `Ctrl+C` cancels it, and pressing it again escalates until the command stops. The window stays open until then. Other keys, including `Esc`, go to the command. After it finishes, `l` saves the log and any other key closes the window. Keys pressed in the moment the result appears are ignored, so keys typed ahead can't hide it.
 
 ### Menu Structure
 
