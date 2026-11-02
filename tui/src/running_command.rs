@@ -278,9 +278,11 @@ fn batch_script(commands: &[&Command]) -> String {
     let mut script = String::new();
     for command in commands {
         match command {
-            // A subshell, so that an `exit` in one command does not end the batch.
+            // A separate shell isolates `exit` and preserves `set -e`: putting
+            // a subshell directly before `||` disables errexit inside it.
             Command::Raw(prompt) => {
-                script.push_str(&format!("(\n{prompt}\n) || linutil_failed=$?\n"))
+                let quoted_prompt = prompt.replace('\'', "'\\''");
+                script.push_str(&format!("sh -c '{quoted_prompt}' || linutil_failed=$?\n"))
             }
             Command::LocalFile {
                 executable,
@@ -1399,6 +1401,37 @@ mod tests {
                 height: 24,
             })
             .contents()
+    }
+
+    #[test]
+    fn test_batch_preserves_inline_errexit() {
+        let commands = [
+            Command::Raw("set -e; false; printf 'continued\\n'".to_string()),
+            Command::Raw("printf 'next\\n'".to_string()),
+        ];
+        let refs: Vec<&Command> = commands.iter().collect();
+        let output = std::process::Command::new("sh")
+            .args(["-c", &batch_script(&refs)])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        assert_eq!(output.stdout, b"next\n");
+    }
+
+    #[test]
+    fn test_batch_preserves_inline_shell_quoting() {
+        let command = Command::Raw(
+            "value='quoted'; printf \"%s\\n\" \"it's $value\" \"$(printf substitution)\"\ncat <<'EOF'\n$literal `literal`\nEOF".to_string(),
+        );
+        let output = std::process::Command::new("sh")
+            .args(["-c", &batch_script(&[&command])])
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        assert_eq!(
+            output.stdout,
+            b"it's quoted\nsubstitution\n$literal `literal`\n"
+        );
     }
 
     #[test]
