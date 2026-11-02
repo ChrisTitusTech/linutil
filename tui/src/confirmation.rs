@@ -1,9 +1,7 @@
-use crate::{float::FloatContent, hint::Shortcut, shortcuts, theme};
+use crate::{float::FloatContent, theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
-    layout::Alignment,
     prelude::*,
-    symbols::border,
     widgets::{Block, Clear, List},
 };
 use std::borrow::Cow;
@@ -60,19 +58,29 @@ impl ConfirmPrompt {
 impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
         let block = Block::bordered()
-            .border_set(border::PLAIN)
+            .border_set(crate::dashboard::border_set())
             .border_style(Style::default().fg(theme.focused_color()))
-            .title(" CONFIRM SELECTIONS ")
-            .title_bottom(Line::from(vec![
-                Span::raw(" ["),
-                Span::styled("y", Style::default().fg(theme.success_color())),
-                Span::raw("] to continue ["),
-                Span::styled("n", Style::default().fg(theme.fail_color())),
-                Span::raw("] to abort "),
-            ]))
-            .title_alignment(Alignment::Center)
-            .title_style(Style::default().fg(theme.tab_color()).bold())
-            .style(Style::default());
+            .title_top(
+                Line::styled(
+                    " Confirmation ",
+                    Style::default().fg(theme.tab_color()).bold(),
+                )
+                .centered(),
+            )
+            .title_bottom(
+                Line::from(vec![
+                    Span::styled(" [", Style::default().fg(theme.unfocused_color())),
+                    Span::styled("y", Style::default().fg(theme.success_color())),
+                    Span::styled(
+                        "] to continue [",
+                        Style::default().fg(theme.unfocused_color()),
+                    ),
+                    Span::styled("n", Style::default().fg(theme.fail_color())),
+                    Span::styled("] to cancel ", Style::default().fg(theme.unfocused_color())),
+                ])
+                .centered(),
+            )
+            .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()));
 
         let inner_area = block.inner(area);
         self.inner_area_height = inner_area.height as usize;
@@ -110,19 +118,19 @@ impl FloatContent for ConfirmPrompt {
         use ConfirmStatus::*;
         use KeyCode::{Char, Down, Esc, Up};
         self.status = match key.code {
-            Char('y') | Char('Y') => Confirm,
-            Char('n') | Char('N') | Esc | Char('q') => Abort,
-            Char('j') | Char('J') | Down => {
+            Char('y') => Confirm,
+            Char('n' | 'q') | Esc => Abort,
+            Char('j') | Down => {
                 self.scroll_down();
                 None
             }
-            Char('k') | Char('K') | Up => {
+            Char('k') | Up => {
                 self.scroll_up();
                 None
             }
             _ => None,
         };
-        false
+        self.is_finished()
     }
 
     fn is_finished(&self) -> bool {
@@ -132,17 +140,22 @@ impl FloatContent for ConfirmPrompt {
             None => false,
         }
     }
+}
 
-    fn get_shortcut_list(&self) -> (&str, Box<[Shortcut]>) {
-        (
-            "Confirmation prompt",
-            shortcuts!(
-                ("Continue", ["Y", "y"]),
-                ("Abort", ["N", "n", "q", "Esc"]),
-                ("Scroll up", ["k", "Up"]),
-                ("Scroll down", ["j", "Down"]),
-                ("Close linutil", ["CTRL-c"]),
-            ),
-        )
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ratatui::{backend::TestBackend, Terminal};
+
+    #[test]
+    fn prompt_uses_the_theme_background() {
+        let theme = theme::Theme::Default;
+        let mut prompt = ConfirmPrompt::new(&["Google Chrome"]);
+        let mut terminal = Terminal::new(TestBackend::new(40, 10)).unwrap();
+        terminal
+            .draw(|frame| prompt.draw(frame, frame.area(), &theme))
+            .unwrap();
+        let buffer = terminal.backend().buffer();
+        assert!(buffer.content.iter().all(|cell| cell.bg == theme.bg()));
     }
 }

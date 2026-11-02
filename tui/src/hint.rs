@@ -59,18 +59,21 @@ pub fn create_shortcut_list(
 }
 
 impl Shortcut {
-    pub fn new<const N: usize>(desc: &'static str, key_sequences: [&'static str; N]) -> Self {
+    pub fn new<K: Into<Cow<'static, str>>, const N: usize>(
+        desc: &'static str,
+        key_sequences: [K; N],
+    ) -> Self {
         Self {
             key_sequences: key_sequences
-                .iter()
-                .map(|s| Span::styled(Cow::<'static, str>::Borrowed(s), Style::default().bold()))
+                .into_iter()
+                .map(|s| Span::styled(s.into(), Style::default().bold()))
                 .collect(),
             desc,
         }
     }
 
     fn to_spans(&self) -> Vec<Span<'static>> {
-        let description = Span::styled(self.desc, Style::default().italic());
+        let description = Span::styled(self.desc, crate::dashboard::italic(Style::default()));
         self.key_sequences
             .iter()
             .flat_map(|seq| [Span::raw("["), seq.clone(), Span::raw("] ")])
