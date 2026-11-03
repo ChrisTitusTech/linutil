@@ -134,6 +134,26 @@ echo -ne "
 ------------------------------------------------------------------------
 "
 }
+# @description Prompts for a password twice and exports it to the given variable.
+# @arg $1 Name of the variable to store and export the password in
+set_password () {
+    local password1 password2
+
+    while true; do
+        read -rs -p "Please enter password: " password1
+        printf "\n"
+        read -rs -p "Please re-enter password: " password2
+        printf "\n"
+
+        if [[ "$password1" == "$password2" ]]; then
+            export "$1=$password1"
+            break
+        fi
+
+        printf "ERROR! Passwords do not match.\n"
+    done
+}
+
 # @description This function will handle file systems. At this movement we are handling only
 # btrfs and ext4. Others will be added in future.
 filesystem () {
@@ -172,6 +192,7 @@ timezone () {
     done
     export TIMEZONE
 }
+
 # @description Set user's keyboard mapping.
 keymap () {
     echo -ne "
@@ -453,7 +474,7 @@ elif [[ "${FS}" == "ext4" ]]; then
 elif [[ "${FS}" == "luks" ]]; then
     mkfs.fat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
+    echo -n "${LUKS_PASSWORD}" | cryptsetup -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder
     echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
@@ -653,9 +674,12 @@ echo "$USERNAME password set"
 echo $NAME_OF_MACHINE > /etc/hostname
 
 if [[ ${FS} == "luks" ]]; then
-# Making sure to edit mkinitcpio conf if luks is selected
-# add encrypt in mkinitcpio.conf before filesystems in hooks
-    sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
+# The systemd initcpio hook cannot run the legacy encrypt hook; use sd-encrypt there
+    if grep -qE '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
+        sed -i 's/\bfilesystems\b/sd-encrypt filesystems/' /etc/mkinitcpio.conf
+    else
+        sed -i 's/\bfilesystems\b/encrypt filesystems/' /etc/mkinitcpio.conf
+    fi
 # making mkinitcpio with linux kernel
     mkinitcpio -p linux-lts
 fi
@@ -687,7 +711,11 @@ echo -ne "
 "
 # set kernel parameter for decrypting the drive
 if [[ "${FS}" == "luks" ]]; then
-sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    if grep -qE '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
+        sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"rd.luks.name=${ENCRYPTED_PARTITION_UUID}=ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    else
+        sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    fi
 fi
 # set kernel parameter for adding splash screen
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash /' /etc/default/grub
