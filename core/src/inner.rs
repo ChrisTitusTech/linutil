@@ -138,10 +138,14 @@ impl Entry {
                                     .all(|matching| data.contains(matching) == *matches)
                             }),
                         SystemDataType::CommandExists => {
-                            let path = std::env::var_os("PATH");
                             // Keep relative PATH entries relative even in deeply nested directories.
                             values.iter().all(|command| {
-                                which::which_in(command, path.as_ref(), "").is_ok() == *matches
+                                let executable = if Path::new(command).components().count() > 1 {
+                                    which::which(command)
+                                } else {
+                                    which::which_global(command)
+                                };
+                                executable.is_ok() == *matches
                             })
                         }
                         SystemDataType::FileExists => {
@@ -337,13 +341,12 @@ mod tests {
         }
 
         let temp_dir = crate::tests::create_temp_dir();
-        let bin = temp_dir.path().join("bin");
+        let root = temp_dir.path().canonicalize().unwrap();
+        let bin = root.join("bin");
         std::fs::create_dir(&bin).unwrap();
-        let executable = bin.join("firewall-cmd");
-        std::fs::write(&executable, "#!/bin/sh\nexit 0\n").unwrap();
-        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o755)).unwrap();
+        std::os::unix::fs::symlink("/bin/sh", bin.join("firewall-cmd")).unwrap();
 
-        let mut cwd = temp_dir.path().to_path_buf();
+        let mut cwd = root.clone();
         let mut relative_path = String::new();
         // Keep the cwd usable, but make the absolute executable path exceed Linux's PATH_MAX.
         while cwd.as_os_str().len() < 4079 {
@@ -362,6 +365,7 @@ mod tests {
             .current_dir(cwd)
             .env(CHILD_ENV, "1")
             .env("PATH", relative_path)
+            .env("TMPDIR", root)
             .output()
             .unwrap();
         assert!(
