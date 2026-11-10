@@ -86,16 +86,21 @@ elif name == "grub-mkconfig":
     if os.environ.get("GRUB_CUSTOM_MENU") == "1":
         target.write_text("menuentry 'Custom' {\n    linux /vmlinuz-linux-cachyos-lts quiet\n}\n")
     else:
-        target.write_text(
+        generated = (
             f'   set default="{default}"\n'
             "### BEGIN /etc/grub.d/10_linux ###\n"
             "menuentry 'Arch Linux' $menuentry_id_option 'gnulinux-simple-test' {\n"
             "    linux /vmlinuz-linux-cachyos-lts quiet\n}\n"
             "submenu 'Advanced options for Arch Linux' $menuentry_id_option 'gnulinux-advanced-test' {\n"
-            "    menuentry 'CachyOS LTS' $menuentry_id_option 'gnulinux-linux-cachyos-lts-advanced-test' {\n        linux /vmlinuz-linux-cachyos-lts quiet\n    }\n"
-            "    menuentry 'Stock' $menuentry_id_option 'gnulinux-linux-advanced-test' {\n        linux /vmlinuz-linux quiet\n    }\n}\n"
+            "    menuentry 'CachyOS LTS' $menuentry_id_option 'gnulinux-linux-cachyos-lts-advanced-test' {\n        linux /vmlinuz-linux-cachyos-lts quiet\n        initrd /initramfs-linux-cachyos-lts.img\n    }\n"
+            "    menuentry 'Stock' $menuentry_id_option 'gnulinux-linux-advanced-test' {\n        linux /vmlinuz-linux quiet\n        initrd /initramfs-linux.img\n    }\n}\n"
             "### END /etc/grub.d/10_linux ###\n"
         )
+        if os.environ.get("GRUB_MISSING_INITRAMFS") == "1":
+            generated = generated.replace("initrd /initramfs-linux.img", "initrd /intel-ucode.img")
+        if os.environ.get("GRUB_LATE_OVERRIDE") == "1":
+            generated += 'set default="0"\n'
+        target.write_text(generated)
 elif name == "rm":
     for argument in args:
         if argument.startswith("-"):
@@ -117,7 +122,8 @@ elif name != "pacman":
 def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_command=True, grub_directory=True, skip_repo_edit=False,
              grub_custom_menu=False, included_repos=None, grub_override=False,
-             grub_interrupt=False, keyring_installed=False, confirm="y"):
+             grub_interrupt=False, keyring_installed=False, confirm="y",
+             grub_missing_initramfs=False, grub_late_override=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -165,6 +171,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if grub_missing_initramfs:
+            environment["GRUB_MISSING_INITRAMFS"] = "1"
+        if grub_late_override:
+            environment["GRUB_LATE_OVERRIDE"] = "1"
         if keyring_installed:
             environment["KEYRING_INSTALLED"] = "1"
         if grub_interrupt:
@@ -283,16 +293,16 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["grub"], "#GRUB_DEFAULT=0\n" + STOCK_ENTRY + "\n")
         self.assertTrue(result["generated"])
 
-    def test_reset_does_not_change_another_default(self):
+    def test_reset_selects_stock_when_the_previous_default_is_saved(self):
         result = run_menu(5, grub="GRUB_DEFAULT=saved\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], [])
-        self.assertEqual(result["grub"], "GRUB_DEFAULT=saved\n")
+        self.assertEqual(result["commands"], ["grub-mkconfig", "sed", "grub-mkconfig"])
+        self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
 
     def test_combined_remove_handles_active_repositories(self):
         result = run_menu(4, pacman="[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["grub-mkconfig", "sed", "grub-mkconfig", "curl", "tar", "repo-installer", "rm"])
+        self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "sed", "grub-mkconfig", "repo-installer", "rm"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
         self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
         self.assertTrue(result["script_exists"])
@@ -322,11 +332,13 @@ class CachyosReposTests(unittest.TestCase):
                 self.assertFalse(result["generated"])
 
     def test_grub_override_preserves_original_default(self):
-        result = run_menu(5, grub=CACHY_ENTRY + "\n", grub_override=True)
-        self.assertNotEqual(result["status"], 0)
-        self.assertIn("Could not verify", result["output"])
-        self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
-        self.assertFalse(result["generated"])
+        for override in ({"grub_override": True}, {"grub_late_override": True}):
+            with self.subTest(override=override):
+                result = run_menu(5, grub=CACHY_ENTRY + "\n", **override)
+                self.assertNotEqual(result["status"], 0)
+                self.assertIn("Could not verify", result["output"])
+                self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
+                self.assertFalse(result["generated"])
 
     def test_grub_interrupt_restores_original_default(self):
         result = run_menu(5, grub=CACHY_ENTRY + "\n", grub_interrupt=True)
@@ -336,10 +348,13 @@ class CachyosReposTests(unittest.TestCase):
 
     def test_combined_removal_checks_stock_entry_before_package_changes(self):
         config = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
-        result = run_menu(4, pacman=config, grub=CACHY_ENTRY + "\n", grub_custom_menu=True)
-        self.assertNotEqual(result["status"], 0)
-        self.assertEqual(result["pacman"], config)
-        self.assertEqual(result["commands"], ["grub-mkconfig"])
+        for settings in ({"grub_custom_menu": True}, {"grub_missing_initramfs": True}):
+            with self.subTest(settings=settings):
+                result = run_menu(4, pacman=config, **settings)
+                self.assertNotEqual(result["status"], 0)
+                self.assertEqual(result["pacman"], config)
+                self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "rm"])
+                self.assertEqual(result["grub"], "GRUB_DEFAULT=0\n")
 
     def test_removal_reports_possible_incomplete_migration(self):
         result = run_menu(6, keyring_installed=True)
