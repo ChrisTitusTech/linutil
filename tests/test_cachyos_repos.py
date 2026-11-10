@@ -90,7 +90,13 @@ elif name == "grub-mkconfig":
         target.write_text("menuentry 'Custom' {\n    linux /vmlinuz-linux-cachyos-lts quiet\n}\n")
     else:
         generated = (
+            "### BEGIN /etc/grub.d/00_header ###\n"
+            'if [ "${next_entry}" ]; then\n'
+            '   set default="${next_entry}"\n'
+            "else\n"
             f'   set default="{default}"\n'
+            "fi\n"
+            "### END /etc/grub.d/00_header ###\n"
             "### BEGIN /etc/grub.d/10_linux ###\n"
             "menuentry 'Arch Linux' $menuentry_id_option 'gnulinux-simple-test' {\n"
             "    linux /vmlinuz-linux-cachyos-lts quiet\n}\n"
@@ -333,7 +339,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
 
     def test_combined_remove_handles_active_repositories(self):
-        result = run_menu(4, pacman="[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
+        result = run_menu(4, pacman="[core]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
         self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "sed", "grub-mkconfig", "repo-installer", "rm"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
@@ -342,7 +348,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertTrue(result["notes_exist"])
 
     def test_repo_only_removal_works_without_grub_and_skips_comments(self):
-        for config in ("[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n", "# [cachyos]\n"):
+        for config in ("[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n", "# [cachyos]\n"):
             with self.subTest(config=config):
                 result = run_menu(6, pacman=config, grub=None, grub_command=False, grub_directory=False)
                 self.assert_success(result)
@@ -380,7 +386,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertFalse(result["generated"])
 
     def test_combined_removal_checks_stock_entry_before_package_changes(self):
-        config = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        config = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         for settings in ({"grub_custom_menu": True}, {"grub_missing_initramfs": True}):
             with self.subTest(settings=settings):
                 result = run_menu(4, pacman=config, **settings)
@@ -396,11 +402,18 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["commands"], [])
 
     def test_removal_refuses_nonstandard_blocks_and_requires_confirmation(self):
-        standard = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        standard = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         malformed = standard.replace("Include", "# Mirror\nInclude")
-        result = run_menu(6, pacman=malformed)
+        duplicate = standard + "\n[cachyos]\n# Mirror\nServer = https://example.invalid\n"
+        for config in (malformed, duplicate):
+            with self.subTest(config=config):
+                result = run_menu(6, pacman=config)
+                self.assertNotEqual(result["status"], 0)
+                self.assertIn("standard repository block", result["output"])
+                self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard.replace("[core]\n\n", ""))
         self.assertNotEqual(result["status"], 0)
-        self.assertIn("standard repository block", result["output"])
+        self.assertIn("Enable the stock [core] repository", result["output"])
         self.assertEqual(result["commands"], [])
         result = run_menu(6, pacman=standard, confirm="n")
         self.assertNotEqual(result["status"], 0)
@@ -408,7 +421,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["commands"], [])
 
     def test_download_or_extraction_failure_stops_before_running_helper(self):
-        for choice, config in ((1, "[core]\n"), (4, "[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n")):
+        for choice, config in ((1, "[core]\n"), (4, "[core]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n")):
             for index, failure in enumerate(("curl", "tar")):
                 with self.subTest(choice=choice, failure=failure):
                     result = run_menu(choice, pacman=config, fail=failure)

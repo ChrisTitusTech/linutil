@@ -106,7 +106,8 @@ findGrubEntry() {
                         found = 1
                         exit
                     }
-                    if (kernel == "linux" && image == "linux-lts") fallback = path
+                    if (kernel == "linux" && image == "linux-lts" &&
+                        (fallback == "" || args[j] == "initramfs-linux-lts.img")) fallback = path
                 }
             }
         }
@@ -184,6 +185,10 @@ setDefaultKernel() {
 removeRepos() {
     checkRepo
     if [ -n "$activeRepos" ]; then
+        if ! printf '%s\n' "$repoList" | grep -Fxq core; then
+            printf '%s\n' "Enable the stock [core] repository before migrating CachyOS packages." >&2
+            return 1
+        fi
         for repo in $activeRepos; do
             case "$repo" in
                 cachyos|cachyos-v3|cachyos-core-v3|cachyos-extra-v3|cachyos-testing-v3|\
@@ -195,15 +200,20 @@ removeRepos() {
             esac
             if ! awk -v header="[$repo]" '
                 $0 == header {
-                    if (getline != 1 || $0 !~ /^Include = \/etc\/pacman[.]d\/cachyos(-[[:alnum:]-]+)?-mirrorlist$/) exit
-                    while (getline == 1) {
-                        if ($0 ~ /^[[:space:]]*\[/) break
-                        if ($0 !~ /^[[:space:]]*(#.*)?$/) exit
+                    if (++sections > 1 || getline != 1 ||
+                        $0 !~ /^Include = \/etc\/pacman[.]d\/cachyos(-[[:alnum:]-]+)?-mirrorlist$/) {
+                        invalid = 1
+                        exit
                     }
-                    safe = 1
+                    inside = 1
+                    next
+                }
+                /^[[:space:]]*\[/ { inside = 0 }
+                inside && $0 !~ /^[[:space:]]*(#.*)?$/ {
+                    invalid = 1
                     exit
                 }
-                END { exit !safe }
+                END { exit (sections != 1 || invalid) }
             ' /etc/pacman.conf; then
                 printf '%s\n' "Remove the $repo repository manually. The CachyOS helper requires a standard repository block in /etc/pacman.conf." >&2
                 return 1
