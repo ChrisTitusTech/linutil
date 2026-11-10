@@ -16,6 +16,10 @@ checkGrub() {
         printf "%b\n" "${RED}Changing the default kernel requires GRUB. Other bootloaders, including Limine and systemd-boot, are not supported by this action.${RC}"
         return 1
     fi
+    if ! rootFilesystem=$(findmnt -n -o FSTYPE --target /) || [ -z "$rootFilesystem" ] || [ "$rootFilesystem" = zfs ]; then
+        printf '%s\n' "Verify and change the kernel default manually when the root filesystem is ZFS or cannot be identified." >&2
+        return 1
+    fi
     checkEscalationTool
     if ! "$ESCALATION_TOOL" test -r /etc/default/grub ||
         ! "$ESCALATION_TOOL" test -d /boot/grub ||
@@ -208,20 +212,30 @@ setDefaultKernel() {
     fi
 }
 
+checkStockRepo() {
+    if ! printf '%s\n' "$repoList" | grep -Fxq "$1"; then
+        printf '%s\n' "Enable the stock [$1] repository before migrating CachyOS packages." >&2
+        return 1
+    fi
+    servers=$(pacman-conf --repo "$1" Server)
+    usage=$(pacman-conf --repo "$1" Usage)
+    if [ -z "$servers" ] || [ "$usage" != All ]; then
+        printf '%s\n' "Configure a usable stock [$1] repository with servers and full usage before migrating CachyOS packages." >&2
+        return 1
+    fi
+}
+
 removeRepos() {
     checkRepo
     if [ -n "$activeRepos" ]; then
-        if ! printf '%s\n' "$repoList" | grep -Fxq core; then
-            printf '%s\n' "Enable the stock [core] repository before migrating CachyOS packages." >&2
+        if ! printf '%s\n' "$activeRepos" | awk 'seen[$0]++ { duplicate = 1 } END { exit duplicate }'; then
+            printf '%s\n' "Resolve duplicate CachyOS repositories before migrating packages." >&2
             return 1
         fi
+        checkStockRepo core
         for repo in $activeRepos; do
             case "$repo" in
-                cachyos-extra-*)
-                    if ! printf '%s\n' "$repoList" | grep -Fxq extra; then
-                        printf '%s\n' "Enable the stock [extra] repository before migrating CachyOS Extra packages." >&2
-                        return 1
-                    fi ;;
+                cachyos-extra-*) checkStockRepo extra ;;
             esac
             if ! awk -v header="[$repo]" '
                 {

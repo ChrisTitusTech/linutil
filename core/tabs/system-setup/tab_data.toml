@@ -47,7 +47,7 @@ multi_select = false
 name = "Install CachyOS Repository and Kernel"
 description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
 script = "arch/cachyos-repos.sh"
-task_list = "I RP"
+task_list = "I K RP"
 multi_select = false
 
 [[data.entries]]

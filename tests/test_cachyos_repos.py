@@ -41,7 +41,7 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-if name not in ("pacman-conf", "ld-linux-x86-64.so.2") and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
+if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
@@ -50,7 +50,15 @@ if name == os.environ.get("FAIL_COMMAND"):
 if name == "ld-linux-x86-64.so.2":
     if os.environ.get("UNSUPPORTED_CPU") != "1":
         print("  x86-64-v3 (supported, searched)")
+elif name == "findmnt":
+    print(os.environ.get("ROOT_FS", "ext4"))
 elif name == "pacman-conf":
+    if args[0] == "--repo":
+        if args[-1] == "Usage":
+            print("All")
+        elif os.environ.get("STOCK_NO_SERVERS") != "1":
+            print("https://example.invalid/arch")
+        sys.exit(0)
     for config in (root / "etc/pacman.conf", root / "etc/included-repos.conf"):
         if config.exists():
             for line in config.read_text().splitlines():
@@ -133,7 +141,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_custom_menu=False, included_repos=None, grub_override=False,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
-             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False):
+             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -179,7 +187,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         binaries.mkdir()
         for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test", "sh"):
             (binaries / command).symlink_to(shutil.which(command))
-        commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed"]
+        commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed", "findmnt"]
         if grub_command:
             commands.append("grub-mkconfig")
         loader = root / "lib/ld-linux-x86-64.so.2"
@@ -197,6 +205,9 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        environment["ROOT_FS"] = root_fs
+        if stock_no_servers:
+            environment["STOCK_NO_SERVERS"] = "1"
         if unsupported_cpu:
             environment["UNSUPPORTED_CPU"] = "1"
         if grub_missing_initramfs:
@@ -304,7 +315,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
@@ -414,12 +425,20 @@ class CachyosReposTests(unittest.TestCase):
         standard = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         malformed = standard.replace("Include", "# Mirror\nInclude")
         duplicate = standard + "\n[cachyos] # override\nServer = https://example.invalid\n"
-        for config in (malformed, duplicate):
+        for config, diagnostic in ((malformed, "standard repository block"), (duplicate, "duplicate CachyOS")):
             with self.subTest(config=config):
                 result = run_menu(6, pacman=config)
                 self.assertNotEqual(result["status"], 0)
-                self.assertIn("standard repository block", result["output"])
+                self.assertIn(diagnostic, result["output"])
                 self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard, included_repos="[cachyos]\n")
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("duplicate CachyOS", result["output"])
+        self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard, stock_no_servers=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("usable stock [core] repository", result["output"])
+        self.assertEqual(result["commands"], [])
         result = run_menu(6, pacman=standard.replace("[core]\n\n", ""))
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Enable the stock [core] repository", result["output"])
