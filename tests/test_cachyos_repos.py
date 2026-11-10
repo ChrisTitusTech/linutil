@@ -133,7 +133,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_custom_menu=False, included_repos=None, grub_override=False,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
-             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None):
+             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -157,9 +157,11 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
                 grub_path.write_text(grub)
         if grub_directory:
             (root / "boot/grub").mkdir(parents=True)
+            if grub_custom_config:
+                (root / "boot/grub/custom.cfg").write_text('set default="0"\n')
         source = SCRIPT.read_text()
         assert source.startswith("#!/bin/sh -e\n")
-        for path in ("/etc/pacman.conf", "/etc/default/grub", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
+        for path in ("/etc/pacman.conf", "/etc/default", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
             source = source.replace(path, str(root / path.lstrip("/")))
         script = directory / SCRIPT.name
         script.write_text(source)
@@ -302,7 +304,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
@@ -411,7 +413,7 @@ class CachyosReposTests(unittest.TestCase):
     def test_removal_refuses_nonstandard_blocks_and_requires_confirmation(self):
         standard = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         malformed = standard.replace("Include", "# Mirror\nInclude")
-        duplicate = standard + "\n[cachyos]\n# Mirror\nServer = https://example.invalid\n"
+        duplicate = standard + "\n[cachyos] # override\nServer = https://example.invalid\n"
         for config in (malformed, duplicate):
             with self.subTest(config=config):
                 result = run_menu(6, pacman=config)

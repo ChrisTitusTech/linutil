@@ -19,12 +19,18 @@ checkGrub() {
     checkEscalationTool
     if ! "$ESCALATION_TOOL" test -r /etc/default/grub ||
         ! "$ESCALATION_TOOL" test -d /boot/grub ||
-        ! "$ESCALATION_TOOL" test -x /boot/grub; then
-        printf '%s\n' "Changing the default kernel requires GRUB and access to /etc/default/grub and /boot/grub." >&2
+        ! "$ESCALATION_TOOL" test -x /boot/grub ||
+        ! "$ESCALATION_TOOL" test -w /etc/default ||
+        ! "$ESCALATION_TOOL" test -w /boot/grub; then
+        printf '%s\n' "Changing the default kernel requires GRUB and writable /etc/default and /boot/grub directories." >&2
         return 1
     fi
     if "$ESCALATION_TOOL" test -L /etc/default/grub || "$ESCALATION_TOOL" test -L /boot/grub/grub.cfg; then
         printf '%s\n' "GRUB settings or config are managed through a symlink. Change the kernel default manually." >&2
+        return 1
+    fi
+    if "$ESCALATION_TOOL" test -e /boot/grub/custom.cfg; then
+        printf '%s\n' "GRUB loads /boot/grub/custom.cfg at boot. Verify and change the kernel default manually." >&2
         return 1
     fi
     if ! "$ESCALATION_TOOL" grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
@@ -54,7 +60,7 @@ checkGrub() {
 
 runRepoHelper() (
     workdir=$(mktemp -d)
-    trap '"$ESCALATION_TOOL" rm -rf -- "$workdir"' 0
+    trap 'rm -rf -- "$workdir" 2>/dev/null || "$ESCALATION_TOOL" rm -rf -- "$workdir"' 0
     cd "$workdir"
     curl -f https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
     tar xvf cachyos-repo.tar.xz
@@ -218,8 +224,14 @@ removeRepos() {
                     fi ;;
             esac
             if ! awk -v header="[$repo]" '
-                $0 == header {
-                    if (++sections > 1 || getline != 1 ||
+                {
+                    section = $0
+                    sub(/#.*/, "", section)
+                    sub(/^[[:space:]]+/, "", section)
+                    sub(/[[:space:]]+$/, "", section)
+                }
+                section == header {
+                    if (++sections > 1 || $0 != header || getline != 1 ||
                         $0 !~ /^Include = \/etc\/pacman[.]d\/cachyos(-[[:alnum:]-]+)?-mirrorlist$/) {
                         invalid = 1
                         exit
