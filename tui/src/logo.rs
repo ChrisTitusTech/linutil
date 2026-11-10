@@ -63,6 +63,10 @@ impl Logo {
     }
 
     fn configure_picker(picker: &mut Picker) {
+        // A failed probe can select a graphics protocol based on environment hints alone.
+        if picker.capabilities().is_empty() {
+            *picker = Picker::halfblocks();
+        }
         picker.set_background_color(Some([0, 0, 0, 0]));
         // Kitty placeholders carry their image ID in the foreground color.
         if picker.protocol_type() == ProtocolType::Kitty && Colored::ansi_color_disabled() {
