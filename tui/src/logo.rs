@@ -1,6 +1,6 @@
 use crate::theme::Theme;
 use image::{imageops::FilterType, RgbaImage};
-use ratatui::{prelude::*, widgets::Paragraph};
+use ratatui::{crossterm::style::Colored, prelude::*, widgets::Paragraph};
 use ratatui_image::{
     picker::{Picker, ProtocolType},
     protocol::StatefulProtocol,
@@ -37,7 +37,7 @@ impl Logo {
         let image_size = rgba.dimensions();
 
         let mut picker = Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
-        picker.set_background_color(Some([0, 0, 0, 0]));
+        Self::configure_picker(&mut picker);
         let font_size = picker.font_size();
         let font_size = (font_size.width, font_size.height);
         let renderer = if picker.protocol_type() == ProtocolType::Halfblocks {
@@ -60,6 +60,18 @@ impl Logo {
             cached_lines: Vec::new(),
             last_area_size: (0, 0),
         })
+    }
+
+    fn configure_picker(picker: &mut Picker) {
+        // A failed probe can select a graphics protocol based on environment hints alone.
+        if picker.capabilities().is_empty() {
+            *picker = Picker::halfblocks();
+        }
+        picker.set_background_color(Some([0, 0, 0, 0]));
+        // Kitty placeholders carry their image ID in the foreground color.
+        if picker.protocol_type() == ProtocolType::Kitty && Colored::ansi_color_disabled() {
+            picker.set_protocol_type(ProtocolType::Halfblocks);
+        }
     }
 
     pub fn area_height_for_width(&self, width: u16, max_height: u16) -> u16 {
@@ -229,7 +241,7 @@ impl Logo {
             Ok(picker) => picker,
             Err(_) => return,
         };
-        picker.set_background_color(Some([0, 0, 0, 0]));
+        Self::configure_picker(&mut picker);
         let new_font_size = picker.font_size();
         let new_font_size = (new_font_size.width, new_font_size.height);
         let protocol_type = picker.protocol_type();
