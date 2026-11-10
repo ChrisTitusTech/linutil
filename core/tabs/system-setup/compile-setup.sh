@@ -3,6 +3,18 @@
 
 . ../common-script.sh
 
+apt_can_install() {
+    if "$ESCALATION_TOOL" apt-get -s install "$1" >/dev/null 2>&1; then
+        return 0
+    elif [ "$?" -eq 100 ]; then
+        return 1
+    fi
+
+    # APT reports errors with status 100. A restricted escalation policy may
+    # deny the simulation even when it permits the actual install command.
+    apt-get -s install "$1" >/dev/null 2>&1
+}
+
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
@@ -24,8 +36,8 @@ installDepend() {
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
             # Use the install privileges so the simulation sees the same APT configuration.
-            if ! "$ESCALATION_TOOL" apt-get -s install tldr >/dev/null 2>&1; then
-                if ! "$ESCALATION_TOOL" apt-get -s install tealdeer >/dev/null 2>&1; then
+            if ! apt_can_install tldr; then
+                if ! apt_can_install tealdeer; then
                     printf '%b\n' "${RED}APT could not resolve an installation of tldr or tealdeer from the configured repositories.${RC}" >&2
                     return 1
                 fi
