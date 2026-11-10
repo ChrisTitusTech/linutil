@@ -21,6 +21,10 @@ checkGrub() {
         return 1
     fi
     checkEscalationTool
+    if ! "$ESCALATION_TOOL" test -x /etc/grub.d/10_linux; then
+        printf '%s\n' "Enable the standard GRUB Linux menu generator before changing the kernel default." >&2
+        return 1
+    fi
     if ! "$ESCALATION_TOOL" test -r /etc/default/grub ||
         ! "$ESCALATION_TOOL" test -d /boot/grub ||
         ! "$ESCALATION_TOOL" test -x /boot/grub ||
@@ -110,7 +114,7 @@ findGrubEntry() {
         /\$menuentry_id_option / {
             split(substr($0, index($0, "$menuentry_id_option ") + length("$menuentry_id_option ")), fields, FS)
             id = fields[2]
-            if (id !~ /^[[:alnum:]_-]+$/) next
+            if (id !~ /^[[:alnum:]_\/-]+$/) next
             if ($1 ~ /^submenu[[:space:]]/) submenu = id
             if ($1 ~ /^[[:space:]]*menuentry[[:space:]]/) {
                 path = ($1 ~ /^[[:space:]]/ && submenu != "" ? submenu ">" : "") id
@@ -174,7 +178,7 @@ updateGrubDefault() (
     backup=$("$ESCALATION_TOOL" mktemp /etc/default/grub.linutil.XXXXXX)
     "$ESCALATION_TOOL" cp -p /etc/default/grub "$backup"
     restore=true
-    "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=\"$entry\"/" /etc/default/grub
+    "$ESCALATION_TOOL" sed -i "s|^GRUB_DEFAULT=.*|GRUB_DEFAULT=\"$entry\"|" /etc/default/grub
     "$ESCALATION_TOOL" grub-mkconfig -o "$candidate"
     # The standard header may honor a one-time boot entry from grubenv.
     # Reject any other assignment that could override the requested default.
@@ -264,6 +268,10 @@ removeRepos() {
                 return 1
             fi
         done
+        if ! "$PACKAGER" -Q cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist cachyos-v4-mirrorlist >/dev/null 2>&1; then
+            printf '%s\n' "The CachyOS keyring and mirrorlist packages are required by the removal helper. Complete this migration manually." >&2
+            return 1
+        fi
         printf '%s\n' "Removal can downgrade system packages, replace pacman, and remove the CachyOS keyring and mirrorlists."
         printf '%s\n' "Package hooks may regenerate bootloader files."
         if [ "$#" -eq 0 ]; then

@@ -113,6 +113,8 @@ elif name == "grub-mkconfig":
             "    menuentry 'Stock' $menuentry_id_option 'gnulinux-linux-advanced-test' {\n        linux /vmlinuz-linux quiet\n        initrd /initramfs-linux.img\n    }\n}\n"
             "### END /etc/grub.d/10_linux ###\n"
         )
+        if os.environ.get("GRUB_DEVICE_ID") == "1":
+            generated = generated.replace("-test'", "-/dev/sda2'")
         if os.environ.get("GRUB_MISSING_INITRAMFS") == "1":
             generated = generated.replace("initrd /initramfs-linux.img", "initrd /intel-ucode.img")
         if os.environ.get("GRUB_LATE_OVERRIDE") == "1":
@@ -130,6 +132,8 @@ elif name == "rm":
         elif target.exists():
             target.unlink()
 elif name == "pacman" and args[0] == "-Q":
+    if len(args) > 2:
+        sys.exit(1 if os.environ.get("MISSING_MIGRATION_PACKAGES") == "1" else 0)
     sys.exit(0 if os.environ.get("KEYRING_INSTALLED") == "1" else 1)
 elif name != "pacman":
     sys.exit("Unexpected mock command: " + name)
@@ -141,7 +145,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_custom_menu=False, included_repos=None, grub_override=False,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
-             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False):
+             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False, grub_generator=True,
+             missing_migration_packages=False, grub_device_id=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -167,9 +172,13 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             (root / "boot/grub").mkdir(parents=True)
             if grub_custom_config:
                 (root / "boot/grub/custom.cfg").write_text('set default="0"\n')
+        if grub_generator:
+            generator = root / "etc/grub.d/10_linux"
+            generator.parent.mkdir()
+            generator.touch(mode=0o755)
         source = SCRIPT.read_text()
         assert source.startswith("#!/bin/sh -e\n")
-        for path in ("/etc/pacman.conf", "/etc/default", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
+        for path in ("/etc/pacman.conf", "/etc/default", "/etc/grub.d", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
             source = source.replace(path, str(root / path.lstrip("/")))
         script = directory / SCRIPT.name
         script.write_text(source)
@@ -206,6 +215,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "LC_ALL": "C",
         }
         environment["ROOT_FS"] = root_fs
+        if missing_migration_packages:
+            environment["MISSING_MIGRATION_PACKAGES"] = "1"
+        if grub_device_id:
+            environment["GRUB_DEVICE_ID"] = "1"
         if stock_no_servers:
             environment["STOCK_NO_SERVERS"] = "1"
         if unsupported_cpu:
@@ -315,7 +328,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
@@ -390,6 +403,11 @@ class CachyosReposTests(unittest.TestCase):
                 self.assertEqual(result["grub"], initial)
                 self.assertFalse(result["generated"])
 
+    def test_grub_accepts_device_path_entry_ids(self):
+        result = run_menu(5, grub_device_id=True)
+        self.assert_success(result)
+        self.assertEqual(result["grub"], STOCK_ENTRY.replace("-test", "-/dev/sda2") + "\n")
+
     def test_grub_override_preserves_original_default(self):
         for override in ({"grub_override": True}, {"grub_late_override": True}):
             with self.subTest(override=override):
@@ -446,6 +464,10 @@ class CachyosReposTests(unittest.TestCase):
         result = run_menu(6, pacman=standard.replace("[cachyos]", "[cachyos-extra-v3]"))
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Enable the stock [extra] repository", result["output"])
+        self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard, missing_migration_packages=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("keyring and mirrorlist packages are required", result["output"])
         self.assertEqual(result["commands"], [])
         result = run_menu(6, pacman=standard, confirm="n")
         self.assertNotEqual(result["status"], 0)
