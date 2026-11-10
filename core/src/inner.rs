@@ -141,7 +141,7 @@ impl Entry {
                             let path = std::env::var_os("PATH");
                             // Keep relative PATH entries relative even in deeply nested directories.
                             values.iter().all(|command| {
-                                which::which_in(command, path.as_ref(), ".").is_ok() == *matches
+                                which::which_in(command, path.as_ref(), "").is_ok() == *matches
                             })
                         }
                         SystemDataType::FileExists => {
