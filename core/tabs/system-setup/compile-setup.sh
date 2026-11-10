@@ -19,6 +19,17 @@ apt_can_install() {
     apt-get -s install "$1" >/dev/null 2>&1
 }
 
+select_apt_tldr() {
+    if apt_can_install tldr; then
+        return 0
+    fi
+    if apt_can_install tealdeer; then
+        DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
+        return 0
+    fi
+    return 1
+}
+
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
@@ -37,16 +48,16 @@ installDepend() {
         apt-get|nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
-            "$ESCALATION_TOOL" dpkg --add-architecture i386
-            "$ESCALATION_TOOL" "$PACKAGER" update
-            # Use the install privileges so the simulation sees the same APT configuration.
-            if ! apt_can_install tldr; then
-                if ! apt_can_install tealdeer; then
+            if ! select_apt_tldr; then
+                # APT can report success even when a mirror's index failed to refresh.
+                "$ESCALATION_TOOL" "$PACKAGER" update
+                if ! select_apt_tldr; then
                     printf '%b\n' "${RED}APT could not resolve an installation of tldr or tealdeer from the configured repositories.${RC}" >&2
                     return 1
                 fi
-                DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
             fi
+            "$ESCALATION_TOOL" dpkg --add-architecture i386
+            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             ;;
         dnf)
