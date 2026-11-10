@@ -23,9 +23,9 @@ installDepend() {
             "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
-            # Simulate installation so APT can account for package providers.
-            if ! apt-get -s install tldr >/dev/null 2>&1; then
-                if ! apt-get -s install tealdeer >/dev/null 2>&1; then
+            # Use the install privileges so the simulation sees the same APT configuration.
+            if ! "$ESCALATION_TOOL" apt-get -s install tldr >/dev/null 2>&1; then
+                if ! "$ESCALATION_TOOL" apt-get -s install tealdeer >/dev/null 2>&1; then
                     printf '%b\n' "${RED}APT could not resolve an installation of tldr or tealdeer from the configured repositories.${RC}" >&2
                     return 1
                 fi
