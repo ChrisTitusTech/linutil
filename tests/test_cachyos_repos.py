@@ -37,13 +37,20 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-if name != "rm" or not any("grub.linutil." in arg for arg in args):
+if name != "pacman-conf" and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
     sys.exit(42)
 
-if name == "curl":
+if name == "pacman-conf":
+    for config in (root / "etc/pacman.conf", root / "etc/included-repos.conf"):
+        if config.exists():
+            for line in config.read_text().splitlines():
+                header = line.split("#", 1)[0].strip()
+                if header.startswith("[") and header.endswith("]"):
+                    print(header[1:-1])
+elif name == "curl":
     Path(args[args.index("-o") + 1]).write_text("mock archive")
 elif name == "tar":
     repo = Path.cwd() / "cachyos-repo"
@@ -66,7 +73,14 @@ elif name == "grub-mkconfig":
     target = Path(args[-1]).resolve()
     if not target.is_relative_to(root):
         sys.exit("Refusing a non-fixture GRUB target")
-    target.write_text("mock regenerated config\n")
+    if os.environ.get("GRUB_CUSTOM_MENU") == "1":
+        target.write_text("menuentry 'Custom' {\n    linux /vmlinuz-linux-cachyos-lts quiet\n}\n")
+    else:
+        target.write_text(
+            "menuentry 'Arch Linux' {\n    linux /vmlinuz-linux quiet\n}\n"
+            "submenu 'Advanced options for Arch Linux' {\n"
+            "    menuentry 'Arch Linux, with Linux linux-cachyos-lts' {\n    }\n}\n"
+        )
 elif name == "rm":
     for argument in args:
         if argument.startswith("-"):
@@ -84,7 +98,8 @@ elif name != "pacman":
 
 
 def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
-             grub_command=True, grub_directory=True, skip_repo_edit=False):
+             grub_command=True, grub_directory=True, skip_repo_edit=False,
+             grub_custom_menu=False, included_repos=None):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -92,6 +107,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         (root / "etc/default").mkdir(parents=True)
         pacman_path = root / "etc/pacman.conf"
         pacman_path.write_text(pacman)
+        if included_repos:
+            (root / "etc/included-repos.conf").write_text(included_repos)
         grub_path = root / "etc/default/grub"
         if grub is not None:
             grub_path.write_text(grub)
@@ -107,7 +124,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         notes = directory / "cachyos-repo-notes.txt"
         notes.write_text("unrelated file\n")
         (root / "tabs/common-script.sh").write_text(
-            'checkEnv() { ESCALATION_TOOL=escalate; PACKAGER=pacman; '
+            'checkEnv() { [ "$AUR_HELPER_CHECKED" = true ] || return 99; '
+            'ESCALATION_TOOL=escalate; PACKAGER=pacman; '
             'printf checked > "$TEST_ROOT/environment-checked"; }\n'
             'command_exists() { command -v "$1" >/dev/null 2>&1; }\n'
         )
@@ -115,7 +133,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         binaries.mkdir()
         for command in ("grep", "awk", "cat", "mktemp", "cp", "mv"):
             (binaries / command).symlink_to(shutil.which(command))
-        commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "sed"]
+        commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed"]
         if grub_command:
             commands.append("grub-mkconfig")
         for command in commands:
@@ -129,6 +147,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if grub_custom_menu:
+            environment["GRUB_CUSTOM_MENU"] = "1"
         if skip_repo_edit:
             environment["SKIP_REPO_EDIT"] = "1"
         if fail:
@@ -261,6 +281,21 @@ class CachyosReposTests(unittest.TestCase):
                 self.assert_success(result)
                 expected = [] if config.startswith("#") else ["curl", "tar", "repo-installer", "rm"]
                 self.assertEqual(result["commands"], expected)
+
+    def test_removal_refuses_repos_defined_in_included_files(self):
+        result = run_menu(6, included_repos="[cachyos]\n")
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("Remove the cachyos repository manually", result["output"])
+        self.assertEqual(result["commands"], [])
+
+    def test_custom_grub_menu_preserves_original_default(self):
+        for choice, initial in ((2, "GRUB_DEFAULT=0\n"), (5, CACHY_DEFAULT + "\n")):
+            with self.subTest(choice=choice):
+                result = run_menu(choice, pacman="[cachyos]\n", grub=initial, grub_custom_menu=True)
+                self.assertNotEqual(result["status"], 0)
+                self.assertIn("Could not verify", result["output"])
+                self.assertEqual(result["grub"], initial)
+                self.assertFalse(result["generated"])
 
     def test_download_or_extraction_failure_stops_before_running_helper(self):
         for choice, config in ((1, "[core]\n"), (4, "[cachyos-v3]\n")):

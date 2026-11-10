@@ -3,15 +3,11 @@
 . ../../common-script.sh
 
 checkRepo() {
-    hasConfiguredRepos=false
-    hasActiveRepos=false
-    repoSection='\[cachyos(-[[:alnum:]-]+)?\][[:space:]]*(#.*)?$'
-    if grep -Eq "^[[:space:]]*#?[[:space:]]*${repoSection}" /etc/pacman.conf; then
-        hasConfiguredRepos=true
+    if ! repoList=$(pacman-conf --repo-list); then
+        printf '%s\n' "Could not read the pacman repository configuration." >&2
+        return 1
     fi
-    if grep -Eq "^[[:space:]]*${repoSection}" /etc/pacman.conf; then
-        hasActiveRepos=true
-    fi
+    activeRepos=$(printf '%s\n' "$repoList" | grep -E '^cachyos(-[[:alnum:]-]+)?$' || :)
 }
 
 checkGrub() {
@@ -37,34 +33,64 @@ runRepoHelper() (
 
 setupRepos() {
     checkRepo
-    if [ "$hasActiveRepos" = true ]; then
+    if [ -n "$activeRepos" ]; then
         printf "%b\n" "CachyOS repos already configured"
-    elif [ "$hasConfiguredRepos" = true ]; then
+    elif grep -Eq '^[[:space:]]*#[[:space:]]*\[cachyos(-[[:alnum:]-]+)?\][[:space:]]*(#.*)?$' /etc/pacman.conf; then
         printf "%b\n" "Enable the commented CachyOS repos in /etc/pacman.conf before continuing."
         return 1
     else
         printf "%b\n" "Installing CachyOS repo.."
         runRepoHelper
         checkRepo
-        if [ "$hasActiveRepos" = false ]; then
+        if [ -z "$activeRepos" ]; then
             printf "%b\n" "The installer did not enable CachyOS repos in /etc/pacman.conf."
             return 1
         fi
     fi
 }
 
+verifyGrubEntry() {
+    # Check the standard 10_linux layout. Leave custom menus alone.
+    # shellcheck disable=SC2016
+    "$ESCALATION_TOOL" awk -F "'" -v setting="$1" '
+        setting == "GRUB_DEFAULT=0" {
+            if ($1 ~ /^menuentry[[:space:]]/) {
+                if (++entries > 1) exit
+            } else if ($1 ~ /^submenu[[:space:]]/) {
+                exit
+            } else if (entries == 1 && $0 ~ /^[[:space:]]+linux(efi)?[[:space:]]+[^[:space:]]*\/vmlinuz-linux(-lts)?[[:space:]]/) {
+                found = 1
+                exit
+            }
+        }
+        setting != "GRUB_DEFAULT=0" {
+            if ($1 ~ /^submenu[[:space:]]/) cachyosSubmenu = ($2 == "Advanced options for Arch Linux")
+            if ($0 ~ /^}/) cachyosSubmenu = 0
+            if (cachyosSubmenu && $1 ~ /^[[:space:]]+menuentry[[:space:]]/ &&
+                $2 == "Arch Linux, with Linux linux-cachyos-lts") found = 1
+        }
+        END { exit !found }
+    ' "$2"
+}
+
 updateGrubDefault() (
     backup=$("$ESCALATION_TOOL" mktemp /etc/default/grub.linutil.XXXXXX)
-    trap '"$ESCALATION_TOOL" rm -f -- "$backup"' 0
+    candidate=
+    trap '"$ESCALATION_TOOL" rm -f -- ${backup:+"$backup"} ${candidate:+"$candidate" "$candidate.new"}' 0
+    candidate=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.XXXXXX)
     "$ESCALATION_TOOL" cp -p /etc/default/grub "$backup"
     "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/$1/" /etc/default/grub
-    if "$ESCALATION_TOOL" grub-mkconfig -o /boot/grub/grub.cfg; then
+    if "$ESCALATION_TOOL" grub-mkconfig -o "$candidate" &&
+        verifyGrubEntry "$1" "$candidate" &&
+        "$ESCALATION_TOOL" mv -f -- "$candidate" /boot/grub/grub.cfg; then
         return 0
     else
         status=$?
+        printf '%s\n' "Could not verify and install the requested GRUB default." >&2
         if ! "$ESCALATION_TOOL" mv -f -- "$backup" /etc/default/grub; then
-            trap - 0
-            printf '%s\n' "Could not restore GRUB settings. Backup kept at $backup." >&2
+            backup_path=$backup
+            backup=
+            printf '%s\n' "Could not restore GRUB settings. Backup kept at $backup_path." >&2
         fi
         return "$status"
     fi
@@ -72,7 +98,7 @@ updateGrubDefault() (
 
 setDefaultKernel() {
     checkRepo
-    if [ "$hasActiveRepos" = true ]; then
+    if [ -n "$activeRepos" ]; then
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
 
         newDefaultKernel='GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'
@@ -96,11 +122,17 @@ resetDefaultKernel() {
 
 removeRepos() {
     checkRepo
-    if [ "$hasActiveRepos" = true ]; then
+    if [ -n "$activeRepos" ]; then
+        for repo in $activeRepos; do
+            if ! grep -Fqx "[$repo]" /etc/pacman.conf; then
+                printf '%s\n' "Remove the $repo repository manually. The CachyOS helper requires an exact header in /etc/pacman.conf." >&2
+                return 1
+            fi
+        done
         printf "%b\n" "Removing CachyOS repo.."
         runRepoHelper --remove
         checkRepo
-        if [ "$hasActiveRepos" = true ]; then
+        if [ -n "$activeRepos" ]; then
             printf "%b\n" "CachyOS repos are still enabled in /etc/pacman.conf."
             return 1
         fi
@@ -122,7 +154,8 @@ main() {
     case "$CHOICE" in
         2|3|4|5) checkGrub ;;
     esac
-    checkEnv
+    # None of these actions needs an AUR helper.
+    AUR_HELPER_CHECKED=true checkEnv
     case "$CHOICE" in
         1) setupRepos ;;
         2) setDefaultKernel ;;
