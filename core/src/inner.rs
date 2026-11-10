@@ -137,9 +137,13 @@ impl Entry {
                                     .iter()
                                     .all(|matching| data.contains(matching) == *matches)
                             }),
-                        SystemDataType::CommandExists => values
-                            .iter()
-                            .all(|command| which::which(command).is_ok() == *matches),
+                        SystemDataType::CommandExists => {
+                            let path = std::env::var_os("PATH");
+                            // Keep relative PATH entries relative even in deeply nested directories.
+                            values.iter().all(|command| {
+                                which::which_in(command, path.as_ref(), ".").is_ok() == *matches
+                            })
+                        }
                         SystemDataType::FileExists => {
                             values.iter().all(|p| Path::new(p).is_file() == *matches)
                         }
