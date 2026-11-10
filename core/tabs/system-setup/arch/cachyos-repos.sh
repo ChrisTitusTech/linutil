@@ -59,12 +59,13 @@ findGrubEntry() {
         /^}/ { submenu = ""; path = "" }
         /^[[:space:]]*}/ { path = "" }
         /\$menuentry_id_option / {
-            id = $4
+            split(substr($0, index($0, "$menuentry_id_option ") + length("$menuentry_id_option ")), fields, FS)
+            id = fields[2]
             if (id !~ /^[[:alnum:]_-]+$/) next
             if ($1 ~ /^submenu[[:space:]]/) submenu = id
             if ($1 ~ /^[[:space:]]*menuentry[[:space:]]/) {
                 path = ($1 ~ /^[[:space:]]/ && submenu != "" ? submenu ">" : "") id
-                if (id ~ /-recovery-/) path = ""
+                if (id ~ /-recovery-/ || id ~ /^gnulinux-simple-/) path = ""
             }
         }
         path != "" && $1 ~ /^[[:space:]]+linux(efi)?[[:space:]]/ {
@@ -72,12 +73,9 @@ findGrubEntry() {
             image = args[3]
             sub(/^.*[/]/, "", image)
             if (image == "vmlinuz-" kernel) {
-                if (id !~ /^gnulinux-simple-/) {
-                    print path
-                    found = 1
-                    exit
-                }
-                fallback = path
+                print path
+                found = 1
+                exit
             }
             if (kernel == "linux" && image == "vmlinuz-linux-lts" && fallback == "")
                 fallback = path
@@ -151,7 +149,8 @@ resetDefaultKernel() {
     oldDefaultKernel=$(awk '/^GRUB_DEFAULT=/{print; exit}' /etc/default/grub)
 
     case "$oldDefaultKernel" in
-        'GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"' )
+        'GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'|\
+        'GRUB_DEFAULT="'*gnulinux-linux-cachyos-lts-advanced-*'"')
             updateGrubDefault linux ;;
         'GRUB_DEFAULT="gnulinux-'*'"')
             updateGrubDefault linux "$oldDefaultKernel" ;;
@@ -194,6 +193,9 @@ removeRepos() {
             y|Y) ;;
             *) return 1 ;;
         esac
+        if [ "$#" -gt 0 ]; then
+            resetDefaultKernel
+        fi
         printf "%b\n" "Removing CachyOS repo.."
         runRepoHelper --remove
         checkRepo
@@ -202,7 +204,14 @@ removeRepos() {
             return 1
         fi
     else
+        if "$PACKAGER" -Q cachyos-keyring >/dev/null 2>&1; then
+            printf '%s\n' "CachyOS repos are disabled but the CachyOS keyring is still installed. Check whether package migration needs recovery." >&2
+            return 1
+        fi
         printf "%b\n" "No CachyOS repos are enabled"
+        if [ "$#" -gt 0 ]; then
+            resetDefaultKernel
+        fi
     fi
 }
 
@@ -226,8 +235,7 @@ main() {
         2) setDefaultKernel ;;
         3) setupRepos
            setDefaultKernel ;;
-        4) removeRepos
-           resetDefaultKernel;;
+        4) removeRepos --reset-kernel ;;
         5) resetDefaultKernel ;;
         6) removeRepos ;;
         *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;

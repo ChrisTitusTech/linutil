@@ -41,7 +41,7 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-if name != "pacman-conf" and (name != "rm" or not any(".linutil." in arg for arg in args)):
+if name != "pacman-conf" and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
@@ -107,6 +107,8 @@ elif name == "rm":
             shutil.rmtree(target)
         elif target.exists():
             target.unlink()
+elif name == "pacman" and args[0] == "-Q":
+    sys.exit(0 if os.environ.get("KEYRING_INSTALLED") == "1" else 1)
 elif name != "pacman":
     sys.exit("Unexpected mock command: " + name)
 """
@@ -115,7 +117,7 @@ elif name != "pacman":
 def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_command=True, grub_directory=True, skip_repo_edit=False,
              grub_custom_menu=False, included_repos=None, grub_override=False,
-             grub_interrupt=False, confirm="y"):
+             grub_interrupt=False, keyring_installed=False, confirm="y"):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -163,6 +165,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if keyring_installed:
+            environment["KEYRING_INSTALLED"] = "1"
         if grub_interrupt:
             environment["GRUB_INTERRUPT"] = "1"
         if grub_override:
@@ -288,7 +292,7 @@ class CachyosReposTests(unittest.TestCase):
     def test_combined_remove_handles_active_repositories(self):
         result = run_menu(4, pacman="[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "grub-mkconfig", "sed", "grub-mkconfig"])
+        self.assertEqual(result["commands"], ["grub-mkconfig", "sed", "grub-mkconfig", "curl", "tar", "repo-installer", "rm"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
         self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
         self.assertTrue(result["script_exists"])
@@ -329,6 +333,19 @@ class CachyosReposTests(unittest.TestCase):
         self.assertNotEqual(result["status"], 0)
         self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
         self.assertFalse(result["generated"])
+
+    def test_combined_removal_checks_stock_entry_before_package_changes(self):
+        config = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        result = run_menu(4, pacman=config, grub=CACHY_ENTRY + "\n", grub_custom_menu=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertEqual(result["pacman"], config)
+        self.assertEqual(result["commands"], ["grub-mkconfig"])
+
+    def test_removal_reports_possible_incomplete_migration(self):
+        result = run_menu(6, keyring_installed=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("package migration needs recovery", result["output"])
+        self.assertEqual(result["commands"], [])
 
     def test_removal_refuses_nonstandard_blocks_and_requires_confirmation(self):
         standard = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
