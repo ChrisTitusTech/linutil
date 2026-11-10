@@ -3,23 +3,31 @@
 . ../../common-script.sh
 
 checkRepo() {
+    repoName='cachyos(-(v[34]|core-v[34]|extra-v[34]|testing-v3|znver4|core-znver4|extra-znver4))?'
     if ! repoList=$(pacman-conf --repo-list); then
         printf '%s\n' "Could not read the pacman repository configuration." >&2
         return 1
     fi
-    activeRepos=$(printf '%s\n' "$repoList" | grep -E '^cachyos(-[[:alnum:]-]+)?$' || :)
+    activeRepos=$(printf '%s\n' "$repoList" | grep -E "^$repoName\$" || :)
 }
 
 checkGrub() {
-    if ! command_exists grub-mkconfig || [ ! -f /etc/default/grub ] || [ ! -d /boot/grub ]; then
+    if ! command_exists grub-mkconfig; then
         printf "%b\n" "${RED}Changing the default kernel requires GRUB. Other bootloaders, including Limine and systemd-boot, are not supported by this action.${RC}"
         return 1
     fi
-    if [ -L /etc/default/grub ] || [ -L /boot/grub/grub.cfg ]; then
+    checkEscalationTool
+    if ! "$ESCALATION_TOOL" test -r /etc/default/grub ||
+        ! "$ESCALATION_TOOL" test -d /boot/grub ||
+        ! "$ESCALATION_TOOL" test -x /boot/grub; then
+        printf '%s\n' "Changing the default kernel requires GRUB and access to /etc/default/grub and /boot/grub." >&2
+        return 1
+    fi
+    if "$ESCALATION_TOOL" test -L /etc/default/grub || "$ESCALATION_TOOL" test -L /boot/grub/grub.cfg; then
         printf '%s\n' "GRUB settings or config are managed through a symlink. Change the kernel default manually." >&2
         return 1
     fi
-    if ! grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
+    if ! "$ESCALATION_TOOL" grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
         printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
         return 1
     fi
@@ -49,7 +57,7 @@ setupRepos() {
     checkRepo
     if [ -n "$activeRepos" ]; then
         printf "%b\n" "CachyOS repos already configured"
-    elif grep -Eq '^[[:space:]]*#[[:space:]]*\[cachyos(-[[:alnum:]-]+)?\][[:space:]]*(#.*)?$' /etc/pacman.conf; then
+    elif grep -Eq "^[[:space:]]*#[[:space:]]*\[$repoName\][[:space:]]*(#.*)?\$" /etc/pacman.conf; then
         printf "%b\n" "Enable the commented CachyOS repos in /etc/pacman.conf before continuing."
         return 1
     else
@@ -190,14 +198,6 @@ removeRepos() {
             return 1
         fi
         for repo in $activeRepos; do
-            case "$repo" in
-                cachyos|cachyos-v3|cachyos-core-v3|cachyos-extra-v3|cachyos-testing-v3|\
-                cachyos-v4|cachyos-core-v4|cachyos-extra-v4|cachyos-znver4|cachyos-core-znver4|cachyos-extra-znver4)
-                    ;;
-                *)
-                    printf '%s\n' "Remove the unsupported $repo repository manually." >&2
-                    return 1 ;;
-            esac
             if ! awk -v header="[$repo]" '
                 $0 == header {
                     if (++sections > 1 || getline != 1 ||
@@ -239,9 +239,9 @@ removeRepos() {
             return 1
         fi
         printf "%b\n" "No CachyOS repos are enabled"
-        if [ "$#" -gt 0 ]; then
-            updateGrubDefault linux
-        fi
+    fi
+    if [ "$#" -gt 0 ]; then
+        updateGrubDefault linux
     fi
 }
 

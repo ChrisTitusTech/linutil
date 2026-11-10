@@ -167,10 +167,11 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             'ESCALATION_TOOL=escalate; PACKAGER=pacman; '
             'printf checked > "$TEST_ROOT/environment-checked"; }\n'
             'command_exists() { command -v "$1" >/dev/null 2>&1; }\n'
+            'checkEscalationTool() { ESCALATION_TOOL=escalate; }\n'
         )
         binaries = root / "bin"
         binaries.mkdir()
-        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv"):
+        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test"):
             (binaries / command).symlink_to(shutil.which(command))
         commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed"]
         if grub_command:
@@ -265,9 +266,11 @@ class CachyosReposTests(unittest.TestCase):
                 self.assertEqual(kernel["commands"], [])
 
     def test_unrelated_mentions_do_not_count_as_repository_sections(self):
-        result = run_menu(1, pacman="# See [cachyos-v3] docs\nInclude = /etc/cachyos-mirrorlist\n")
-        self.assert_success(result)
-        self.assertIn("repo-installer", result["commands"])
+        for config in ("# See [cachyos-v3] docs\nInclude = /etc/cachyos-mirrorlist\n", "[cachyos-local]\n"):
+            with self.subTest(config=config):
+                result = run_menu(1, pacman=config)
+                self.assert_success(result)
+                self.assertIn("repo-installer", result["commands"])
 
     def test_active_base_and_v3_repos_install_and_regenerate_grub(self):
         for section in ("[cachyos]", "  [cachyos-v3] # enabled", "#[cachyos]\n[cachyos-core-v3]"):
@@ -341,7 +344,7 @@ class CachyosReposTests(unittest.TestCase):
     def test_combined_remove_handles_active_repositories(self):
         result = run_menu(4, pacman="[core]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "sed", "grub-mkconfig", "repo-installer", "rm"])
+        self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "sed", "grub-mkconfig", "repo-installer", "rm", "grub-mkconfig", "sed", "grub-mkconfig"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
         self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
         self.assertTrue(result["script_exists"])
