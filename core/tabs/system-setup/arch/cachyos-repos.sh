@@ -50,6 +50,10 @@ checkGrub() {
         printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
         return 1
     fi
+    if "$ESCALATION_TOOL" grep -Eq '^GRUB_DEFAULT=.*;' /etc/default/grub; then
+        printf '%s\n' "GRUB_DEFAULT shares a line with other commands. Change the default manually." >&2
+        return 1
+    fi
     # shellcheck disable=SC2016
     if ! "$ESCALATION_TOOL" sh -c '
         for config in /etc/default/grub.d/*.cfg; do
@@ -146,7 +150,9 @@ findGrubEntry() {
                     sub(/^.*[/]/, "", args[j])
                     if (args[j] != "initramfs-" image ".img" &&
                         args[j] != "initramfs-" image "-fallback.img" &&
-                        args[j] != "booster-" image ".img") continue
+                        args[j] != "booster-" image ".img" &&
+                        args[j] != "initrd-" image ".img" &&
+                        args[j] != "initrd.img-" image) continue
                     if (image == kernel) {
                         print path
                         found = 1
@@ -198,6 +204,7 @@ updateGrubDefault() (
     if ! "$ESCALATION_TOOL" awk -v entry="$entry" '
         /^### BEGIN .*[/]00_header ###$/ { header = 1 }
         /^### END .*[/]00_header ###$/ { header = 0 }
+        /[;{}][[:space:]]*set[[:space:]]+default[[:space:]]*=/ { wrong = 1 }
         /^[[:space:]]*set[[:space:]]+default[[:space:]]*=/ {
             sub(/^[[:space:]]*set[[:space:]]+default[[:space:]]*=[[:space:]]*/, "")
             sub(/[[:space:]]*$/, "")
@@ -328,6 +335,9 @@ main() {
     read -r CHOICE
     case "$CHOICE" in
         2|3|4|5) checkGrub ;;
+    esac
+    case "$CHOICE" in
+        2|3) "$ESCALATION_TOOL" grub-mkconfig >/dev/null ;;
     esac
     # None of these actions needs an AUR helper.
     AUR_HELPER_CHECKED=true checkEnv

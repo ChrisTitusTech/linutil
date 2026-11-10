@@ -40,6 +40,8 @@ args = sys.argv[1:]
 root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
+if name == "grub-mkconfig" and not args:
+    sys.exit(42 if os.environ.get("GRUB_PREFLIGHT_FAILURE") == "1" else 0)
 
 if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] in ("-Q", "-Qq")) and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
@@ -118,7 +120,7 @@ elif name == "grub-mkconfig":
         if os.environ.get("GRUB_MISSING_INITRAMFS") == "1":
             generated = generated.replace("initrd /initramfs-linux.img", "initrd /intel-ucode.img")
         if os.environ.get("GRUB_LATE_OVERRIDE") == "1":
-            generated += 'set default="0"\n'
+            generated += 'set timeout=5; set default=0\n'
         target.write_text(generated)
 elif name == "rm":
     for argument in args:
@@ -149,7 +151,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
              grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False, grub_generator=True,
-             missing_migration_packages=False, grub_device_id=False, grub_unmanaged=False, lib32_installed=False):
+             missing_migration_packages=False, grub_device_id=False, grub_unmanaged=False, lib32_installed=False, grub_preflight_failure=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -222,6 +224,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         environment["ROOT_FS"] = root_fs
         if missing_migration_packages:
             environment["MISSING_MIGRATION_PACKAGES"] = "1"
+        if grub_preflight_failure:
+            environment["GRUB_PREFLIGHT_FAILURE"] = "1"
         if lib32_installed:
             environment["LIB32_INSTALLED"] = "1"
         if grub_device_id:
@@ -335,7 +339,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub_preflight_failure": True}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
