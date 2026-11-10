@@ -40,13 +40,14 @@ args = sys.argv[1:]
 root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
-if name == "grub-mkconfig" and args and ".preflight." in args[-1]:
-    sys.exit(42 if os.environ.get("GRUB_PREFLIGHT_FAILURE") == "1" else 0)
+preflight = name == "grub-mkconfig" and args and ".preflight." in args[-1]
+if preflight and os.environ.get("GRUB_PREFLIGHT_FAILURE") == "1":
+    sys.exit(42)
 
-if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] in ("-Q", "-Qq")) and (name != "rm" or not any(".linutil." in arg for arg in args)):
+if not preflight and name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] in ("-Q", "-Qq")) and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
-if name == os.environ.get("FAIL_COMMAND"):
+if not preflight and name == os.environ.get("FAIL_COMMAND"):
     sys.exit(42)
 
 if name == "ld-linux-x86-64.so.2":
@@ -121,6 +122,8 @@ elif name == "grub-mkconfig":
             generated = generated.replace("initrd /initramfs-linux.img", "initrd /intel-ucode.img")
         if os.environ.get("GRUB_LATE_OVERRIDE") == "1":
             generated += 'set timeout=5; set default=0\n'
+        if os.environ.get("GRUB_LATE_OVERRIDE") == "bare":
+            generated += 'default=0\n'
         target.write_text(generated)
 elif name == "rm":
     for argument in args:
@@ -237,7 +240,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         if grub_missing_initramfs:
             environment["GRUB_MISSING_INITRAMFS"] = "1"
         if grub_late_override:
-            environment["GRUB_LATE_OVERRIDE"] = "1"
+            environment["GRUB_LATE_OVERRIDE"] = "bare" if grub_late_override == "bare" else "1"
         if keyring_installed:
             environment["KEYRING_INSTALLED"] = "1"
         if grub_interrupt:
@@ -339,7 +342,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub": 'GRUB_DEFAULT=0 GRUB_CMDLINE_LINUX="cryptdevice=foo"\n'}, {"grub_preflight_failure": True}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub": 'GRUB_DEFAULT=0 GRUB_CMDLINE_LINUX="cryptdevice=foo"\n'}, {"grub_preflight_failure": True}, {"grub_late_override": "bare"}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
@@ -416,7 +419,8 @@ class CachyosReposTests(unittest.TestCase):
             with self.subTest(choice=choice):
                 result = run_menu(choice, pacman="[cachyos]\n", grub=initial, grub_custom_menu=True)
                 self.assertNotEqual(result["status"], 0)
-                self.assertIn("Could not find a GRUB entry", result["output"])
+                diagnostic = "ambiguous boot defaults" if choice == 2 else "Could not find a GRUB entry"
+                self.assertIn(diagnostic, result["output"])
                 self.assertEqual(result["grub"], initial)
                 self.assertFalse(result["generated"])
 
@@ -426,7 +430,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["grub"], STOCK_ENTRY.replace("-test", "-/dev/sda2") + "\n")
 
     def test_grub_override_preserves_original_default(self):
-        for override in ({"grub_override": True}, {"grub_late_override": True}):
+        for override in ({"grub_override": True}, {"grub_late_override": True}, {"grub_late_override": "bare"}):
             with self.subTest(override=override):
                 result = run_menu(5, grub=CACHY_ENTRY + "\n", **override)
                 self.assertNotEqual(result["status"], 0)

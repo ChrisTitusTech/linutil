@@ -84,10 +84,36 @@ checkGrub() {
     esac
 }
 
+verifyGrubDefaults() {
+    # The standard header may honor a one-time boot entry from grubenv.
+    # shellcheck disable=SC2016
+    "$ESCALATION_TOOL" awk -v entry="${2:-}" '
+        /^### BEGIN .*[/]00_header ###$/ { header = 1 }
+        /^### END .*[/]00_header ###$/ { header = 0 }
+        /[;{}][[:space:]]*(set[[:space:]]+)?default[[:space:]]*=/ { wrong = 1 }
+        /^[[:space:]]*(set[[:space:]]+)?default[[:space:]]*=/ {
+            if (!header) {
+                wrong = 1
+                next
+            }
+            sub(/^[[:space:]]*(set[[:space:]]+)?default[[:space:]]*=[[:space:]]*/, "")
+            sub(/[[:space:]]*$/, "")
+            if ($0 == "\"${next_entry}\"") next
+            if (entry != "" && $0 != "\"" entry "\"") wrong = 1
+            found++
+        }
+        END { exit (wrong || found != 1) }
+    ' "$1"
+}
+
 preflightGrub() (
     preflightConfig=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.preflight.XXXXXX)
     trap '"$ESCALATION_TOOL" rm -f -- "$preflightConfig" "$preflightConfig.new"' 0
     "$ESCALATION_TOOL" grub-mkconfig -o "$preflightConfig"
+    if ! verifyGrubDefaults "$preflightConfig"; then
+        printf '%s\n' "The generated GRUB configuration has ambiguous boot defaults." >&2
+        return 1
+    fi
 )
 
 runRepoHelper() (
@@ -213,22 +239,8 @@ updateGrubDefault() (
     restore=true
     "$ESCALATION_TOOL" sed -i "s|^GRUB_DEFAULT=.*|GRUB_DEFAULT=\"$entry\"|" /etc/default/grub
     "$ESCALATION_TOOL" grub-mkconfig -o "$candidate"
-    # The standard header may honor a one-time boot entry from grubenv.
-    # Reject any other assignment that could override the requested default.
-    # shellcheck disable=SC2016
-    if ! "$ESCALATION_TOOL" awk -v entry="$entry" '
-        /^### BEGIN .*[/]00_header ###$/ { header = 1 }
-        /^### END .*[/]00_header ###$/ { header = 0 }
-        /[;{}][[:space:]]*set[[:space:]]+default[[:space:]]*=/ { wrong = 1 }
-        /^[[:space:]]*set[[:space:]]+default[[:space:]]*=/ {
-            sub(/^[[:space:]]*set[[:space:]]+default[[:space:]]*=[[:space:]]*/, "")
-            sub(/[[:space:]]*$/, "")
-            if (header && $0 == "\"${next_entry}\"") next
-            if ($0 != "\"" entry "\"") wrong = 1
-            else found = 1
-        }
-        END { exit (wrong || !found) }
-    ' "$candidate" || [ "$(findGrubEntry "$1" "$candidate")" != "$entry" ]; then
+    if ! verifyGrubDefaults "$candidate" "$entry" ||
+        [ "$(findGrubEntry "$1" "$candidate")" != "$entry" ]; then
         printf '%s\n' "Could not verify the requested GRUB default." >&2
         return 1
     fi
