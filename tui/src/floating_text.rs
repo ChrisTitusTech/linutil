@@ -91,7 +91,9 @@ impl<'a> FloatingText<'a> {
         hl_conf.configure(&matched_tokens);
 
         let mut hl = hl::Highlighter::new();
-        let events = hl.highlight(&hl_conf, s.as_bytes(), None, |_| None).ok()?;
+        let events = hl
+            .highlight(&hl_conf, s.as_bytes(), None, None, |_| None)
+            .ok()?;
 
         for event in events {
             match event.ok()? {
