@@ -15,10 +15,21 @@ checkGrub() {
         printf "%b\n" "${RED}Changing the default kernel requires GRUB. Other bootloaders, including Limine and systemd-boot, are not supported by this action.${RC}"
         return 1
     fi
+    if [ -L /etc/default/grub ] || [ -L /boot/grub/grub.cfg ]; then
+        printf '%s\n' "GRUB settings or config are managed through a symlink. Change the kernel default manually." >&2
+        return 1
+    fi
     if ! grep -q '^GRUB_DEFAULT=' /etc/default/grub; then
         printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
         return 1
     fi
+    printf '%s\n' "Continue only if this machine boots from /boot/grub/grub.cfg. Choose option 6 for removal without changing GRUB."
+    printf '%s' "Does this machine boot from that GRUB config? [y/N] "
+    read -r grubConfirmed
+    case "$grubConfirmed" in
+        y|Y) ;;
+        *) return 1 ;;
+    esac
 }
 
 runRepoHelper() (
@@ -42,6 +53,11 @@ setupRepos() {
         printf "%b\n" "Enable the commented CachyOS repos in /etc/pacman.conf before continuing."
         return 1
     else
+        if ! LC_ALL=C /lib/ld-linux-x86-64.so.2 --help 2>/dev/null |
+            grep -Fq 'x86-64-v3 (supported, searched)'; then
+            printf '%s\n' "Installing CachyOS repos requires an x86-64-v3 compatible CPU and glibc loader." >&2
+            return 1
+        fi
         printf "%b\n" "Installing CachyOS repo.."
         runRepoHelper
         checkRepo
@@ -81,9 +97,10 @@ findGrubEntry() {
             for (i = 1; i <= NF; i++) {
                 count = split($i, args, /[[:space:]]+/)
                 for (j = 1; j <= count; j++) {
-                    if (args[j] !~ /[/]initramfs-/) continue
                     sub(/^.*[/]/, "", args[j])
-                    if (args[j] != "initramfs-" image ".img") continue
+                    if (args[j] != "initramfs-" image ".img" &&
+                        args[j] != "initramfs-" image "-fallback.img" &&
+                        args[j] != "booster-" image ".img") continue
                     if (image == kernel) {
                         print path
                         found = 1

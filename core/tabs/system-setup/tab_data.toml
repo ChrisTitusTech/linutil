@@ -48,6 +48,7 @@ name = "Install CachyOS Repository and Kernel"
 description = "To deliver a performance-optimized distribution, CachyOS recompiles Arch Linux packages specifically for the x86-64-v3, x86-64-v4, and Zen4+ architectures."
 script = "arch/cachyos-repos.sh"
 task_list = "I"
+multi_select = false
 
 [[data.entries]]
 name = "Install Chaotic-AUR Repository"

@@ -41,13 +41,16 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-if name != "pacman-conf" and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
+if name not in ("pacman-conf", "ld-linux-x86-64.so.2") and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
     sys.exit(42)
 
-if name == "pacman-conf":
+if name == "ld-linux-x86-64.so.2":
+    if os.environ.get("UNSUPPORTED_CPU") != "1":
+        print("  x86-64-v3 (supported, searched)")
+elif name == "pacman-conf":
     for config in (root / "etc/pacman.conf", root / "etc/included-repos.conf"):
         if config.exists():
             for line in config.read_text().splitlines():
@@ -123,7 +126,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_command=True, grub_directory=True, skip_repo_edit=False,
              grub_custom_menu=False, included_repos=None, grub_override=False,
              grub_interrupt=False, keyring_installed=False, confirm="y",
-             grub_missing_initramfs=False, grub_late_override=False):
+             grub_missing_initramfs=False, grub_late_override=False,
+             grub_confirm="y", grub_symlink=False, unsupported_cpu=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -135,12 +139,17 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             (root / "etc/included-repos.conf").write_text(included_repos)
         grub_path = root / "etc/default/grub"
         if grub is not None:
-            grub_path.write_text(grub)
+            if grub_symlink:
+                managed = root / "etc/default/grub-managed"
+                managed.write_text(grub)
+                grub_path.symlink_to(managed)
+            else:
+                grub_path.write_text(grub)
         if grub_directory:
             (root / "boot/grub").mkdir(parents=True)
         source = SCRIPT.read_text()
         assert source.startswith("#!/bin/sh -e\n")
-        for path in ("/etc/pacman.conf", "/etc/default/grub", "/boot/grub"):
+        for path in ("/etc/pacman.conf", "/etc/default/grub", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
             source = source.replace(path, str(root / path.lstrip("/")))
         script = directory / SCRIPT.name
         script.write_text(source)
@@ -160,6 +169,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed"]
         if grub_command:
             commands.append("grub-mkconfig")
+        loader = root / "lib/ld-linux-x86-64.so.2"
+        loader.parent.mkdir()
+        loader.write_text(f"#!{sys.executable}\n" + MOCK)
+        loader.chmod(0o755)
         for command in commands:
             mock = binaries / command
             mock.write_text(f"#!{sys.executable}\n" + MOCK)
@@ -171,6 +184,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if unsupported_cpu:
+            environment["UNSUPPORTED_CPU"] = "1"
         if grub_missing_initramfs:
             environment["GRUB_MISSING_INITRAMFS"] = "1"
         if grub_late_override:
@@ -187,9 +202,13 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             environment["SKIP_REPO_EDIT"] = "1"
         if fail:
             environment["FAIL_COMMAND"] = fail
+        answers = [str(choice)]
+        if choice in (2, 3, 4, 5):
+            answers.append(grub_confirm)
+        answers.append(confirm)
         completed = subprocess.run(
             [str(script)], cwd=directory, env=environment,
-            input=f"{choice}\n{confirm}\n", text=True, capture_output=True, timeout=10, start_new_session=True,
+            input="\n".join(answers) + "\n", text=True, capture_output=True, timeout=10, start_new_session=True,
         )
         log = root / "commands.jsonl"
         events = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
@@ -268,6 +287,20 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertIn("requires GRUB", result["output"])
                     self.assertEqual(result["commands"], [])
                     self.assertFalse(result["environment_checked"])
+
+    def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}):
+            with self.subTest(settings=settings):
+                result = run_menu(3, **settings)
+                self.assertNotEqual(result["status"], 0)
+                self.assertEqual(result["commands"], [])
+                self.assertFalse(result["environment_checked"])
+
+    def test_unsupported_cpu_rejects_install_before_package_changes(self):
+        result = run_menu(1, unsupported_cpu=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("x86-64-v3 compatible CPU", result["output"])
+        self.assertEqual(result["commands"], [])
 
     def test_missing_grub_default_is_rejected_before_combined_install(self):
         result = run_menu(3, grub="#GRUB_DEFAULT=0\n")
