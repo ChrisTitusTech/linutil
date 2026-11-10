@@ -342,7 +342,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub": 'GRUB_DEFAULT=0 GRUB_CMDLINE_LINUX="cryptdevice=foo"\n'}, {"grub_preflight_failure": True}, {"grub_late_override": "bare"}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub": 'GRUB_DEFAULT=0 GRUB_CMDLINE_LINUX="cryptdevice=foo"\n'}, {"grub": "GRUB_DEFAULT=0\nif true; then\n    GRUB_DEFAULT=0\nfi\n"}, {"grub_preflight_failure": True}, {"grub_late_override": "bare"}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)

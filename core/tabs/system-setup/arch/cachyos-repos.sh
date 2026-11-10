@@ -52,7 +52,8 @@ checkGrub() {
     fi
     # shellcheck disable=SC2016
     if ! "$ESCALATION_TOOL" awk -v quote="'" '
-        /^GRUB_DEFAULT=/ {
+        /[;][[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=/ { invalid = 1 }
+        /^[[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=/ {
             count++
             if ($0 !~ /^GRUB_DEFAULT=("[^"]*"|[[:alnum:]_.\/>-]+)[[:space:]]*(#.*)?$/ &&
                 $0 !~ ("^GRUB_DEFAULT=" quote "[^" quote "]*" quote "[[:space:]]*(#.*)?$"))
@@ -109,6 +110,9 @@ verifyGrubDefaults() {
 preflightGrub() (
     preflightConfig=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.preflight.XXXXXX)
     trap '"$ESCALATION_TOOL" rm -f -- "$preflightConfig" "$preflightConfig.new"' 0
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     "$ESCALATION_TOOL" grub-mkconfig -o "$preflightConfig"
     if ! verifyGrubDefaults "$preflightConfig"; then
         printf '%s\n' "The generated GRUB configuration has ambiguous boot defaults." >&2
@@ -119,6 +123,9 @@ preflightGrub() (
 runRepoHelper() (
     workdir=$(mktemp -d)
     trap 'rm -rf -- "$workdir" 2>/dev/null || "$ESCALATION_TOOL" rm -rf -- "$workdir"' 0
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     cd "$workdir"
     curl -f https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
     tar xvf cachyos-repo.tar.xz
