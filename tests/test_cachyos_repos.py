@@ -40,7 +40,7 @@ args = sys.argv[1:]
 root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
-if name == "grub-mkconfig" and not args:
+if name == "grub-mkconfig" and args and ".preflight." in args[-1]:
     sys.exit(42 if os.environ.get("GRUB_PREFLIGHT_FAILURE") == "1" else 0)
 
 if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] in ("-Q", "-Qq")) and (name != "rm" or not any(".linutil." in arg for arg in args)):
@@ -339,7 +339,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub_preflight_failure": True}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}, {"grub": "GRUB_DEFAULT=0; GRUB_DISABLE_OS_PROBER=false\n"}, {"grub": 'GRUB_DEFAULT=0 GRUB_CMDLINE_LINUX="cryptdevice=foo"\n'}, {"grub_preflight_failure": True}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)

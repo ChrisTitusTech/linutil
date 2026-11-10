@@ -50,8 +50,17 @@ checkGrub() {
         printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
         return 1
     fi
-    if "$ESCALATION_TOOL" grep -Eq '^GRUB_DEFAULT=.*;' /etc/default/grub; then
-        printf '%s\n' "GRUB_DEFAULT shares a line with other commands. Change the default manually." >&2
+    # shellcheck disable=SC2016
+    if ! "$ESCALATION_TOOL" awk -v quote="'" '
+        /^GRUB_DEFAULT=/ {
+            count++
+            if ($0 !~ /^GRUB_DEFAULT=("[^"]*"|[[:alnum:]_.\/>-]+)[[:space:]]*(#.*)?$/ &&
+                $0 !~ ("^GRUB_DEFAULT=" quote "[^" quote "]*" quote "[[:space:]]*(#.*)?$"))
+                invalid = 1
+        }
+        END { exit (count != 1 || invalid) }
+    ' /etc/default/grub; then
+        printf '%s\n' "GRUB_DEFAULT must be a single standalone assignment. Change the default manually." >&2
         return 1
     fi
     # shellcheck disable=SC2016
@@ -74,6 +83,12 @@ checkGrub() {
         *) return 1 ;;
     esac
 }
+
+preflightGrub() (
+    preflightConfig=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.preflight.XXXXXX)
+    trap '"$ESCALATION_TOOL" rm -f -- "$preflightConfig" "$preflightConfig.new"' 0
+    "$ESCALATION_TOOL" grub-mkconfig -o "$preflightConfig"
+)
 
 runRepoHelper() (
     workdir=$(mktemp -d)
@@ -226,7 +241,7 @@ updateGrubDefault() (
 setDefaultKernel() {
     checkRepo
     if [ -n "$activeRepos" ]; then
-        "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
+        "$ESCALATION_TOOL" pacman -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
 
         updateGrubDefault linux-cachyos-lts
     else
@@ -257,7 +272,7 @@ removeRepos() {
         fi
         checkStockRepo core
         checkStockRepo extra
-        installedPackages=$("$PACKAGER" -Qq)
+        installedPackages=$(pacman -Qq)
         if printf '%s\n' "$installedPackages" | grep -q '^lib32-'; then
             checkStockRepo multilib
         fi
@@ -289,7 +304,7 @@ removeRepos() {
                 return 1
             fi
         done
-        if ! "$PACKAGER" -Q cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist cachyos-v4-mirrorlist >/dev/null 2>&1; then
+        if ! pacman -Q cachyos-keyring cachyos-mirrorlist cachyos-v3-mirrorlist cachyos-v4-mirrorlist >/dev/null 2>&1; then
             printf '%s\n' "The CachyOS keyring and mirrorlist packages are required by the removal helper. Complete this migration manually." >&2
             return 1
         fi
@@ -312,7 +327,7 @@ removeRepos() {
             return 1
         fi
     else
-        if "$PACKAGER" -Q cachyos-keyring >/dev/null 2>&1; then
+        if pacman -Q cachyos-keyring >/dev/null 2>&1; then
             printf '%s\n' "CachyOS repos are disabled but the CachyOS keyring is still installed. Check whether package migration needs recovery." >&2
             return 1
         fi
@@ -333,11 +348,15 @@ main() {
     printf "%b\n" "6. ${YELLOW}Remove CachyOS repos and migrate packages without selecting a kernel${RC}"
     printf "%b" "Enter your choice [1-6]: "
     read -r CHOICE
+    if ! command_exists pacman || ! command_exists pacman-conf; then
+        printf '%s\n' "CachyOS setup requires pacman and pacman-conf." >&2
+        return 1
+    fi
     case "$CHOICE" in
         2|3|4|5) checkGrub ;;
     esac
     case "$CHOICE" in
-        2|3) "$ESCALATION_TOOL" grub-mkconfig >/dev/null ;;
+        2|3) preflightGrub ;;
     esac
     # None of these actions needs an AUR helper.
     AUR_HELPER_CHECKED=true checkEnv
