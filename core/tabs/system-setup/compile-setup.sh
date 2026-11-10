@@ -3,11 +3,6 @@
 
 . ../common-script.sh
 
-apt_has_candidate() {
-    policy=$(LC_ALL=C apt-cache policy "$1") || return
-    printf '%s\n' "$policy" | awk '$1 == "Candidate:" && NF > 1 && $2 != "(none)" { found = 1 } END { exit !found }'
-}
-
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
@@ -26,15 +21,16 @@ installDepend() {
         apt-get|nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
-            if ! apt_has_candidate tldr; then
-                if ! apt_has_candidate tealdeer; then
-                    printf '%b\n' "${RED}Neither tldr nor tealdeer has an install candidate in the configured repositories.${RC}" >&2
+            "$ESCALATION_TOOL" dpkg --add-architecture i386
+            "$ESCALATION_TOOL" "$PACKAGER" update
+            # Simulate installation so APT can account for package providers.
+            if ! apt-get -s install tldr >/dev/null 2>&1; then
+                if ! apt-get -s install tealdeer >/dev/null 2>&1; then
+                    printf '%b\n' "${RED}APT could not resolve an installation of tldr or tealdeer from the configured repositories.${RC}" >&2
                     return 1
                 fi
                 DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
             fi
-            "$ESCALATION_TOOL" dpkg --add-architecture i386
-            "$ESCALATION_TOOL" "$PACKAGER" update
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
             ;;
         dnf)
