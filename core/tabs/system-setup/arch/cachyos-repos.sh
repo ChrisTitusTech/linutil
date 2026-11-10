@@ -31,7 +31,19 @@ checkGrub() {
         printf "%b\n" "${RED}No GRUB_DEFAULT setting found in /etc/default/grub.${RC}"
         return 1
     fi
-    printf '%s\n' "Continue only if this machine boots from /boot/grub/grub.cfg. Choose option 6 for removal without changing GRUB."
+    # shellcheck disable=SC2016
+    if ! "$ESCALATION_TOOL" sh -c '
+        for config in /etc/default/grub.d/*.cfg; do
+            [ -f "$config" ] || continue
+            if grep -Eq "^[[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=" "$config"; then
+                exit 1
+            fi
+        done
+    '; then
+        printf '%s\n' "A GRUB drop-in overrides the default. Change the kernel default manually." >&2
+        return 1
+    fi
+    printf '%s\n' "Continue only if this machine boots from /boot/grub/grub.cfg. Choose option 6 to skip kernel selection during removal."
     printf '%s' "Does this machine boot from that GRUB config? [y/N] "
     read -r grubConfirmed
     case "$grubConfirmed" in
@@ -198,6 +210,13 @@ removeRepos() {
             return 1
         fi
         for repo in $activeRepos; do
+            case "$repo" in
+                cachyos-extra-*)
+                    if ! printf '%s\n' "$repoList" | grep -Fxq extra; then
+                        printf '%s\n' "Enable the stock [extra] repository before migrating CachyOS Extra packages." >&2
+                        return 1
+                    fi ;;
+            esac
             if ! awk -v header="[$repo]" '
                 $0 == header {
                     if (++sections > 1 || getline != 1 ||
@@ -220,6 +239,10 @@ removeRepos() {
             fi
         done
         printf '%s\n' "Removal can downgrade system packages, replace pacman, and remove the CachyOS keyring and mirrorlists."
+        printf '%s\n' "Package hooks may regenerate bootloader files."
+        if [ "$#" -eq 0 ]; then
+            printf '%s\n' "This option leaves kernel selection to you. Select a maintained replacement if your machine boots a CachyOS kernel."
+        fi
         printf '%s' "Continue with CachyOS removal? [y/N] "
         read -r confirm
         case "$confirm" in
@@ -252,7 +275,7 @@ main() {
     printf "%b\n" "3. ${YELLOW}Install CachyOS repos and and set CachyOS-LTS as default kernel${RC}"
     printf "%b\n" "4. ${YELLOW}Remove CachyOS Repos and set default kernel to stock${RC}"
     printf "%b\n" "5. ${YELLOW}Reset default kernel to stock${RC}"
-    printf "%b\n" "6. ${YELLOW}Remove CachyOS repos and migrate packages without changing GRUB${RC}"
+    printf "%b\n" "6. ${YELLOW}Remove CachyOS repos and migrate packages without selecting a kernel${RC}"
     printf "%b" "Enter your choice [1-6]: "
     read -r CHOICE
     case "$CHOICE" in

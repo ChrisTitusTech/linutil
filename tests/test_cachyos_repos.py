@@ -133,7 +133,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_custom_menu=False, included_repos=None, grub_override=False,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
-             grub_confirm="y", grub_symlink=False, unsupported_cpu=False):
+             grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -144,6 +144,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         if included_repos:
             (root / "etc/included-repos.conf").write_text(included_repos)
         grub_path = root / "etc/default/grub"
+        if grub_drop_in:
+            drop_in = root / "etc/default/grub.d/custom.cfg"
+            drop_in.parent.mkdir()
+            drop_in.write_text(grub_drop_in)
         if grub is not None:
             if grub_symlink:
                 managed = root / "etc/default/grub-managed"
@@ -171,7 +175,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         )
         binaries = root / "bin"
         binaries.mkdir()
-        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test"):
+        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test", "sh"):
             (binaries / command).symlink_to(shutil.which(command))
         commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed"]
         if grub_command:
@@ -298,7 +302,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
@@ -417,6 +421,10 @@ class CachyosReposTests(unittest.TestCase):
         result = run_menu(6, pacman=standard.replace("[core]\n\n", ""))
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Enable the stock [core] repository", result["output"])
+        self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard.replace("[cachyos]", "[cachyos-extra-v3]"))
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("Enable the stock [extra] repository", result["output"])
         self.assertEqual(result["commands"], [])
         result = run_menu(6, pacman=standard, confirm="n")
         self.assertNotEqual(result["status"], 0)
