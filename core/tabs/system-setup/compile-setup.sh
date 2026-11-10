@@ -3,28 +3,9 @@
 
 . ../common-script.sh
 
-apt_can_install() {
-    if "$ESCALATION_TOOL" apt-get -s install "$@" >/dev/null 2>&1; then
-        return 0
-    elif [ "$?" -eq 100 ]; then
-        return 1
-    fi
-
-    # APT reports errors with status 100. A restricted escalation policy may
-    # deny the simulation even when it permits the actual install command.
-    if [ -n "${APT_CONFIG:-}" ]; then
-        printf '%b\n' "${RED}Cannot verify APT package availability with APT_CONFIG set and the elevated simulation unavailable.${RC}" >&2
-        exit 1
-    fi
-    apt_status=0
-    apt_output=$(LC_ALL=C apt-get -s install "$@" 2>&1) || apt_status=$?
-    case "$apt_output" in
-        *"Permission denied"*)
-            printf '%b\n' "${RED}Cannot verify APT package availability because the unprivileged simulation could not read all required files.${RC}" >&2
-            exit 1
-            ;;
-    esac
-    return "$apt_status"
+apt_has_candidate() {
+    policy=$(LC_ALL=C apt-cache policy "$1") || return
+    printf '%s\n' "$policy" | awk '$1 == "Candidate:" && NF > 1 && $2 != "(none)" { found = 1 } END { exit !found }'
 }
 
 installDepend() {
@@ -44,22 +25,25 @@ installDepend() {
             ;;
         apt-get|nala)
             COMPILEDEPS='build-essential'
-            TEALDEER_DEPS=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
+            TLDR_PACKAGE=tldr
             "$ESCALATION_TOOL" "$PACKAGER" update
-            if [ -n "${APT_CONFIG:-}" ]; then
-                # Check that we can use the install's configuration before changing architectures.
-                apt_can_install $DEPENDENCIES $COMPILEDEPS || apt_can_install $TEALDEER_DEPS $COMPILEDEPS || :
-            fi
             "$ESCALATION_TOOL" dpkg --add-architecture i386
             "$ESCALATION_TOOL" "$PACKAGER" update
-            if ! apt_can_install $DEPENDENCIES $COMPILEDEPS; then
-                if ! apt_can_install $TEALDEER_DEPS $COMPILEDEPS; then
-                    printf '%b\n' "${RED}APT could not resolve the prerequisites with either tldr or tealdeer.${RC}" >&2
+            if ! apt_has_candidate tldr; then
+                if command_exists tldr; then
+                    TLDR_PACKAGE=''
+                elif apt_has_candidate tealdeer; then
+                    TLDR_PACKAGE=tealdeer
+                else
+                    printf '%b\n' "${RED}Neither tldr nor tealdeer has an install candidate in the configured repositories.${RC}" >&2
                     return 1
                 fi
-                DEPENDENCIES=$TEALDEER_DEPS
+                DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed "s/ tldr / $TLDR_PACKAGE /")
             fi
             "$ESCALATION_TOOL" "$PACKAGER" install -y $DEPENDENCIES $COMPILEDEPS
+            if [ "$TLDR_PACKAGE" = tealdeer ]; then
+                printf '%s\n' "Run 'tldr --update' as your regular user to download tealdeer pages."
+            fi
             ;;
         dnf)
             "$ESCALATION_TOOL" "$PACKAGER" update -y
