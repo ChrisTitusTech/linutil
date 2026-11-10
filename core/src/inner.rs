@@ -321,6 +321,58 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_relative_path_command_precondition() {
+        const CHILD_ENV: &str = "LINUTIL_TEST_RELATIVE_PATH_CHILD";
+        if std::env::var_os(CHILD_ENV).is_some() {
+            let tabs = get_tabs(true);
+            let security = tabs.iter().find(|tab| tab.name == "Security").unwrap();
+            let root = security.tree.root();
+            assert!(root
+                .children()
+                .any(|node| { node.value().name == "FirewallD Firewall Baselines (CTT)" }));
+            assert!(!root
+                .children()
+                .any(|node| { node.value().name == "UFW Firewall Baselines (CTT)" }));
+            return;
+        }
+
+        let temp_dir = crate::tests::create_temp_dir();
+        let bin = temp_dir.path().join("bin");
+        std::fs::create_dir(&bin).unwrap();
+        let executable = bin.join("firewall-cmd");
+        std::fs::write(&executable, "#!/bin/sh\nexit 0\n").unwrap();
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+        let mut cwd = temp_dir.path().to_path_buf();
+        let mut relative_path = String::new();
+        // Keep the cwd usable, but make the absolute executable path exceed Linux's PATH_MAX.
+        while cwd.as_os_str().len() < 4079 {
+            let remaining = 4080 - cwd.as_os_str().len() - 1;
+            cwd.push("d".repeat(remaining.min(200)));
+            relative_path.push_str("../");
+        }
+        relative_path.push_str("bin");
+        std::fs::create_dir_all(&cwd).unwrap();
+
+        let output = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "inner::tests::test_relative_path_command_precondition",
+            ])
+            .current_dir(cwd)
+            .env(CHILD_ENV, "1")
+            .env("PATH", relative_path)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    #[test]
     fn test_is_executable() {
         let temp_dir = crate::tests::create_temp_dir();
         let file_path = temp_dir.path().join("test_script.sh");
