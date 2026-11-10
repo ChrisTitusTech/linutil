@@ -41,7 +41,7 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] == "-Q") and (name != "rm" or not any(".linutil." in arg for arg in args)):
+if name not in ("pacman-conf", "ld-linux-x86-64.so.2", "findmnt") and not (name == "pacman" and args[0] in ("-Q", "-Qq")) and (name != "rm" or not any(".linutil." in arg for arg in args)):
     with (root / "commands.jsonl").open("a") as log:
         log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
@@ -131,6 +131,9 @@ elif name == "rm":
             shutil.rmtree(target)
         elif target.exists():
             target.unlink()
+elif name == "pacman" and args[0] == "-Qq":
+    if os.environ.get("LIB32_INSTALLED") == "1":
+        print("lib32-mesa")
 elif name == "pacman" and args[0] == "-Q":
     if len(args) > 2:
         sys.exit(1 if os.environ.get("MISSING_MIGRATION_PACKAGES") == "1" else 0)
@@ -146,7 +149,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
              grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False, grub_generator=True,
-             missing_migration_packages=False, grub_device_id=False):
+             missing_migration_packages=False, grub_device_id=False, grub_unmanaged=False, lib32_installed=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -170,6 +173,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
                 grub_path.write_text(grub)
         if grub_directory:
             (root / "boot/grub").mkdir(parents=True)
+            if grub_unmanaged:
+                (root / "boot/grub/grub.cfg").write_text("# hand-maintained config\n")
             if grub_custom_config:
                 (root / "boot/grub/custom.cfg").write_text('set default="0"\n')
         if grub_generator:
@@ -217,6 +222,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         environment["ROOT_FS"] = root_fs
         if missing_migration_packages:
             environment["MISSING_MIGRATION_PACKAGES"] = "1"
+        if lib32_installed:
+            environment["LIB32_INSTALLED"] = "1"
         if grub_device_id:
             environment["GRUB_DEVICE_ID"] = "1"
         if stock_no_servers:
@@ -328,12 +335,18 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertFalse(result["environment_checked"])
 
     def test_grub_preflight_preserves_managed_settings_and_requires_confirmation(self):
-        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}):
+        for settings in ({"grub_confirm": "n"}, {"grub_symlink": True}, {"grub_drop_in": "export GRUB_DEFAULT=saved\n"}, {"grub_custom_config": True}, {"root_fs": "zfs"}, {"grub_generator": False}, {"grub_unmanaged": True}):
             with self.subTest(settings=settings):
                 result = run_menu(3, **settings)
                 self.assertNotEqual(result["status"], 0)
                 self.assertEqual(result["commands"], [])
                 self.assertFalse(result["environment_checked"])
+
+    def test_install_requires_confirmation_before_upgrading_packages(self):
+        result = run_menu(1, confirm="n")
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("replaces pacman, and upgrades system packages", result["output"])
+        self.assertEqual(result["commands"], [])
 
     def test_unsupported_cpu_rejects_install_before_package_changes(self):
         result = run_menu(1, unsupported_cpu=True)
@@ -372,7 +385,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
 
     def test_combined_remove_handles_active_repositories(self):
-        result = run_menu(4, pacman="[core]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
+        result = run_menu(4, pacman="[core]\n\n[extra]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
         self.assertEqual(result["commands"], ["curl", "tar", "grub-mkconfig", "sed", "grub-mkconfig", "repo-installer", "rm", "grub-mkconfig", "sed", "grub-mkconfig"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
@@ -381,7 +394,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertTrue(result["notes_exist"])
 
     def test_repo_only_removal_works_without_grub_and_skips_comments(self):
-        for config in ("[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n", "# [cachyos]\n"):
+        for config in ("[core]\n\n[extra]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n", "# [cachyos]\n"):
             with self.subTest(config=config):
                 result = run_menu(6, pacman=config, grub=None, grub_command=False, grub_directory=False)
                 self.assert_success(result)
@@ -389,7 +402,7 @@ class CachyosReposTests(unittest.TestCase):
                 self.assertEqual(result["commands"], expected)
 
     def test_removal_refuses_repos_defined_in_included_files(self):
-        result = run_menu(6, included_repos="[cachyos]\n")
+        result = run_menu(6, pacman="[core]\n[extra]\n", included_repos="[cachyos]\n")
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Remove the cachyos repository manually", result["output"])
         self.assertEqual(result["commands"], [])
@@ -424,7 +437,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertFalse(result["generated"])
 
     def test_combined_removal_checks_stock_entry_before_package_changes(self):
-        config = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        config = "[core]\n\n[extra]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         for settings in ({"grub_custom_menu": True}, {"grub_missing_initramfs": True}):
             with self.subTest(settings=settings):
                 result = run_menu(4, pacman=config, **settings)
@@ -440,7 +453,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["commands"], [])
 
     def test_removal_refuses_nonstandard_blocks_and_requires_confirmation(self):
-        standard = "[core]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        standard = "[core]\n\n[extra]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
         malformed = standard.replace("Include", "# Mirror\nInclude")
         duplicate = standard + "\n[cachyos] # override\nServer = https://example.invalid\n"
         for config, diagnostic in ((malformed, "standard repository block"), (duplicate, "duplicate CachyOS")):
@@ -461,9 +474,13 @@ class CachyosReposTests(unittest.TestCase):
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Enable the stock [core] repository", result["output"])
         self.assertEqual(result["commands"], [])
-        result = run_menu(6, pacman=standard.replace("[cachyos]", "[cachyos-extra-v3]"))
+        result = run_menu(6, pacman=standard.replace("[extra]\n\n", ""))
         self.assertNotEqual(result["status"], 0)
         self.assertIn("Enable the stock [extra] repository", result["output"])
+        self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard, lib32_installed=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("Enable the stock [multilib] repository", result["output"])
         self.assertEqual(result["commands"], [])
         result = run_menu(6, pacman=standard, missing_migration_packages=True)
         self.assertNotEqual(result["status"], 0)
@@ -475,7 +492,7 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["commands"], [])
 
     def test_download_or_extraction_failure_stops_before_running_helper(self):
-        for choice, config in ((1, "[core]\n"), (4, "[core]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n")):
+        for choice, config in ((1, "[core]\n"), (4, "[core]\n\n[extra]\n\n[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n")):
             for index, failure in enumerate(("curl", "tar")):
                 with self.subTest(choice=choice, failure=failure):
                     result = run_menu(choice, pacman=config, fail=failure)
