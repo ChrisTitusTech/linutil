@@ -12,8 +12,11 @@ apt_can_install() {
 
     # APT reports errors with status 100. A restricted escalation policy may
     # deny the simulation even when it permits the actual install command.
-    # Use the system configuration without the caller's APT_CONFIG override.
-    APT_CONFIG='' apt-get -s install "$1" >/dev/null 2>&1
+    if [ -n "${APT_CONFIG:-}" ]; then
+        printf '%b\n' "${RED}Cannot verify APT package availability with APT_CONFIG set and the elevated simulation unavailable.${RC}" >&2
+        exit 1
+    fi
+    apt-get -s install "$1" >/dev/null 2>&1
 }
 
 installDepend() {
