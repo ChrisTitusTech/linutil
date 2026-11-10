@@ -37,8 +37,9 @@ root = Path(os.environ["TEST_ROOT"])
 if name == "escalate":
     sys.exit(subprocess.run(args).returncode)
 
-with (root / "commands.jsonl").open("a") as log:
-    log.write(json.dumps([name, *args]) + "\n")
+if name != "rm" or not any("grub.linutil." in arg for arg in args):
+    with (root / "commands.jsonl").open("a") as log:
+        log.write(json.dumps([name, *args]) + "\n")
 if name == os.environ.get("FAIL_COMMAND"):
     sys.exit(42)
 
@@ -51,6 +52,8 @@ elif name == "tar":
     installer.write_text('#!/bin/sh -e\nrepo-installer "$@"\n')
     installer.chmod(0o755)
 elif name == "repo-installer":
+    if os.environ.get("SKIP_REPO_EDIT") == "1":
+        sys.exit(0)
     (root / "etc/pacman.conf").write_text(
         "[core]\n" if "--remove" in args else "[cachyos]\n"
     )
@@ -81,7 +84,7 @@ elif name != "pacman":
 
 
 def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
-             grub_command=True, grub_directory=True):
+             grub_command=True, grub_directory=True, skip_repo_edit=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -110,7 +113,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         )
         binaries = root / "bin"
         binaries.mkdir()
-        for command in ("grep", "awk", "cat"):
+        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv"):
             (binaries / command).symlink_to(shutil.which(command))
         commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "sed"]
         if grub_command:
@@ -122,9 +125,12 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         environment = {
             "PATH": str(binaries),
             "TEST_ROOT": str(root),
+            "TMPDIR": str(root),
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if skip_repo_edit:
+            environment["SKIP_REPO_EDIT"] = "1"
         if fail:
             environment["FAIL_COMMAND"] = fail
         completed = subprocess.run(
@@ -167,13 +173,13 @@ class CachyosReposTests(unittest.TestCase):
                 self.assert_success(result)
                 self.assertEqual(result["commands"], [])
 
-    def test_commented_repos_can_be_enabled_but_cannot_directly_install_kernels(self):
+    def test_commented_repos_require_manual_enablement(self):
         for section in ("#[cachyos]", "# [cachyos-v3]", "  # [cachyos-core-v3]"):
             with self.subTest(section=section):
                 install = run_menu(1, pacman=section + "\n")
-                self.assert_success(install)
-                self.assertEqual(install["commands"], ["curl", "tar", "repo-installer", "rm"])
-                self.assertIn("[cachyos]", install["pacman"])
+                self.assertNotEqual(install["status"], 0)
+                self.assertIn("Enable the commented CachyOS repos", install["output"])
+                self.assertEqual(install["commands"], [])
                 kernel = run_menu(2, pacman=section + "\n")
                 self.assertNotEqual(kernel["status"], 0)
                 self.assertIn("not enabled", kernel["output"])
@@ -217,12 +223,14 @@ class CachyosReposTests(unittest.TestCase):
         self.assertFalse(result["environment_checked"])
 
     def test_combined_install_rechecks_repositories(self):
-        for config in ("[core]\n", "# [cachyos-v3]\n"):
-            with self.subTest(config=config):
-                result = run_menu(3, pacman=config)
-                self.assert_success(result)
-                self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "pacman", "sed", "grub-mkconfig"])
-                self.assertEqual(result["grub"], CACHY_DEFAULT + "\n")
+        result = run_menu(3)
+        self.assert_success(result)
+        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "pacman", "sed", "grub-mkconfig"])
+        self.assertEqual(result["grub"], CACHY_DEFAULT + "\n")
+        result = run_menu(3, skip_repo_edit=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("did not enable", result["output"])
+        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm"])
 
     def test_reset_matches_active_setting_and_regenerates_grub(self):
         result = run_menu(5, grub="#GRUB_DEFAULT=0\n" + CACHY_DEFAULT + "\n")
@@ -237,8 +245,8 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["commands"], [])
         self.assertEqual(result["grub"], "GRUB_DEFAULT=saved\n")
 
-    def test_combined_remove_handles_commented_repositories(self):
-        result = run_menu(4, pacman="# [cachyos-v3]\n", grub=CACHY_DEFAULT + "\n")
+    def test_combined_remove_handles_active_repositories(self):
+        result = run_menu(4, pacman="[cachyos-v3]\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
         self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "sed", "grub-mkconfig"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
@@ -246,13 +254,21 @@ class CachyosReposTests(unittest.TestCase):
         self.assertTrue(result["script_exists"])
         self.assertTrue(result["notes_exist"])
 
+    def test_repo_only_removal_works_without_grub_and_skips_comments(self):
+        for config in ("[cachyos]\n", "# [cachyos]\n"):
+            with self.subTest(config=config):
+                result = run_menu(6, pacman=config, grub=None, grub_command=False, grub_directory=False)
+                self.assert_success(result)
+                expected = [] if config.startswith("#") else ["curl", "tar", "repo-installer", "rm"]
+                self.assertEqual(result["commands"], expected)
+
     def test_download_or_extraction_failure_stops_before_running_helper(self):
         for choice, config in ((1, "[core]\n"), (4, "[cachyos-v3]\n")):
             for index, failure in enumerate(("curl", "tar")):
                 with self.subTest(choice=choice, failure=failure):
                     result = run_menu(choice, pacman=config, fail=failure)
                     self.assertEqual(result["status"], 42, result["output"])
-                    self.assertEqual(result["commands"], ["curl", "tar"][:index + 1])
+                    self.assertEqual(result["commands"], ["curl", "tar"][:index + 1] + ["rm"])
 
     def test_failures_stop_and_propagate_under_shebang_errexit(self):
         for choice, initial in ((2, "GRUB_DEFAULT=0\n"), (5, CACHY_DEFAULT + "\n")):
@@ -263,6 +279,7 @@ class CachyosReposTests(unittest.TestCase):
                     self.assertEqual(result["status"], 42, result["output"])
                     self.assertEqual(result["commands"], stages[:index + 1])
                     self.assertFalse(result["generated"])
+                    self.assertEqual(result["grub"], initial)
 
 
 if __name__ == "__main__":
