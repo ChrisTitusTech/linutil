@@ -3,6 +3,11 @@
 
 . ../common-script.sh
 
+apt_has_candidate() {
+    policy=$(LC_ALL=C apt-cache policy "$1") || return
+    printf '%s\n' "$policy" | awk '$1 == "Candidate:" && NF > 1 && $2 != "(none)" { found = 1 } END { exit !found }'
+}
+
 installDepend() {
     ## Check for dependencies.
     DEPENDENCIES='tar tree multitail tldr trash-cli unzip cmake make jq'
@@ -21,8 +26,11 @@ installDepend() {
         apt-get|nala)
             COMPILEDEPS='build-essential'
             "$ESCALATION_TOOL" "$PACKAGER" update
-            TLDR_CANDIDATE=$(apt-cache policy tldr | awk '/Candidate:/ {print $2}')
-            if [ -z "$TLDR_CANDIDATE" ] || [ "$TLDR_CANDIDATE" = "(none)" ]; then
+            if ! apt_has_candidate tldr; then
+                if ! apt_has_candidate tealdeer; then
+                    printf '%b\n' "${RED}Neither tldr nor tealdeer has an install candidate in the configured repositories.${RC}" >&2
+                    return 1
+                fi
                 DEPENDENCIES=$(printf '%s' "$DEPENDENCIES" | sed 's/ tldr / tealdeer /')
             fi
             "$ESCALATION_TOOL" dpkg --add-architecture i386
