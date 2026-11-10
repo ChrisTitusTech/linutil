@@ -349,9 +349,10 @@ mod tests {
         let mut cwd = root.clone();
         let mut relative_path = String::new();
         // Keep the cwd usable, but make the absolute executable path exceed Linux's PATH_MAX.
-        while cwd.as_os_str().len() < 4079 {
-            let remaining = 4080 - cwd.as_os_str().len() - 1;
-            cwd.push("d".repeat(remaining.min(200)));
+        const CWD_LEN: usize = 4080;
+        while cwd.as_os_str().len() + 1 < CWD_LEN {
+            let remaining = CWD_LEN - cwd.as_os_str().len() - 1;
+            cwd.push("d".repeat(remaining.min(100)));
             relative_path.push_str("../");
         }
         relative_path.push_str("bin");
