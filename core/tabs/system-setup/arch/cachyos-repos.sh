@@ -49,51 +49,90 @@ setupRepos() {
     fi
 }
 
-verifyGrubEntry() {
-    # Check the standard 10_linux layout. Leave custom menus alone.
+findGrubEntry() {
+    # GRUB's 10_linux assigns stable IDs to its advanced kernel entries.
     # shellcheck disable=SC2016
-    "$ESCALATION_TOOL" awk -F "'" -v setting="$1" '
-        setting == "GRUB_DEFAULT=0" {
-            if ($1 ~ /^menuentry[[:space:]]/) {
-                if (++entries > 1) exit
-            } else if ($1 ~ /^submenu[[:space:]]/) {
-                exit
-            } else if (entries == 1 && $0 ~ /^[[:space:]]+linux(efi)?[[:space:]]+[^[:space:]]*\/vmlinuz-linux(-lts)?[[:space:]]/) {
-                found = 1
-                exit
+    "$ESCALATION_TOOL" awk -F "'" -v kernel="$1" '
+        /^### BEGIN .*[/]10_linux ###$/ { linux = 1 }
+        /^### END .*[/]10_linux ###$/ { linux = 0 }
+        !linux { next }
+        /^}/ { submenu = ""; path = "" }
+        /^[[:space:]]*}/ { path = "" }
+        /\$menuentry_id_option / {
+            id = $4
+            if (id !~ /^[[:alnum:]_-]+$/) next
+            if ($1 ~ /^submenu[[:space:]]/) submenu = id
+            if ($1 ~ /^[[:space:]]*menuentry[[:space:]]/) {
+                path = ($1 ~ /^[[:space:]]/ && submenu != "" ? submenu ">" : "") id
+                if (id ~ /-recovery-/) path = ""
             }
         }
-        setting != "GRUB_DEFAULT=0" {
-            if ($1 ~ /^submenu[[:space:]]/) cachyosSubmenu = ($2 == "Advanced options for Arch Linux")
-            if ($0 ~ /^}/) cachyosSubmenu = 0
-            if (cachyosSubmenu && $1 ~ /^[[:space:]]+menuentry[[:space:]]/ &&
-                $2 == "Arch Linux, with Linux linux-cachyos-lts") found = 1
+        path != "" && $1 ~ /^[[:space:]]+linux(efi)?[[:space:]]/ {
+            split($0, args, /[[:space:]]+/)
+            image = args[3]
+            sub(/^.*[/]/, "", image)
+            if (image == "vmlinuz-" kernel) {
+                if (id !~ /^gnulinux-simple-/) {
+                    print path
+                    found = 1
+                    exit
+                }
+                fallback = path
+            }
+            if (kernel == "linux" && image == "vmlinuz-linux-lts" && fallback == "")
+                fallback = path
         }
-        END { exit !found }
+        END {
+            if (found) exit 0
+            if (fallback == "") exit 1
+            print fallback
+        }
     ' "$2"
 }
 
-updateGrubDefault() (
-    backup=$("$ESCALATION_TOOL" mktemp /etc/default/grub.linutil.XXXXXX)
-    candidate=
-    trap '"$ESCALATION_TOOL" rm -f -- ${backup:+"$backup"} ${candidate:+"$candidate" "$candidate.new"}' 0
-    candidate=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.XXXXXX)
-    "$ESCALATION_TOOL" cp -p /etc/default/grub "$backup"
-    "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/$1/" /etc/default/grub
-    if "$ESCALATION_TOOL" grub-mkconfig -o "$candidate" &&
-        verifyGrubEntry "$1" "$candidate" &&
-        "$ESCALATION_TOOL" mv -f -- "$candidate" /boot/grub/grub.cfg; then
-        return 0
-    else
-        status=$?
-        printf '%s\n' "Could not verify and install the requested GRUB default." >&2
-        if ! "$ESCALATION_TOOL" mv -f -- "$backup" /etc/default/grub; then
-            backup_path=$backup
-            backup=
-            printf '%s\n' "Could not restore GRUB settings. Backup kept at $backup_path." >&2
-        fi
-        return "$status"
+cleanupGrubUpdate() {
+    if [ "$restore" = true ] && ! "$ESCALATION_TOOL" mv -f -- "$backup" /etc/default/grub; then
+        printf '%s\n' "Could not restore GRUB settings. Backup kept at $backup." >&2
+        backup=
     fi
+    "$ESCALATION_TOOL" rm -f -- ${backup:+"$backup"} ${candidate:+"$candidate" "$candidate.new"}
+}
+
+updateGrubDefault() (
+    backup=
+    candidate=
+    restore=false
+    trap cleanupGrubUpdate 0
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    candidate=$("$ESCALATION_TOOL" mktemp /boot/grub/grub.cfg.linutil.XXXXXX)
+    "$ESCALATION_TOOL" grub-mkconfig -o "$candidate"
+    if [ "$#" -eq 2 ]; then
+        cachyosEntry=$(findGrubEntry linux-cachyos-lts "$candidate" || :)
+        if [ "$2" != "GRUB_DEFAULT=\"$cachyosEntry\"" ] || [ -z "$cachyosEntry" ]; then
+            printf '%s\n' "CachyOS is not the default kernel"
+            return 0
+        fi
+    fi
+    if ! entry=$(findGrubEntry "$1" "$candidate"); then
+        printf '%s\n' "Could not find a GRUB entry for $1." >&2
+        return 1
+    fi
+    backup=$("$ESCALATION_TOOL" mktemp /etc/default/grub.linutil.XXXXXX)
+    "$ESCALATION_TOOL" cp -p /etc/default/grub "$backup"
+    restore=true
+    "$ESCALATION_TOOL" sed -i "s/^GRUB_DEFAULT=.*/GRUB_DEFAULT=\"$entry\"/" /etc/default/grub
+    "$ESCALATION_TOOL" grub-mkconfig -o "$candidate"
+    if ! "$ESCALATION_TOOL" grep -Eq "^[[:space:]]*set default=\"$entry\"[[:space:]]*$" "$candidate" ||
+        [ "$(findGrubEntry "$1" "$candidate")" != "$entry" ]; then
+        printf '%s\n' "Could not verify the requested GRUB default." >&2
+        return 1
+    fi
+    # Finish installing the config before handling any further signals.
+    trap '' HUP INT TERM
+    "$ESCALATION_TOOL" mv -f -- "$candidate" /boot/grub/grub.cfg
+    restore=false
 )
 
 setDefaultKernel() {
@@ -101,9 +140,7 @@ setDefaultKernel() {
     if [ -n "$activeRepos" ]; then
         "$ESCALATION_TOOL" "$PACKAGER" -S --needed --noconfirm linux-cachyos-lts linux-cachyos-lts-headers linux-cachyos linux-cachyos-headers
 
-        newDefaultKernel='GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"'
-
-        updateGrubDefault "$newDefaultKernel"
+        updateGrubDefault linux-cachyos-lts
     else
         printf "%b\n" "CachyOS repos are not enabled. Install or enable them in /etc/pacman.conf before installing the kernel."
         return 1
@@ -113,22 +150,50 @@ setDefaultKernel() {
 resetDefaultKernel() {
     oldDefaultKernel=$(awk '/^GRUB_DEFAULT=/{print; exit}' /etc/default/grub)
 
-    if [ "$oldDefaultKernel" = 'GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"' ]; then
-        updateGrubDefault "GRUB_DEFAULT=0"
-    else
-        printf "%b\n" "CachyOS is not the default kernel"
-    fi
+    case "$oldDefaultKernel" in
+        'GRUB_DEFAULT="Advanced options for Arch Linux>Arch Linux, with Linux linux-cachyos-lts"' )
+            updateGrubDefault linux ;;
+        'GRUB_DEFAULT="gnulinux-'*'"')
+            updateGrubDefault linux "$oldDefaultKernel" ;;
+        *) printf '%s\n' "CachyOS is not the default kernel" ;;
+    esac
 }
 
 removeRepos() {
     checkRepo
     if [ -n "$activeRepos" ]; then
         for repo in $activeRepos; do
-            if ! grep -Fqx "[$repo]" /etc/pacman.conf; then
-                printf '%s\n' "Remove the $repo repository manually. The CachyOS helper requires an exact header in /etc/pacman.conf." >&2
+            case "$repo" in
+                cachyos|cachyos-v3|cachyos-core-v3|cachyos-extra-v3|cachyos-testing-v3|\
+                cachyos-v4|cachyos-core-v4|cachyos-extra-v4|cachyos-znver4|cachyos-core-znver4|cachyos-extra-znver4)
+                    ;;
+                *)
+                    printf '%s\n' "Remove the unsupported $repo repository manually." >&2
+                    return 1 ;;
+            esac
+            if ! awk -v header="[$repo]" '
+                $0 == header {
+                    if (getline != 1 || $0 !~ /^Include = \/etc\/pacman[.]d\/cachyos(-[[:alnum:]-]+)?-mirrorlist$/) exit
+                    while (getline == 1) {
+                        if ($0 ~ /^[[:space:]]*\[/) break
+                        if ($0 !~ /^[[:space:]]*(#.*)?$/) exit
+                    }
+                    safe = 1
+                    exit
+                }
+                END { exit !safe }
+            ' /etc/pacman.conf; then
+                printf '%s\n' "Remove the $repo repository manually. The CachyOS helper requires a standard repository block in /etc/pacman.conf." >&2
                 return 1
             fi
         done
+        printf '%s\n' "Removal can downgrade system packages, replace pacman, and remove the CachyOS keyring and mirrorlists."
+        printf '%s' "Continue with CachyOS removal? [y/N] "
+        read -r confirm
+        case "$confirm" in
+            y|Y) ;;
+            *) return 1 ;;
+        esac
         printf "%b\n" "Removing CachyOS repo.."
         runRepoHelper --remove
         checkRepo
@@ -148,7 +213,7 @@ main() {
     printf "%b\n" "3. ${YELLOW}Install CachyOS repos and and set CachyOS-LTS as default kernel${RC}"
     printf "%b\n" "4. ${YELLOW}Remove CachyOS Repos and set default kernel to stock${RC}"
     printf "%b\n" "5. ${YELLOW}Reset default kernel to stock${RC}"
-    printf "%b\n" "6. ${YELLOW}Remove CachyOS repos only${RC}"
+    printf "%b\n" "6. ${YELLOW}Remove CachyOS repos and migrate packages without changing GRUB${RC}"
     printf "%b" "Enter your choice [1-6]: "
     read -r CHOICE
     case "$CHOICE" in

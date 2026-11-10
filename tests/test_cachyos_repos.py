@@ -23,11 +23,15 @@ CACHY_DEFAULT = (
     'Arch Linux, with Linux linux-cachyos-lts"'
 )
 
+CACHY_ENTRY = 'GRUB_DEFAULT="gnulinux-advanced-test>gnulinux-linux-cachyos-lts-advanced-test"'
+STOCK_ENTRY = 'GRUB_DEFAULT="gnulinux-advanced-test>gnulinux-linux-advanced-test"'
+
 MOCK = r"""
 import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 
@@ -73,13 +77,24 @@ elif name == "grub-mkconfig":
     target = Path(args[-1]).resolve()
     if not target.is_relative_to(root):
         sys.exit("Refusing a non-fixture GRUB target")
+    default = next(line for line in (root / "etc/default/grub").read_text().splitlines()
+                   if line.startswith("GRUB_DEFAULT=")).split("=", 1)[1].strip('"')
+    if os.environ.get("GRUB_INTERRUPT") == "1" and default.endswith(">gnulinux-linux-advanced-test"):
+        os.killpg(os.getpgrp(), signal.SIGINT)
+    if os.environ.get("GRUB_OVERRIDE") == "1":
+        default = "saved"
     if os.environ.get("GRUB_CUSTOM_MENU") == "1":
         target.write_text("menuentry 'Custom' {\n    linux /vmlinuz-linux-cachyos-lts quiet\n}\n")
     else:
         target.write_text(
-            "menuentry 'Arch Linux' {\n    linux /vmlinuz-linux quiet\n}\n"
-            "submenu 'Advanced options for Arch Linux' {\n"
-            "    menuentry 'Arch Linux, with Linux linux-cachyos-lts' {\n    }\n}\n"
+            f'   set default="{default}"\n'
+            "### BEGIN /etc/grub.d/10_linux ###\n"
+            "menuentry 'Arch Linux' $menuentry_id_option 'gnulinux-simple-test' {\n"
+            "    linux /vmlinuz-linux-cachyos-lts quiet\n}\n"
+            "submenu 'Advanced options for Arch Linux' $menuentry_id_option 'gnulinux-advanced-test' {\n"
+            "    menuentry 'CachyOS LTS' $menuentry_id_option 'gnulinux-linux-cachyos-lts-advanced-test' {\n        linux /vmlinuz-linux-cachyos-lts quiet\n    }\n"
+            "    menuentry 'Stock' $menuentry_id_option 'gnulinux-linux-advanced-test' {\n        linux /vmlinuz-linux quiet\n    }\n}\n"
+            "### END /etc/grub.d/10_linux ###\n"
         )
 elif name == "rm":
     for argument in args:
@@ -99,7 +114,8 @@ elif name != "pacman":
 
 def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_command=True, grub_directory=True, skip_repo_edit=False,
-             grub_custom_menu=False, included_repos=None):
+             grub_custom_menu=False, included_repos=None, grub_override=False,
+             grub_interrupt=False, confirm="y"):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -147,6 +163,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "REAL_SED": shutil.which("sed"),
             "LC_ALL": "C",
         }
+        if grub_interrupt:
+            environment["GRUB_INTERRUPT"] = "1"
+        if grub_override:
+            environment["GRUB_OVERRIDE"] = "1"
         if grub_custom_menu:
             environment["GRUB_CUSTOM_MENU"] = "1"
         if skip_repo_edit:
@@ -155,7 +175,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             environment["FAIL_COMMAND"] = fail
         completed = subprocess.run(
             [str(script)], cwd=directory, env=environment,
-            input=f"{choice}\n", text=True, capture_output=True, timeout=10,
+            input=f"{choice}\n{confirm}\n", text=True, capture_output=True, timeout=10, start_new_session=True,
         )
         log = root / "commands.jsonl"
         events = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
@@ -215,8 +235,8 @@ class CachyosReposTests(unittest.TestCase):
             with self.subTest(section=section):
                 result = run_menu(2, pacman=section + "\n")
                 self.assert_success(result)
-                self.assertEqual(result["commands"], ["pacman", "sed", "grub-mkconfig"])
-                self.assertEqual(result["grub"], CACHY_DEFAULT + "\n")
+                self.assertEqual(result["commands"], ["pacman", "grub-mkconfig", "sed", "grub-mkconfig"])
+                self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
                 self.assertTrue(result["generated"])
 
     def test_missing_repositories_reject_kernel_install_without_mutations(self):
@@ -245,8 +265,8 @@ class CachyosReposTests(unittest.TestCase):
     def test_combined_install_rechecks_repositories(self):
         result = run_menu(3)
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "pacman", "sed", "grub-mkconfig"])
-        self.assertEqual(result["grub"], CACHY_DEFAULT + "\n")
+        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "pacman", "grub-mkconfig", "sed", "grub-mkconfig"])
+        self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
         result = run_menu(3, skip_repo_edit=True)
         self.assertNotEqual(result["status"], 0)
         self.assertIn("did not enable", result["output"])
@@ -255,8 +275,8 @@ class CachyosReposTests(unittest.TestCase):
     def test_reset_matches_active_setting_and_regenerates_grub(self):
         result = run_menu(5, grub="#GRUB_DEFAULT=0\n" + CACHY_DEFAULT + "\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["sed", "grub-mkconfig"])
-        self.assertEqual(result["grub"], "#GRUB_DEFAULT=0\nGRUB_DEFAULT=0\n")
+        self.assertEqual(result["commands"], ["grub-mkconfig", "sed", "grub-mkconfig"])
+        self.assertEqual(result["grub"], "#GRUB_DEFAULT=0\n" + STOCK_ENTRY + "\n")
         self.assertTrue(result["generated"])
 
     def test_reset_does_not_change_another_default(self):
@@ -266,16 +286,16 @@ class CachyosReposTests(unittest.TestCase):
         self.assertEqual(result["grub"], "GRUB_DEFAULT=saved\n")
 
     def test_combined_remove_handles_active_repositories(self):
-        result = run_menu(4, pacman="[cachyos-v3]\n", grub=CACHY_DEFAULT + "\n")
+        result = run_menu(4, pacman="[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n", grub=CACHY_DEFAULT + "\n")
         self.assert_success(result)
-        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "sed", "grub-mkconfig"])
+        self.assertEqual(result["commands"], ["curl", "tar", "repo-installer", "rm", "grub-mkconfig", "sed", "grub-mkconfig"])
         self.assertIn(["repo-installer", "--remove"], result["events"])
-        self.assertEqual(result["grub"], "GRUB_DEFAULT=0\n")
+        self.assertEqual(result["grub"], STOCK_ENTRY + "\n")
         self.assertTrue(result["script_exists"])
         self.assertTrue(result["notes_exist"])
 
     def test_repo_only_removal_works_without_grub_and_skips_comments(self):
-        for config in ("[cachyos]\n", "# [cachyos]\n"):
+        for config in ("[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n", "# [cachyos]\n"):
             with self.subTest(config=config):
                 result = run_menu(6, pacman=config, grub=None, grub_command=False, grub_directory=False)
                 self.assert_success(result)
@@ -293,12 +313,37 @@ class CachyosReposTests(unittest.TestCase):
             with self.subTest(choice=choice):
                 result = run_menu(choice, pacman="[cachyos]\n", grub=initial, grub_custom_menu=True)
                 self.assertNotEqual(result["status"], 0)
-                self.assertIn("Could not verify", result["output"])
+                self.assertIn("Could not find a GRUB entry", result["output"])
                 self.assertEqual(result["grub"], initial)
                 self.assertFalse(result["generated"])
 
+    def test_grub_override_preserves_original_default(self):
+        result = run_menu(5, grub=CACHY_ENTRY + "\n", grub_override=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("Could not verify", result["output"])
+        self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
+        self.assertFalse(result["generated"])
+
+    def test_grub_interrupt_restores_original_default(self):
+        result = run_menu(5, grub=CACHY_ENTRY + "\n", grub_interrupt=True)
+        self.assertNotEqual(result["status"], 0)
+        self.assertEqual(result["grub"], CACHY_ENTRY + "\n")
+        self.assertFalse(result["generated"])
+
+    def test_removal_refuses_nonstandard_blocks_and_requires_confirmation(self):
+        standard = "[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n"
+        malformed = standard.replace("Include", "# Mirror\nInclude")
+        result = run_menu(6, pacman=malformed)
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("standard repository block", result["output"])
+        self.assertEqual(result["commands"], [])
+        result = run_menu(6, pacman=standard, confirm="n")
+        self.assertNotEqual(result["status"], 0)
+        self.assertIn("downgrade system packages", result["output"])
+        self.assertEqual(result["commands"], [])
+
     def test_download_or_extraction_failure_stops_before_running_helper(self):
-        for choice, config in ((1, "[core]\n"), (4, "[cachyos-v3]\n")):
+        for choice, config in ((1, "[core]\n"), (4, "[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n")):
             for index, failure in enumerate(("curl", "tar")):
                 with self.subTest(choice=choice, failure=failure):
                     result = run_menu(choice, pacman=config, fail=failure)
@@ -307,8 +352,9 @@ class CachyosReposTests(unittest.TestCase):
 
     def test_failures_stop_and_propagate_under_shebang_errexit(self):
         for choice, initial in ((2, "GRUB_DEFAULT=0\n"), (5, CACHY_DEFAULT + "\n")):
-            stages = ["pacman", "sed", "grub-mkconfig"] if choice == 2 else ["sed", "grub-mkconfig"]
-            for index, failure in enumerate(stages):
+            stages = ["pacman", "grub-mkconfig", "sed", "grub-mkconfig"] if choice == 2 else ["grub-mkconfig", "sed", "grub-mkconfig"]
+            for failure in dict.fromkeys(stages):
+                index = stages.index(failure)
                 with self.subTest(choice=choice, failure=failure):
                     result = run_menu(choice, pacman="[cachyos]\n", grub=initial, fail=failure)
                     self.assertEqual(result["status"], 42, result["output"])
