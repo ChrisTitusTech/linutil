@@ -140,10 +140,21 @@ set_password () {
     local password1 password2
 
     while true; do
-        read -rs -p "Please enter password: " password1
+        if ! IFS= read -rs -p "Please enter password: " password1; then
+            printf "\nERROR! Failed to read password.\n"
+            return 1
+        fi
         printf "\n"
-        read -rs -p "Please re-enter password: " password2
+        if ! IFS= read -rs -p "Please re-enter password: " password2; then
+            printf "\nERROR! Failed to read password.\n"
+            return 1
+        fi
         printf "\n"
+
+        if [[ -z "$password1" ]]; then
+            printf "ERROR! Password must not be empty.\n"
+            continue
+        fi
 
         if [[ "$password1" == "$password2" ]]; then
             export "$1=$password1"
@@ -167,7 +178,8 @@ filesystem () {
     0) export FS=btrfs;;
     1) export FS=ext4;;
     2)
-        set_password "LUKS_PASSWORD"
+        printf "Enter the LUKS passphrase using keyboard layout '%s'.\n" "${KEYMAP}"
+        set_password "LUKS_PASSWORD" || exit 1
         export FS=luks
         ;;
     3) exit ;;
@@ -210,6 +222,12 @@ keymap () {
 
     echo -ne "Your key boards layout: ${keymap} \n"
     export KEYMAP=$keymap
+
+    if ! localectl set-keymap "${keymap}" 2>/dev/null; then
+        printf "WARNING: Could not apply console keymap '%s'; using the default layout 'us'.\n" "${keymap}"
+        keymap=us
+        export KEYMAP=$keymap
+    fi
 }
 
 # @description Derives a default locale from the selected keymap and lets the user confirm or override.
@@ -350,6 +368,9 @@ userinfo () {
 background_checks
 clear
 logo
+keymap
+clear
+logo
 userinfo
 clear
 logo
@@ -360,9 +381,6 @@ filesystem
 clear
 logo
 timezone
-clear
-logo
-keymap
 clear
 logo
 set_locale
@@ -474,9 +492,9 @@ elif [[ "${FS}" == "ext4" ]]; then
 elif [[ "${FS}" == "luks" ]]; then
     mkfs.fat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -v luksFormat "${partition3}" -
+    printf '%s' "${LUKS_PASSWORD}" | cryptsetup -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder
-    echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
+    printf '%s' "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
     mkfs.btrfs /dev/mapper/ROOT
 # create subvolumes for btrfs
