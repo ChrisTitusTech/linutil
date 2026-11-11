@@ -33,6 +33,12 @@ use nix::{
 #[cfg(unix)]
 use std::os::fd::{AsFd, BorrowedFd};
 
+#[derive(Default)]
+struct StartupCancellation {
+    pending: usize,
+    error: Option<&'static str>,
+}
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -44,6 +50,8 @@ pub struct RunningCommand {
     killer: Option<Box<dyn ChildKiller + Send + Sync>>,
     /// Child process ID (for process-group and session signaling on Unix)
     child_pid: Arc<AtomicU32>,
+    /// Serializes PID publication with cancellation requested during startup.
+    startup_cancellation: Arc<Mutex<StartupCancellation>>,
     /// Number of times kill_child has been invoked
     kill_count: usize,
     menu_consumed: usize,
@@ -368,6 +376,13 @@ impl RunningCommand {
     }
 
     pub fn new(commands: &[&Command]) -> Self {
+        Self::new_with_start_hook(commands, || {})
+    }
+
+    fn new_with_start_hook(
+        commands: &[&Command],
+        before_pid_publication: impl FnOnce() + Send + 'static,
+    ) -> Self {
         let pty_system = NativePtySystem::default();
 
         // Build the command based on the provided Command enum variant
@@ -396,14 +411,38 @@ impl RunningCommand {
 
         let child_pid = Arc::new(AtomicU32::new(0));
         let child_pid_clone = Arc::clone(&child_pid);
+        let startup_cancellation = Arc::new(Mutex::new(StartupCancellation::default()));
+        let startup_clone = Arc::clone(&startup_cancellation);
         let (tx, rx) = channel();
         // Thread waiting for the child to complete
         let command_handle = std::thread::spawn(move || {
             let mut child = pair.slave.spawn_command(cmd).unwrap();
-            let killer = child.clone_killer();
-            if let Some(pid) = child.process_id() {
-                child_pid_clone.store(pid, Ordering::Release);
+            let mut killer = child.clone_killer();
+            before_pid_publication();
+            {
+                let mut startup = startup_clone.lock().unwrap();
+                if let Some(pid) = child.process_id() {
+                    child_pid_clone.store(pid, Ordering::Release);
+                    // A request either lands in this queue or sees the published
+                    // PID under the same lock. There is no unprotected handoff.
+                    for attempt in 0..startup.pending {
+                        #[cfg(unix)]
+                        {
+                            let signal = Self::cancellation_signal(attempt);
+                            startup.error = Self::signal_ids(pid, signal, false, false)
+                                .or(Self::kill_session_processes(pid, signal))
+                                .map(Errno::desc);
+                            if attempt >= 2 {
+                                let _ = killer.kill();
+                            }
+                        }
+                        #[cfg(not(unix))]
+                        let _ = killer.kill();
+                    }
+                }
+                startup.pending = 0;
             }
+            TERMINAL_UPDATED.store(true, Ordering::Release);
             let _ = tx.send(killer);
             child.wait().unwrap()
         });
@@ -473,6 +512,7 @@ impl RunningCommand {
             child_killer: Some(rx),
             killer: None,
             child_pid,
+            startup_cancellation,
             kill_count: 0,
             menu_consumed: 0,
             menu_back: false,
@@ -506,7 +546,8 @@ impl RunningCommand {
 
     /// The footer while a command runs: what Ctrl-C does next, or why it failed.
     fn cancel_hint(&self) -> String {
-        if let Some(error) = self.cancel_error {
+        let startup_error = self.startup_cancellation.lock().unwrap().error;
+        if let Some(error) = self.cancel_error.or(startup_error) {
             return format!(" Not stopped: {error} · Ctrl-C to retry ");
         }
         if self.menu_waiting() {
@@ -640,7 +681,17 @@ impl RunningCommand {
             }
         }
 
-        let pid = self.child_pid.load(Ordering::Acquire);
+        let pid = {
+            let mut startup = self.startup_cancellation.lock().unwrap();
+            let pid = self.child_pid.load(Ordering::Acquire);
+            if pid == 0 {
+                startup.pending += 1;
+                self.kill_count += 1;
+                return;
+            }
+            startup.error = None;
+            pid
+        };
 
         // What is left holds only the terminal, from a session of its own. The
         // command's IDs cannot reach it and may now belong to something else.
@@ -654,37 +705,16 @@ impl RunningCommand {
         }
 
         #[cfg(unix)]
-        if pid == 0 {
-            return;
-        }
-
-        #[cfg(unix)]
         {
-            let error = match self.kill_count {
-                // First Ctrl+C: Send SIGINT to process group and root process.
-                // Do not send SIGHUP via killer.kill() here, as that terminates
-                // the top-level shell process immediately and leaves child
-                // processes (such as package managers, build processes, or subshells) orphaned.
-                0 => self
-                    .signal_group(pid, Signal::SIGINT)
-                    .or(self.kill_session_processes(pid, Signal::SIGINT)),
-                // Second Ctrl+C: Escalate to SIGTERM for process group and session.
-                1 => self
-                    .signal_group(pid, Signal::SIGTERM)
-                    .or(self.kill_session_processes(pid, Signal::SIGTERM)),
-                // Subsequent Ctrl+C: Force termination with SIGKILL.
-                _ => {
-                    let error = self
-                        .signal_group(pid, Signal::SIGKILL)
-                        .or(self.kill_session_processes(pid, Signal::SIGKILL));
-                    if !self.leader_exited() {
-                        if let Some(killer) = &mut self.killer {
-                            let _ = killer.kill();
-                        }
-                    }
-                    error
+            let signal = Self::cancellation_signal(self.kill_count);
+            let error = self
+                .signal_group(pid, signal)
+                .or(Self::kill_session_processes(pid, signal));
+            if self.kill_count >= 2 && !self.leader_exited() {
+                if let Some(killer) = &mut self.killer {
+                    let _ = killer.kill();
                 }
-            };
+            }
             self.cancel_error = error.map(Errno::desc);
         }
 
@@ -696,16 +726,40 @@ impl RunningCommand {
         self.kill_count += 1;
     }
 
+    #[cfg(unix)]
+    fn cancellation_signal(attempt: usize) -> Signal {
+        match attempt {
+            0 => Signal::SIGINT,
+            1 => Signal::SIGTERM,
+            _ => Signal::SIGKILL,
+        }
+    }
+
     /// Signal the process group and its leader. A process that has already
     /// exited is not an error.
     #[cfg(unix)]
     fn signal_group(&self, pid: u32, signal: Signal) -> Option<Errno> {
-        let group = if self.group_gone.load(Ordering::Acquire) {
+        Self::signal_ids(
+            pid,
+            signal,
+            self.group_gone.load(Ordering::Acquire),
+            self.leader_exited(),
+        )
+    }
+
+    #[cfg(unix)]
+    fn signal_ids(
+        pid: u32,
+        signal: Signal,
+        group_gone: bool,
+        leader_exited: bool,
+    ) -> Option<Errno> {
+        let group = if group_gone {
             Ok(())
         } else {
             kill(Pid::from_raw(-(pid as i32)), signal)
         };
-        let leader = if self.leader_exited() {
+        let leader = if leader_exited {
             Ok(())
         } else {
             kill(Pid::from_raw(pid as i32), signal)
@@ -734,7 +788,7 @@ impl RunningCommand {
     /// Signal the rest of the session. A permission error is returned: a group
     /// signal that reached some processes succeeds without saying so.
     #[cfg(unix)]
-    fn kill_session_processes(&self, session_pid: u32, signal: Signal) -> Option<Errno> {
+    fn kill_session_processes(session_pid: u32, signal: Signal) -> Option<Errno> {
         let mut denied = None;
         for process in Self::session_processes(session_pid) {
             if kill(process, signal) == Err(Errno::EPERM) {
@@ -841,6 +895,41 @@ mod tests {
         while !running.is_finished() {
             assert!(std::time::Instant::now() < deadline);
             std::thread::sleep(std::time::Duration::from_millis(20));
+        }
+    }
+
+    #[test]
+    fn cancellation_before_pid_publication_is_replayed() {
+        for presses in [1, 3] {
+            let (ready_tx, ready_rx) = std::sync::mpsc::channel();
+            let (release_tx, release_rx) = std::sync::mpsc::channel();
+            let command = Command::Raw("sleep 60".into());
+            let mut running = RunningCommand::new_with_start_hook(&[&command], move || {
+                ready_tx.send(()).unwrap();
+                release_rx.recv().unwrap();
+            });
+            ready_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+            assert_eq!(running.child_pid.load(Ordering::Acquire), 0);
+            for _ in 0..presses {
+                assert!(!running.handle_key_event(&ctrl_c()));
+            }
+            let queued = running.startup_cancellation.lock().unwrap().pending;
+            release_tx.send(()).unwrap();
+            let deadline = Instant::now() + Duration::from_secs(5);
+            while !running.is_finished() && Instant::now() < deadline {
+                std::thread::sleep(Duration::from_millis(5));
+            }
+            let stopped = running.is_finished();
+            if !stopped {
+                for _ in 0..3 {
+                    running.kill_child();
+                }
+                wait_until_finished(&running);
+            }
+            assert_eq!(queued, presses);
+            assert_eq!(running.kill_count, presses);
+            assert!(stopped, "Cancellation was lost during startup");
+            assert!(!running.get_exit_status().success());
         }
     }
 

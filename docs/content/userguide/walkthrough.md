@@ -100,6 +100,7 @@ https://github.com/ChrisTitusTech/neovim
 ### Multi-System Emulators
 
 - **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+- **RetroArch Cores**: Install core packages for an existing native RetroArch installation.
 
 ### Nintendo Emulators
 
@@ -253,7 +254,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Locale Setup**: This allows the user to set their locale
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
-- **Ramalama**: This utility is designed to manage ramalama in your system
+- **Ramalama**: Install Ramalama to run AI models locally.
+- **Ramalama Model Manager**: List, inspect, create, run, and remove Ramalama models.
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system

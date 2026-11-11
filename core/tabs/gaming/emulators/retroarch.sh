@@ -48,13 +48,15 @@ configureRetroArch() {
 		        # Only in AUR
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter libretro-pcsx2-launcher
 	            ;;
-	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.libretro.RetroArch
-	            ;;
+            *)
+                printf "%b\n" "${YELLOW}Core package installation is not supported by this package manager. Manage cores in RetroArch.${RC}"
+                return 1
+                ;;
 	    esac
 	else
-		printf "%b\n" "${GREEN}RetroArch is not installed.${RC}"
-	fi
+        printf "%b\n" "${YELLOW}Install RetroArch before installing core packages.${RC}"
+        return 1
+    fi
 }
 
 uninstallRetroArch() {
@@ -78,8 +80,12 @@ uninstallRetroArch() {
 }
 
 main() {
-    installRetroArch
+    case "${1:-}" in
+        '') installRetroArch ;;
+        --cores) configureRetroArch ;;
+        *) printf '%s\n' "Unknown action: $1" >&2; return 2 ;;
+    esac
 }
 
 checkEnv
-main
+main "$@"

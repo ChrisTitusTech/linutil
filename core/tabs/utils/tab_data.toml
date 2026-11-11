@@ -167,9 +167,15 @@ task_list = "I SS"
 
 [[data]]
 name = "Ramalama"
-description = "This utility is designed to manage ramalama in your system"
+description = "Install Ramalama to run AI models locally."
 script = "ramalama.sh"
 task_list = "I SS"
+
+[[data]]
+name = "Ramalama Model Manager"
+description = "List, inspect, create, run, and remove Ramalama models."
+script = "ramalama-models.sh"
+multi_select = false
 
 [[data]]
 name = "Service Manager"

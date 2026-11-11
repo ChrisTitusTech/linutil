@@ -12,6 +12,13 @@ description = "Frontend for emulators, game engines and media players. NO Games 
 script = "emulators/retroarch.sh"
 task_list = "FM"
 
+[[data.entries.entries]]
+name = "RetroArch Cores"
+description = "Install core packages for an existing native RetroArch installation."
+script = "emulators/retroarch-cores.sh"
+task_list = "I"
+multi_select = false
+
 [[data.entries]]
 name = "Nintendo Emulators"
 

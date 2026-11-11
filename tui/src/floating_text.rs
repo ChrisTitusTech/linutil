@@ -100,6 +100,15 @@ impl<'a> FloatingText<'a> {
 // Cache the visual rows and render those same rows, so scroll limits always
 // agree with wrapping, including wide graphemes and styled help columns.
 pub(crate) fn wrapped_text(text: &Text<'_>, width: u16) -> Text<'static> {
+    wrap_text(text, width, true)
+}
+
+/// Wrap source code without discarding spaces at row boundaries.
+pub(crate) fn wrapped_source(text: &Text<'_>, width: u16) -> Text<'static> {
+    wrap_text(text, width, false)
+}
+
+fn wrap_text(text: &Text<'_>, width: u16, words: bool) -> Text<'static> {
     if width == 0 {
         return Text::default();
     }
@@ -131,7 +140,7 @@ pub(crate) fn wrapped_text(text: &Text<'_>, width: u16) -> Text<'static> {
                 end += 1;
             }
             let mut next = end;
-            if end < graphemes.len() {
+            if words && end < graphemes.len() {
                 if let Some(boundary) = word_break {
                     end = boundary;
                     next = boundary;

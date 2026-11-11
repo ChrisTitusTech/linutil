@@ -1,4 +1,4 @@
-use crate::{floating_text::wrapped_text, theme::Theme};
+use crate::{floating_text::wrapped_source, theme::Theme};
 use linutil_core::Command;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
@@ -195,7 +195,7 @@ impl ScriptPreview {
             .iter()
             .enumerate()
             .flat_map(|(index, line)| {
-                let wrapped = wrapped_text(&Text::from(line.clone()), width).lines;
+                let wrapped = wrapped_source(&Text::from(line.clone()), width).lines;
                 let wrapped = if wrapped.is_empty() {
                     vec![Line::default()]
                 } else {
@@ -313,6 +313,29 @@ mod tests {
         assert!(content.contains("discord-setup.sh"));
         assert!(content.contains("Lines 1-"));
         assert!(!content.contains("communication-apps/"));
+    }
+
+    #[test]
+    fn wrapping_preserves_quoted_spaces_indentation_and_tabs() {
+        let source = "printf 'a    b'\n    printf 'x  y'\n\tprintf '界  界'";
+        let mut preview =
+            ScriptPreview::new(&Command::Raw(source.into()), "Inline", &Theme::Default);
+        for width in [2, 10, 20] {
+            preview.rewrap(width);
+            for (index, original) in source.lines().enumerate() {
+                let joined: String = preview
+                    .rows
+                    .iter()
+                    .filter(|(line, _)| *line == index)
+                    .map(|(_, row)| row.to_string())
+                    .collect();
+                assert_eq!(
+                    joined,
+                    original.replace('\t', "    "),
+                    "source line {index}, width {width}"
+                );
+            }
+        }
     }
 
     #[test]

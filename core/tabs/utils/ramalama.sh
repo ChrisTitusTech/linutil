@@ -267,8 +267,18 @@ menu() {
 }
 
 main() {
-    installramalama
+    case "${1:-}" in
+        '') installramalama ;;
+        --manage)
+            if ! command_exists ramalama; then
+                printf '%s\n' "Install Ramalama before opening the model manager." >&2
+                return 1
+            fi
+            menu
+            ;;
+        *) printf '%s\n' "Unknown action: $1" >&2; return 2 ;;
+    esac
 }
 
 checkEnv
-main
+main "$@"
