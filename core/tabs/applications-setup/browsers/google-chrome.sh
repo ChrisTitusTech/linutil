@@ -91,17 +91,16 @@ removeLocalAI() {
 
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Chrome${RC}"
-    printf "%b\n" "1. ${YELLOW}Install Chrome${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall Chrome${RC}"
-    printf "%b\n" "3. ${YELLOW}Remove Local AI (Prevents Chrome From Reinstalling)${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
+	printf "%b\n" "Google Chrome options:"
+    printf "%b\n" "${YELLOW}1.${RC} Install"
+    printf "%b\n" "${YELLOW}2.${RC} Remove Local AI (Prevents AI From Reinstalling)"
+    printf "%b" "Enter your choice [1-2]: "
+    CHOICE=''
+    readMenuChoice CHOICE
     case "$CHOICE" in
         1) installChrome ;;
-        2) uninstallChrome ;;
-        3) removeLocalAI ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+        2) removeLocalAI ;;
+        *) invalidChoice ;;
     esac
 }
 

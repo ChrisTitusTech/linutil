@@ -35,7 +35,6 @@ install_dwm_titus() {
         return 1
     }
     
-    printf "%b\n" "${GREEN}DWM-Titus installation complete${RC}"
 }
 
 checkEnv

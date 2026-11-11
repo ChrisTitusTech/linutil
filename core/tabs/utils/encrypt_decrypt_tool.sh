@@ -138,8 +138,8 @@ main(){
     while true; do
         show_menu
         printf "%b" "Enter your choice: "
-        read -r CHOICE
-
+        CHOICE=''
+        readMenuChoice CHOICE
         case $CHOICE in
             1) encrypt_file ;;
             2) decrypt_file ;;

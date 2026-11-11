@@ -83,7 +83,8 @@ main() {
     printf "%b\n" "4. ${YELLOW}Virtual-Manager${RC}"
     printf "%b\n" "5. ${YELLOW}All${RC}"
     printf "%b" "Enter your choice [1-5]: "
-    read -r CHOICE
+    CHOICE=''
+    readMenuChoice CHOICE
     case "$CHOICE" in
         1) installQEMUDesktop ;;
         2) installQEMUEmulators ;;

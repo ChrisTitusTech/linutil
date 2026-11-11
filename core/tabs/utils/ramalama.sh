@@ -21,8 +21,8 @@ installramalama() {
                     printf "%b\n" "3. ${YELLOW}Install Both${RC}"
                     printf "%b\n" "4. ${YELLOW}Dont install Ramalama${RC}"
                     printf "%b" "Enter your choice [1-4]: "
-                    read -r CHOICE
-
+                    CHOICE=''
+                    readMenuChoice CHOICE
                     case "$CHOICE" in
                         1)  sh ../applications-setup/docker-setup.sh
                             ;;
@@ -249,8 +249,8 @@ menu() {
         printf "%b\n" "6) Exit"
 
         printf "%b" "${YELLOW}Enter your choice (1-6): ${RC}"
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case $choice in
             1) list_models ;;
             2) show_model_info ;;
@@ -267,22 +267,7 @@ menu() {
 }
 
 main() {
-    printf "%b\n" "${YELLOW}Choose to install or uninstall ramalama:${RC}"
-    printf "%b\n" "1. ${YELLOW}Install Ramalama${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall Ramalama${RC}"
-    printf "%b\n" "3. ${YELLOW}View Ramalama Options${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
-
-    case "$CHOICE" in
-        1) installramalama
-            ;;
-        2) uninstallramalama
-            ;;
-        3) menu
-            ;;
-        *) printf "%b\n" "${RED}Invalid choice. Exiting.${RC}"; exit 1 ;;
-    esac
+    installramalama
 }
 
 checkEnv

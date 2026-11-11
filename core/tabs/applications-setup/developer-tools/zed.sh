@@ -25,7 +25,8 @@ installZed() {
                 printf "%b\n" "2) Source"
                 printf "%b\n" "3) Exit"
                 printf "%b" "Choose an option: "
-                read -r choice
+                choice=''
+                readMenuChoice choice
                 case "$choice" in
                     1)  
                         checkFlatpak      

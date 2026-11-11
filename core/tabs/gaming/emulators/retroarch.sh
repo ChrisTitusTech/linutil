@@ -78,23 +78,7 @@ uninstallRetroArch() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install RetroArch, Install Cores, Uninstall RetroArch or Install RetroArch With Cores ${RC}"
-    printf "%b\n" "1. ${YELLOW}Install RetroArch${RC}"
-    printf "%b\n" "2. ${YELLOW}Install Cores${RC}"
-    printf "%b\n" "3. ${YELLOW}Uninstall RetroArch${RC}"
-	printf "%b\n" "4. ${YELLOW}Install RetroArch With Cores${RC}"
-    printf "%b" "Enter your choice [1-4]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installRetroArch ;;
-    	2) configureRetroArch ;;
-        3) uninstallRetroArch ;;
-        4) 
-        	installRetroArch
-        	configureRetroArch
-        	;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installRetroArch
 }
 
 checkEnv

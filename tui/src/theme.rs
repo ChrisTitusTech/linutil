@@ -1,5 +1,6 @@
 use clap::ValueEnum;
 use ratatui::style::Color;
+#[cfg(not(test))]
 use std::sync::OnceLock;
 
 type Rgb = (u8, u8, u8);
@@ -185,8 +186,8 @@ const CYCLE: [Theme; 9] = [
     Theme::Flexoki,
 ];
 
-pub(crate) fn supports_truecolor(term: &str, colorterm: &str) -> bool {
-    !matches!(term, "linux" | "dumb")
+pub(crate) fn supports_truecolor(term: &str, colorterm: &str, console: bool) -> bool {
+    !crate::stars::basic_terminal(term, console)
         && (matches!(colorterm, "truecolor" | "24bit") || term.ends_with("-direct"))
 }
 
@@ -199,6 +200,12 @@ fn palette_color(theme: Theme, truecolor: bool, rgb: Rgb, fallback: Color) -> Co
 }
 
 /// Whether the terminal can show the themes' colours.
+#[cfg(test)]
+pub fn truecolor() -> bool {
+    true
+}
+
+#[cfg(not(test))]
 pub fn truecolor() -> bool {
     // Terminal capabilities do not change when cycling the application's theme.
     static TRUECOLOR: OnceLock<bool> = OnceLock::new();
@@ -206,6 +213,7 @@ pub fn truecolor() -> bool {
         supports_truecolor(
             &std::env::var("TERM").unwrap_or_default(),
             &std::env::var("COLORTERM").unwrap_or_default(),
+            crate::stars::linux_console(),
         )
     })
 }
@@ -338,12 +346,16 @@ mod tests {
 
     #[test]
     fn truecolor_detection_respects_console_and_explicit_capabilities() {
-        assert!(supports_truecolor("xterm-256color", "truecolor"));
-        assert!(supports_truecolor("xterm-256color", "24bit"));
-        assert!(supports_truecolor("xterm-direct", ""));
-        assert!(!supports_truecolor("linux", "truecolor"));
-        assert!(!supports_truecolor("dumb", "truecolor"));
-        assert!(!supports_truecolor("xterm-256color", ""));
+        for term in ["", "linux", "dumb", "vt100", "ansi"] {
+            assert!(!supports_truecolor(term, "truecolor", false));
+        }
+        assert!(!supports_truecolor("xterm-256color", "truecolor", true));
+        assert!(supports_truecolor("xterm-256color", "truecolor", false));
+        assert!(supports_truecolor("xterm-256color", "24bit", false));
+        assert!(supports_truecolor("xterm-direct", "", false));
+        assert!(!supports_truecolor("linux", "truecolor", false));
+        assert!(!supports_truecolor("dumb", "truecolor", false));
+        assert!(!supports_truecolor("xterm-256color", "", false));
     }
 
     #[test]

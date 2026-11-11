@@ -1,8 +1,8 @@
-use crate::{
-    stars::{basic_terminal, linux_console},
-    theme::Theme,
-};
+#[cfg(not(test))]
+use crate::stars::{basic_terminal, linux_console};
+use crate::theme::Theme;
 use ratatui::{prelude::*, symbols::border, widgets::Block};
+#[cfg(not(test))]
 use std::sync::OnceLock;
 use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
@@ -21,7 +21,7 @@ pub const FLAGS: &[(&str, &str)] = &[
 pub const CONTROLS: &[(&str, &str)] = &[
     ("k/j/up/down", "Move selection"),
     ("enter/right", "Open/run"),
-    ("h/left", "Parent directory"),
+    ("h/left/esc", "Parent directory"),
     ("tab/shift+tab", "Switch category"),
     ("t", "Change theme"),
     ("p", "Script preview"),
@@ -29,7 +29,13 @@ pub const CONTROLS: &[(&str, &str)] = &[
     ("q/ctrl+c", "Quit Linutil"),
 ];
 
-fn is_basic_terminal() -> bool {
+#[cfg(test)]
+pub(crate) fn is_basic_terminal() -> bool {
+    false
+}
+
+#[cfg(not(test))]
+pub(crate) fn is_basic_terminal() -> bool {
     static BASIC: OnceLock<bool> = OnceLock::new();
     *BASIC
         .get_or_init(|| basic_terminal(&std::env::var("TERM").unwrap_or_default(), linux_console()))

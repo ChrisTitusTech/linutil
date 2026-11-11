@@ -73,7 +73,8 @@ main() {
     printf "%b\n" "4. ${YELLOW}Remove CachyOS Repos and set default kernel to stock${RC}"
     printf "%b\n" "5. ${YELLOW}Reset default kernel to stock${RC}"
     printf "%b" "Enter your choice [1-5]: "
-    read -r CHOICE
+    CHOICE=''
+    readMenuChoice CHOICE
     case "$CHOICE" in
         1) setupRepos ;;
         2) setDefaultKernel ;;

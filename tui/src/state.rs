@@ -55,6 +55,7 @@ pub struct AppState {
     filter: Filter,
     multi_select: bool,
     selected_commands: Vec<Rc<ListNode>>,
+    confirmation_implicit: bool,
     drawable: bool,
     #[cfg(feature = "tips")]
     tip: &'static str,
@@ -68,7 +69,6 @@ pub struct AppState {
 
 pub enum Focus {
     Search,
-    TabList,
     List,
     ScriptPreview(ScriptPreview),
     FloatingWindow(Float<dyn FloatContent>),
@@ -86,13 +86,6 @@ struct Areas {
     tabs: Vec<Rect>,
     search: Rect,
     list: Rect,
-}
-
-enum SelectedItem {
-    UpDir,
-    Directory,
-    Command,
-    None,
 }
 
 enum ScrollDir {
@@ -122,6 +115,7 @@ impl AppState {
             filter: Filter::new(),
             multi_select: false,
             selected_commands: Vec::new(),
+            confirmation_implicit: false,
             drawable: false,
             #[cfg(feature = "tips")]
             tip: crate::tips::get_random_tip(),
@@ -165,7 +159,7 @@ impl AppState {
     }
 
     fn spawn_confirmprompt(&mut self) {
-        if self.skip_confirmation || self.should_skip_confirmation_for_selection() {
+        if self.skip_confirmation {
             self.handle_confirm_command();
         } else {
             let cmd_names: Vec<_> = self
@@ -183,39 +177,19 @@ impl AppState {
         }
     }
 
-    fn should_skip_confirmation_for_selection(&self) -> bool {
-        !self.selected_commands.is_empty()
-            && self
-                .selected_commands
-                .iter()
-                .all(|node| self.should_skip_confirmation_for_command(&node.command))
-    }
-
-    fn should_skip_confirmation_for_command(&self, command: &Command) -> bool {
-        match command {
-            Command::LocalFile { file, .. } => {
-                let path = file.to_string_lossy();
-                path.ends_with("/gaming/steam-launcher.sh")
-                    || path.ends_with("/gaming/lutris-launcher.sh")
-                    || path.ends_with("/gaming/retroarch-launcher.sh")
-                    || path.ends_with("/gaming/heroic-launcher.sh")
-                    || path.ends_with("/gaming/protonplus.sh")
-                    || path.ends_with("/gaming/protonup-qt.sh")
-            }
-            _ => false,
-        }
-    }
-
     fn is_terminal_too_small(&self, terminal_size: Rect) -> bool {
         !self.size_bypass && (terminal_size.height < MIN_HEIGHT || terminal_size.width < MIN_WIDTH)
     }
 
     pub fn draw(&mut self, frame: &mut Frame) {
+        if matches!(&self.focus, Focus::FloatingWindow(float) if float.content.should_close()) {
+            self.focus = Focus::List;
+        }
         if self.notice_expired() {
             self.notice = None;
         }
         let area = frame.area();
-        self.drawable = !self.is_terminal_too_small(area);
+        self.drawable = !self.is_terminal_too_small(area) && area.width >= 20 && area.height >= 12;
         frame.render_widget(
             Block::default().style(
                 Style::default()
@@ -224,7 +198,7 @@ impl AppState {
             ),
             area,
         );
-        if !self.drawable || area.width < 20 || area.height < 12 {
+        if !self.drawable {
             frame.render_widget(
                 Paragraph::new(format!(
                     "Terminal size too small: {}x{}\nMinimum: {}x{} · resize or q to exit",
@@ -286,7 +260,14 @@ impl AppState {
             commands.height.saturating_sub(6),
         );
         self.areas = Some(Areas {
-            tab_list: Rect::new(area.x, area.y + 1, area.width, 1),
+            tab_list: Rect::new(
+                area.x,
+                area.y + 1,
+                tabs.last()
+                    .map_or(area.x, |rect| rect.right())
+                    .saturating_sub(area.x),
+                1,
+            ),
             tabs,
             search,
             list: list_area,
@@ -459,16 +440,16 @@ impl AppState {
             dashboard::block(
                 title,
                 &self.theme,
-                matches!(self.focus, Focus::List | Focus::TabList | Focus::Search),
+                matches!(self.focus, Focus::List | Focus::Search),
             ),
             area,
         );
         self.filter.draw_searchbar(frame, search, &self.theme);
         frame.render_widget(
-            Paragraph::new("Flag")
+            Paragraph::new("Flags")
                 .alignment(Alignment::Right)
                 .style(Style::default().fg(self.theme.muted())),
-            Rect::new(list_area.right().saturating_sub(4), area.y + 2, 4, 1),
+            Rect::new(list_area.right().saturating_sub(5), area.y + 2, 5, 1),
         );
         let mut rows = Vec::new();
         if !self.at_root() {
@@ -520,15 +501,7 @@ impl AppState {
                 ),
             ])
         }));
-        let focused = matches!(self.focus, Focus::List | Focus::TabList);
-        let row_count = rows.len();
-        let rows = rows.into_iter().enumerate().map(|(index, line)| {
-            if index + 1 < row_count {
-                Text::from(vec![line, Line::default()])
-            } else {
-                Text::from(line)
-            }
-        });
+        let focused = matches!(self.focus, Focus::List);
         let list = List::new(rows)
             .highlight_spacing(HighlightSpacing::Always)
             .highlight_symbol(self.theme.tab_icon())
@@ -544,13 +517,6 @@ impl AppState {
             .scroll_padding(1);
         // ListState is also used by the navigation handlers; keep its viewport offset.
         frame.render_stateful_widget(list, list_area, &mut self.selection);
-        // Keep the spacer below the selected item free of its highlight background.
-        for y in (list_area.y + 1..list_area.bottom()).step_by(2) {
-            frame.render_widget(
-                Block::default().style(Style::default().bg(self.theme.bg())),
-                Rect::new(list_area.x, y, list_area.width, 1),
-            );
-        }
         let group = if self.filter.is_filtered() {
             "Search results"
         } else {
@@ -571,7 +537,20 @@ impl AppState {
         };
         let footer = format!("{} entries · {}", self.filter.item_list().len(), group);
         let content_width = area.width.saturating_sub(4);
-        let footer_width = (footer.width() as u16).min(content_width);
+        let back_hint = "Esc or left arrow to go back";
+        let hint_width = if !self.at_root() && matches!(self.focus, Focus::List) {
+            (back_hint.width() as u16).min(content_width)
+        } else {
+            0
+        };
+        if hint_width > 0 {
+            frame.render_widget(
+                Paragraph::new(back_hint).style(Style::default().fg(self.theme.muted())),
+                Rect::new(area.x + 2, area.bottom().saturating_sub(2), hint_width, 1),
+            );
+        }
+        let footer_width = (footer.width() as u16)
+            .min(content_width.saturating_sub(hint_width + u16::from(hint_width > 0)));
         frame.render_widget(
             Paragraph::new(footer)
                 .alignment(Alignment::Right)
@@ -707,13 +686,6 @@ impl AppState {
                 self.refresh_tab();
                 self.focus = Focus::List;
             }
-            MouseEventKind::Moved if !matches!(self.focus, Focus::Search) => {
-                if in_list {
-                    self.focus = Focus::List;
-                } else if in_tabs {
-                    self.focus = Focus::TabList;
-                }
-            }
             MouseEventKind::ScrollDown if !matches!(self.focus, Focus::Search) => {
                 if in_tabs {
                     self.scroll_tab_down();
@@ -737,7 +709,12 @@ impl AppState {
         // This should be defined first to allow closing
         // the application even when not drawable ( If terminal is small )
         // Exit on 'q' or 'Ctrl-c' input
-        if matches!(self.focus, Focus::TabList | Focus::List)
+        if (matches!(self.focus, Focus::List)
+            || !self.drawable
+                && !matches!(
+                    self.focus,
+                    Focus::FloatingWindow(_) | Focus::ConfirmationPrompt(_)
+                ))
             && (matches!(key.code, KeyCode::Char('q'))
                 || key.modifiers.contains(KeyModifiers::CONTROL)
                     && matches!(key.code, KeyCode::Char('c' | 'C')))
@@ -761,12 +738,8 @@ impl AppState {
             return true;
         }
 
-        // Handle key only when Tablist or List is focused
-        // Prevents exiting the application even when a command is running
-        // Add keys here which should work on both TabList and List
-        if matches!(self.focus, Focus::TabList | Focus::List)
-            && self.handle_tablist_and_list_keys(key)
-        {
+        // Navigation shortcuts are inactive while a modal or search is focused.
+        if matches!(self.focus, Focus::List) && self.handle_navigation_keys(key) {
             return true;
         }
 
@@ -785,7 +758,7 @@ impl AppState {
                         self.focus = Focus::List;
                         // selected command was pushed to selection list if multi-select was
                         // enabled, need to clear it to prevent state corruption
-                        if !self.multi_select {
+                        if !self.multi_select || self.confirmation_implicit {
                             self.selected_commands.clear()
                         } else {
                             // Prevents non multi_selectable cmd from being pushed into the selected list
@@ -807,21 +780,13 @@ impl AppState {
                 SearchAction::None => {}
             },
 
-            Focus::TabList => match key.code {
-                KeyCode::Enter | KeyCode::Right => self.focus = Focus::List,
-                KeyCode::Char('j') | KeyCode::Down => self.scroll_tab_down(),
-                KeyCode::Char('k') | KeyCode::Up => self.scroll_tab_up(),
-
-                _ => {}
-            },
-
             Focus::List if key.kind != KeyEventKind::Release => match key.code {
                 KeyCode::Char('j') | KeyCode::Down => self.scroll_down(),
                 KeyCode::Char('k') | KeyCode::Up => self.scroll_up(),
                 KeyCode::Char('p') => self.enable_preview(),
                 KeyCode::Char('d') => self.enable_description(),
                 KeyCode::Enter | KeyCode::Right => self.handle_enter(),
-                KeyCode::Char('h') | KeyCode::Left => self.go_back(),
+                KeyCode::Char('h') | KeyCode::Left | KeyCode::Esc => self.go_back(),
                 KeyCode::Char(' ') if self.multi_select => self.toggle_selection(),
                 _ => {}
             },
@@ -837,7 +802,7 @@ impl AppState {
                 && (self.notice_expired()
                     || matches!(
                         self.focus,
-                        Focus::List | Focus::TabList | Focus::Search | Focus::ScriptPreview(_)
+                        Focus::List | Focus::Search | Focus::ScriptPreview(_)
                     ) && self.stars.frame_due(&self.theme))
     }
 
@@ -859,7 +824,7 @@ impl AppState {
         self.notice = Some((notice, Instant::now()));
     }
 
-    fn handle_tablist_and_list_keys(&mut self, key: &KeyEvent) -> bool {
+    fn handle_navigation_keys(&mut self, key: &KeyEvent) -> bool {
         match key.code {
             KeyCode::Tab => self.scroll_tab_down(),
             KeyCode::BackTab => self.scroll_tab_up(),
@@ -951,7 +916,7 @@ impl AppState {
     /// Returns `true` if we can't go up the tree (we are at the tree root)
     /// else returns `false`
     pub fn at_root(&self) -> bool {
-        self.visit_stack.len() == 1
+        self.visit_stack.len() == 1 || self.filter.is_filtered()
     }
 
     fn go_back(&mut self) {
@@ -978,55 +943,8 @@ impl AppState {
             .map(|node| node.description.clone())
     }
 
-    pub fn go_to_selected_dir(&mut self) {
-        let selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() && selected_index == 0 {
-            self.enter_parent_directory();
-            return;
-        }
-
-        let actual_index = if self.at_root() {
-            selected_index
-        } else {
-            selected_index - 1
-        };
-
-        if let Some(item) = self.filter.item_list().get(actual_index) {
-            if item.has_children {
-                self.visit_stack.push((item.id, selected_index));
-                self.selection.select(Some(0));
-                self.update_items();
-            }
-        }
-    }
-
-    pub fn selected_item_is_dir(&self) -> bool {
-        let mut selected_index = self.selection.selected().unwrap_or(0);
-
-        if !self.at_root() {
-            if selected_index == 0 {
-                return false;
-            } else {
-                selected_index = selected_index.saturating_sub(1);
-            }
-        }
-
-        self.filter
-            .item_list()
-            .get(selected_index)
-            .is_some_and(|i| i.has_children)
-    }
-
-    pub fn selected_item_is_cmd(&self) -> bool {
-        // Any item that is not a directory or up directory (..) must be a command
-        self.selection.selected().is_some()
-            && !(self.selected_item_is_up_dir() || self.selected_item_is_dir())
-    }
-
     pub fn selected_item_is_up_dir(&self) -> bool {
-        let selected_index = self.selection.selected().unwrap_or(0);
-        !self.at_root() && selected_index == 0
+        !self.at_root() && self.selection.selected() == Some(0)
     }
 
     fn enable_preview(&mut self) {
@@ -1051,17 +969,10 @@ impl AppState {
     }
 
     fn enable_help(&mut self) {
-        let mut lines = vec![
-            Line::styled(
-                "Lowercase shortcuts only · running commands accept normal input",
-                Style::default().fg(self.theme.muted()),
-            ),
-            Line::default(),
-            Line::styled(
-                "Navigation",
-                Style::default().fg(self.theme.tab_color()).bold(),
-            ),
-        ];
+        let mut lines = vec![Line::styled(
+            "Navigation",
+            Style::default().fg(self.theme.tab_color()).bold(),
+        )];
         // The same list wherever the help is opened; it fills two columns
         // row by row, so pairs (tab/shift+tab, v/space) stay stacked.
         let mut shortcuts = shortcuts!(
@@ -1069,7 +980,7 @@ impl AppState {
             ("Open/run", ["enter", "right"]),
             ("Select item above", ["k", "up"]),
             ("Select item below", ["j", "down"]),
-            ("Parent directory", ["h", "left"]),
+            ("Parent directory", ["h", "left", "esc"]),
             ("Script preview", ["p"]),
             ("Command description", ["d"]),
             ("Search", ["/"]),
@@ -1133,14 +1044,22 @@ impl AppState {
             (
                 "Running command",
                 &[
-                    ("ctrl+c", "Cancel; press again to escalate"),
+                    ("esc", "Go back while choosing a menu action"),
+                    ("ctrl+c", "Abort; press again to escalate"),
                     ("pageup/pagedown", "Scroll; other keys go to the command"),
                 ],
             ),
             (
                 "Finished command",
                 &[
-                    ("any key", "Close"),
+                    (
+                        "other keys",
+                        "Close after 300 ms when no background work remains",
+                    ),
+                    (
+                        "ctrl+c",
+                        "Stop remaining background work; otherwise ignored",
+                    ),
                     ("ctrl+d", "Leave while background work remains"),
                     ("l", "Save log; pageup/pagedown scrolls"),
                 ],
@@ -1162,7 +1081,7 @@ impl AppState {
                 ]));
             }
         }
-        let height = (lines.len() as u16 + 4).min(44);
+        let height = lines.len() as u16 + 4;
         self.focus = Focus::FloatingWindow(Float::capped(
             Box::new(
                 FloatingText::from_text(Text::from(lines), " Help ", true)
@@ -1174,31 +1093,28 @@ impl AppState {
         ));
     }
 
-    fn get_selected_item_type(&self) -> SelectedItem {
-        if self.selected_item_is_up_dir() {
-            SelectedItem::UpDir
-        } else if self.selected_item_is_dir() {
-            SelectedItem::Directory
-        } else if self.selected_item_is_cmd() {
-            SelectedItem::Command
-        } else {
-            SelectedItem::None
-        }
-    }
-
     fn handle_enter(&mut self) {
-        match self.get_selected_item_type() {
-            SelectedItem::UpDir => self.enter_parent_directory(),
-            SelectedItem::Directory => self.go_to_selected_dir(),
-            SelectedItem::Command => {
-                if self.selected_commands.is_empty() {
-                    if let Some(node) = self.get_selected_node() {
-                        self.selected_commands.push(node);
-                    }
-                }
-                self.spawn_confirmprompt();
+        if self.selected_item_is_up_dir() {
+            self.enter_parent_directory();
+            return;
+        }
+        let Some(selected_index) = self.selection.selected() else {
+            return;
+        };
+        let Some(item) = self.selected_entry() else {
+            return;
+        };
+        if item.has_children {
+            self.visit_stack.push((item.id, selected_index));
+            self.selection.select(Some(0));
+            self.update_items();
+        } else {
+            let node = item.node.clone();
+            self.confirmation_implicit = self.selected_commands.is_empty();
+            if self.confirmation_implicit {
+                self.selected_commands.push(node);
             }
-            SelectedItem::None => {}
+            self.spawn_confirmprompt();
         }
     }
 
@@ -1297,6 +1213,7 @@ mod tests {
 
     fn app() -> AppState {
         AppState::new(Args {
+            intro: false,
             config: None,
             theme: Theme::Default,
             skip_confirmation: false,
@@ -1326,6 +1243,132 @@ mod tests {
     }
 
     #[test]
+    fn every_catalog_entry_asks_for_confirmation() {
+        let mut app = app();
+        let mut checked = 0;
+        for tab_index in 0..app.tabs.len() {
+            let nodes: Vec<_> = app.tabs[tab_index]
+                .tree
+                .root()
+                .descendants()
+                .filter(|node| !node.has_children() && node.parent().is_some())
+                .map(|node| node.value().clone())
+                .collect();
+            for node in nodes {
+                let name = node.name.clone();
+                app.selected_commands = vec![node];
+                app.spawn_confirmprompt();
+                assert!(matches!(app.focus, Focus::ConfirmationPrompt(_)), "{name}");
+                assert!(draw(&mut app, 200, 50).contains("Confirmation"), "{name}");
+                app.focus = Focus::List;
+                app.selected_commands.clear();
+                checked += 1;
+            }
+        }
+        assert!(checked > 100, "only {checked} catalog entries were checked");
+    }
+
+    #[test]
+    fn subdirectory_search_has_no_parent_and_restores_directory_on_escape() {
+        let mut app = app();
+        draw(&mut app, 200, 50);
+        key(&mut app, KeyCode::Enter);
+        let directory = app.visit_stack.clone();
+        key(&mut app, KeyCode::Char('/'));
+        for c in "ghostty".chars() {
+            key(&mut app, KeyCode::Char(c));
+        }
+        let rendered = draw(&mut app, 200, 50);
+        assert!(rendered.contains("Ghostty is"));
+        assert!(!rendered.contains("[D] .."));
+        key(&mut app, KeyCode::Enter);
+        assert_eq!(app.get_selected_node().unwrap().name, "Ghostty");
+        key(&mut app, KeyCode::Left);
+        assert_eq!(app.visit_stack, directory);
+        key(&mut app, KeyCode::Char('/'));
+        key(&mut app, KeyCode::Char('z'));
+        assert!(draw(&mut app, 200, 50).contains("No matches"));
+        assert_eq!(app.selection.selected(), None);
+        key(&mut app, KeyCode::Esc);
+        assert_eq!(app.visit_stack, directory);
+        assert!(draw(&mut app, 200, 50).contains("[D] .."));
+    }
+
+    #[test]
+    fn header_hover_keeps_list_keys_and_unused_header_does_not_scroll_tabs() {
+        let mut app = app();
+        draw(&mut app, 200, 50);
+        app.handle_mouse(&MouseEvent {
+            kind: MouseEventKind::Moved,
+            column: 5,
+            row: 1,
+            modifiers: KeyModifiers::NONE,
+        });
+        key(&mut app, KeyCode::Down);
+        assert_eq!(app.current_tab.selected(), Some(0));
+        assert_eq!(app.selection.selected(), Some(1));
+        app.handle_mouse(&MouseEvent {
+            kind: MouseEventKind::ScrollDown,
+            column: 199,
+            row: 1,
+            modifiers: KeyModifiers::NONE,
+        });
+        assert_eq!(app.current_tab.selected(), Some(0));
+    }
+
+    #[test]
+    fn cancelling_implicit_batch_selection_preserves_only_explicit_choices() {
+        let mut app = app();
+        draw(&mut app, 200, 50);
+        key(&mut app, KeyCode::Enter);
+        key(&mut app, KeyCode::Down);
+        key(&mut app, KeyCode::Char('v'));
+        for abort in [KeyCode::Char('n'), KeyCode::Char('q'), KeyCode::Esc] {
+            key(&mut app, KeyCode::Enter);
+            assert!(matches!(app.focus, Focus::ConfirmationPrompt(_)));
+            key(&mut app, abort);
+            assert!(app.selected_commands.is_empty());
+        }
+        key(&mut app, KeyCode::Down);
+        let selected = app.get_selected_node().unwrap();
+        key(&mut app, KeyCode::Enter);
+        assert!(app.selected_commands == vec![selected.clone()]);
+        key(&mut app, KeyCode::Esc);
+        key(&mut app, KeyCode::Char(' '));
+        key(&mut app, KeyCode::Enter);
+        key(&mut app, KeyCode::Esc);
+        assert!(app.selected_commands == vec![selected]);
+    }
+
+    #[test]
+    fn undersized_search_and_preview_allow_quitting_even_with_size_bypass() {
+        for preview in [false, true] {
+            for bypass in [false, true] {
+                for quit in [
+                    KeyEvent::new(KeyCode::Char('q'), KeyModifiers::NONE),
+                    KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL),
+                ] {
+                    let mut app = app();
+                    draw(&mut app, 200, 50);
+                    if preview {
+                        key(&mut app, KeyCode::Enter);
+                        key(&mut app, KeyCode::Down);
+                        key(&mut app, KeyCode::Char('p'));
+                        assert!(matches!(app.focus, Focus::ScriptPreview(_)));
+                    } else {
+                        key(&mut app, KeyCode::Char('/'));
+                    }
+                    app.size_bypass = bypass;
+                    let (w, h) = if bypass { (19, 11) } else { (80, 24) };
+                    draw(&mut app, w, h);
+                    assert!(!app.drawable);
+                    assert!(!app.handle_key(&quit));
+                }
+            }
+        }
+    }
+
+    #[test]
     fn catalog_navigation_preview_and_confirmation_use_real_scripts_without_execution() {
         let mut app = app();
         draw(&mut app, 200, 50);
@@ -1348,8 +1391,13 @@ mod tests {
         key(&mut app, KeyCode::Char('n'));
         assert!(app.selected_commands.is_empty());
         assert!(matches!(app.focus, Focus::List));
-        key(&mut app, KeyCode::Char('h'));
+        key(&mut app, KeyCode::Esc);
         assert!(app.at_root());
+        let selected = app.selection.selected();
+        key(&mut app, KeyCode::Esc);
+        assert!(app.at_root());
+        assert_eq!(app.selection.selected(), selected);
+        assert!(matches!(app.focus, Focus::List));
     }
 
     #[test]
@@ -1588,6 +1636,10 @@ mod tests {
             assert_eq!(column(&rows, "[space]"), Some((v_y + 1, v_x)));
             assert_eq!(tab_y, v_y);
             assert!(rendered.contains(&format!("[1..{}] Jump to category", app.tabs.len())));
+            // A full-height TTY must show the final Help row without scrolling.
+            let full = draw(&mut app, 240, 67);
+            assert!(full.contains("Save log; pageup/pagedown scrolls"));
+            assert!(full.contains("Close after 300 ms when no background work remains"));
             key(&mut app, KeyCode::Esc);
         }
     }
@@ -1634,8 +1686,8 @@ mod tests {
         assert_eq!(buffer[(list.x - 2, list.y)].fg, app.theme.focused_color());
         assert_eq!(buffer[(list.x, list.y)].fg, app.theme.focused_color());
         assert_eq!(buffer[(list.x + 2, list.y)].fg, app.theme.focused_color());
+        // Entries sit on consecutive rows; only the selected one is highlighted.
         for x in list.x..list.right() {
-            assert_eq!(buffer[(x, list.y + 1)].symbol(), " ");
             assert_eq!(buffer[(x, list.y + 1)].bg, app.theme.bg());
         }
         assert!(matches!(app.focus, Focus::List));
@@ -1858,7 +1910,7 @@ mod tests {
         }
 
         let working_rendered = draw(&mut app, 200, 50);
-        assert!(working_rendered.contains("Ctrl-C to cancel"));
+        assert!(working_rendered.contains("Ctrl+C to Abort"));
 
         // Esc goes to the command: nothing stops and the window stays
         key(&mut app, KeyCode::Esc);
@@ -1910,6 +1962,37 @@ mod tests {
         }
         assert!(draw(&mut app, 200, 50).contains("Done!"));
         assert!(!app.needs_animation_frame());
+    }
+
+    #[test]
+    fn escape_leaves_a_menu_after_the_script_stops() {
+        use std::time::{Duration, Instant};
+        let mut app = app();
+        draw(&mut app, 200, 50);
+        app.selected_commands.push(Rc::new(ListNode {
+            name: "Menu fixture".to_string(),
+            description: String::new(),
+            command: Command::Raw(format!(
+                ". '{}/../core/tabs/common-script.sh'; printf '1. Install\\n2. Uninstall\\n'; readMenuChoice choice; printf 'ACTION STARTED'",
+                env!("CARGO_MANIFEST_DIR")
+            )),
+            task_list: String::new(),
+            multi_select: false,
+        }));
+        app.spawn_confirmprompt();
+        key(&mut app, KeyCode::Char('y'));
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !draw(&mut app, 200, 50).contains("Esc to go back") {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        key(&mut app, KeyCode::Esc);
+        while matches!(app.focus, Focus::FloatingWindow(_)) {
+            assert!(Instant::now() < deadline);
+            assert!(!draw(&mut app, 200, 50).contains("ACTION STARTED"));
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(matches!(app.focus, Focus::List));
     }
 
     #[test]

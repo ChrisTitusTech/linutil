@@ -8,12 +8,32 @@ YELLOW='\033[33m'
 CYAN='\033[36m'
 GREEN='\033[32m'
 
+# Tell the TUI precisely when a script is waiting for a menu selection.
+# Outside Linutil this behaves like ordinary read -r, with no control output.
+readMenuChoice() {
+    if [ "${LINUTIL_MENU_PROTOCOL:-}" = "1" ]; then
+        printf '\033]777;linutil;menu\007'
+    fi
+    linutil_menu_status=0
+    read -r "$1" || linutil_menu_status=$?
+    if [ "${LINUTIL_MENU_PROTOCOL:-}" = "1" ]; then
+        printf '\033]777;linutil;running\007'
+    fi
+    return "$linutil_menu_status"
+}
+
 command_exists() {
 for cmd in "$@"; do
     export PATH="$HOME/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
     command -v "$cmd" >/dev/null 2>&1 || return 1
 done
 return 0
+}
+
+# Exit for a choice that is not on the menu. linutil shows "Invalid!" for
+# this status, so the script prints nothing itself.
+invalidChoice() {
+    exit 64
 }
 
 checkFlatpak() {

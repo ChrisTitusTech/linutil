@@ -228,22 +228,24 @@ Using a real PTY (instead of piped stdio) means scripts that use terminal colors
 The TUI is rendered by `AppState::draw()` and divided into these regions:
 
 ```
-┌──────────────┬────────────────────────────────┐
-│   Logo /     │  [ Search bar                ] │
-│   Version    ├────────────────────────────────┤
-│              │                                │
-│  Tab List    │   Item List                    │
-│              │                                │
-│  System Info │                                │
-├──────────────┴────────────────────────────────┤
-│   Keyboard hint bar                           │
-└───────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Category tabs                                      │
+├──────────────────────────┬──────────────────────────┤
+│ Directories & Commands   │ System info / Logo       │
+│ Search                   │                          │
+│ Item list / Script       ├──────────────────────────┤
+│ Preview                  │ Details                  │
+│                          ├──────────────────────────┤
+│                          │ Flags / Quick help       │
+│                          │ Tips / Links             │
+└──────────────────────────┴──────────────────────────┘
 ```
 
-- **Left column**: Logo (or version label), tab list, system info panel
-- **Right column**: Search bar (top) + scrollable item list
-- **Bottom bar**: Context-sensitive keyboard shortcut hints
-- **Floating windows**: Overlaid on the item list for running commands, previews, descriptions, and confirmation prompts
+- **Header**: Clickable category tabs
+- **Main panel**: Search and command list, replaced by the script viewer during preview
+- **Supporting panels**: System information, logo, quick help, and tips; geometry adapts to terminal size
+- **Details**: Description of the selected entry or live search match
+- **Floating windows**: Running commands, descriptions, help, and confirmation prompts
 
 ### Focus State Machine
 
@@ -251,10 +253,10 @@ The TUI is rendered by `AppState::draw()` and divided into these regions:
 
 | State | Description |
 |-------|-------------|
-| `TabList` | User is navigating the left tab panel |
 | `List` | User is navigating the item list |
 | `Search` | The search bar is active |
-| `FloatingWindow` | A modal is open (preview, description, running command, guide) |
+| `ScriptPreview` | The command panel displays a scrollable script viewer |
+| `FloatingWindow` | A modal is open (description, running command, guide) |
 | `ConfirmationPrompt` | User is being asked to confirm before running a command |
 
 Input is dispatched to the currently focused component.
@@ -310,3 +312,13 @@ task_list = "I"
 | `serde` + `toml` | Deserialize `tab_data.toml` and config files |
 | `clap` | CLI argument parsing |
 | `tree-sitter-bash` | Bash syntax highlighting in script previews |
+
+### Script action menus
+
+Catalog scripts use `readMenuChoice VARIABLE` from `common-script.sh` for action
+menus. It preserves `read -r` input and exit status. When the TUI sets
+`LINUTIL_MENU_PROTOCOL=1`, the helper emits OSC 777 `linutil;menu` and
+`linutil;running` markers around the read. Standalone scripts emit no markers.
+The TUI uses these explicit states for the footer: Esc stops a waiting menu and
+returns to the list after its processes stop. Ordinary prompts and interactive
+programs retain Esc passthrough. New menu prompts should use the helper rather than plain `read`.

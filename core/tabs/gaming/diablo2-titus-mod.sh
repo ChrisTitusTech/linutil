@@ -42,7 +42,6 @@ if ! clone_git_repo; then
     exit 1
 fi
 
-printf "%b\n" "${GREEN}Diablo II: Resurrected loot filter installed successfully!${RC}"
 printf "%b\n" "${YELLOW}To complete the setup, add the following Steam launch options:${RC}"
 printf "%b\n" "1. Right-click Diablo II: Resurrected in your Steam library"
 printf "%b\n" "2. Select 'Properties'"

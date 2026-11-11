@@ -137,25 +137,25 @@ name = "Game Launchers"
 
 [[data.entries]]
 name = "Heroic"
-description = "Manage Heroic launcher installation with Install, Uninstall, or Abort actions."
+description = "Install the Heroic launcher."
 script = "heroic-launcher.sh"
 task_list = "FI"
 
 [[data.entries]]
 name = "Lutris"
-description = "Manage Lutris launcher installation with Install, Uninstall, or Abort actions."
+description = "Install the Lutris launcher."
 script = "lutris-launcher.sh"
 task_list = "FI"
 
 [[data.entries]]
 name = "RetroArch"
-description = "Manage RetroArch launcher installation with Install, Uninstall, or Abort actions."
+description = "Install the RetroArch launcher."
 script = "retroarch-launcher.sh"
 task_list = "FI"
 
 [[data.entries]]
 name = "Steam"
-description = "Manage Steam launcher installation with Install, Uninstall, or Abort actions."
+description = "Install the Steam launcher."
 script = "steam-launcher.sh"
 task_list = "FI"
 

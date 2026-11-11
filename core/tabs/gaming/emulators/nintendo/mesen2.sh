@@ -37,16 +37,7 @@ uninstallMesen2() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Mesen2${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installMesen2 ;;
-        2) uninstallMesen2 ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installMesen2
 }
 
 checkEnv

@@ -53,16 +53,7 @@ uninstallHeliumBrowser() {
 }
 
 main() {
-  printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Helium Browser?${RC}"
-  printf "%b\n" "1. ${YELLOW}Install Helium Browser${RC}"
-  printf "%b\n" "2. ${YELLOW}Uninstall Helium Browser${RC}"
-  printf "%b" "Enter your choice [1-2]: "
-  read -r CHOICE
-  case "$CHOICE" in
-  1) installHeliumBrowser ;;
-  2) uninstallHeliumBrowser ;;
-  *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-  esac
+    installHeliumBrowser
 }
 
 checkEnv

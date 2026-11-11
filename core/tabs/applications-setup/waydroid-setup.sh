@@ -75,7 +75,6 @@ setupWaydroid() {
     printf "%b\n" "${YELLOW}Setting up Waydroid...${RC}"
     "$ESCALATION_TOOL" systemctl enable --now waydroid-container
     "$ESCALATION_TOOL" waydroid init
-    printf "%b\n" "${GREEN}Waydroid setup complete.${RC}"
 }
 
 checkEnv

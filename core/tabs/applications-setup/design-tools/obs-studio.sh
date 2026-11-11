@@ -46,16 +46,7 @@ uninstallObsStudio() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall OBS Studio${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installObsStudio ;;
-        2) uninstallObsStudio ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installObsStudio
 }
 
 checkEnv

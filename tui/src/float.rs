@@ -11,6 +11,9 @@ pub trait FloatContent {
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool;
     fn handle_mouse_event(&mut self, key: &MouseEvent) -> bool;
     fn is_finished(&self) -> bool;
+    fn should_close(&self) -> bool {
+        false
+    }
     /// Whether a result has not been drawn yet. A command can end after its
     /// last output, which is what asks for a redraw, so this has to ask too.
     fn result_pending(&self) -> bool {
@@ -125,82 +128,25 @@ pub(crate) fn dim_cell(cell: &mut ratatui::buffer::Cell, theme: &Theme) {
 
 fn dim_color(color: Color, reset: Color, theme: Theme) -> Color {
     let color = if color == Color::Reset { reset } else { color };
-    let (r, g, b) = match color {
-        Color::Rgb(r, g, b) => (r, g, b),
-        Color::Indexed(index @ 16..=231) => {
-            let index = index - 16;
-            let channel = |value| if value == 0 { 0 } else { 55 + 40 * value };
-            (
-                channel(index / 36),
-                channel(index / 6 % 6),
-                channel(index % 6),
-            )
-        }
-        Color::Indexed(index @ 232..=255) => {
-            let value = 8 + 10 * (index - 232);
-            (value, value, value)
-        }
-        color => {
-            let index = match color {
-                Color::Black => 0,
-                Color::Red => 1,
-                Color::Green => 2,
-                Color::Yellow => 3,
-                Color::Blue => 4,
-                Color::Magenta => 5,
-                Color::Cyan => 6,
-                Color::Gray => 7,
-                Color::DarkGray => 8,
-                Color::LightRed => 9,
-                Color::LightGreen => 10,
-                Color::LightYellow => 11,
-                Color::LightBlue => 12,
-                Color::LightMagenta => 13,
-                Color::LightCyan => 14,
-                Color::White => 15,
-                Color::Indexed(index) => index as usize,
-                _ => 0,
-            };
-            const ANSI: [(u8, u8, u8); 16] = [
-                (0, 0, 0),
-                (128, 0, 0),
-                (0, 128, 0),
-                (128, 128, 0),
-                (0, 0, 128),
-                (128, 0, 128),
-                (0, 128, 128),
-                (192, 192, 192),
-                (128, 128, 128),
-                (255, 0, 0),
-                (0, 255, 0),
-                (255, 255, 0),
-                (0, 0, 255),
-                (255, 0, 255),
-                (0, 255, 255),
-                (255, 255, 255),
-            ];
-            ANSI[index]
-        }
-    };
-    let gray = ((0.2126 * r as f64 + 0.7152 * g as f64 + 0.0722 * b as f64) * 0.35).round() as u8;
-    if matches!(color, Color::Rgb(..)) && theme != Theme::Compatible {
-        match theme.bg() {
-            // Fade towards the background: a fixed gray can be as bright as a
-            // lighter background and vanish.
+    match color {
+        Color::Rgb(r, g, b) if theme != Theme::Compatible => match theme.bg() {
+            // Fade towards the background so dim text stays distinct from it.
             Color::Rgb(bg_r, bg_g, bg_b) if theme != Theme::Default => {
                 let fade = |color: u8, bg: u8| {
                     (f64::from(bg) + (f64::from(color) - f64::from(bg)) * 0.35).round() as u8
                 };
                 Color::Rgb(fade(r, bg_r), fade(g, bg_g), fade(b, bg_b))
             }
-            _ => Color::Rgb(gray, gray, gray),
-        }
-    } else if (r, g, b) == (0, 0, 0) {
-        Color::Black
-    } else {
-        // With 16 colours, anything darker would be black, and borders
-        // would vanish behind a popup while their text stayed visible.
-        Color::DarkGray
+            _ => {
+                let gray = ((0.2126 * f64::from(r) + 0.7152 * f64::from(g) + 0.0722 * f64::from(b))
+                    * 0.35)
+                    .round() as u8;
+                Color::Rgb(gray, gray, gray)
+            }
+        },
+        Color::Reset | Color::Black | Color::Indexed(0 | 16) | Color::Rgb(0, 0, 0) => Color::Black,
+        // Keep non-black ANSI colours visible behind the popup.
+        _ => Color::DarkGray,
     }
 }
 
@@ -324,6 +270,23 @@ mod tests {
 
     #[test]
     fn compatible_dimming_keeps_dark_colours_visible() {
+        for index in 0..=255 {
+            for theme in [Theme::Default, Theme::Compatible, Theme::Nord] {
+                let expected = if matches!(index, 0 | 16) {
+                    Color::Black
+                } else {
+                    Color::DarkGray
+                };
+                assert_eq!(
+                    dim_color(Color::Indexed(index), Color::White, theme),
+                    expected
+                );
+            }
+        }
+        assert_eq!(
+            dim_color(Color::Reset, Color::Reset, Theme::Default),
+            Color::Black
+        );
         for color in [Color::Blue, Color::DarkGray, Color::Indexed(17)] {
             assert_eq!(
                 dim_color(color, Color::White, Theme::Compatible),

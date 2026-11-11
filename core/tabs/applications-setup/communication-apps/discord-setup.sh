@@ -119,8 +119,8 @@ main() {
     printf "%b\n" "${YELLOW}2) Vesktop (Discord with plugins)${RC}"
     printf "%b\n" "${YELLOW}3) Equibop (Vesktop with more plugins)${RC}"
     printf "%b" "Enter your choice [1-3]: "
-    read -r choice
-
+    choice=''
+    readMenuChoice choice
     case "$choice" in
         1)
             installDiscord

@@ -38,7 +38,7 @@ impl Starfield {
     pub fn for_terminal(term: &str, colorterm: &str, console: bool) -> Self {
         let now = Instant::now();
         Self {
-            supported: !basic_terminal(term, console) && supports_truecolor(term, colorterm),
+            supported: supports_truecolor(term, colorterm, console),
             enabled: true,
             started: now,
             last_frame: now,

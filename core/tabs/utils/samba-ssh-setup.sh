@@ -181,8 +181,8 @@ setup_ssh_samba(){
     printf "%b\n" "5. Exit"
 
     printf "%b" "Enter your choice (1-5): "
-    read -r CHOICE
-
+    CHOICE=''
+    readMenuChoice CHOICE
     case "$CHOICE" in
         1)
             setup_ssh
@@ -208,7 +208,6 @@ setup_ssh_samba(){
             ;;
     esac
 
-    printf "%b\n" "${GREEN}Setup completed.${RC}"
 }
 
 checkEnv

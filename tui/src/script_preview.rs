@@ -3,7 +3,7 @@ use linutil_core::Command;
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     prelude::*,
-    widgets::{Block, Clear, Paragraph},
+    widgets::{Clear, Paragraph},
 };
 use tree_sitter_bash as bash;
 use tree_sitter_highlight::{HighlightConfiguration, HighlightEvent, Highlighter};
@@ -61,12 +61,7 @@ impl ScriptPreview {
     }
 
     pub fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        let block = Block::bordered()
-            .border_set(crate::dashboard::border_set())
-            .title(" Script Preview ")
-            .title_style(Style::default().fg(theme.tab_color()).bold())
-            .border_style(Style::default().fg(theme.focused_color()))
-            .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()));
+        let block = crate::dashboard::block(" Script Preview ", theme, true);
         let inner = block.inner(area);
         frame.render_widget(Clear, area);
         frame.render_widget(block, area);

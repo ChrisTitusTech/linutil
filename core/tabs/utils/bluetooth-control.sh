@@ -45,8 +45,8 @@ main_menu() {
         printf "%b\n" "5. Remove a device"
         printf "%b\n" "0. Exit"
         printf "%b" "Choose an option: "
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case $choice in
             1) scan_devices ;;
             2) pair_device ;;
@@ -98,8 +98,8 @@ prompt_for_mac() {
         done
         printf "%b\n" "0. Exit to main menu"
         printf "%b" "$prompt_msg"
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         count=$(printf "%b" "$devices" | wc -l)
         count=$((count + 1))
 

@@ -48,16 +48,7 @@ uninstallgopher64() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall gopher64${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installgopher64 ;;
-        2) uninstallgopher64 ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installgopher64
 }
 
 checkEnv

@@ -16,8 +16,8 @@ list_sessions() {
     printf "%b\n" "9) i3 (i3.desktop)"
     printf "%b\n" "10) Custom session"
     printf "%b" "Enter your choice (1-10): "
-    read -r session_choice
-
+    session_choice=''
+    readMenuChoice session_choice
     case "$session_choice" in
         1) session="gnome.desktop" ;;
         2) session="plasma.desktop" ;;
@@ -127,8 +127,8 @@ configure_or_remove_autologin() {
     printf "%b\n" "1) Add autologin"
     printf "%b\n" "2) Remove autologin"
     printf "%b" "Enter your choice (1-2): "
-    read -r action_choice
-
+    action_choice=''
+    readMenuChoice action_choice
     if [ "$action_choice" = "1" ]; then
         printf "%b\n" "Choose the display manager to configure:"
         printf "%b\n" "1) LightDM"
@@ -136,8 +136,8 @@ configure_or_remove_autologin() {
         printf "%b\n" "3) SDDM"
         printf "%b\n" "4) LXDM"
         printf "%b" "Enter your choice (1-4): "
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case "$choice" in
             1) configure_lightdm ;;
             2) configure_gdm ;;
@@ -152,8 +152,8 @@ configure_or_remove_autologin() {
         printf "%b\n" "3) SDDM"
         printf "%b\n" "4) LXDM"
         printf "%b" "Enter your choice (1-4): "
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case "$choice" in
             1) remove_lightdm_autologin ;;
             2) remove_gdm_autologin ;;
@@ -166,7 +166,6 @@ configure_or_remove_autologin() {
         exit 1
     fi
 
-    printf "%b\n" "Action completed. Exiting..."
     exit 0
 }
 

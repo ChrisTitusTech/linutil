@@ -83,8 +83,8 @@ main() {
     printf "%b\n" "${YELLOW}2) Remove tweak${RC}"
     printf "%b\n" "${YELLOW}3) Exit${RC}"
     printf "%b" "Enter your choice [1/3]: "
-    read -r choice
-
+    choice=''
+    readMenuChoice choice
     case "$choice" in
         1)
             applyTweak
@@ -102,7 +102,6 @@ main() {
             ;;
     esac
 
-    printf "%b\n" "${GREEN}auto-cpufreq setup complete.${RC}"
 }
 
 checkEnv

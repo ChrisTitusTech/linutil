@@ -329,8 +329,8 @@ main() {
     while true; do
         show_menu
         printf "%b" "Enter your choice: "
-        read -r CHOICE
-
+        CHOICE=''
+        readMenuChoice CHOICE
         case $CHOICE in
             1) view_all_services ;;
             2) view_enabled_services ;;

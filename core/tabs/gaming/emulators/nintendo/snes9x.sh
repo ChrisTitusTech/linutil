@@ -36,16 +36,7 @@ uninstallsnes9x() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall snes9x${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installsnes9x ;;
-        2) uninstallsnes9x ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installsnes9x
 }
 
 checkEnv

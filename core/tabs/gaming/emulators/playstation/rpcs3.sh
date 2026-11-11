@@ -36,16 +36,7 @@ uninstallrpcs3() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall RPCS3${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installrpcs3 ;;
-        2) uninstallrpcs3 ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installrpcs3
 }
 
 checkEnv

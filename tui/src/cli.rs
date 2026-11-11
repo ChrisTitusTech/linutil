@@ -4,6 +4,9 @@ use std::path::PathBuf;
 
 #[derive(Debug, Parser, Clone)]
 pub struct Args {
+    #[arg(long, hide = true)]
+    pub intro: bool,
+
     /// Path to the configuration file
     #[arg(short, long)]
     pub config: Option<PathBuf>,
@@ -32,4 +35,16 @@ pub struct Args {
     /// Bypass root user check
     #[arg(short = 'r', long)]
     pub bypass_root: bool,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn intro_is_an_optional_flag() {
+        assert!(!Args::try_parse_from(["linutil"]).unwrap().intro);
+        assert!(Args::try_parse_from(["linutil", "--intro"]).unwrap().intro);
+        assert!(Args::try_parse_from(["linutil", "--intro", "rain"]).is_err());
+    }
 }

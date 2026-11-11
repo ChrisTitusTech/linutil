@@ -2,7 +2,7 @@ use crate::{float::FloatContent, theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     prelude::*,
-    widgets::{Block, Clear, List},
+    widgets::{Clear, List},
 };
 use std::borrow::Cow;
 
@@ -43,7 +43,7 @@ impl ConfirmPrompt {
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll + self.inner_area_height < self.names.len().saturating_sub(1) {
+        if self.scroll + self.inner_area_height < self.names.len() {
             self.scroll += 1;
         }
     }
@@ -57,33 +57,36 @@ impl ConfirmPrompt {
 
 impl FloatContent for ConfirmPrompt {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &theme::Theme) {
-        let block = Block::bordered()
-            .border_set(crate::dashboard::border_set())
-            .border_style(Style::default().fg(theme.focused_color()))
-            .title_top(
-                Line::styled(
-                    " Confirmation ",
-                    Style::default().fg(theme.tab_color()).bold(),
-                )
-                .centered(),
+        let block = crate::dashboard::block(
+            Line::styled(
+                " Confirmation ",
+                Style::default().fg(theme.tab_color()).bold(),
             )
-            .title_bottom(
-                Line::from(vec![
-                    Span::styled(" [", Style::default().fg(theme.unfocused_color())),
-                    Span::styled("y", Style::default().fg(theme.success_color())),
-                    Span::styled(
-                        "] to continue [",
-                        Style::default().fg(theme.unfocused_color()),
-                    ),
-                    Span::styled("n", Style::default().fg(theme.fail_color())),
-                    Span::styled("] to cancel ", Style::default().fg(theme.unfocused_color())),
-                ])
-                .centered(),
-            )
-            .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()));
+            .centered(),
+            theme,
+            true,
+        )
+        // The footer has its own colours and is not bold.
+        .title_style(Style::default())
+        .title_bottom(
+            Line::from(vec![
+                Span::styled(" [", Style::default().fg(theme.unfocused_color())),
+                Span::styled("y", Style::default().fg(theme.success_color())),
+                Span::styled(
+                    "] to continue [",
+                    Style::default().fg(theme.unfocused_color()),
+                ),
+                Span::styled("n", Style::default().fg(theme.fail_color())),
+                Span::styled("] to cancel ", Style::default().fg(theme.unfocused_color())),
+            ])
+            .centered(),
+        );
 
         let inner_area = block.inner(area);
         self.inner_area_height = inner_area.height as usize;
+        self.scroll = self
+            .scroll
+            .min(self.names.len().saturating_sub(self.inner_area_height));
 
         frame.render_widget(Clear, area);
         frame.render_widget(block, area);
@@ -146,6 +149,34 @@ impl FloatContent for ConfirmPrompt {
 mod tests {
     use super::*;
     use ratatui::{backend::TestBackend, Terminal};
+
+    #[test]
+    fn final_item_is_reachable_and_resize_reclamps_scroll() {
+        let mut prompt = ConfirmPrompt::new(&["a", "b", "c", "d", "e", "f", "g", "h", "i", "last"]);
+        let mut terminal = Terminal::new(TestBackend::new(40, 20)).unwrap();
+        terminal
+            .draw(|frame| prompt.draw(frame, Rect::new(0, 0, 40, 6), &theme::Theme::Compatible))
+            .unwrap();
+        for _ in 0..10 {
+            prompt.scroll_down();
+        }
+        terminal
+            .draw(|frame| prompt.draw(frame, Rect::new(0, 0, 40, 6), &theme::Theme::Compatible))
+            .unwrap();
+        assert_eq!(prompt.scroll, 6);
+        let text: String = terminal
+            .backend()
+            .buffer()
+            .content
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect();
+        assert!(text.contains("10. last"));
+        terminal
+            .draw(|frame| prompt.draw(frame, frame.area(), &theme::Theme::Compatible))
+            .unwrap();
+        assert_eq!(prompt.scroll, 0);
+    }
 
     #[test]
     fn prompt_uses_the_theme_background() {

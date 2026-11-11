@@ -31,7 +31,6 @@ installCursor() {
                 exit 1
                 ;;
         esac
-        printf "%b\n" "${GREEN}Cursor installed successfully.${RC}"
     else
         printf "%b\n" "${GREEN}Cursor is already installed.${RC}"
     fi

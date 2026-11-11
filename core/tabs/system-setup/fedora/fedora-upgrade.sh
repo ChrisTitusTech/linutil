@@ -75,8 +75,8 @@ checkEscalationTool
 printf "%b\n" "${YELLOW}Select an option:${RC}"
 printf "%b\n" "${GREEN}1. Upgrade to the next Fedora version${RC}"
 printf "%b\n" "${GREEN}2. Run post-upgrade tasks${RC}"
-read -r choice
-
+choice=''
+readMenuChoice choice
 case "$choice" in
     1)
         update

@@ -156,7 +156,6 @@ someNotices() {
     printf "%b\n" "${YELLOW}Notice: You may change (Hourly, daily, weekly, monthly, yearly) timeline settings with Btrfs Assistant GUI.${RC}"
     printf "%b\n" "${RED}Notice: If you used the default Fedora disk partitioning during OS installation, the /boot configured as an separate EXT4 partition. Therefore, it cannot be included in root snapshots. Backup separately...${RC}"
     printf "%b\n" "${YELLOW}================================NOTICES================================${RC}"
-    printf "%b\n" "${GREEN}Setup process completed.${RC}"
 }
 
 checkEnv

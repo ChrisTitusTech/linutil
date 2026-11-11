@@ -2,7 +2,7 @@ use crate::{float::FloatContent, theme::Theme};
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, MouseEvent, MouseEventKind},
     prelude::*,
-    widgets::{Block, Borders, Clear, Paragraph},
+    widgets::{Clear, Paragraph},
 };
 use unicode_width::UnicodeWidthStr;
 
@@ -159,19 +159,13 @@ pub(crate) fn wrapped_text(text: &Text<'_>, width: u16) -> Text<'static> {
 
 impl FloatContent for FloatingText<'_> {
     fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        let block = Block::default()
-            .borders(Borders::ALL)
-            .border_set(crate::dashboard::border_set())
-            .border_style(Style::default().fg(theme.focused_color()))
-            .title(self.mode_title.as_str())
+        let block = crate::dashboard::block(self.mode_title.as_str(), theme, true)
             .title_alignment(Alignment::Center)
-            .title_style(Style::default().fg(theme.tab_color()).bold())
             .title_bottom(
                 Line::from(self.footer.as_deref().unwrap_or_default())
                     .style(theme.unfocused_color())
                     .centered(),
-            )
-            .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()));
+            );
         let inner = block.inner(area);
         let content = inner.inner(Margin::new(
             u16::from(inner.width >= 3),

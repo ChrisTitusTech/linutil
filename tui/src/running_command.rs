@@ -1,8 +1,4 @@
-use crate::{
-    float::FloatContent,
-    stars::{basic_terminal, linux_console},
-    theme::Theme,
-};
+use crate::{float::FloatContent, theme::Theme};
 use linutil_core::Command;
 use oneshot::{channel, Receiver};
 use portable_pty::{
@@ -11,7 +7,6 @@ use portable_pty::{
 use ratatui::{
     crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind},
     prelude::*,
-    widgets::Block,
 };
 use std::{
     fs::File,
@@ -51,6 +46,8 @@ pub struct RunningCommand {
     child_pid: Arc<AtomicU32>,
     /// Number of times kill_child has been invoked
     kill_count: usize,
+    menu_consumed: usize,
+    menu_back: bool,
     /// Why the last kill_child could not signal every process
     cancel_error: Option<&'static str>,
     /// A join handle for the thread that reads command output and sends it to the main thread
@@ -88,24 +85,23 @@ impl FloatContent for RunningCommand {
         // Define the block for the terminal display
         let block = if !self.is_finished() {
             // Display a block indicating the command is running
-            Block::bordered()
-                .border_set(crate::dashboard::border_set())
-                .border_style(Style::default().fg(theme.focused_color()))
-                .title_top(
-                    Line::styled(
-                        " Running Command ",
-                        Style::default().fg(theme.tab_color()).bold(),
-                    )
-                    .centered(),
+            crate::dashboard::block(
+                Line::styled(
+                    " Running Command ",
+                    Style::default().fg(theme.tab_color()).bold(),
                 )
-                .title_bottom(
-                    Line::styled(
-                        self.cancel_hint(),
-                        Style::default().fg(theme.unfocused_color()),
-                    )
-                    .centered(),
+                .centered(),
+                theme,
+                true,
+            )
+            .title_style(Style::default())
+            .title_bottom(
+                Line::styled(
+                    self.cancel_hint(),
+                    Style::default().fg(theme.unfocused_color()),
                 )
-                .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()))
+                .centered(),
+            )
         } else {
             // Display a block with the command's exit status
             let is_invalid = self.check_invalid_choice();
@@ -147,12 +143,10 @@ impl FloatContent for RunningCommand {
                 )
             };
 
-            Block::bordered()
-                .border_set(crate::dashboard::border_set())
+            crate::dashboard::block(title_line.centered(), theme, true)
+                .title_style(Style::default())
                 .border_style(Style::default().fg(border_color).bold())
-                .title_top(title_line.centered())
                 .title_bottom(log_path.centered())
-                .style(Style::default().bg(theme.bg()).fg(theme.cmd_color()))
         };
 
         // Calculate the inner size of the terminal area, considering borders
@@ -200,6 +194,14 @@ impl FloatContent for RunningCommand {
     /// Handle key events of the running command "window". Returns true when the "window" should be
     /// closed
     fn handle_key_event(&mut self, key: &KeyEvent) -> bool {
+        if key.code == KeyCode::Esc && (self.menu_waiting() || self.menu_back) {
+            self.menu_back = true;
+            self.kill_child();
+            return self.should_close();
+        }
+        if self.menu_back && self.should_close() {
+            return true;
+        }
         if self.is_finished() {
             match key.code {
                 KeyCode::Char('c' | 'C') if key.modifiers.contains(KeyModifiers::CONTROL) => {
@@ -231,6 +233,13 @@ impl FloatContent for RunningCommand {
             }
         }
 
+        if matches!(key.code, KeyCode::Enter)
+            || (key.modifiers.contains(KeyModifiers::CONTROL)
+                && matches!(key.code, KeyCode::Char('j' | 'm' | 'd')))
+        {
+            // Do not advertise a stale menu while the script processes input.
+            self.menu_consumed = self.buffer.lock().unwrap().len();
+        }
         match key.code {
             // Each press escalates. The window stays open until the command
             // has ended, so nothing keeps running out of sight.
@@ -255,6 +264,10 @@ impl FloatContent for RunningCommand {
         }
         let done = self.leader_done_at.get_or_init(Instant::now);
         !self.background_work_remains() || done.elapsed() >= LINGER_LIMIT
+    }
+
+    fn should_close(&self) -> bool {
+        self.menu_back && self.leader_exited() && !self.background_work_remains()
     }
 
     fn result_pending(&self) -> bool {
@@ -321,15 +334,11 @@ fn terminal_closed(error: &std::io::Error) -> bool {
 
 /// The bullet before "Done!"/"Failed!". The Linux console font has no `●`.
 fn status_marker() -> &'static str {
-    static MARKER: OnceLock<&'static str> = OnceLock::new();
-    MARKER.get_or_init(|| {
-        let term = std::env::var("TERM").unwrap_or_default();
-        if basic_terminal(&term, linux_console()) {
-            "*"
-        } else {
-            "●"
-        }
-    })
+    if crate::dashboard::is_basic_terminal() {
+        "*"
+    } else {
+        "●"
+    }
 }
 
 impl RunningCommand {
@@ -366,6 +375,7 @@ impl RunningCommand {
         cmd.arg("-c");
 
         // Set environment variables needed for interactive TUI tools like gum
+        cmd.env("LINUTIL_MENU_PROTOCOL", "1");
         cmd.env("TERM", "xterm-256color");
         cmd.env("COLORTERM", "truecolor");
         // Ensure that interactive tools can detect they're in a terminal
@@ -464,6 +474,8 @@ impl RunningCommand {
             killer: None,
             child_pid,
             kill_count: 0,
+            menu_consumed: 0,
+            menu_back: false,
             cancel_error: None,
             reader_thread: Some(reader_handle),
             reader_stop,
@@ -479,13 +491,29 @@ impl RunningCommand {
         }
     }
 
+    fn menu_waiting(&self) -> bool {
+        if self.kill_count != 0 || self.leader_exited() {
+            return false;
+        }
+        let buffer = self.buffer.lock().unwrap();
+        let pending = &buffer[self.menu_consumed.min(buffer.len())..];
+        let menu = b"\x1b]777;linutil;menu\x07";
+        let running = b"\x1b]777;linutil;running\x07";
+        let last_menu = pending.windows(menu.len()).rposition(|w| w == menu);
+        let last_running = pending.windows(running.len()).rposition(|w| w == running);
+        last_menu.is_some_and(|menu| last_running.is_none_or(|running| menu > running))
+    }
+
     /// The footer while a command runs: what Ctrl-C does next, or why it failed.
     fn cancel_hint(&self) -> String {
         if let Some(error) = self.cancel_error {
             return format!(" Not stopped: {error} · Ctrl-C to retry ");
         }
+        if self.menu_waiting() {
+            return " Esc to go back ".to_string();
+        }
         match self.kill_count {
-            0 => " Ctrl-C to cancel ",
+            0 => " Ctrl+C to Abort ",
             1 => " Cancelling · Ctrl-C to terminate ",
             2 => " Terminating · Ctrl-C to force stop ",
             _ => " Force stop sent · Ctrl-C to retry ",
@@ -580,6 +608,7 @@ impl RunningCommand {
         parser.process(buffer);
         // Adjust the screen content based on the scroll offset
         parser.screen_mut().set_scrollback(self.scroll_offset);
+        self.scroll_offset = parser.screen().scrollback();
         parser.screen().clone()
     }
 
@@ -625,22 +654,33 @@ impl RunningCommand {
         }
 
         #[cfg(unix)]
-        if pid != 0 {
+        if pid == 0 {
+            return;
+        }
+
+        #[cfg(unix)]
+        {
             let error = match self.kill_count {
                 // First Ctrl+C: Send SIGINT to process group and root process.
                 // Do not send SIGHUP via killer.kill() here, as that terminates
                 // the top-level shell process immediately and leaves child
                 // processes (such as package managers, build processes, or subshells) orphaned.
-                0 => Self::signal_group(pid, Signal::SIGINT),
+                0 => self
+                    .signal_group(pid, Signal::SIGINT)
+                    .or(self.kill_session_processes(pid, Signal::SIGINT)),
                 // Second Ctrl+C: Escalate to SIGTERM for process group and session.
-                1 => Self::signal_group(pid, Signal::SIGTERM)
+                1 => self
+                    .signal_group(pid, Signal::SIGTERM)
                     .or(self.kill_session_processes(pid, Signal::SIGTERM)),
                 // Subsequent Ctrl+C: Force termination with SIGKILL.
                 _ => {
-                    let error = Self::signal_group(pid, Signal::SIGKILL)
+                    let error = self
+                        .signal_group(pid, Signal::SIGKILL)
                         .or(self.kill_session_processes(pid, Signal::SIGKILL));
-                    if let Some(killer) = &mut self.killer {
-                        let _ = killer.kill();
+                    if !self.leader_exited() {
+                        if let Some(killer) = &mut self.killer {
+                            let _ = killer.kill();
+                        }
                     }
                     error
                 }
@@ -659,9 +699,17 @@ impl RunningCommand {
     /// Signal the process group and its leader. A process that has already
     /// exited is not an error.
     #[cfg(unix)]
-    fn signal_group(pid: u32, signal: Signal) -> Option<Errno> {
-        let group = kill(Pid::from_raw(-(pid as i32)), signal);
-        let leader = kill(Pid::from_raw(pid as i32), signal);
+    fn signal_group(&self, pid: u32, signal: Signal) -> Option<Errno> {
+        let group = if self.group_gone.load(Ordering::Acquire) {
+            Ok(())
+        } else {
+            kill(Pid::from_raw(-(pid as i32)), signal)
+        };
+        let leader = if self.leader_exited() {
+            Ok(())
+        } else {
+            kill(Pid::from_raw(pid as i32), signal)
+        };
         [group, leader]
             .into_iter()
             .filter_map(|result| result.err())
@@ -797,6 +845,40 @@ mod tests {
     }
 
     #[test]
+    fn menu_submission_switches_to_abort_and_preserves_escape_passthrough() {
+        let command = Command::Raw(format!(
+            ". '{}/../core/tabs/common-script.sh'; readMenuChoice choice; printf 'selected:%s\\n' \"$choice\"; stty -icanon -echo min 1 time 0; printf 'ready\\n'; od -An -tx1 -N1",
+            env!("CARGO_MANIFEST_DIR")
+        ));
+        let mut running = RunningCommand::new(&[&command]);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !running.menu_waiting() {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert_eq!(running.cancel_hint().trim(), "Esc to go back");
+        running.handle_key_event(&KeyEvent::new(KeyCode::Char('1'), KeyModifiers::NONE));
+        assert!(running.menu_waiting());
+        running.handle_key_event(&KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE));
+        assert_eq!(running.cancel_hint().trim(), "Ctrl+C to Abort");
+        let size = Size {
+            width: 80,
+            height: 24,
+        };
+        while !running.screen(size).contents().contains("ready") {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(!running.handle_key_event(&KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)));
+        wait_until_finished(&running);
+        let output = running.screen(size).contents();
+        assert!(output.contains("selected:1"), "{output}");
+        assert!(output.contains("1b"), "{output}");
+        assert!(!output.contains("777;linutil"), "{output}");
+        assert!(!running.should_close());
+    }
+
+    #[test]
     fn test_running_command_ctrl_c_cancels_and_keeps_the_window_open() {
         let commands = [Command::Raw("sleep 10".to_string())];
         let refs: Vec<&Command> = commands.iter().collect();
@@ -837,7 +919,7 @@ mod tests {
 
         std::thread::sleep(std::time::Duration::from_millis(100));
         assert!(!running.is_finished());
-        assert!(running.cancel_hint().contains("Ctrl-C to cancel"));
+        assert!(running.cancel_hint().contains("Ctrl+C to Abort"));
 
         // SIGINT and SIGTERM are ignored: the command stays, and so does the window
         for hint in ["to terminate", "to force stop"] {
@@ -897,7 +979,7 @@ mod tests {
         wait_until_finished(&running);
 
         let pid = running.child_pid.load(Ordering::Acquire);
-        assert_eq!(RunningCommand::signal_group(pid, Signal::SIGTERM), None);
+        assert_eq!(running.signal_group(pid, Signal::SIGTERM), None);
     }
 
     #[test]
@@ -1225,6 +1307,41 @@ mod tests {
         let buffer = Arc::downgrade(&running.buffer);
         drop(running);
         assert!(buffer.upgrade().is_none(), "The reader kept the buffer");
+    }
+
+    #[test]
+    fn first_interrupt_reaches_a_background_process_in_another_group() {
+        let fixture = OwnedProcess::new("61.0737");
+        // Bash monitor mode starts the asynchronous job in its own process group
+        // with SIGINT enabled, while retaining the PTY session.
+        let script = format!(
+            "bash -m -c \"trap '' HUP; sleep {} & echo \\$! > '{}'\"",
+            fixture.marker,
+            fixture.pid_file.display()
+        );
+        let mut running = start_lingering(script);
+        wait_until(|| fixture.is_running());
+        let pid = fixture.pid().unwrap();
+        let leader = running.child_pid.load(Ordering::Acquire);
+        assert_eq!(getsid(Some(pid)).unwrap().as_raw(), leader as i32);
+        assert_eq!(nix::unistd::getpgid(Some(pid)), Ok(pid));
+        wait_until(|| {
+            running.background_work_remains();
+            running.group_gone.load(Ordering::Acquire)
+        });
+        running.kill_child();
+        assert_eq!(running.kill_count, 1);
+        wait_until(|| !fixture.is_running());
+    }
+
+    #[test]
+    fn scrolling_past_short_output_does_not_accumulate_offset() {
+        let (mut running, _) = drawn_result();
+        for _ in 0..5 {
+            running.handle_key_event(&KeyEvent::new(KeyCode::PageUp, KeyModifiers::NONE));
+        }
+        running.screen(SCREEN);
+        assert_eq!(running.scroll_offset, 0);
     }
 
     #[test]

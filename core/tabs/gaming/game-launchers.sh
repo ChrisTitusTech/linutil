@@ -158,7 +158,6 @@ install_launcher() {
             install_flatpak_app
             ;;
     esac
-    printf "%b\n" "${GREEN}${LAUNCHER_NAME} installation completed.${RC}"
 }
 
 uninstall_arch_launcher() {
@@ -245,7 +244,7 @@ uninstall_launcher() {
     esac
 
     if [ "$removed_any" = true ]; then
-        printf "%b\n" "${GREEN}${LAUNCHER_NAME} uninstall completed.${RC}"
+        :
     else
         printf "%b\n" "${CYAN}${LAUNCHER_NAME} is not installed.${RC}"
     fi
@@ -258,19 +257,7 @@ main() {
         exit 1
     fi
     set_launcher "$preset"
-    printf "%b\n" "${YELLOW}Choose action for ${LAUNCHER_NAME}:${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b\n" "3. ${YELLOW}Abort${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r action_choice
-
-    case "$action_choice" in
-        1) install_launcher ;;
-        2) uninstall_launcher ;;
-        3) printf "%b\n" "${CYAN}Aborted.${RC}" ; exit 0 ;;
-        *) printf "%b\n" "${RED}Invalid action choice.${RC}" ; exit 1 ;;
-    esac
+    install_launcher
 }
 
 checkDistro

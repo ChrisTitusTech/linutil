@@ -191,7 +191,6 @@ restart_thunar() {
 }
 
 successOutput() {
-    printf "%b\n" "${GREEN}Global dark theming applied successfully.${RC}"
     printf "%b\n" "${YELLOW}NOTE: Qt app theming (qt5ct/qt6ct) requires a re-login to take effect.${RC}"
 }
 

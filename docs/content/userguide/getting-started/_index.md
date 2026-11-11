@@ -95,7 +95,7 @@ Shortcuts are lowercase only. Press `?` for the full list inside Linutil.
 |-----|--------|
 | `↑` / `↓` or `k` / `j` | Move up/down in the list |
 | `Enter` or `→` | Open a folder / run a command |
-| `←` or `h` | Go to the parent folder |
+| `←`, `h`, or `Esc` | Go to the parent folder |
 | `Tab` / `Shift+Tab` | Next / previous category |
 | `1`–`9` | Jump to a category |
 | `/` | Search |
@@ -108,9 +108,9 @@ Shortcuts are lowercase only. Press `?` for the full list inside Linutil.
 | `?` | Help (`?` or `Esc` closes it) |
 | `q` or `Ctrl+C` | Quit Linutil |
 
-While a command runs, `Ctrl+C` cancels it, and pressing it again escalates until the command stops. The window stays open until then. Other keys, including `Esc`, go to the command. After it finishes, `l` saves the log and any other key closes the window. Keys pressed in the moment the result appears are ignored, so keys typed ahead can't hide it.
+At supported action menus, `Esc` goes back. While a command runs, `Ctrl+C` cancels it; repeated presses escalate if needed. Other keys, including `Esc`, go to the command. After it finishes, `l` saves the log, `PageUp`/`PageDown` scroll, and other keys close the window.
 
-If a script ends but leaves background work running, Linutil waits 2 seconds, then says so and shows the script's exit status. `Ctrl+C` still tries to stop that work, and `Ctrl+D` leaves the window. Other keys don't close it, and it shows the final result if the work ends. Leaving closes the terminal connection, which may affect the background work: some programs keep running and others stop.
+If background work remains, the window shows a warning. Use `Ctrl+C` to stop it or `Ctrl+D` to leave. Leaving may allow that work to continue.
 
 ### Menu Structure
 

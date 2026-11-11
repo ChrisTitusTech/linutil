@@ -8,7 +8,7 @@ installPdfstudioviewer() {
         curl -O https://download.qoppa.com/pdfstudioviewer/PDFStudioViewer_linux64.sh
         "$ESCALATION_TOOL" chmod +x PDFStudioViewer_linux64.sh
         if sh PDFStudioViewer_linux64.sh; then
-            printf "%b\n" "${GREEN}PDF Studio Viewer installed successfully!${RC}"
+            :
         else
             printf "%b\n" "${RED}Installation failed!${RC}"
         fi

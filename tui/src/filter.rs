@@ -210,7 +210,6 @@ impl Filter {
             KeyCode::Enter => return SearchAction::Exit,
             _ => return SearchAction::None,
         };
-        self.update_completion();
         SearchAction::Update
     }
 

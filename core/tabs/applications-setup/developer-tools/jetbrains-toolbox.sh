@@ -40,7 +40,6 @@ installJetBrainsToolBox() {
                 manualInstall
                 ;;
         esac
-        printf "%b\n" "${GREEN}Successfully installed Jetbrains Toolbox.${RC}"
     else
         printf "%b\n" "${GREEN}Jetbrains toolbox is already installed.${RC}"
     fi
