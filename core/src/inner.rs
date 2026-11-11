@@ -137,9 +137,17 @@ impl Entry {
                                     .iter()
                                     .all(|matching| data.contains(matching) == *matches)
                             }),
-                        SystemDataType::CommandExists => values
-                            .iter()
-                            .all(|command| which::which(command).is_ok() == *matches),
+                        SystemDataType::CommandExists => {
+                            // Keep relative PATH entries relative even in deeply nested directories.
+                            values.iter().all(|command| {
+                                let executable = if Path::new(command).components().count() > 1 {
+                                    which::which(command)
+                                } else {
+                                    which::which_global(command)
+                                };
+                                executable.is_ok() == *matches
+                            })
+                        }
                         SystemDataType::FileExists => {
                             values.iter().all(|p| Path::new(p).is_file() == *matches)
                         }
@@ -315,6 +323,59 @@ mod tab_directories_tests {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_relative_path_command_precondition() {
+        const CHILD_ENV: &str = "LINUTIL_TEST_RELATIVE_PATH_CHILD";
+        if std::env::var_os(CHILD_ENV).is_some() {
+            let tabs = get_tabs(true);
+            let security = tabs.iter().find(|tab| tab.name == "Security").unwrap();
+            let root = security.tree.root();
+            assert!(root
+                .children()
+                .any(|node| { node.value().name == "FirewallD Firewall Baselines (CTT)" }));
+            assert!(!root
+                .children()
+                .any(|node| { node.value().name == "UFW Firewall Baselines (CTT)" }));
+            return;
+        }
+
+        let temp_dir = crate::tests::create_temp_dir();
+        let root = temp_dir.path().canonicalize().unwrap();
+        let bin = root.join("bin");
+        std::fs::create_dir(&bin).unwrap();
+        std::os::unix::fs::symlink("/bin/sh", bin.join("firewall-cmd")).unwrap();
+
+        let mut cwd = root.clone();
+        let mut relative_path = String::new();
+        // Keep the cwd usable, but make the absolute executable path exceed Linux's PATH_MAX.
+        const CWD_LEN: usize = 4080;
+        while cwd.as_os_str().len() + 1 < CWD_LEN {
+            let remaining = CWD_LEN - cwd.as_os_str().len() - 1;
+            cwd.push("d".repeat(remaining.min(100)));
+            relative_path.push_str("../");
+        }
+        relative_path.push_str("bin");
+        std::fs::create_dir_all(&cwd).unwrap();
+
+        let output = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "inner::tests::test_relative_path_command_precondition",
+            ])
+            .current_dir(cwd)
+            .env(CHILD_ENV, "1")
+            .env("PATH", relative_path)
+            .env("TMPDIR", root)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
     #[test]
     fn test_is_executable() {

@@ -235,7 +235,7 @@ fn highlighted_lines(source: &str, theme: &Theme) -> Option<Vec<Line<'static>>> 
     configuration.configure(&styles.iter().map(|(name, _)| *name).collect::<Vec<_>>());
     let mut highlighter = Highlighter::new();
     let events = highlighter
-        .highlight(&configuration, source.as_bytes(), None, |_| None)
+        .highlight(&configuration, source.as_bytes(), None, None, |_| None)
         .ok()?;
     let mut lines = Vec::new();
     let mut spans = Vec::new();
