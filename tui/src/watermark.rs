@@ -5,6 +5,7 @@
 
 use crate::theme::Theme;
 use ratatui::{buffer::Buffer, layout::Rect, style::Color};
+use unicode_width::UnicodeWidthStr;
 
 const OUTLINE_WIDTH: f64 = 1188.0;
 const OUTLINE_HEIGHT: f64 = 1145.0;
@@ -102,20 +103,26 @@ impl Watermark {
         let clip = clip.intersection(buffer.area);
         // Nord's lighter background needs a little more contrast to retain the faint outline.
         let opacity = self.opacity * if *theme == Theme::Nord { 1.4 } else { 1.0 };
-        for (index, glyph) in self.glyphs.iter().enumerate() {
-            if glyph.symbol == ' ' {
-                continue;
-            }
-            let index = index as u16;
-            let x = stage.x + index % stage.width;
-            let y = stage.y + index / stage.width;
-            if !clip.contains((x, y).into()) {
-                continue;
-            }
-            let cell = &mut buffer[(x, y)];
-            if cell.symbol() == " " && cell.bg == background {
-                cell.set_char(glyph.symbol)
-                    .set_fg(tint([r, g, b], opacity * glyph.strength));
+        for y in stage.y..stage.bottom() {
+            let mut occupied_until = buffer.area.x;
+            // Scan from the row's start: a grapheme may begin outside the logo or clip.
+            for x in buffer.area.x..stage.right() {
+                let cell = &mut buffer[(x, y)];
+                let covered = x < occupied_until;
+                if !covered {
+                    let width = u16::try_from(cell.symbol().width()).unwrap_or(u16::MAX);
+                    occupied_until = x.saturating_add(width);
+                }
+                if covered || x < stage.x || !clip.contains((x, y).into()) {
+                    continue;
+                }
+                let index =
+                    usize::from(y - stage.y) * usize::from(stage.width) + usize::from(x - stage.x);
+                let glyph = self.glyphs[index];
+                if glyph.symbol != ' ' && cell.symbol() == " " && cell.bg == background {
+                    cell.set_char(glyph.symbol)
+                        .set_fg(tint([r, g, b], opacity * glyph.strength));
+                }
             }
         }
     }
@@ -312,6 +319,53 @@ mod tests {
         let before = buffer.clone();
         watermark.draw(&mut buffer, area, area, area, &theme);
         assert_eq!(buffer, before);
+    }
+
+    #[test]
+    fn wide_grapheme_trailing_columns_never_emit_watermark_cells() {
+        use ratatui::widgets::{Paragraph, Widget};
+
+        let area = Rect::new(3, 2, 100, 40);
+        let theme = Theme::Default;
+        if !matches!(theme.bg(), Color::Rgb(..)) {
+            return; // Exercise this rendering path with TERM/COLORTERM set to truecolor.
+        }
+        let mut blank = Buffer::empty(area);
+        for cell in &mut blank.content {
+            cell.set_bg(theme.bg());
+        }
+        let mut watermark = Watermark::new();
+        let mut painted = blank.clone();
+        watermark.draw(&mut painted, area, area, area, &theme);
+        let (x, y) = (area.y..area.bottom())
+            .flat_map(|y| (area.x + 1..area.right()).map(move |x| (x, y)))
+            .find(|&position| painted[position].symbol() != " ")
+            .expect("logo contains a painted cell");
+
+        for text in ["⚠️", "界", "👩‍💻"] {
+            let mut previous = blank.clone();
+            previous[(x, y)].set_char('X');
+            let mut next = blank.clone();
+            Paragraph::new(text).render(Rect::new(x - 1, y, 2, 1), &mut next);
+            assert_eq!(next[(x - 1, y)].symbol(), text);
+            assert_eq!(next[(x, y)].symbol(), " ");
+            let expected = previous
+                .diff(&next)
+                .into_iter()
+                .filter(|&(cx, cy, _)| cy == y && (cx == x - 1 || cx == x))
+                .map(|(cx, cy, cell)| (cx, cy, cell.clone()))
+                .collect::<Vec<_>>();
+            // The leading grapheme is outside the clip, but still covers its next column.
+            watermark.draw(&mut next, area, area, Rect::new(x, y, 1, 1), &theme);
+            assert_eq!(next[(x, y)].symbol(), " ");
+            let emitted = previous
+                .diff(&next)
+                .into_iter()
+                .filter(|&(cx, cy, _)| cy == y && (cx == x - 1 || cx == x))
+                .map(|(cx, cy, cell)| (cx, cy, cell.clone()))
+                .collect::<Vec<_>>();
+            assert_eq!(emitted, expected, "watermark changed updates for {text}");
+        }
     }
 
     fn dot_mirror(dots: u32) -> u32 {
