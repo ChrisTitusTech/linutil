@@ -45,7 +45,6 @@ updateLinutil() {
 
     printf "%b\n" "${YELLOW}Updating linutil_tui...${RC}"
     cargo install --force linutil_tui
-    printf "%b\n" "${GREEN}Updated successfully.${RC}"
 }
 
 checkEnv

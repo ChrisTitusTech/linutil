@@ -51,8 +51,8 @@ main_menu() {
         printf "%b\n" "6. Remove a WiFi connection"
         printf "%b\n" "0. Exit"
         printf "%b" "Choose an option: "
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case $choice in
             1) wifi_on ;;
             2) wifi_off ;;
@@ -144,8 +144,8 @@ select_network_index() {
         nl -w1 -s'. ' "$list_file" | sed -n "${start},${end}p"
         printf "%b\n" "n. Next page    p. Previous page    r. Refresh list    0. Exit to main menu"
         printf "%b" "$prompt_msg"
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case "$choice" in
             0) return 1 ;;
             n | N)

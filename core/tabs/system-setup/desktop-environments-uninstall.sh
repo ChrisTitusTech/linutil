@@ -459,8 +459,8 @@ main() {
   echo "q) Quit"
 
   printf "Enter your choice: "
-  read -r choice
-
+  choice=''
+  readMenuChoice choice
   case "$choice" in
   '' | *[!0-9]*)
     if [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then

@@ -34,7 +34,7 @@ Installs the libraries and tools needed to run games on Linux across different d
 
 ### Proton Compatibility Tools
 
-The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Setups**. Both entries use an interactive Install, Uninstall, or Abort prompt, try native packages first, and fall back to Flathub Flatpak packages:
+The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Setups**. Both tools use native packages where available, with Flathub Flatpak packages as a fallback:
 
 | Tool | Flatpak ID |
 |------|------------|
@@ -43,7 +43,7 @@ The Gaming tab includes **ProtonPlus** and **ProtonUp-Qt** under **Tools and Set
 
 ### Game Launchers
 
-The Gaming tab includes a **Game Launchers** section for managing common launchers with an interactive Install, Uninstall, or Abort prompt.
+The Gaming tab includes a **Game Launchers** section for installing common game launchers.
 
 | Launcher | Behavior |
 |----------|----------|
@@ -118,3 +118,9 @@ On NixOS, these entries print declarative configuration guidance instead of modi
 | Auto Mount Drive | Automate mounting a drive at startup |
 | Ollama | Manage Ollama (local AI model runner) |
 | US Locale Setup | Fix US UTF-8 locale and folder listings |
+
+## Themes
+
+Press `t` to switch between the dark themes: Linutil, Nord, Tokyo Night, One Dark, Monochrome, Lucent-Orng, GitHub, Material and Flexoki. Linutil starts with the Linutil theme each time. To start with another one, use `--theme`, for example `linutil --theme tokyo-night`.
+
+Themes need a truecolor terminal. On the Linux console and other terminals with fewer colours, Linutil keeps its basic colours and `t` shows a short note. If your terminal cannot draw the normal logo, `--theme compatible` selects the plain logo and basic colours.

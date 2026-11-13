@@ -105,14 +105,12 @@ install_tool() {
     fi
 
     if install_native_tool; then
-        printf "%b\n" "${GREEN}${TOOL_NAME} installation completed.${RC}"
         return 0
     fi
 
     checkFlatpak
     printf "%b\n" "${YELLOW}Native package unavailable. Installing ${TOOL_NAME} with Flatpak...${RC}"
     "$ESCALATION_TOOL" flatpak install --noninteractive flathub "$FLATPAK_ID"
-    printf "%b\n" "${GREEN}${TOOL_NAME} installation completed.${RC}"
 }
 
 uninstall_tool() {
@@ -133,7 +131,6 @@ uninstall_tool() {
         return 0
     fi
 
-    printf "%b\n" "${GREEN}${TOOL_NAME} uninstall completed.${RC}"
 }
 
 main() {
@@ -144,19 +141,7 @@ main() {
     fi
 
     set_tool "$preset"
-    printf "%b\n" "${YELLOW}Choose action for ${TOOL_NAME}:${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b\n" "3. ${YELLOW}Abort${RC}"
-    printf "%b" "Enter your choice [1-3]: "
-    read -r action_choice
-
-    case "$action_choice" in
-        1) install_tool ;;
-        2) uninstall_tool ;;
-        3) printf "%b\n" "${CYAN}Aborted.${RC}" ; exit 0 ;;
-        *) printf "%b\n" "${RED}Invalid action choice.${RC}" ; exit 1 ;;
-    esac
+    install_tool
 }
 
 checkDistro

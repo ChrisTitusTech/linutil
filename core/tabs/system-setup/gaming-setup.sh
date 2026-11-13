@@ -79,8 +79,6 @@ print_install_summary() {
             printf "%b\n" "${YELLOW}Failures:${RC}"
             printf "%b\n" "$INSTALL_FAILURES"
         fi
-    else
-        printf "%b\n" "${GREEN}Completed.${RC}"
     fi
 }
 

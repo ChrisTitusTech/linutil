@@ -38,7 +38,6 @@ installNoctalia() {
         printf "%b\n" "${GREEN}Noctalia Shell already installed${RC}"
     fi
 
-    printf "%b\n" "${GREEN}Noctalia Shell installation complete${RC}"
 }
 
 uninstallNoctalia() {
@@ -60,20 +59,10 @@ uninstallNoctalia() {
         printf "%b\n" "${GREEN}Noctalia Shell is not installed${RC}"
     fi
 
-    printf "%b\n" "${GREEN}Noctalia Shell uninstall complete${RC}"
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Noctalia Shell${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installNoctalia ;;
-        2) uninstallNoctalia ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installNoctalia
 }
 
 checkEnv

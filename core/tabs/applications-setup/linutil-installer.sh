@@ -11,7 +11,6 @@ install_extra() {
     printf "%b\n" "${YELLOW}Creating a Desktop Entry...${RC}"
     "$ESCALATION_TOOL" mkdir -p /usr/share/applications
     curl -fsSL 'https://raw.githubusercontent.com/ChrisTitusTech/linutil/refs/heads/main/linutil.desktop' | "$ESCALATION_TOOL" tee /usr/share/applications/linutil.desktop > /dev/null
-    printf "%b\n" "${GREEN}Done.${RC}"
 }
 
 installLinutil() {
@@ -25,7 +24,8 @@ installLinutil() {
             printf "%b\n" "3. ${CYAN}linutil-git${RC}  (compiled from the latest commit)"
             printf "%b\n" "-----------------------------------------------------"
             printf "%b" "Enter your choice: "
-            read -r choice
+            choice=''
+            readMenuChoice choice
             case $choice in
                 1) "$AUR_HELPER" -S --needed --noconfirm linutil ;;
                 2) "$AUR_HELPER" -S --needed --noconfirm linutil-bin ;;
@@ -35,16 +35,15 @@ installLinutil() {
                     exit 1
                     ;;
             esac
-            printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
         zypper)
             "$ESCALATION_TOOL" "$PACKAGER" install linutil -y
-            printf "%b\n" "${GREEN}Installed successfully.${RC}"
             ;;
         *)
             printf "%b\n" "${RED}There are no official packages for your distro.${RC}"
             printf "%b" "${YELLOW}Do you want to install the crates.io package? (y/N): ${RC}"
-            read -r choice
+            choice=''
+            readMenuChoice choice
             case $choice in
                 y | Y)
                     if ! command -v cargo > /dev/null 2>&1; then
@@ -71,7 +70,6 @@ installLinutil() {
                         export PATH="$HOME/.cargo/bin:$PATH"
                     fi
                     cargo install --force linutil_tui
-                    printf "%b\n" "${GREEN}Installed successfully.${RC}"
                     install_extra
                     ;;
                 *) printf "%b\n" "${RED}Linutil not installed.${RC}" ;;

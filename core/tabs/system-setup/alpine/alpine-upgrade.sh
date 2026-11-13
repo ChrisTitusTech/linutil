@@ -10,8 +10,8 @@ upgradeAlpine() {
     printf "%b\n" "${CYAN}1) Latest Stable${RC}"
     printf "%b\n" "${CYAN}2) Edge (rolling)${RC}"
     printf "%b" "Enter your choice (1 or 2): "
-    read -r choice
-
+    choice=''
+    readMenuChoice choice
     case $choice in
         1)
             printf "%b\n" "${YELLOW}Updating repositories to latest stable...${RC}"
@@ -40,9 +40,8 @@ EOF'
     printf "%b\n" "${YELLOW}Upgrading all packages...${RC}"
     "$ESCALATION_TOOL" "$PACKAGER" upgrade --available
 
-    printf "%b\n" "${GREEN}Upgrade completed!${RC}"
     printf "%b\n" "${YELLOW}Note: If you encounter any issues, you can restore your previous repositories file from /etc/apk/repositories.backup${RC}"
 }
 
 checkEnv
-upgradeAlpine 
+upgradeAlpine

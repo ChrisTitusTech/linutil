@@ -377,7 +377,8 @@ main() {
     printf "%b\n" "5. ${YELLOW}Reset default kernel to stock${RC}"
     printf "%b\n" "6. ${YELLOW}Remove CachyOS repos and migrate packages without selecting a kernel${RC}"
     printf "%b" "Enter your choice [1-6]: "
-    read -r CHOICE
+    CHOICE=''
+    readMenuChoice CHOICE
     if ! command_exists pacman || ! command_exists pacman-conf; then
         printf '%s\n' "CachyOS setup requires pacman and pacman-conf." >&2
         return 1

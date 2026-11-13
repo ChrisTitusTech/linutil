@@ -58,5 +58,3 @@ if ! clone_git_repo; then
     printf "%b\n" "${RED}Setup failed: Could not configure game files.${RC}"
     exit 1
 fi
-
-printf "%b\n" "${GREEN}Fallout 76 configuration completed successfully!${RC}"

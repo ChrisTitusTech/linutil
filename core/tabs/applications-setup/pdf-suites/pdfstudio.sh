@@ -8,7 +8,7 @@ installPdfstudio() {
         curl -O https://download.qoppa.com/pdfstudio/PDFStudio_linux64.sh
         "$ESCALATION_TOOL" chmod +x PDFStudio_linux64.sh
         if sh PDFStudio_linux64.sh; then
-            printf "%b\n" "${GREEN}PDF Studio installed successfully!${RC}"
+            :
         else
             printf "%b\n" "${RED}PDF Studio installation failed!${RC}"
         fi

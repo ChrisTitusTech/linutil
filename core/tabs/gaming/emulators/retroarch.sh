@@ -48,13 +48,15 @@ configureRetroArch() {
 		        # Only in AUR
 		        "$AUR_HELPER" -S --needed --noconfirm --cleanafter libretro-pcsx2-launcher
 	            ;;
-	        *)
-	            "$ESCALATION_TOOL" flatpak uninstall --noninteractive org.libretro.RetroArch
-	            ;;
+            *)
+                printf "%b\n" "${YELLOW}Core package installation is not supported by this package manager. Manage cores in RetroArch.${RC}"
+                return 1
+                ;;
 	    esac
 	else
-		printf "%b\n" "${GREEN}RetroArch is not installed.${RC}"
-	fi
+        printf "%b\n" "${YELLOW}Install RetroArch before installing core packages.${RC}"
+        return 1
+    fi
 }
 
 uninstallRetroArch() {
@@ -78,24 +80,12 @@ uninstallRetroArch() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install RetroArch, Install Cores, Uninstall RetroArch or Install RetroArch With Cores ${RC}"
-    printf "%b\n" "1. ${YELLOW}Install RetroArch${RC}"
-    printf "%b\n" "2. ${YELLOW}Install Cores${RC}"
-    printf "%b\n" "3. ${YELLOW}Uninstall RetroArch${RC}"
-	printf "%b\n" "4. ${YELLOW}Install RetroArch With Cores${RC}"
-    printf "%b" "Enter your choice [1-4]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installRetroArch ;;
-    	2) configureRetroArch ;;
-        3) uninstallRetroArch ;;
-        4) 
-        	installRetroArch
-        	configureRetroArch
-        	;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
+    case "${1:-}" in
+        '') installRetroArch ;;
+        --cores) configureRetroArch ;;
+        *) printf '%s\n' "Unknown action: $1" >&2; return 2 ;;
     esac
 }
 
 checkEnv
-main
+main "$@"

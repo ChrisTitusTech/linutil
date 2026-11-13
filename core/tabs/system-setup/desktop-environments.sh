@@ -144,8 +144,8 @@ main() {
   printf "%s\n" " 2. Install Window Manager "
   printf "%s\n" " 3. Exit "
   printf "%s" " Please select an option (1-3): "
-  read -r choice
-
+  choice=''
+  readMenuChoice choice
   case "$choice" in
   1)
     printf "%s\n" " Available Desktop Environments: "

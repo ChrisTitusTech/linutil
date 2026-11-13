@@ -216,8 +216,8 @@ When a user selects a command and confirms it:
 4. A **reader thread** reads output from the PTY master and writes it into a shared `Arc<Mutex<Vec<u8>>>` buffer
 5. An **atomic flag** (`TERMINAL_UPDATED`) is set when new output arrives, triggering a TUI redraw
 6. The PTY output is decoded by a `vt100` parser and rendered as a `PseudoTerminal` widget (from `tui-term`) inside a floating window
-7. The user can scroll up/down to review output, or press `Ctrl-C` to kill the process
-8. When the process exits, the floating window title changes to `SUCCESS` (green) or `FAILED` (red)
+7. The user can scroll with `PageUp`/`PageDown`; other keys, including `Esc`, go to the command. `Ctrl-C` cancels it, and each further press escalates: SIGINT, then SIGTERM, then SIGKILL. The window stays open while the script runs. If a signal is refused, the footer says why and the window keeps showing the command as running.
+8. When the process exits, the window title changes to `Success` (green) or `Fail` (red), and the output ends with `Done!`, `Failed!` or, for exit status 64 (`invalidChoice` in `common-script.sh`), `Invalid!`. A key closes the window only after that result has been drawn and keys have paused for 300 ms, so keys typed ahead or a held key can't close it unread. If processes or the PTY outlive the script by more than 2 seconds, the title reads `Script ended; background work remains` instead and the window shows the script's exit status. `Ctrl-C` keeps escalating, ordinary keys do nothing, and `Ctrl-D` leaves once that warning has been drawn. Leaving closes the PTY connection, which may affect those processes: some keep running and some stop. A process in another session cannot be signalled, and the footer says so. If the work ends while the window is open, the final result replaces the warning.
 
 Using a real PTY (instead of piped stdio) means scripts that use terminal colors, interactive prompts, or check `isatty()` work correctly.
 
@@ -228,22 +228,26 @@ Using a real PTY (instead of piped stdio) means scripts that use terminal colors
 The TUI is rendered by `AppState::draw()` and divided into these regions:
 
 ```
-┌──────────────┬────────────────────────────────┐
-│   Logo /     │  [ Search bar                ] │
-│   Version    ├────────────────────────────────┤
-│              │                                │
-│  Tab List    │   Item List                    │
-│              │                                │
-│  System Info │                                │
-├──────────────┴────────────────────────────────┤
-│   Keyboard hint bar                           │
-└───────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Category tabs                                      │
+├──────────────────────────┬──────────────────────────┤
+│ Directories & Commands   │ System info / Logo       │
+│ Search                   │                          │
+│ Item list / Script       ├──────────────────────────┤
+│ Preview                  │ Details                  │
+│                          ├──────────────────────────┤
+│                          │ Flags / Quick help       │
+│                          │ Tips / Links             │
+└──────────────────────────┴──────────────────────────┘
 ```
 
-- **Left column**: Logo (or version label), tab list, system info panel
-- **Right column**: Search bar (top) + scrollable item list
-- **Bottom bar**: Context-sensitive keyboard shortcut hints
-- **Floating windows**: Overlaid on the item list for running commands, previews, descriptions, and confirmation prompts
+- **Header**: Clickable category tabs
+- **Main panel**: Search and command list, replaced by the script viewer during preview
+- **Supporting panels**: System information, logo, quick help, and tips; geometry adapts to terminal size
+- **Details**: Description of the selected entry or live search match
+- **Floating windows**: Running commands, descriptions, help, and confirmation prompts
+
+The command list also holds a dim, fixed CTT logo (`tui/src/watermark.rs`), drawn in Braille in the list's blank cells only, so it never covers text. In Script Preview it keeps the same panel-centered position and size and is drawn after the code, within the code viewport's blank cells, leaving the line-number gutter, header, and footer untouched. It is hidden where the stars are unavailable (the Linux console and terminals without truecolor) and on the Compatible theme.
 
 ### Focus State Machine
 
@@ -251,10 +255,10 @@ The TUI is rendered by `AppState::draw()` and divided into these regions:
 
 | State | Description |
 |-------|-------------|
-| `TabList` | User is navigating the left tab panel |
 | `List` | User is navigating the item list |
 | `Search` | The search bar is active |
-| `FloatingWindow` | A modal is open (preview, description, running command, guide) |
+| `ScriptPreview` | The command panel displays a scrollable script viewer |
+| `FloatingWindow` | A modal is open (description, running command, guide) |
 | `ConfirmationPrompt` | User is being asked to confirm before running a command |
 
 Input is dispatched to the currently focused component.
@@ -310,3 +314,13 @@ task_list = "I"
 | `serde` + `toml` | Deserialize `tab_data.toml` and config files |
 | `clap` | CLI argument parsing |
 | `tree-sitter-bash` | Bash syntax highlighting in script previews |
+
+### Script action menus
+
+Catalog scripts use `readMenuChoice VARIABLE` from `common-script.sh` for action
+menus. It preserves `read -r` input and exit status. When the TUI sets
+`LINUTIL_MENU_PROTOCOL=1`, the helper emits OSC 777 `linutil;menu` and
+`linutil;running` markers around the read. Standalone scripts emit no markers.
+The TUI uses these explicit states for the footer: Esc stops a waiting menu and
+returns to the list after its processes stop. Ordinary prompts and interactive
+programs retain Esc passthrough. New menu prompts should use the helper rather than plain `read`.

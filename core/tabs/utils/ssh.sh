@@ -249,7 +249,8 @@ show_menu() {
 main() {
     while true; do
     show_menu
-    read -r choice
+    choice=''
+    readMenuChoice choice
     case $choice in
         1) ask_for_host_details ;;
         2) show_available_hosts && printf "%b" "Enter the alias of the host to connect to: " && read -r  host_alias; ssh "$host_alias" ;;

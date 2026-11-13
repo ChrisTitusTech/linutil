@@ -71,6 +71,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
+- **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
 - **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
 - **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
 - **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
@@ -99,6 +100,7 @@ https://github.com/ChrisTitusTech/neovim
 ### Multi-System Emulators
 
 - **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
+- **RetroArch Cores**: Install core packages for an existing native RetroArch installation.
 
 ### Nintendo Emulators
 
@@ -120,13 +122,20 @@ https://github.com/ChrisTitusTech/neovim
 ### Sega Emulators
 
 - **Blastem**: A Genesis emulator. NO Games are included
-- **Flycast**: A Dreamcase emulator. NO Games are included
+- **Flycast**: A Dreamcast emulator. NO Games are included
 - **Kronos**: A Sega Saturn emulator. NO Games are included
 
 ### Xbox Emulators
 
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
+
+### Game Launchers
+
+- **Heroic**: Install the Heroic launcher.
+- **Lutris**: Install the Lutris launcher.
+- **RetroArch**: Install the RetroArch launcher.
+- **Steam**: Install the Steam launcher.
 
 ### Tools and Setups
 
@@ -135,18 +144,11 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **Auto Mount Drive**: This utility is designed to help with automating the process of mounting a drive on to your system.
 - **Bottles**: Bottles allows Windows software, like applications and games, to run on Linux. Bottles also provides tools to categorize, organize and optimize your applications.
 - **Gaming Dependencies**: Installs gaming runtime dependencies across distributions. Steam and Lutris are managed separately from Game Launchers.
-- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
-- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **General GPU Drivers**: Auto-detects your GPU and installs a recommended driver stack for your distro, with NixOS guidance.
 - **Nvidia Drivers & Hardware Acceleration**: Opens the Arch-specific NVIDIA installer (kept under System Setup / Arch).
+- **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
+- **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
-
-### Game Launchers
-
-- **Steam**: Manage Steam launcher installation with Install, Uninstall, or Abort actions.
-- **Lutris**: Manage Lutris launcher installation with Install, Uninstall, or Abort actions.
-- **RetroArch**: Manage RetroArch launcher installation with Install, Uninstall, or Abort actions.
-- **Heroic**: Manage Heroic launcher installation with Install, Uninstall, or Abort actions.
 - **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
 - **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
 - **EverQuest Legends MIDI Fix**: Configures native Lutris to start a stable FluidSynth MIDI device, maps Wine to it, and loads the SC-55 SoundCanvas bank for EverQuest Legends music. Downloads a verified 177 MiB SoundFont and preserves the original Lutris and Wine registry configuration.
@@ -182,7 +184,10 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Linux Neptune for SteamDeck**: Valve's fork of Linux Kernel for the SteamDeck
 - **Nvidia Drivers & Hardware Acceleration**: This script installs and configures nvidia drivers with Hardware Acceleration.
 - **Omarchy Rice by DHH**: Simplified Hyprland configuration by DHH the ruby on rails dude.
+- **Pacman Config**: Enables Color, ILoveCandy, ParallelDownloads, VerbosePkgLists, multilib in pacman.conf and sets MAKEFLAGS in makepkg.conf.
 - **Paru AUR Helper**: Paru is your standard pacman wrapping AUR helper with lots of features and minimal interaction. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
+- **Snapper Snapshots**: Sets up Snapper with hourly Btrfs snapshots, snap-pac hooks, and GRUB boot menu entries.
+- **System Maintenance**: Enables paccache.timer, removes orphan packages, and cleans system journals.
 - **Virtualization**: QEMU, Libvirt, Virt-Manager installation and configuration.
 - **Yay AUR Helper**: Yet Another Yogurt - An AUR Helper Written in Go. To know more about AUR helpers visit: https://wiki.archlinux.org/title/AUR_helpers
 
@@ -215,8 +220,10 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Full System Update**: This command updates your system to the latest packages available for your distro
 - **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
 - **Global Theme**: This script is designed to handle the installation and configuration of global theming
+- **PipeWire Audio**: Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio).
 - **Remove Snaps**: This script is designed to remove snap
 - **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
+- **Zram Swap**: Configures compressed RAM swap via zram-generator with zstd algorithm.
 
 ## Utilities
 
@@ -245,10 +252,11 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### User Account Manager
 
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Locale Setup**: This allows the user to set their locale
+- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
-- **Ranalama**: This utility is designed to manage ramalama in your system
+- **Ramalama**: Install Ramalama to run AI models locally.
+- **Ramalama Model Manager**: List, inspect, create, run, and remove Ramalama models.
 - **Service Manager**: This utility is designed to manage services in your system
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system

@@ -44,16 +44,7 @@ uninstallyabause() {
 }
 
 main() {
-	printf "%b\n" "${YELLOW}Do you want to Install or Uninstall yabause${RC}"
-    printf "%b\n" "1. ${YELLOW}Install${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installyabause ;;
-        2) uninstallyabause ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installyabause
 }
 
 checkEnv

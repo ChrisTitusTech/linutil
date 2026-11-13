@@ -10,8 +10,8 @@ choose_installation() {
     printf "%b\n" "2. ${YELLOW}Docker Compose${RC}"
     printf "%b\n" "3. ${YELLOW}Both${RC}"
     printf "%b" "Enter your choice [1-3]: "
-    read -r CHOICE
-
+    CHOICE=''
+    readMenuChoice CHOICE
     case "$CHOICE" in
         1) INSTALL_DOCKER=1; INSTALL_COMPOSE=0 ;;
         2) INSTALL_DOCKER=0; INSTALL_COMPOSE=1 ;;

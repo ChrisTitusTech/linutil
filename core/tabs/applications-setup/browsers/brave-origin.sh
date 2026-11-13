@@ -78,16 +78,7 @@ uninstallBraveOrigin() {
 }
 
 main() {
-    printf "%b\n" "${YELLOW}Do you want to Install or Uninstall Brave Origin?${RC}"
-    printf "%b\n" "1. ${YELLOW}Install Brave Origin${RC}"
-    printf "%b\n" "2. ${YELLOW}Uninstall Brave Origin${RC}"
-    printf "%b" "Enter your choice [1-2]: "
-    read -r CHOICE
-    case "$CHOICE" in
-        1) installBraveOrigin ;;
-        2) uninstallBraveOrigin ;;
-        *) printf "%b\n" "${RED}Invalid choice.${RC}" && exit 1 ;;
-    esac
+    installBraveOrigin
 }
 
 checkEnv

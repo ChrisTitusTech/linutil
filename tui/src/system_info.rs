@@ -4,14 +4,17 @@ use ratatui::{
     text::{Line, Span},
 };
 use std::process::Command;
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
-const FASTFETCH_ARGS: [&str; 6] = [
+const FASTFETCH_ARGS: [&str; 8] = [
+    "--config",
+    "none",
     "--logo",
     "none",
     "--separator",
     " : ",
     "--structure",
-    "cpu:disk:memory:gpu",
+    "cpu:gpu:memory:disk",
 ];
 
 pub struct SystemInfo {
@@ -36,15 +39,14 @@ impl SystemInfo {
         self.entries
             .iter()
             .map(|entry| {
-                let prefix = format!("{:>4}: ", entry.label);
-                let value_width = max_width.saturating_sub(prefix.len());
+                let label = truncate_value(entry.label, max_width);
+                let label_width = label.width();
+                let value_width = max_width.saturating_sub(label_width + 1);
                 let value = truncate_value(&entry.value, value_width);
+                let gap = max_width.saturating_sub(label_width + value.width());
                 Line::from(vec![
-                    Span::styled(
-                        format!("{:>4}", entry.label),
-                        Style::default().fg(theme.tab_color()).bold(),
-                    ),
-                    Span::styled(": ", Style::default().fg(theme.unfocused_color())),
+                    Span::styled(label, Style::default().fg(theme.muted())),
+                    Span::raw(" ".repeat(gap)),
                     Span::styled(value, Style::default().fg(theme.cmd_color())),
                 ])
             })
@@ -59,146 +61,135 @@ fn fastfetch_entries() -> Option<Vec<InfoEntry>> {
         .output()
         .ok()?;
 
-    if !output.status.success() {
-        return None;
-    }
+    output
+        .status
+        .success()
+        .then(|| parse_entries(&String::from_utf8_lossy(&output.stdout)))
+}
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let cleaned = strip_ansi_codes(&stdout);
-
-    let mut cpu = None;
-    let mut disk = None;
-    let mut ram = None;
-    let mut gpu = None;
+fn parse_entries(stdout: &str) -> Vec<InfoEntry> {
+    let cleaned = strip_ansi_codes(stdout);
+    let mut values: [Option<String>; 4] = [None, None, None, None];
 
     for line in cleaned.lines() {
-        let line = line.trim();
-        if line.is_empty() {
+        let Some((label, value)) = line.trim().split_once(':') else {
             continue;
-        }
-
-        let mut parts = line.splitn(2, ':');
-        let label = parts.next().unwrap_or("").trim();
-        let value = parts.next().unwrap_or("").trim();
+        };
+        let label = label.trim().to_ascii_lowercase();
+        let value = value.trim();
         if value.is_empty() {
             continue;
         }
-
-        let label_lower = label.to_ascii_lowercase();
-        if cpu.is_none() && label_lower.starts_with("cpu") {
-            cpu = Some(normalize_value("cpu", value));
-        } else if disk.is_none() && label_lower.starts_with("disk") {
-            disk = Some(normalize_value("disk", value));
-        } else if ram.is_none()
-            && (label_lower.starts_with("memory") || label_lower.starts_with("ram"))
-        {
-            ram = Some(normalize_value("ram", value));
-        } else if gpu.is_none() && label_lower.starts_with("gpu") {
-            gpu = Some(normalize_value("gpu", value));
+        let index = if label.starts_with("cpu") {
+            0
+        } else if label.starts_with("gpu") {
+            1
+        } else if label.starts_with("memory") || label.starts_with("ram") {
+            2
+        } else if label.starts_with("disk") {
+            3
+        } else {
+            continue;
+        };
+        if values[index].is_none() {
+            values[index] = Some(if index >= 2 {
+                // Fastfetch appends utilization and filesystem details after capacity.
+                value.split(" (").next().unwrap_or(value).trim().to_owned()
+            } else {
+                value.to_owned()
+            });
         }
     }
 
-    if cpu.is_none() && disk.is_none() && ram.is_none() && gpu.is_none() {
-        return None;
-    }
-
-    Some(vec![
-        InfoEntry {
-            label: "CPU",
-            value: cpu.unwrap_or_else(|| "n/a".to_string()),
-        },
-        InfoEntry {
-            label: "DISK",
-            value: disk.unwrap_or_else(|| "n/a".to_string()),
-        },
-        InfoEntry {
-            label: "RAM",
-            value: ram.unwrap_or_else(|| "n/a".to_string()),
-        },
-        InfoEntry {
-            label: "GPU",
-            value: gpu.unwrap_or_else(|| "n/a".to_string()),
-        },
-    ])
+    ["CPU", "GPU", "Memory", "Disk"]
+        .into_iter()
+        .zip(values)
+        .map(|(label, value)| InfoEntry {
+            label,
+            value: value.unwrap_or_else(|| "n/a".to_owned()),
+        })
+        .collect()
 }
 
 fn strip_ansi_codes(input: &str) -> String {
     let mut output = String::with_capacity(input.len());
     let mut chars = input.chars().peekable();
-
     while let Some(c) = chars.next() {
         if c == '\x1b' && matches!(chars.peek(), Some('[')) {
             chars.next();
             for next in chars.by_ref() {
-                if next == 'm' {
+                if ('@'..='~').contains(&next) {
                     break;
                 }
             }
-            continue;
+        } else {
+            output.push(c);
         }
-        output.push(c);
     }
-
     output
 }
 
-fn normalize_value(label: &str, value: &str) -> String {
-    match label {
-        "cpu" => strip_device_details(value),
-        "gpu" => strip_device_details(value),
-        "disk" => extract_total(value),
-        "ram" => extract_total(value),
-        _ => value.trim().to_string(),
-    }
-}
-
-fn strip_device_details(value: &str) -> String {
-    let mut trimmed = value.trim().to_string();
-    if let Some(idx) = trimmed.find(" @") {
-        trimmed.truncate(idx);
-        trimmed = trimmed.trim().to_string();
-    }
-    if let Some(idx) = trimmed.find(" (") {
-        trimmed.truncate(idx);
-        trimmed = trimmed.trim().to_string();
-    }
-    if let Some(idx) = trimmed.find(" [") {
-        trimmed.truncate(idx);
-        trimmed = trimmed.trim().to_string();
-    }
-    trimmed
-}
-
-fn extract_total(value: &str) -> String {
-    let mut parts = value.splitn(2, '/');
-    let _used = parts.next();
-    let Some(total_part) = parts.next() else {
-        return value.trim().to_string();
-    };
-    let mut tokens = total_part.split_whitespace();
-    let Some(amount) = tokens.next() else {
-        return total_part.trim().to_string();
-    };
-    let Some(unit) = tokens.next() else {
-        return amount.to_string();
-    };
-    format!("{amount} {unit}")
-}
-
 fn truncate_value(value: &str, max_width: usize) -> String {
+    if value.width() <= max_width {
+        return value.to_owned();
+    }
     if max_width == 0 {
         return String::new();
     }
+    let mut truncated = String::new();
+    let mut width = 0;
+    for c in value.chars() {
+        let char_width = c.width().unwrap_or(0);
+        if width + char_width > max_width - 1 {
+            break;
+        }
+        truncated.push(c);
+        width += char_width;
+    }
+    truncated.push('…');
+    truncated
+}
 
-    let value_chars: Vec<char> = value.chars().collect();
-    if value_chars.len() <= max_width {
-        return value.to_string();
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_full_devices_and_used_total_capacity_in_dashboard_order() {
+        let entries = parse_entries(
+            "\x1b[34mCPU\x1b[0m : Example CPU (8) @ 3.00 GHz\n\
+             Disk (/) : 100.00 GiB / 500.00 GiB (20%) - ext4\n\
+             Memory : 4.00 GiB / 16.00 GiB (25%)\n\
+             GPU : Example GPU @ 1.00 GHz [Integrated]\n",
+        );
+        assert_eq!(
+            entries.iter().map(|e| e.label).collect::<Vec<_>>(),
+            ["CPU", "GPU", "Memory", "Disk"]
+        );
+        assert_eq!(entries[0].value, "Example CPU (8) @ 3.00 GHz");
+        assert_eq!(entries[1].value, "Example GPU @ 1.00 GHz [Integrated]");
+        assert_eq!(entries[2].value, "4.00 GiB / 16.00 GiB");
+        assert_eq!(entries[3].value, "100.00 GiB / 500.00 GiB");
     }
 
-    if max_width <= 3 {
-        return value_chars.iter().take(max_width).collect();
+    #[test]
+    fn missing_devices_are_explicitly_unavailable() {
+        let entries = parse_entries("CPU : Test CPU\nGPU : \nUnknown : ignored\n");
+        assert_eq!(entries[0].value, "Test CPU");
+        assert!(entries[1..].iter().all(|entry| entry.value == "n/a"));
+        assert!(parse_entries("").iter().all(|entry| entry.value == "n/a"));
     }
 
-    let slice: String = value_chars.iter().take(max_width - 3).collect();
-    format!("{slice}...")
+    #[test]
+    fn lines_fit_the_terminal_cell_width_even_with_wide_characters() {
+        let info = SystemInfo {
+            entries: parse_entries("CPU : 处理器 AMD\nGPU : Graphics\n"),
+        };
+        for width in 0..40 {
+            for line in info.render_lines(&Theme::Compatible, width) {
+                assert_eq!(line.width(), width);
+            }
+        }
+        assert_eq!(truncate_value("处理器 AMD", 5), "处理…");
+    }
 }

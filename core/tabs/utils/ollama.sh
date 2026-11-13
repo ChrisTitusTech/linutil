@@ -184,8 +184,8 @@ menu() {
         printf "%b\n" "6) Exit"
 
         printf "%b" "${YELLOW}Enter your choice (1-5): ${RC}"
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         case $choice in
             1) list_models ;;
             2) show_model_info ;;

@@ -20,8 +20,8 @@ setLocale() {
         printf "  %s\n" "c) Enter a custom locale"
 
         printf "%s" "Select a locale number (or 'c' for custom): "
-        read -r choice
-
+        choice=''
+        readMenuChoice choice
         if [ "$choice" = "c" ] || [ "$choice" = "C" ]; then
             LOCALE=""
             while [ -z "$LOCALE" ]; do

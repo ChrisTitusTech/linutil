@@ -1,18 +1,23 @@
 mod cli;
 mod confirmation;
+mod dashboard;
 mod filter;
 mod float;
 mod floating_text;
 mod hint;
+mod intro;
 mod logo;
 mod root;
 mod running_command;
+mod script_preview;
+mod stars;
 mod state;
 mod system_info;
 mod theme;
 
 #[cfg(feature = "tips")]
 mod tips;
+mod watermark;
 
 use crate::cli::Args;
 use clap::Parser;
@@ -31,7 +36,7 @@ use state::AppState;
 use std::{
     io::{stdout, Result, Stdout},
     sync::atomic::Ordering,
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 fn main() -> Result<()> {
@@ -48,7 +53,7 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    run(&mut terminal, &mut state)?;
+    let result = run(&mut terminal, &mut state, args.intro);
 
     // restore terminal
     disable_raw_mode()?;
@@ -59,18 +64,36 @@ fn main() -> Result<()> {
     terminal.backend_mut().execute(ResetColor)?;
     terminal.show_cursor()?;
 
-    Ok(())
+    result
 }
 
-fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) -> Result<()> {
+fn run(
+    terminal: &mut Terminal<CrosstermBackend<Stdout>>,
+    state: &mut AppState,
+    show_intro: bool,
+) -> Result<()> {
+    let mut intro = show_intro.then(Instant::now);
     loop {
+        if let Some(started) = intro {
+            let elapsed = started.elapsed();
+            terminal.draw(|frame| {
+                state.draw(frame);
+                intro::apply(frame.buffer_mut(), elapsed);
+            })?;
+            if elapsed >= intro::DURATION {
+                intro = None;
+            }
+        }
         // Wait for an event
-        if !event::poll(Duration::from_millis(10))? {
-            if TERMINAL_UPDATED
+        if !event::poll(Duration::from_millis(if intro.is_some() { 33 } else { 10 }))? {
+            if intro.is_some() {
+                continue;
+            }
+            let terminal_updated = TERMINAL_UPDATED
                 .compare_exchange(true, false, Ordering::AcqRel, Ordering::Acquire)
-                .is_ok()
-            {
-                terminal.draw(|frame| state.draw(frame)).unwrap();
+                .is_ok();
+            if terminal_updated || state.needs_animation_frame() {
+                terminal.draw(|frame| state.draw(frame))?;
             }
             continue;
         }
@@ -83,15 +106,23 @@ fn run(terminal: &mut Terminal<CrosstermBackend<Stdout>>, state: &mut AppState) 
                     continue;
                 }
 
+                if intro.take().is_some() {
+                    terminal.draw(|frame| state.draw(frame))?;
+                    continue;
+                }
+
                 if !state.handle_key(&key) {
                     return Ok(());
                 }
             }
+            Event::Mouse(_) if intro.is_some() => continue,
             Event::Mouse(mouse_event) if !state.handle_mouse(&mouse_event) => {
                 return Ok(());
             }
             _ => {}
         }
-        terminal.draw(|frame| state.draw(frame)).unwrap();
+        if intro.is_none() {
+            terminal.draw(|frame| state.draw(frame))?;
+        }
     }
 }

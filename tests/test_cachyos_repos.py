@@ -200,7 +200,10 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         script.chmod(0o755)
         notes = directory / "cachyos-repo-notes.txt"
         notes.write_text("unrelated file\n")
+        common_source = (SCRIPT.parents[2] / "common-script.sh").read_text()
+        menu_reader = "readMenuChoice() {" + common_source.split("readMenuChoice() {", 1)[1].split("\n}", 1)[0] + "\n}\n"
         (root / "tabs/common-script.sh").write_text(
+            menu_reader +
             'checkEnv() { [ "$AUR_HELPER_CHECKED" = true ] || return 99; '
             'ESCALATION_TOOL=escalate; PACKAGER=pacman; '
             'printf checked > "$TEST_ROOT/environment-checked"; }\n'
