@@ -52,7 +52,7 @@ checkGrub() {
     fi
     # shellcheck disable=SC2016
     if ! "$ESCALATION_TOOL" awk -v quote="'" '
-        /[;][[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=/ { invalid = 1 }
+        /GRUB_DEFAULT[[:space:]]*=/ && $0 !~ /^[[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=/ && $0 !~ /^[[:space:]]*#/ { invalid = 1 }
         /^[[:space:]]*(export[[:space:]]+)?GRUB_DEFAULT[[:space:]]*=/ {
             count++
             if ($0 !~ /^GRUB_DEFAULT=("[^"]*"|[[:alnum:]_.\/>-]+)[[:space:]]*(#.*)?$/ &&
