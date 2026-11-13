@@ -134,6 +134,37 @@ echo -ne "
 ------------------------------------------------------------------------
 "
 }
+# @description Prompts for a password twice and exports it to the given variable.
+# @arg $1 Name of the variable to store and export the password in
+set_password () {
+    local password1 password2
+
+    while true; do
+        if ! IFS= read -rs -p "Please enter password: " password1; then
+            printf "\nERROR! Failed to read password.\n"
+            return 1
+        fi
+        printf "\n"
+        if ! IFS= read -rs -p "Please re-enter password: " password2; then
+            printf "\nERROR! Failed to read password.\n"
+            return 1
+        fi
+        printf "\n"
+
+        if [[ -z "$password1" ]]; then
+            printf "ERROR! Password must not be empty.\n"
+            continue
+        fi
+
+        if [[ "$password1" == "$password2" ]]; then
+            export "$1=$password1"
+            break
+        fi
+
+        printf "ERROR! Passwords do not match.\n"
+    done
+}
+
 # @description This function will handle file systems. At this movement we are handling only
 # btrfs and ext4. Others will be added in future.
 filesystem () {
@@ -147,7 +178,8 @@ filesystem () {
     0) export FS=btrfs;;
     1) export FS=ext4;;
     2)
-        set_password "LUKS_PASSWORD"
+        printf "Enter the LUKS passphrase using keyboard layout '%s'.\n" "${KEYMAP}"
+        set_password "LUKS_PASSWORD" || exit 1
         export FS=luks
         ;;
     3) exit ;;
@@ -172,23 +204,59 @@ timezone () {
     done
     export TIMEZONE
 }
+
 # @description Set user's keyboard mapping.
 keymap () {
     echo -ne "
     Please select key board layout from this list"
-    # These are default key maps as presented in official arch repo archinstall
-    # shellcheck disable=SC1010
-    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk)
-
-    select_option "${options[@]}"
-    keymap=${options[$?]}
-
-    if ! localectl list-x11-keymap-layouts 2>/dev/null | grep -qx "${keymap}"; then
-        echo "WARNING: '${keymap}' was not found in X11 keymap layouts. It may still work for console keymaps."
+    local available_keymaps layout console_map selected=0
+    local -a options=() console_keymaps=()
+    local -A console_aliases=([ca]=cf [si]=slovene [tr]=trq [se]=sv-latin1 [pl]=pl2 [dk]=dk-latin1)
+    if ! available_keymaps=$(localectl list-keymaps) || [[ -z "$available_keymaps" ]]; then
+        printf "ERROR: Could not list available console keymaps.\n" >&2
+        exit 1
     fi
+    # Keep locale identifiers separate, and offer only console maps on this ISO.
+    for layout in us by ca cf cz de dk es et fa "fi" fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk; do
+        console_map=$layout
+        if ! grep -Fxq "$console_map" <<< "$available_keymaps"; then
+            console_map=${console_aliases[$layout]:-}
+            if [[ -z "$console_map" ]] || ! grep -Fxq "$console_map" <<< "$available_keymaps"; then
+                continue
+            fi
+        fi
+        options+=("$layout")
+        console_keymaps+=("$console_map")
+    done
+    if [[ ${#options[@]} -eq 0 ]]; then
+        printf "ERROR: No supported console keymaps are available.\n" >&2
+        exit 1
+    fi
+    select_option "${options[@]}" || selected=$?
+    export KEYBOARD_LAYOUT=${options[$selected]}
+    export KEYMAP=${console_keymaps[$selected]}
+    export XKBLAYOUT=$KEYBOARD_LAYOUT
+    case "$XKBLAYOUT" in
+        cf) XKBLAYOUT=ca ;;
+        sg) XKBLAYOUT=ch ;;
+        uk) XKBLAYOUT=gb ;;
+    esac
+    printf "Selected layout: %s; console keymap: %s\n" "$KEYBOARD_LAYOUT" "$KEYMAP"
 
-    echo -ne "Your key boards layout: ${keymap} \n"
-    export KEYMAP=$keymap
+    if ! localectl set-keymap "${KEYMAP}" 2>/dev/null; then
+        printf "ERROR: Could not configure the selected console keymap.\n" >&2
+        exit 1
+    fi
+    if ! loadkeys "${KEYMAP}"; then
+        printf "ERROR: Could not apply the selected console keymap.\n" >&2
+        exit 1
+    fi
+    printf "Confirm your terminal input layout matches boot keymap '%s'.\n" "$KEYMAP"
+    read -r -p "Does your input layout match? [y/N] " layout_confirmed
+    case "$layout_confirmed" in
+        y|Y) ;;
+        *) exit 1 ;;
+    esac
 }
 
 # @description Derives a default locale from the selected keymap and lets the user confirm or override.
@@ -205,7 +273,7 @@ set_locale () {
         [ru]="ru_RU.UTF-8"  [se]="sv_SE.UTF-8"  [sg]="de_CH.UTF-8"
         [si]="sl_SI.UTF-8"  [tr]="tr_TR.UTF-8"  [ua]="uk_UA.UTF-8"
     )
-    local suggested_locale="${keymap_locale_map[${KEYMAP}]:-en_US.UTF-8}"
+    local suggested_locale="${keymap_locale_map[${KEYBOARD_LAYOUT}]:-en_US.UTF-8}"
     while true; do
         read -r -p "Detected locale: '$suggested_locale'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " input
         LOCALE="${input:-$suggested_locale}"
@@ -329,6 +397,9 @@ userinfo () {
 background_checks
 clear
 logo
+keymap
+clear
+logo
 userinfo
 clear
 logo
@@ -339,9 +410,6 @@ filesystem
 clear
 logo
 timezone
-clear
-logo
-keymap
 clear
 logo
 set_locale
@@ -453,9 +521,9 @@ elif [[ "${FS}" == "ext4" ]]; then
 elif [[ "${FS}" == "luks" ]]; then
     mkfs.fat -F32 "${partition2}"
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat "${partition3}" -
+    printf '%s' "${LUKS_PASSWORD}" | cryptsetup -v luksFormat "${partition3}" -
 # open luks container and ROOT will be place holder
-    echo -n "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
+    printf '%s' "${LUKS_PASSWORD}" | cryptsetup open "${partition3}" ROOT -
 # now format that container
     mkfs.btrfs /dev/mapper/ROOT
 # create subvolumes for btrfs
@@ -586,7 +654,7 @@ ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 
 # Set keymaps
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
-echo "XKBLAYOUT=${KEYMAP}" >> /etc/vconsole.conf
+echo "XKBLAYOUT=${XKBLAYOUT}" >> /etc/vconsole.conf
 echo "Keymap set to: ${KEYMAP}"
 
 # Add sudo no password rights
@@ -653,9 +721,12 @@ echo "$USERNAME password set"
 echo $NAME_OF_MACHINE > /etc/hostname
 
 if [[ ${FS} == "luks" ]]; then
-# Making sure to edit mkinitcpio conf if luks is selected
-# add encrypt in mkinitcpio.conf before filesystems in hooks
-    sed -i 's/filesystems/encrypt filesystems/g' /etc/mkinitcpio.conf
+# The systemd initcpio hook cannot run the legacy encrypt hook; use sd-encrypt there
+    if grep -qE '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
+        sed -i 's/\bfilesystems\b/sd-encrypt filesystems/' /etc/mkinitcpio.conf
+    else
+        sed -i 's/\bfilesystems\b/encrypt filesystems/' /etc/mkinitcpio.conf
+    fi
 # making mkinitcpio with linux kernel
     mkinitcpio -p linux-lts
 fi
@@ -687,7 +758,11 @@ echo -ne "
 "
 # set kernel parameter for decrypting the drive
 if [[ "${FS}" == "luks" ]]; then
-sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    if grep -qE '^HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then
+        sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"rd.luks.name=${ENCRYPTED_PARTITION_UUID}=ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    else
+        sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+    fi
 fi
 # set kernel parameter for adding splash screen
 sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& splash /' /etc/default/grub
