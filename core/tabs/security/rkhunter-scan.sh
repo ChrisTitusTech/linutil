@@ -93,13 +93,13 @@ runScan() {
     # normal scan outcome rather than an execution error. Capture its real
     # exit status through the tee pipe and save the full report straight to
     # the user's home directory, independent of /var/log or syslog settings.
-    printf "%b\n" "${YELLOW}Running: rkhunter --check --skip-keypress${RC}"
+    printf "%b\n" "${YELLOW}Running: rkhunter --check --skip-keypress --language en${RC}"
     # Disable 'set -e' only around the capture: rkhunter's non-zero warning
     # status must reach the status file instead of aborting the script, and
     # tee keeps the scan streaming live while the full report is written.
     set +e
     {
-        "$ESCALATION_TOOL" rkhunter --check --skip-keypress --logfile "$ROOT_LOG_DIR/scan.log"
+        "$ESCALATION_TOOL" rkhunter --check --skip-keypress --language en --logfile "$ROOT_LOG_DIR/scan.log"
         echo "$?" >"$STATUS_FILE"
     } | tee "$LIVE_OUTPUT"
     TEE_STATUS=$?
@@ -108,6 +108,8 @@ runScan() {
     "$ESCALATION_TOOL" cat "$ROOT_LOG_DIR/scan.log" >"$SCAN_LOG"
     rm -f "$STATUS_FILE"
 
+    # The scan explicitly uses English so this marker also works with a
+    # non-English LANGUAGE configured in rkhunter.conf.
     # Exit status 0 (clean) and 1 (warnings found) both mean the scan ran. A
     # higher status, or an empty log, means rkhunter aborted before scanning,
     # which usually points to an invalid option in /etc/rkhunter.conf.
