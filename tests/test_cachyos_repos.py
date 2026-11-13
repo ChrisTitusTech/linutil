@@ -349,6 +349,16 @@ class CachyosReposTests(unittest.TestCase):
                 self.assertEqual(result["commands"], [])
                 self.assertFalse(result["environment_checked"])
 
+    def test_inline_default_overrides_abort_before_mutations(self):
+        for override in ('if true; then GRUB_DEFAULT=saved; fi', 'true; GRUB_DEFAULT=saved', 'export GRUB_DEFAULT=saved'):
+            with self.subTest(override=override):
+                initial = 'GRUB_DEFAULT=0\n' + override + '\n'
+                result = run_menu(3, grub=initial)
+                self.assertNotEqual(result["status"], 0)
+                self.assertEqual(result["commands"], [])
+                self.assertEqual(result["grub"], initial)
+                self.assertFalse(result["environment_checked"])
+
     def test_install_requires_confirmation_before_upgrading_packages(self):
         result = run_menu(1, confirm="n")
         self.assertNotEqual(result["status"], 0)
