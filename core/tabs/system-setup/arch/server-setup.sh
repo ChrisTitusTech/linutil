@@ -224,10 +224,19 @@ keymap () {
     export KEYMAP=$keymap
 
     if ! localectl set-keymap "${keymap}" 2>/dev/null; then
-        printf "WARNING: Could not apply console keymap '%s'; using the default layout 'us'.\n" "${keymap}"
-        keymap=us
-        export KEYMAP=$keymap
+        printf "ERROR: Could not configure the selected console keymap.\n" >&2
+        exit 1
     fi
+    if ! loadkeys "${keymap}"; then
+        printf "ERROR: Could not apply the selected console keymap.\n" >&2
+        exit 1
+    fi
+    printf "Confirm your terminal input layout matches boot keymap '%s'.\n" "$KEYMAP"
+    read -r -p "Does your input layout match? [y/N] " layout_confirmed
+    case "$layout_confirmed" in
+        y|Y) ;;
+        *) exit 1 ;;
+    esac
 }
 
 # @description Derives a default locale from the selected keymap and lets the user confirm or override.
