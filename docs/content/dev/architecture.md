@@ -247,6 +247,8 @@ The TUI is rendered by `AppState::draw()` and divided into these regions:
 - **Details**: Description of the selected entry or live search match
 - **Floating windows**: Running commands, descriptions, help, and confirmation prompts
 
+The command list also holds a dim, fixed CTT logo (`tui/src/watermark.rs`), drawn in Braille in the list's blank cells only, so it never covers text. In Script Preview it keeps the same panel-centered position and size and is drawn after the code, within the code viewport's blank cells, leaving the line-number gutter, header, and footer untouched. It is hidden where the stars are unavailable (the Linux console and terminals without truecolor) and on the Compatible theme.
+
 ### Focus State Machine
 
 `AppState` tracks a `Focus` enum:

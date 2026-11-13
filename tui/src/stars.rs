@@ -47,6 +47,11 @@ impl Starfield {
         }
     }
 
+    /// Whether this terminal can show faint Braille: a Unicode font and truecolor.
+    pub fn supported(&self) -> bool {
+        self.supported
+    }
+
     pub fn toggle(&mut self) {
         if self.supported {
             self.enabled = !self.enabled;

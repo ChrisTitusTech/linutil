@@ -17,6 +17,7 @@ mod theme;
 
 #[cfg(feature = "tips")]
 mod tips;
+mod watermark;
 
 use crate::cli::Args;
 use clap::Parser;

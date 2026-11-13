@@ -60,7 +60,8 @@ impl ScriptPreview {
         }
     }
 
-    pub fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
+    /// Draw the preview and return its code viewport, excluding the gutter and chrome.
+    pub fn draw(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) -> Rect {
         let block = crate::dashboard::block(" Script Preview ", theme, true);
         let inner = block.inner(area);
         frame.render_widget(Clear, area);
@@ -158,6 +159,7 @@ impl ScriptPreview {
                 Rect::new(content.x, content.bottom() - 1, content.width, 1),
             );
         }
+        code
     }
 
     pub fn handle_key(&mut self, key: &KeyEvent) -> bool {

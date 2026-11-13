@@ -13,6 +13,7 @@ use crate::{
     stars::Starfield,
     system_info::SystemInfo,
     theme::Theme,
+    watermark::Watermark,
     Args,
 };
 use linutil_core::{ego_tree::NodeId, Command, Config, ConfigValues, ListNode, TabList};
@@ -65,6 +66,7 @@ pub struct AppState {
     system_info: Option<SystemInfo>,
     logo: Option<Logo>,
     stars: Starfield,
+    watermark: Watermark,
 }
 
 pub enum Focus {
@@ -125,6 +127,7 @@ impl AppState {
             system_info: SystemInfo::gather(),
             logo: Logo::load(),
             stars: Starfield::new(),
+            watermark: Watermark::new(),
         };
 
         #[cfg(unix)]
@@ -273,8 +276,19 @@ impl AppState {
             list: list_area,
         });
         self.draw_commands(frame, commands, list_area, search);
-        if let Focus::ScriptPreview(preview) = &mut self.focus {
-            preview.draw(frame, commands, &self.theme);
+        let watermark_clip = if let Focus::ScriptPreview(preview) = &mut self.focus {
+            preview.draw(frame, commands, &self.theme)
+        } else {
+            list_area
+        };
+        if self.stars.supported() && self.theme != Theme::Compatible {
+            self.watermark.draw(
+                frame.buffer_mut(),
+                commands,
+                list_area,
+                watermark_clip,
+                &self.theme,
+            );
         }
         self.draw_system_info(frame, layout.system);
         if !layout.logo.is_empty() {
@@ -1551,6 +1565,108 @@ mod tests {
         for y in logo.y..logo.bottom() {
             for x in logo.x..logo.right() {
                 assert_eq!(terminal.backend().buffer()[(x, y)], baseline[(x, y)]);
+            }
+        }
+    }
+
+    #[test]
+    fn dim_logo_fills_only_blank_cells_where_the_terminal_can_show_it() {
+        fn frame(app: &mut AppState) -> ratatui::buffer::Buffer {
+            let mut terminal = Terminal::new(TestBackend::new(200, 50)).unwrap();
+            terminal.draw(|frame| app.draw(frame)).unwrap();
+            terminal.backend().buffer().clone()
+        }
+        let is_braille = |symbol: &str| {
+            symbol
+                .chars()
+                .any(|c| ('\u{2801}'..='\u{28ff}').contains(&c))
+        };
+
+        let mut basic = app();
+        basic.stars = Starfield::for_terminal("linux", "", true);
+        let mut rich = app();
+        rich.stars = Starfield::for_terminal("xterm-256color", "truecolor", false);
+        frame(&mut rich); // Keys only count once a frame has been drawn.
+        key(&mut rich, KeyCode::Char('s'));
+        assert!(!rich.stars.active(&rich.theme));
+        let background = rich.theme.bg();
+        if !matches!(background, Color::Rgb(..)) {
+            return; // Without a truecolor TERM every theme falls back to basic colors.
+        }
+
+        let (plain, painted) = (frame(&mut basic), frame(&mut rich));
+        let list = rich.areas.as_ref().unwrap().list;
+        let mut changed = 0;
+        for y in list.y..list.bottom() {
+            for x in list.x..list.right() {
+                let (before, after) = (&plain[(x, y)], &painted[(x, y)]);
+                if before.symbol() != after.symbol() {
+                    changed += 1;
+                    assert_eq!(before.symbol(), " ");
+                    assert_eq!(before.bg, background);
+                    assert!(is_braille(after.symbol()));
+                }
+            }
+        }
+        assert!(changed > 100, "only {changed} cells");
+        let outside = (0..50)
+            .flat_map(|y| (0..200).map(move |x| (x, y)))
+            .filter(|&position| !list.contains(position.into()) && position.1 > 2);
+        for (x, y) in outside {
+            assert!(!is_braille(painted[(x, y)].symbol()), "at {x}, {y}");
+        }
+        assert!(
+            !rich.needs_animation_frame(),
+            "a fixed logo needs no redraws"
+        );
+
+        rich.theme = Theme::Compatible;
+        let compatible = frame(&mut rich);
+        rich.theme = Theme::default();
+        for y in list.y..list.bottom() {
+            for x in list.x..list.right() {
+                assert!(!is_braille(compatible[(x, y)].symbol()));
+            }
+        }
+
+        let list_frame = painted;
+        // Preview text and styles remain identical, including after scrolling.
+        let source = Command::Raw(
+            (0..60)
+                .map(|i| format!("printf '%s' \"line {i}: {}\"", "x ".repeat(30)))
+                .collect::<Vec<_>>()
+                .join("\n"),
+        );
+        basic.focus = Focus::ScriptPreview(ScriptPreview::new(&source, "Test", &basic.theme));
+        rich.focus = Focus::ScriptPreview(ScriptPreview::new(&source, "Test", &rich.theme));
+        for scroll in [KeyCode::Home, KeyCode::PageDown, KeyCode::End] {
+            frame(&mut basic);
+            frame(&mut rich);
+            key(&mut basic, scroll);
+            key(&mut rich, scroll);
+            let plain = frame(&mut basic);
+            let painted = frame(&mut rich);
+            let mut changed = 0;
+            for y in list.y..list.bottom() {
+                for x in list.x..list.right() {
+                    let (before, after) = (&plain[(x, y)], &painted[(x, y)]);
+                    if before != after {
+                        changed += 1;
+                        assert_eq!(before.symbol(), " ");
+                        assert_eq!(before.bg, background);
+                        assert_eq!(after.bg, background);
+                        assert!(is_braille(after.symbol()));
+                        assert_eq!(after, &list_frame[(x, y)], "watermark moved at {x},{y}");
+                    }
+                }
+            }
+            assert!(changed > 0, "preview should show the watermark");
+            for y in list.y - 4..list.bottom() + 2 {
+                for x in list.x - 2..list.right() + 2 {
+                    if !list.contains((x, y).into()) {
+                        assert_eq!(plain[(x, y)], painted[(x, y)]);
+                    }
+                }
             }
         }
     }
