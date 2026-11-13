@@ -127,7 +127,18 @@ runRepoHelper() (
     trap 'exit 130' INT
     trap 'exit 143' TERM
     cd "$workdir"
+    # Reviewed archive, pinned on 2026-11-13. Review upstream changes before
+    # updating this digest; a changed mirror artifact must fail closed.
+    helperSha256='a1e3a74bdd12c10ac7317079e3e8c8e7d5557d818e4d4021364005a336b6afdc'
+    if ! command_exists sha256sum; then
+        printf '%s\n' "sha256sum is required to verify the CachyOS helper." >&2
+        return 1
+    fi
     curl -f https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+    if ! printf '%s  %s\n' "$helperSha256" cachyos-repo.tar.xz | sha256sum -c -; then
+        printf '%s\n' "CachyOS helper verification failed. Update Linutil before retrying." >&2
+        return 1
+    fi
     tar xvf cachyos-repo.tar.xz
     cd cachyos-repo
     if [ "${2:-}" = --reset-kernel ]; then

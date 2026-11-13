@@ -5,8 +5,10 @@ All system paths point into a temporary directory. PATH contains only read-only
 text tools and local mocks for downloads, packages, privilege and boot changes.
 """
 
+import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -69,7 +71,7 @@ elif name == "pacman-conf":
                 if header.startswith("[") and header.endswith("]"):
                     print(header[1:-1])
 elif name == "curl":
-    Path(args[args.index("-o") + 1]).write_text("mock archive")
+    Path(args[args.index("-o") + 1]).write_text("corrupt archive" if os.environ.get("CORRUPT_ARCHIVE") == "1" else "mock archive")
 elif name == "tar":
     repo = Path.cwd() / "cachyos-repo"
     repo.mkdir()
@@ -154,7 +156,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
              grub_interrupt=False, keyring_installed=False, confirm="y",
              grub_missing_initramfs=False, grub_late_override=False,
              grub_confirm="y", grub_symlink=False, unsupported_cpu=False, grub_drop_in=None, grub_custom_config=False, root_fs="ext4", stock_no_servers=False, grub_generator=True,
-             missing_migration_packages=False, grub_device_id=False, grub_unmanaged=False, lib32_installed=False, grub_preflight_failure=False):
+             missing_migration_packages=False, grub_device_id=False, grub_unmanaged=False, lib32_installed=False, grub_preflight_failure=False, corrupt_archive=False):
     with tempfile.TemporaryDirectory(prefix="linutil-cachyos-") as temporary:
         root = Path(temporary)
         directory = root / "tabs/system-setup/arch"
@@ -187,6 +189,9 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             generator.parent.mkdir()
             generator.touch(mode=0o755)
         source = SCRIPT.read_text()
+        # Verify fixture bytes with the real checksum tool, never a success mock.
+        source = re.sub(r"helperSha256='[0-9a-f]{64}'",
+                        f"helperSha256='{hashlib.sha256(b'mock archive').hexdigest()}'", source)
         assert source.startswith("#!/bin/sh -e\n")
         for path in ("/etc/pacman.conf", "/etc/default", "/etc/grub.d", "/boot/grub", "/lib/ld-linux-x86-64.so.2"):
             source = source.replace(path, str(root / path.lstrip("/")))
@@ -204,7 +209,7 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
         )
         binaries = root / "bin"
         binaries.mkdir()
-        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test", "sh"):
+        for command in ("grep", "awk", "cat", "mktemp", "cp", "mv", "test", "sh", "sha256sum"):
             (binaries / command).symlink_to(shutil.which(command))
         commands = ["escalate", "curl", "tar", "repo-installer", "rm", "pacman", "pacman-conf", "sed", "findmnt"]
         if grub_command:
@@ -225,6 +230,8 @@ def run_menu(choice, pacman="[core]\n", grub="GRUB_DEFAULT=0\n", fail=None,
             "LC_ALL": "C",
         }
         environment["ROOT_FS"] = root_fs
+        if corrupt_archive:
+            environment["CORRUPT_ARCHIVE"] = "1"
         if missing_migration_packages:
             environment["MISSING_MIGRATION_PACKAGES"] = "1"
         if grub_preflight_failure:
@@ -281,6 +288,16 @@ class CachyosReposTests(unittest.TestCase):
     def assert_success(self, result):
         self.assertEqual(result["status"], 0, result["output"])
         self.assertTrue(result["environment_checked"])
+
+    def test_changed_helper_archive_aborts_before_extraction(self):
+        for choice, config in ((1, "[core]\n"),
+                               (6, "[core]\n\n[extra]\n\n[cachyos]\nInclude = /etc/pacman.d/cachyos-mirrorlist\n")):
+            with self.subTest(choice=choice):
+                result = run_menu(choice, pacman=config, corrupt_archive=True)
+                self.assertNotEqual(result["status"], 0)
+                self.assertEqual(result["commands"], ["curl", "rm"])
+                self.assertEqual(result["pacman"], config)
+                self.assertIn("helper verification failed", result["output"])
 
     def test_repository_install_with_no_existing_repos_and_no_grub(self):
         result = run_menu(1, grub=None, grub_command=False, grub_directory=False)
