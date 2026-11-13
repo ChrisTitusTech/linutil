@@ -70,13 +70,18 @@ removeRkhunter() {
 }
 
 runScan() {
+    SCAN_LOG=
+    STATUS_FILE=
+    LIVE_OUTPUT=
+    ROOT_LOG_DIR=
+    REPORT_SAVED=false
+    trap 'rm -f "$STATUS_FILE" "$LIVE_OUTPUT"; if [ "$REPORT_SAVED" = false ]; then rm -f "$SCAN_LOG"; fi; if [ -n "$ROOT_LOG_DIR" ]; then "$ESCALATION_TOOL" rm -rf -- "$ROOT_LOG_DIR"; fi' EXIT
+    trap 'exit 1' HUP INT TERM
     SCAN_LOG=$(mktemp "$HOME/rkhunter-XXXXXXXX.log")
     STATUS_FILE=$(mktemp)
     LIVE_OUTPUT=$(mktemp)
     # Keep the privileged log outside user-controlled directories.
     ROOT_LOG_DIR=$("$ESCALATION_TOOL" mktemp -d /tmp/linutil-rkhunter-XXXXXXXX)
-    trap 'rm -f "$STATUS_FILE" "$LIVE_OUTPUT"; "$ESCALATION_TOOL" rm -rf -- "$ROOT_LOG_DIR"' EXIT
-    trap 'exit 1' HUP INT TERM
 
     # Refresh the data files first. A failed update (for example, no network,
     # or the distro package disabling web downloads) must not abort the scan,
@@ -113,6 +118,7 @@ runScan() {
         exit 1
     fi
 
+    REPORT_SAVED=true
     printf "\n%b\n" "${YELLOW}Scan log saved: ${SCAN_LOG}${RC}"
     if [ "$SCAN_STATUS" -eq 1 ]; then
         printf "%b\n" "${YELLOW}rkhunter reported warnings. Review the log above.${RC}"
