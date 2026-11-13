@@ -1,6 +1,6 @@
 """Exercise scan status, localized output, report capture, and cleanup safely."""
 
-import pathlib,tempfile,subprocess,os
+import pathlib,tempfile,subprocess,os,shutil
 src=(pathlib.Path(__file__).resolve().parents[1] / 'core/tabs/security/rkhunter-scan.sh').read_text().split('checkEnv\ninstallRkhunter')[0].replace('. ../common-script.sh','')
 for case,status,summary,expected in [('clean',0,True,0),('localized',0,True,0),('warnings',1,True,0),('config',1,False,1),('fatal',2,True,1),('tee',0,True,1),('copy',0,True,1),('allocation',0,True,1)]:
  with tempfile.TemporaryDirectory() as d:
@@ -29,9 +29,21 @@ esac
 exit 99
 '''
   (p/'bin/escalate').write_text(mock);(p/'bin/escalate').chmod(0o755)
+  # BusyBox rejects templates whose placeholders are followed by a suffix.
+  (p/'bin/mktemp').write_text("""#!/bin/sh
+for argument do
+ case "$argument" in
+  -*) ;;
+  *XXXXXX) ;;
+  *) printf '%s\\n' 'template must end in XXXXXX' >&2; exit 1;;
+ esac
+done
+exec "$REAL_MKTEMP" "$@"
+""")
+  (p/'bin/mktemp').chmod(0o755)
   if case=='tee':
    (p/'bin/tee').write_text('#!/bin/sh\ncat > "$1"\nexit 1\n');(p/'bin/tee').chmod(0o755)
-  env=dict(os.environ,HOME=str(p/'home'),TMPDIR=d,TEST_ROOT=d,CASE=case,SUMMARY=str(summary),SCAN_EXIT=str(status),PATH=str(p/'bin')+':'+os.environ['PATH'])
+  env=dict(os.environ,REAL_MKTEMP=shutil.which("mktemp"),HOME=str(p/'home'),TMPDIR=d,TEST_ROOT=d,CASE=case,SUMMARY=str(summary),SCAN_EXIT=str(status),PATH=str(p/'bin')+':'+os.environ['PATH'])
   r=subprocess.run(['sh','-e'],input=src+'\nESCALATION_TOOL=escalate\nrunScan\n',text=True,capture_output=True,env=env)
   reports=list((p/'home').iterdir()); leftovers=[x.name for x in p.iterdir() if x.name not in ('home','bin')]
   assert r.returncode==expected,(case,r.returncode,r.stderr)

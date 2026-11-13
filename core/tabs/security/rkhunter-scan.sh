@@ -77,7 +77,7 @@ runScan() {
     REPORT_SAVED=false
     trap 'rm -f "$STATUS_FILE" "$LIVE_OUTPUT"; if [ "$REPORT_SAVED" = false ]; then rm -f "$SCAN_LOG"; fi; if [ -n "$ROOT_LOG_DIR" ]; then "$ESCALATION_TOOL" rm -rf -- "$ROOT_LOG_DIR"; fi' EXIT
     trap 'exit 1' HUP INT TERM
-    SCAN_LOG=$(mktemp "$HOME/rkhunter-XXXXXXXX.log")
+    SCAN_LOG=$(mktemp "$HOME/rkhunter.log.XXXXXX")
     STATUS_FILE=$(mktemp)
     LIVE_OUTPUT=$(mktemp)
     # Keep the privileged log outside user-controlled directories.
