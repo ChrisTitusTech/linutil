@@ -209,25 +209,45 @@ timezone () {
 keymap () {
     echo -ne "
     Please select key board layout from this list"
-    # These are default key maps as presented in official arch repo archinstall
-    # shellcheck disable=SC1010
-    options=(us by ca cf cz de dk es et fa fi fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk)
-
-    select_option "${options[@]}"
-    keymap=${options[$?]}
-
-    if ! localectl list-x11-keymap-layouts 2>/dev/null | grep -qx "${keymap}"; then
-        echo "WARNING: '${keymap}' was not found in X11 keymap layouts. It may still work for console keymaps."
+    local available_keymaps layout console_map selected=0
+    local -a options=() console_keymaps=()
+    local -A console_aliases=([ca]=cf [si]=slovene [tr]=trq [se]=sv-latin1 [pl]=pl2 [dk]=dk-latin1)
+    if ! available_keymaps=$(localectl list-keymaps) || [[ -z "$available_keymaps" ]]; then
+        printf "ERROR: Could not list available console keymaps.\n" >&2
+        exit 1
     fi
+    # Keep locale identifiers separate, and offer only console maps on this ISO.
+    for layout in us by ca cf cz de dk es et fa "fi" fr gr hu il it lt lv mk nl no pl ro ru se sg si tr ua uk; do
+        console_map=$layout
+        if ! grep -Fxq "$console_map" <<< "$available_keymaps"; then
+            console_map=${console_aliases[$layout]:-}
+            if [[ -z "$console_map" ]] || ! grep -Fxq "$console_map" <<< "$available_keymaps"; then
+                continue
+            fi
+        fi
+        options+=("$layout")
+        console_keymaps+=("$console_map")
+    done
+    if [[ ${#options[@]} -eq 0 ]]; then
+        printf "ERROR: No supported console keymaps are available.\n" >&2
+        exit 1
+    fi
+    select_option "${options[@]}" || selected=$?
+    export KEYBOARD_LAYOUT=${options[$selected]}
+    export KEYMAP=${console_keymaps[$selected]}
+    export XKBLAYOUT=$KEYBOARD_LAYOUT
+    case "$XKBLAYOUT" in
+        cf) XKBLAYOUT=ca ;;
+        sg) XKBLAYOUT=ch ;;
+        uk) XKBLAYOUT=gb ;;
+    esac
+    printf "Selected layout: %s; console keymap: %s\n" "$KEYBOARD_LAYOUT" "$KEYMAP"
 
-    echo -ne "Your key boards layout: ${keymap} \n"
-    export KEYMAP=$keymap
-
-    if ! localectl set-keymap "${keymap}" 2>/dev/null; then
+    if ! localectl set-keymap "${KEYMAP}" 2>/dev/null; then
         printf "ERROR: Could not configure the selected console keymap.\n" >&2
         exit 1
     fi
-    if ! loadkeys "${keymap}"; then
+    if ! loadkeys "${KEYMAP}"; then
         printf "ERROR: Could not apply the selected console keymap.\n" >&2
         exit 1
     fi
@@ -253,7 +273,7 @@ set_locale () {
         [ru]="ru_RU.UTF-8"  [se]="sv_SE.UTF-8"  [sg]="de_CH.UTF-8"
         [si]="sl_SI.UTF-8"  [tr]="tr_TR.UTF-8"  [ua]="uk_UA.UTF-8"
     )
-    local suggested_locale="${keymap_locale_map[${KEYMAP}]:-en_US.UTF-8}"
+    local suggested_locale="${keymap_locale_map[${KEYBOARD_LAYOUT}]:-en_US.UTF-8}"
     while true; do
         read -r -p "Detected locale: '$suggested_locale'. Press Enter to accept or type a new one (e.g. de_DE.UTF-8): " input
         LOCALE="${input:-$suggested_locale}"
@@ -634,7 +654,7 @@ ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 
 # Set keymaps
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
-echo "XKBLAYOUT=${KEYMAP}" >> /etc/vconsole.conf
+echo "XKBLAYOUT=${XKBLAYOUT}" >> /etc/vconsole.conf
 echo "Keymap set to: ${KEYMAP}"
 
 # Add sudo no password rights
