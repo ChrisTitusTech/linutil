@@ -10,7 +10,7 @@ pub const FLAGS: &[(&str, &str)] = &[
     ("D", "Disk modifications"),
     ("FI", "Flatpak installation"),
     ("FM", "File modification"),
-    ("I", "Installation"),
+    ("I", "Privileged installation"),
     ("K", "Kernel modifications"),
     ("MP", "Package manager actions"),
     ("SI", "Full system installation"),
