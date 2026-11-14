@@ -292,6 +292,12 @@ script = "browsers/google-chrome.sh"
 task_list = "I"
 
 [[data.entries]]
+name = "Helium Browser"
+description = "Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience."
+script = "browsers/helium-browser.sh"
+task_list = "I"
+
+[[data.entries]]
 name = "LibreWolf"
 description = "LibreWolf is a fork of Firefox, focused on privacy, security, and freedom."
 script = "browsers/librewolf.sh"
@@ -337,12 +343,6 @@ task_list = "FI"
 name = "Zen Browser"
 description = "Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience."
 script = "browsers/zen-browser.sh"
-task_list = "I"
-
-[[data.entries]]
-name = "Helium Browser"
-description = "Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience."
-script = "browsers/helium-browser.sh"
 task_list = "I"
 
 [[data]]
