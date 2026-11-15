@@ -1,0 +1,6 @@
+{{- /* The generated walkthrough has no front matter, so fall back to the file name. */ -}}
+{{- $title := .LinkTitle -}}
+{{- if and (not $title) .File -}}
+  {{- $title = .File.ContentBaseName | humanize | title -}}
+{{- end -}}
+{{- return $title -}}

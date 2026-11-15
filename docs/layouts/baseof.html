@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="{{ site.Language.Lang }}">
+<head>
+  {{- partial "head.html" . }}
+</head>
+<body>
+  <a class="skip-link" href="#_top">Skip to content</a>
+  {{- block "main" . }}{{ end }}
+  {{- block "scripts" . }}{{ end }}
+</body>
+</html>
