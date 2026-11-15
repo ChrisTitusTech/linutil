@@ -150,7 +150,7 @@ Here are recommended actions for new users:
 If the curl command fails, check your internet connection or try:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/linutil.sh | sh
+curl -fsSL https://github.com/ChrisTitusTech/linutil/releases/latest/download/start.sh | sh
 ```
 
 ### Permission Errors
