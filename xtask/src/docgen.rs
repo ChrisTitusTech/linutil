@@ -1,6 +1,6 @@
-use std::fs;
+use std::{fs, rc::Rc};
 
-use linutil_core::Command;
+use linutil_core::{ego_tree::NodeRef, Command, ListNode};
 
 use crate::{path, DynError};
 
@@ -13,42 +13,35 @@ pub fn userguide() -> Result<String, DynError> {
     let tabs = linutil_core::get_tabs(false);
 
     for tab in tabs {
-        #[cfg(debug_assertions)]
-        println!("Tab: {}", tab.name);
-
-        md.push_str(&format!("\n## {}\n\n", tab.name));
-
-        for entry in tab.tree {
-            if entry.command == Command::None {
-                #[cfg(debug_assertions)]
-                println!("  Directory: {}", entry.name);
-
-                if entry.name != "root" {
-                    md.push_str(&format!("\n### {}\n\n", entry.name));
-                }
-
-                /* let current_dir = &entry.name;
-
-                if *current_dir != "root".to_string() {
-                    md.push_str(&format!(
-                        "\n<details><summary>{}</summary>\n\n",
-                        current_dir
-                    ));
-                } */ // Commenting this for now, might be a good idea later
-            } else if !entry.description.is_empty() {
-                #[cfg(debug_assertions)]
-                println!("    Entry: {}", entry.name);
-                #[cfg(debug_assertions)]
-                println!("      Description: {}", entry.description);
-
-                md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
-            } /* else {
-                  md.push_str(&format!("- **{}**\n", entry.name));
-              } */ // https://github.com/ChrisTitusTech/linutil/pull/753
-        }
+        md.push_str(&format!("\n## {}\n", tab.name));
+        write_directory(&mut md, tab.tree.root(), 3);
     }
 
     Ok(md)
+}
+
+// Commands go before subdirectories, otherwise they would read as part of the last subdirectory.
+fn write_directory(md: &mut String, dir: NodeRef<Rc<ListNode>>, level: usize) {
+    let (dirs, commands): (Vec<_>, Vec<_>) = dir
+        .children()
+        .partition(|node| node.value().command == Command::None);
+
+    if !commands.is_empty() {
+        md.push('\n');
+    }
+    for node in commands {
+        let entry = node.value();
+        if entry.description.is_empty() {
+            md.push_str(&format!("- **{}**\n", entry.name));
+        } else {
+            md.push_str(&format!("- **{}**: {}\n", entry.name, entry.description));
+        }
+    }
+
+    for node in dirs {
+        md.push_str(&format!("\n{} {}\n", "#".repeat(level), node.value().name));
+        write_directory(md, node, level + 1);
+    }
 }
 
 pub fn write(file: &str, data: &str) {
