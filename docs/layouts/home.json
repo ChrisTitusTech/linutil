@@ -1,0 +1,22 @@
+{{- /* Search index: one entry per page section, split at each h2 and h3. */ -}}
+{{- $entries := slice }}
+{{- range where site.Pages "Kind" "in" (slice "page" "section") }}
+  {{- $page := . }}
+  {{- $title := partial "title.html" . }}
+  {{- $html := .Content | replaceRE `<h([23]) id=` "<!--section--><h$1 id=" }}
+  {{- range split $html "<!--section-->" }}
+    {{- $id := "" }}
+    {{- $heading := "" }}
+    {{- with findRESubmatch `^<h[23] id="([^"]+)"[^>]*>([\s\S]*?)</h[23]>` . 1 }}
+      {{- $id = index (index . 0) 1 }}
+      {{- $heading = index (index . 0) 2 | plainify | htmlUnescape | strings.TrimSpace }}
+    {{- end }}
+    {{- $text := replaceRE `^<h[23][\s\S]*?</h[23]>` "" . | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace }}
+    {{- if or $heading $text }}
+      {{- $url := $page.RelPermalink }}
+      {{- with $id }}{{ $url = printf "%s#%s" $url . }}{{ end }}
+      {{- $entries = $entries | append (dict "page" $title "url" $url "heading" $heading "text" $text) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $entries | jsonify -}}

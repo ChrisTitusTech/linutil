@@ -5,6 +5,9 @@ enableGitInfo = true
 canonifyURLs = true
 disableKinds = ["taxonomy", "term", "rss"]
 
+[outputs]
+home = ["html", "json"]
+
 [[module.mounts]]
   source = "assets"
   target = "assets"
