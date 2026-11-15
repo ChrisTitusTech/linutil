@@ -108,9 +108,7 @@ Open an issue on [GitHub](https://github.com/ChrisTitusTech/linutil/issues). Inc
 
 ### How do I check what version I'm running?
 
-```bash
-linutil --version
-```
+The version is shown under the logo in the TUI, as `Linutil v<version>`.
 
 ### Where can I see release notes?
 
