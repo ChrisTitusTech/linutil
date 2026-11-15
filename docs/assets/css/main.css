@@ -1029,6 +1029,38 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
   color: var(--info);
 }
 
+/* ---------- Alerts ---------- */
+.alert {
+  --alert-color: var(--focus);
+  margin-top: 1.75rem;
+  padding: 1.1rem 1.1rem 0.9rem;
+  border-color: var(--alert-color);
+}
+.content > .alert {
+  margin-top: 1.75rem;
+}
+.alert .panel-title {
+  color: var(--alert-color);
+}
+.alert--tip {
+  --alert-color: var(--success);
+}
+.alert--important {
+  --alert-color: var(--flag);
+}
+.alert--warning {
+  --alert-color: var(--folder);
+}
+.alert--caution {
+  --alert-color: var(--fail);
+}
+.alert > * {
+  margin: 0;
+}
+.alert > * + * {
+  margin-top: 0.5rem;
+}
+
 /* ---------- Docs footer ---------- */
 .docs-footer {
   display: flex;

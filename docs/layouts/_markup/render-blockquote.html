@@ -1,0 +1,12 @@
+{{- $titles := dict "note" "Note" "tip" "Tip" "important" "Important" "warning" "Warning" "caution" "Caution" }}
+{{- if eq .Type "alert" }}
+  {{- $title := .AlertTitle | default (index $titles .AlertType) | default "Note" }}
+  <aside class="alert alert--{{ .AlertType }} panel" aria-label="{{ $title }}">
+    <p class="panel-title">{{ $title }}</p>
+    {{ .Text }}
+  </aside>
+{{- else }}
+  <blockquote>
+    {{ .Text }}
+  </blockquote>
+{{- end }}
