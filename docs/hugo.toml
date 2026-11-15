@@ -1,5 +1,5 @@
 baseURL = "https://linutil.christitus.com/"
-languageCode = "en-us"
+locale = "en-us"
 title = "Linutil Documentation"
 enableGitInfo = true
 canonifyURLs = true
