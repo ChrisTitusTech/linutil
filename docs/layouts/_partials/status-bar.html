@@ -1,0 +1,14 @@
+{{- /* Bottom bar, after a terminal editor's: mode, path, keys, and how far down the page you are. */ -}}
+{{- $mode := "docs" }}
+{{- if .IsHome }}{{ $mode = "home" }}{{ else if eq .Kind "404" }}{{ $mode = "404" }}{{ end }}
+<div class="status-bar" aria-hidden="true">
+  <span class="status-mode">{{ upper $mode }}</span>
+  <span class="status-path">~{{ strings.TrimSuffix "/" .RelPermalink | default "" }}</span>
+  <span class="status-keys">
+    <span><kbd>/</kbd> search</span>
+    {{- if eq $mode "docs" }}
+      <span><kbd>p</kbd>/<kbd>n</kbd> page</span>
+    {{- end }}
+  </span>
+  <span class="status-progress">Top</span>
+</div>

@@ -5,6 +5,26 @@
   const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
   const typing = (target) => target.closest?.('input, textarea, select, [contenteditable="true"]');
 
+  // Status bar: how far down the page you are, the way a terminal editor shows it.
+  const progress = $('.status-progress');
+  let progressFrame = 0;
+  const showProgress = () => {
+    progressFrame = 0;
+    const max = root.scrollHeight - innerHeight;
+    if (max <= 0) progress.textContent = 'All';
+    else if (scrollY <= 0) progress.textContent = 'Top';
+    else if (scrollY >= max - 2) progress.textContent = 'Bot';
+    else progress.textContent = `${Math.round((scrollY / max) * 100)}%`;
+  };
+  showProgress();
+  addEventListener(
+    'scroll',
+    () => {
+      if (!progressFrame) progressFrame = requestAnimationFrame(showProgress);
+    },
+    { passive: true }
+  );
+
   // Narrow screens: the menu button shows the sidebar on docs pages and the site navigation elsewhere.
   const menuButton = $('.menu-toggle');
   const setMenu = (open) => {

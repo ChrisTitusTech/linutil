@@ -8,6 +8,7 @@
   {{- partial "header.html" . }}
   {{- block "main" . }}{{ end }}
   {{- partial "search.html" . }}
+  {{- partial "status-bar.html" . }}
   {{- $js := resources.Get "js/site.js" | minify | fingerprint }}
   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
   {{- block "scripts" . }}{{ end }}

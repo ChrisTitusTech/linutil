@@ -1,5 +1,5 @@
 /* Linutil docs theme, after the TUI: its default palette, rounded panels with titles set into the border,
-   and [D] and [*] rows. */
+   [D] and [*] rows, and a status bar along the bottom. */
 
 @font-face {
   font-family: 'Geist';
@@ -76,6 +76,7 @@
 
 @media (min-width: 50em) {
   :root {
+    --status-height: 1.75rem;
     --pad-x: 1.5rem;
   }
 }
@@ -542,6 +543,53 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
 .nav-panel .social {
   display: flex;
   gap: 0.25rem;
+}
+
+/* ---------- Status bar ---------- */
+.status-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  gap: 1.5ch;
+  height: var(--status-height);
+  padding-inline-end: var(--pad-x);
+  border-top: 1px solid var(--hairline);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+@media (min-width: 50em) {
+  .status-bar {
+    display: flex;
+  }
+}
+.status-mode {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding-inline: 1.5ch;
+  background: var(--focus);
+  font-weight: 800;
+  color: var(--bg);
+}
+.status-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+.status-keys {
+  display: flex;
+  gap: 2ch;
+  margin-inline-start: auto;
+}
+.status-progress {
+  min-width: 4ch;
+  text-align: end;
+  color: var(--text);
 }
 
 /* ---------- Docs layout ---------- */
