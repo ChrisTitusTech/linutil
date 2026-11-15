@@ -11,7 +11,8 @@ Linutil is a distro-agnostic Linux toolbox built in Rust. It provides an interac
 
 Before running Linutil, ensure your system meets these requirements:
 
-- **Operating System**: Any modern Linux distribution (Arch, Fedora, Debian, Ubuntu, openSUSE, etc.)
+- **Operating System**: Any modern Linux distribution (Arch, Fedora, Debian, Ubuntu, openSUSE, Alpine, Void, Solus, etc.)
+- **Architecture**: x86_64 or aarch64
 - **Shell**: Bash or a compatible POSIX shell
 - **Internet Connection**: Required for downloading applications and scripts
 - **curl**: Pre-installed on most distributions

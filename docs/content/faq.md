@@ -15,7 +15,19 @@ Yes. All scripts are open source and available on [GitHub](https://github.com/Ch
 
 ### What Linux distributions does Linutil support?
 
-Linutil is distro-agnostic — it runs on any modern Linux distribution. Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine), while others work across all distros.
+Linutil is distro-agnostic. Most scripts work with any of these package managers:
+
+| Package manager | Distros |
+|-----------------|---------|
+| `apt-get` / `nala` | Debian, Ubuntu and derivatives |
+| `dnf` | Fedora and RHEL-based distros |
+| `pacman` | Arch and derivatives |
+| `zypper` | openSUSE |
+| `apk` | Alpine |
+| `xbps-install` | Void |
+| `eopkg` | Solus |
+
+Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine) and are only shown on that distro. Linutil runs on x86_64 and aarch64.
 
 ### Does Linutil require root/sudo?
 
