@@ -21,6 +21,12 @@ home = ["html", "json"]
   target = "static"
   files = "preview.gif"
 
+# The homepage menu is built from the same catalog the TUI loads.
+[[module.mounts]]
+  source = "../core/tabs"
+  target = "data/tabs"
+  files = ["tabs.toml", "*/tab_data.toml"]
+
 [[menu.main]]
 identifier = "documentation"
 name = "Documentation"
