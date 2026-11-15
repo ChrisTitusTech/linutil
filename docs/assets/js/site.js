@@ -1,9 +1,17 @@
-// Site chrome: menus, search, table of contents, and code copy buttons.
+// Site chrome: menus, keyboard shortcuts, search, table of contents, and code copy buttons.
 (() => {
   const root = document.documentElement;
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
   const typing = (target) => target.closest?.('input, textarea, select, [contenteditable="true"]');
+
+  // Single-key shortcuts: p and n go to the previous and next page.
+  document.addEventListener('keydown', (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey || typing(event.target) || $('dialog[open]')) return;
+    // The homepage menu takes its own keys while it has focus.
+    if (event.target.closest?.('.tui')) return;
+    $(`[data-key="${event.key}"]`)?.click();
+  });
 
   // Status bar: how far down the page you are, the way a terminal editor shows it.
   const progress = $('.status-progress');
