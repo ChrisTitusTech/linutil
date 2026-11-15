@@ -65,6 +65,14 @@ sudo zypper install linutil
 cargo install linutil_tui
 ```
 
+### Nix
+
+With flakes enabled, run it straight from the repository:
+
+```bash
+nix run github:ChrisTitusTech/linutil
+```
+
 > [!NOTE]
 > Cargo installs require manual updates via `cargo install --force linutil_tui`, or use the built-in **Linutil Updater** script inside the tool.
 

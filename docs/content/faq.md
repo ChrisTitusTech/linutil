@@ -54,6 +54,7 @@ Yes. It's available via:
 - **AUR** (Arch): `paru -S linutil` or `paru -S linutil-bin`
 - **openSUSE**: `sudo zypper install linutil`
 - **Cargo**: `cargo install linutil_tui`
+- **Nix** (flakes): `nix run github:ChrisTitusTech/linutil`
 
 ### The TUI won't open — it says my terminal is too small
 
