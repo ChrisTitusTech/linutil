@@ -52,9 +52,11 @@ linutil --skip-confirmation --size-bypass
 
 | Flag | Description |
 |------|-------------|
-| `--config` / `-c` | Path to TOML config file |
-| `--skip-confirmation` | Skip all confirmation prompts |
-| `--size-bypass` | Bypass minimum terminal size check |
+| `-c`, `--config <path>` | Path to TOML config file |
+| `-y`, `--skip-confirmation` | Skip all confirmation prompts |
+| `-s`, `--size-bypass` | Bypass minimum terminal size check |
+
+See [Getting Started](../getting-started/#options) for the full list of flags.
 
 ## Use Cases
 

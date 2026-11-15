@@ -75,13 +75,23 @@ View all available options:
 linutil --help
 ```
 
-### Common Options
+### Options
 
 | Flag | Description |
 |------|-------------|
-| `--config` / `-c` | Path to a TOML config file |
-| `--skip-confirmation` | Skip confirmation prompts |
-| `--size-bypass` | Bypass terminal size requirements |
+| `-c`, `--config <path>` | Path to a TOML config file (see [Automation](../automation/)) |
+| `-t`, `--theme <theme>` | Theme to start with: `default`, `compatible`, `nord`, `tokyo-night`, `one-dark`, `monochrome`, `lucent-orng`, `github`, `material` or `flexoki` |
+| `-y`, `--skip-confirmation` | Skip the confirmation prompt before running commands |
+| `-s`, `--size-bypass` | Bypass the minimum terminal size check |
+| `-m`, `--mouse` | Enable mouse interaction |
+| `-r`, `--bypass-root` | Don't show the warning when Linutil is run as root |
+| `-u`, `--override-validation` | Show every entry, even ones that aren't supported on your system (unsafe) |
+
+When using the curl command, pass flags after `sh -s --`:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --theme nord
+```
 
 ## Navigating the TUI
 
