@@ -20,5 +20,8 @@
 <link rel="preload" href="{{ "fonts/geist-sans-latin-400-normal.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{{ "fonts/departure-mono-regular.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
 {{- $css := resources.Get "css/main.css" }}
+{{- if or .IsHome (eq .Kind "404") }}
+  {{- $css = slice $css (resources.Get "css/landing.css") | resources.Concat "css/landing-page.css" }}
+{{- end }}
 {{- $css = $css | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
