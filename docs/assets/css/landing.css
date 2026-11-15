@@ -1,4 +1,4 @@
-/* Homepage: the hero with the menu preview, then the catalog, safety, install and automation sections. */
+/* Homepage and 404: the hero with the menu preview, then the catalog, safety, install and automation sections. */
 
 .landing {
   max-width: 78rem;
@@ -532,4 +532,48 @@
 }
 .site-footer .copyright {
   text-align: center;
+}
+
+/* ---------- 404 ---------- */
+.notfound {
+  display: grid;
+  place-items: center;
+  min-height: calc(100svh - var(--nav-height) - var(--status-height));
+  padding-block: 3rem;
+}
+.notfound-terminal {
+  width: min(40rem, 100%);
+  padding: 1.5rem 1.25rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+.notfound-terminal p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.notfound-terminal .prompt {
+  color: var(--success);
+}
+.notfound-terminal .notfound-error {
+  margin-top: 0.25rem;
+  color: var(--fail);
+}
+.notfound-terminal h1 {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display);
+  font-size: 2.0625rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+.notfound-terminal h1:focus {
+  outline: none;
+}
+.notfound-terminal .notfound-text {
+  margin-top: 0.5rem;
+  font-family: var(--font);
+  color: var(--text);
+}
+.notfound .hero-actions {
+  margin-top: 1.5rem;
 }

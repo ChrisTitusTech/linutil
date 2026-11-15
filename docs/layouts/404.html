@@ -1,0 +1,22 @@
+{{ define "main" }}
+<main class="landing notfound">
+  <div class="notfound-terminal panel">
+    <p class="panel-title">404</p>
+    <p><span class="prompt">$</span> cd <span class="notfound-path">that-page</span></p>
+    <p class="notfound-error">cd: no such file or directory</p>
+    <h1 id="_top" tabindex="-1">Page not found</h1>
+    <p class="notfound-text">That page doesn't exist, or it has moved. Search the docs or head back to the start.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ "/" | relURL }}">cd ~</a>
+      <button type="button" class="btn" data-search-open>{{ partial "icon.html" "magnifier" }}Search docs</button>
+    </div>
+  </div>
+</main>
+{{ end }}
+
+{{ define "scripts" }}
+  <script>
+    document.querySelector('.notfound-path').textContent = location.pathname;
+    document.querySelector('.status-path').textContent = `~${location.pathname}`;
+  </script>
+{{ end }}
