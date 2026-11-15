@@ -98,6 +98,32 @@ walkthrough both match it. When a release is published, or a pre-release is
 promoted, the same workflow opens a `docs-update` PR with the regenerated
 walkthrough, which `auto-merge-docs.yaml` merges, and redeploys the site.
 
+## What stays in sync
+
+These update on their own a few minutes after a release goes live, meaning it's
+published, or promoted from a pre-release, which is what the installer
+downloads:
+
+- the homepage menu, the category panels and the script count
+- the walkthrough
+
+A new pre-release on its own doesn't change the site. Any deploy between
+releases also builds these from the latest release, so scripts merged to `main`
+but not released yet never show up early.
+
+These need a person:
+
+- The hand-written pages, such as Getting Started, the FAQ and Automation. They
+  go live from `main` as soon as they merge, so update them in the same change
+  as the behavior they describe, including command-line flags, shortcuts and
+  config options.
+- The homepage Flags and Quick Help panels, copied from `tui/src/dashboard.rs`
+  into `content/_index.md`.
+
+The `docs-update` PR needs an `AUTO_MERGE` secret in the repository. Without
+it the site still updates on release, but the walkthrough file in the
+repository falls behind until someone runs `cargo xtask docgen`.
+
 ## Credits
 
 - Theme: designed and built by [Sean (ANGRYxScotsman)](https://github.com/seanh1995).
