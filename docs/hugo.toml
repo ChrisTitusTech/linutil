@@ -114,6 +114,7 @@ parent = "help"
 
 [params]
 description = "Chris Titus Tech's Linux Utility - Install Programs, Tweaks, Fixes, and Updates"
+editURL = "https://github.com/ChrisTitusTech/linutil/edit/main/docs/content/"
 
   [[params.social]]
   name = "GitHub"

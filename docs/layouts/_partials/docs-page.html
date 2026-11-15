@@ -33,6 +33,7 @@
       <div class="content">
         {{ .Content }}
       </div>
+      {{- partial "docs-footer.html" . }}
     </main>
     {{- with $headings }}
       <aside class="toc-pane">
