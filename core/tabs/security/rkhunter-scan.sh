@@ -2,8 +2,15 @@
 
 . ../common-script.sh
 
+# Some distros (Arch among them) install the rkhunter binary as root-only
+# (mode 0700), so an unprivileged lookup cannot see it. Check as root,
+# which is also how the scan itself runs.
+rkhunterInstalled() {
+    "$ESCALATION_TOOL" sh -c 'command -v rkhunter' >/dev/null 2>&1
+}
+
 installRkhunter() {
-    if command_exists rkhunter; then
+    if rkhunterInstalled; then
         printf "%b\n" "${GREEN}rkhunter is already installed.${RC}"
         return 0
     fi
@@ -31,7 +38,7 @@ installRkhunter() {
             ;;
     esac
 
-    if ! command_exists rkhunter; then
+    if ! rkhunterInstalled; then
         printf "%b\n" "${RED}rkhunter installation failed.${RC}"
         exit 1
     fi
@@ -61,7 +68,7 @@ removeRkhunter() {
             ;;
     esac
 
-    if command_exists rkhunter; then
+    if rkhunterInstalled; then
         printf "%b\n" "${RED}rkhunter removal failed.${RC}"
         exit 1
     fi
