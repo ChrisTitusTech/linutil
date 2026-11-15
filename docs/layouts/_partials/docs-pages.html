@@ -1,0 +1,16 @@
+{{- /* Every page in the sidebar, in sidebar order. Drives pagination and the page count. */ -}}
+{{- $pages := slice }}
+{{- range site.Menus.sidebar }}
+  {{- if .HasChildren }}
+    {{- range .Children }}
+      {{- with .Page }}
+        {{- $pages = $pages | append . }}
+      {{- end }}
+    {{- end }}
+  {{- else if .Page }}
+    {{- range partial "docs-section-pages.html" .Page }}
+      {{- $pages = $pages | append . }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- return $pages -}}

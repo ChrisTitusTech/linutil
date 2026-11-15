@@ -606,6 +606,108 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
   }
 }
 
+/* ---------- Sidebar ---------- */
+.sidebar {
+  padding: 1.1rem 0.5rem 0.75rem;
+}
+.sidebar-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sidebar-top > li + li {
+  margin-top: 0.75rem;
+}
+.sidebar-group > summary {
+  display: flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--folder);
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.sidebar-group > summary::-webkit-details-marker {
+  display: none;
+}
+.sidebar-group > summary::before {
+  content: '  [D] ';
+  white-space: pre;
+}
+.sidebar-group > summary:hover {
+  background: var(--selection);
+}
+.sidebar-caret {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-inline-start: auto;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+.sidebar-group[open] > summary > .sidebar-caret {
+  transform: rotate(90deg);
+}
+.sidebar-group > .sidebar-list {
+  margin-top: 0.15rem;
+}
+.sidebar-group--nested > .sidebar-list {
+  margin-inline-start: 2ch;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text);
+  text-decoration: none;
+}
+.sidebar-link::before {
+  content: '  [*]';
+  flex: none;
+  white-space: pre;
+  color: var(--muted);
+}
+.sidebar-link:hover {
+  background: var(--selection);
+}
+.sidebar-link[aria-current='page'] {
+  background: var(--selection);
+  color: var(--focus);
+}
+.sidebar-link[aria-current='page']::before {
+  content: '> [*]';
+  color: inherit;
+}
+.sidebar-external {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-inline-start: auto;
+  opacity: 0.6;
+}
+.sidebar-count {
+  padding: 0.6rem 0.5rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: end;
+  color: var(--muted);
+}
+.sidebar-footer {
+  display: flex;
+  gap: 0.25rem;
+  padding-top: 1rem;
+}
+@media (min-width: 50em) {
+  .sidebar-footer {
+    display: none;
+  }
+}
+
 /* ---------- Page title ---------- */
 .page-title {
   margin-bottom: 2rem;

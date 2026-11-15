@@ -1,5 +1,6 @@
 {{- $segments := split (strings.Trim .RelPermalink "/") "/" }}
 <div class="docs">
+  {{- partial "sidebar.html" . }}
   <div class="docs-main">
     <main class="docs-article">
       <div class="page-title" id="_top" tabindex="-1">

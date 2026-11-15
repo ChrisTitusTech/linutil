@@ -49,4 +49,13 @@
       menuButton.focus();
     }
   });
+
+  // Long sidebars: scroll the current page's link into view.
+  const sidebarPane = $('.sidebar-pane');
+  const currentLink = sidebarPane && $('[aria-current="page"]', sidebarPane);
+  if (currentLink && matchMedia('(min-width: 50em)').matches) {
+    const pane = sidebarPane.getBoundingClientRect();
+    const box = currentLink.getBoundingClientRect();
+    if (box.bottom > pane.bottom) sidebarPane.scrollTop += box.top - pane.top - pane.height / 3;
+  }
 })();

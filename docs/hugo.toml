@@ -70,6 +70,48 @@ url = "https://forum.christitus.com/"
 weight = 3
 parent = "help"
 
+# Sections listed here show all of their pages in the sidebar, ordered by weight.
+[[menu.sidebar]]
+identifier = "userguide"
+name = "User Guide"
+pageRef = "/userguide"
+weight = 1
+
+[[menu.sidebar]]
+identifier = "dev"
+name = "Developer Docs"
+pageRef = "/dev"
+weight = 2
+
+[[menu.sidebar]]
+identifier = "help"
+name = "Help"
+weight = 3
+
+[[menu.sidebar]]
+name = "FAQ"
+pageRef = "faq.md"
+weight = 1
+parent = "help"
+
+[[menu.sidebar]]
+name = "Known Issues"
+pageRef = "KnownIssues.md"
+weight = 2
+parent = "help"
+
+[[menu.sidebar]]
+name = "Contributing"
+pageRef = "CONTRIBUTING.md"
+weight = 3
+parent = "help"
+
+[[menu.sidebar]]
+name = "Forums"
+url = "https://forum.christitus.com/"
+weight = 4
+parent = "help"
+
 [params]
 description = "Chris Titus Tech's Linux Utility - Install Programs, Tweaks, Fixes, and Updates"
 

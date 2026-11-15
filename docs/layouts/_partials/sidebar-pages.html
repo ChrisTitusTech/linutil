@@ -1,0 +1,15 @@
+{{- range .section.Pages.ByWeight }}
+  <li>
+    {{- if and .IsSection .Pages }}
+      <details class="sidebar-group sidebar-group--nested"{{ if or (eq . $.current) ($.current.IsDescendant .) }} open{{ end }}>
+        <summary>{{ .LinkTitle }}{{ partial "icon.html" (dict "name" "right-caret" "class" "sidebar-caret") }}</summary>
+        <ul class="sidebar-list">
+          <li>{{ partial "sidebar-link.html" (dict "page" . "label" "Overview" "current" $.current) }}</li>
+          {{- partial "sidebar-pages.html" (dict "section" . "current" $.current) }}
+        </ul>
+      </details>
+    {{- else }}
+      {{- partial "sidebar-link.html" (dict "page" . "label" (partial "title.html" .) "current" $.current) }}
+    {{- end }}
+  </li>
+{{- end }}
