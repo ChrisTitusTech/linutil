@@ -186,6 +186,25 @@ cargo run --package linutil_tui
 Interactive validation must not execute destructive utilities merely to test
 navigation. Use preview, descriptions, harmless entries, or focused tests.
 
+## Docs site
+
+`docs/` is a Hugo site with its own layouts. `docs/README.md` explains how it
+is put together.
+
+- The live site shows the catalog of the latest release, not `main`. The deploy
+  in `.github/workflows/docs.yaml` checks out `core/tabs` from that release and
+  runs `cargo xtask docgen` before building, so the homepage menu and the
+  walkthrough list what the installer downloads. Keep it that way.
+- Publishing a release, or promoting a pre-release, redeploys the site and
+  opens a `docs-update` PR with the regenerated walkthrough, which
+  `.github/workflows/auto-merge-docs.yaml` merges. A new pre-release on its own
+  does not change the site.
+- Hand-written pages are not generated. They go live from `main` as soon as
+  they merge, so update them in the same change as the behavior they describe.
+- The homepage Flags and Quick Help panels are copied from
+  `tui/src/dashboard.rs` into the front matter of `docs/content/_index.md`.
+  Update them when the TUI's flags or keys change.
+
 ## Completion criteria
 
 - The change matches `SPEC.md`.
