@@ -18,8 +18,70 @@ disableKinds = ["taxonomy", "term", "rss"]
   target = "static"
   files = "preview.gif"
 
+[[menu.main]]
+identifier = "documentation"
+name = "Documentation"
+weight = 1
+
+[[menu.main]]
+identifier = "userguide"
+name = "User Guides"
+pageRef = "/userguide"
+weight = 1
+parent = "documentation"
+
+[[menu.main]]
+identifier = "contribution-guides"
+name = "Contribution Guides"
+pageRef = "CONTRIBUTING.md"
+weight = 2
+parent = "documentation"
+
+[[menu.main]]
+identifier = "developer-documentation"
+name = "Developer Docs"
+pageRef = "/dev"
+weight = 3
+parent = "documentation"
+
+[[menu.main]]
+identifier = "help"
+name = "Help"
+weight = 2
+
+[[menu.main]]
+identifier = "faq"
+name = "FAQ"
+pageRef = "faq.md"
+weight = 1
+parent = "help"
+
+[[menu.main]]
+identifier = "known-issues"
+name = "Known Issues"
+pageRef = "KnownIssues.md"
+weight = 2
+parent = "help"
+
+[[menu.main]]
+identifier = "forums"
+name = "Forums"
+url = "https://forum.christitus.com/"
+weight = 3
+parent = "help"
+
 [params]
 description = "Chris Titus Tech's Linux Utility - Install Programs, Tweaks, Fixes, and Updates"
+
+  [[params.social]]
+  name = "GitHub"
+  icon = "github"
+  url = "https://github.com/ChrisTitusTech/linutil"
+
+  [[params.social]]
+  name = "Discord"
+  icon = "discord"
+  url = "https://discord.gg/RUbZUZyByQ"
 
 [markup]
   [markup.goldmark]

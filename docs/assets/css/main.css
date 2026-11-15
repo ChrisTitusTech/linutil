@@ -267,6 +267,283 @@ kbd {
   height: 1.1rem;
 }
 
+/* ---------- Header ---------- */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  height: var(--nav-height);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg);
+}
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  padding-inline: var(--pad-x);
+}
+.site-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1;
+  color: var(--text-strong);
+  text-decoration: none;
+}
+.site-title img {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+}
+@media (min-width: 50em) {
+  .header-actions {
+    flex: 1;
+    gap: 0.5rem;
+    margin-inline-start: 1.5rem;
+  }
+  .header-actions .site-nav {
+    margin-inline-start: auto;
+  }
+}
+
+/* Search trigger, styled like the TUI's search bar. */
+.search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.search-trigger:hover {
+  border-color: var(--focus);
+  color: var(--text);
+}
+.search-trigger .icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+.search-trigger-kbd {
+  margin-inline-start: auto;
+}
+@media (min-width: 50em) {
+  .search-trigger {
+    width: min(19rem, 100%);
+  }
+}
+@media (max-width: 49.99em) {
+  .search-trigger {
+    justify-content: center;
+    width: 2.25rem;
+    padding: 0;
+    border-color: transparent;
+  }
+  .search-trigger .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .search-trigger-label,
+  .search-trigger-kbd {
+    display: none;
+  }
+}
+
+/* Top navigation: numbered tabs, like the TUI's category row. */
+.site-nav {
+  display: none;
+}
+@media (min-width: 50em) {
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-inline-end: 0.5rem;
+    margin-inline-end: 0.25rem;
+    border-inline-end: 1px solid var(--hairline);
+  }
+}
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  height: 1.9rem;
+  padding: 0 1ch;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.nav-link .nav-number {
+  color: var(--dim);
+}
+.nav-link:hover,
+.nav-dropdown.is-open > .nav-link {
+  background: var(--selection);
+  color: var(--text);
+}
+.nav-caret {
+  width: 0.9rem;
+  height: 0.9rem;
+  transition: transform 0.2s ease;
+}
+.nav-dropdown.is-open .nav-caret {
+  transform: rotate(180deg);
+}
+.nav-dropdown {
+  position: relative;
+}
+/* Keeps hover alive across the gap between the trigger and the menu. */
+.nav-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 0.75rem;
+}
+.nav-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 15rem;
+  padding: 0.85rem 0.5rem 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.12s ease,
+    visibility 0.12s;
+}
+.nav-dropdown.is-open .nav-menu {
+  opacity: 1;
+  visibility: visible;
+}
+@media (hover: hover) {
+  .nav-dropdown:hover .nav-menu {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+.nav-menu a,
+.nav-panel-group a {
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-menu a::before,
+.nav-panel-group a::before {
+  content: '  [*]';
+  white-space: pre;
+  color: var(--muted);
+}
+.nav-menu a:hover,
+.nav-panel-group a:hover {
+  background: var(--selection);
+  color: var(--focus);
+}
+.nav-menu a:hover::before,
+.nav-panel-group a:hover::before {
+  content: '> [*]';
+  color: inherit;
+}
+.nav-menu .icon,
+.nav-panel-group .icon {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-inline-start: auto;
+  opacity: 0.6;
+}
+
+.site-header-inner .social {
+  display: none;
+}
+@media (min-width: 50em) {
+  .site-header-inner .social {
+    display: flex;
+    gap: 0.125rem;
+  }
+}
+
+.menu-toggle {
+  border-color: var(--border);
+  color: var(--text-strong);
+}
+.menu-toggle .menu-close-icon,
+body[data-menu-open] .menu-toggle .menu-open-icon {
+  display: none;
+}
+body[data-menu-open] .menu-toggle .menu-close-icon {
+  display: block;
+}
+@media (min-width: 50em) {
+  .menu-toggle {
+    display: none;
+  }
+}
+
+/* Narrow pages without a sidebar: site navigation panel under the header. */
+.nav-panel {
+  position: fixed;
+  inset-inline: 0;
+  top: var(--nav-height);
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(100vh - var(--nav-height));
+  overflow-y: auto;
+  padding: 1rem var(--pad-x) 1.5rem;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg);
+}
+@media (max-width: 49.99em) {
+  body[data-menu-open] .nav-panel {
+    display: flex;
+  }
+}
+.nav-panel-group p {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--folder);
+}
+.nav-panel-group p::before {
+  content: '[D] ';
+}
+.nav-panel .social {
+  display: flex;
+  gap: 0.25rem;
+}
+
 /* ---------- Docs layout ---------- */
 .sidebar-pane {
   position: fixed;

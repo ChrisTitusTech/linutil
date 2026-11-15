@@ -1,0 +1,5 @@
+{{- if strings.HasPrefix .URL "http" }}
+  <a href="{{ .URL }}" target="_blank" rel="noreferrer">{{ .Name }}{{ partial "icon.html" "external" }}</a>
+{{- else }}
+  <a href="{{ .URL }}">{{ .Name }}</a>
+{{- end }}
