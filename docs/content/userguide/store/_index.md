@@ -22,73 +22,18 @@ Use the search feature to quickly find what you need:
 
 ## Application Categories
 
-### Communication Apps
+| Category | What's in it |
+|----------|--------------|
+| Communication Apps | Chat, email and video calling |
+| Design Tools | Image, audio, video and 3D editors |
+| Developer Tools | Code editors and Git tools |
+| Office Suites | Office suites |
+| PDF Suites | PDF viewers and editors |
+| Web Browsers | Graphical and text-based browsers |
 
-| App | Description |
-|-----|-------------|
-| Discord | Voice, video, and text chat for communities |
-| Signal | End-to-end encrypted messaging |
-| Slack | Team collaboration platform |
-| Telegram | Fast, cloud-based messaging |
-| Thunderbird | Open-source email client |
-| Zoom | Video conferencing |
+The rest of the tab covers terminals, shell prompts, desktop shells, containers, Flatpak, and Linutil itself.
 
-### Developer Tools
-
-| App | Description |
-|-----|-------------|
-| VS Code | Lightweight code editor by Microsoft |
-| VS Codium | VS Code without Microsoft telemetry |
-| Cursor | AI-powered code editor |
-| Neovim | CTT's configured Neovim setup |
-| Zed | High-performance code editor written in Rust |
-| GitHub Desktop | GUI for Git and GitHub |
-| Docker | Container platform |
-| Podman | Daemonless container engine |
-
-### Web Browsers
-
-| App | Description |
-|-----|-------------|
-| Firefox | Open-source browser by Mozilla |
-| Brave | Privacy-focused Chromium browser |
-| LibreWolf | Privacy-hardened Firefox fork |
-| Chromium | Open-source base for Chrome |
-| Zen Browser | Privacy-focused browser |
-| Tor Browser | Anonymity browser via Tor network |
-
-### Design Tools
-
-| App | Description |
-|-----|-------------|
-| GIMP | Full-featured raster image editor |
-| Inkscape | Vector graphics editor |
-| Krita | Digital painting and 2D animation |
-| Blender | 3D modeling and animation |
-| OBS Studio | Screen recording and live streaming |
-| Kdenlive | Non-linear video editor |
-
-### Terminal & Shell
-
-| App | Description |
-|-----|-------------|
-| Alacritty | GPU-accelerated terminal emulator |
-| Kitty | Feature-rich GPU terminal emulator |
-| Ghostty | Highly customizable terminal |
-| Bash Prompt | CTT's `.bashrc` configuration |
-| ZSH Prompt | ZSH shell with basic configuration |
-
-### Other Notable Apps
-
-| App | Description |
-|-----|-------------|
-| Fastfetch | System info display tool |
-| Flatpak / Flathub | Universal Linux app sandbox |
-| Bottles | Run Windows apps on Linux |
-| Waydroid | Run Android apps on Linux |
-| DWM-Titus | CTT's configured DWM window manager |
-| Rofi | App launcher and window switcher |
-| Auto CPU Frequency | Automatic CPU power optimizer |
+For every app and what it does, see the [Walkthrough](../walkthrough/#applications-setup). It's generated from the script catalog, so it lists everything Linutil ships.
 
 ## Updating Linutil Itself
 
