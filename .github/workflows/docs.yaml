@@ -41,6 +41,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # The homepage menu and the walkthrough show the latest release, which is what the installer
+      # downloads, rather than whatever has landed on main since.
+      - name: Use the catalog from the latest release
+        run: git checkout "$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)" -- core/tabs
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Generate the walkthrough
+        run: cargo xtask docgen
+
       - name: Build with Hugo
         run: hugo --gc --minify --source docs
 
