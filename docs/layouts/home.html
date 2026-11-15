@@ -86,6 +86,101 @@
     </div>
   </section>
 
+  {{- with $p.catalog }}
+    <section class="section">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="category-grid">
+        {{- range $i, $tab := $catalog }}
+          {{- $link := "" }}
+          {{- with $walkthrough }}{{ $link = printf "%s#%s" .RelPermalink (anchorize $tab.name) }}{{ end }}
+          <a class="category panel" href="{{ $link }}">
+            <span class="panel-title">{{ add $i 1 }} {{ .name }}</span>
+            <span class="category-text">{{ index $p.catalog.tabs .dir }}</span>
+            <span class="category-rows">
+              {{- range first 6 .entries }}
+                <span{{ if .entries }} class="is-dir"{{ end }}>{{ if .entries }}[D]{{ else }}[*]{{ end }} {{ .name }}</span>
+              {{- end }}
+              {{- with sub (len .entries) 6 }}{{ if gt . 0 }}<span class="category-more">+ {{ . }} more</span>{{ end }}{{ end }}
+            </span>
+            <span class="category-count">{{ .count }} scripts</span>
+          </a>
+        {{- end }}
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.safety }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="keys panel">
+        <p class="panel-title">Before anything runs</p>
+        <dl>
+          {{- range .keys }}
+            <div><dt><kbd>{{ .key }}</kbd></dt><dd>{{ .text }}</dd></div>
+          {{- end }}
+        </dl>
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.install }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="install panel">
+        <p class="panel-title">Install</p>
+        <ul>
+          {{- range .rows }}
+            <li>
+              <span class="install-label">{{ .label }}</span>
+              <code>{{ .command }}</code>
+              <button type="button" class="copy-button" data-copy="{{ .command }}" aria-label="Copy {{ .label }} command">[copy]</button>
+            </li>
+          {{- end }}
+        </ul>
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.automation }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+        <p><a href="{{ "/userguide/automation/" | relURL }}">Read the automation guide -&gt;</a></p>
+      </div>
+      <div class="automation">
+        {{- partial "code-frame.html" (dict "code" .config "lang" "toml" "title" .file) }}
+        {{- partial "command-line.html" (dict "command" .command) }}
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.cta }}
+    <section class="section cta">
+      <h2>{{ .title }}</h2>
+      <p>{{ .text }}</p>
+      {{- partial "command-line.html" (dict "command" $p.hero.command "class" "cta-command") }}
+      <div class="badges">
+        {{- range $p.badges }}
+          {{- if .link }}
+            <a href="{{ .link }}"><img src="{{ .src }}" alt="{{ .alt }}" height="20"></a>
+          {{- else }}
+            <img src="{{ .src }}" alt="{{ .alt }}" height="20">
+          {{- end }}
+        {{- end }}
+      </div>
+    </section>
+  {{- end }}
+
   <footer class="site-footer">
     <p class="copyright">&copy; {{ now.Year }} <a href="https://christitus.com">Chris Titus Tech</a>. All rights reserved.</p>
   </footer>

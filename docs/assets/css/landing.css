@@ -1,4 +1,4 @@
-/* Homepage: the hero with the menu preview. */
+/* Homepage: the hero with the menu preview, then the catalog, safety, install and automation sections. */
 
 .landing {
   max-width: 78rem;
@@ -335,4 +335,201 @@
   font-size: 0.75rem;
   text-align: center;
   color: var(--muted);
+}
+
+/* ---------- Sections ---------- */
+.section {
+  padding-block: 4rem;
+  border-top: 1px dashed var(--hairline);
+}
+.section-head p {
+  max-width: 40rem;
+  margin: 0.85rem 0 0;
+  color: var(--text);
+}
+.section-head a {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+.section-head a:hover {
+  text-decoration: underline;
+}
+@media (min-width: 60em) {
+  .section--split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 3.5rem;
+  }
+}
+.section--split > :last-child {
+  margin-top: 2.25rem;
+}
+@media (min-width: 60em) {
+  .section--split > :last-child {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Category panels, one per TUI tab. */
+.category-grid {
+  display: grid;
+  gap: 2rem 1.25rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 40em) {
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Three across, then the rest share the next row. */
+@media (min-width: 60em) {
+  .category-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .category {
+    grid-column: span 2;
+  }
+  .category:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+}
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.3rem 1rem 0.8rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.category:hover {
+  border-color: var(--focus);
+}
+.category-text {
+  font-size: var(--text-sm);
+}
+.category-rows {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+.category-rows span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.category-rows .is-dir {
+  font-weight: 700;
+  color: var(--folder);
+}
+.category-rows .category-more {
+  color: var(--muted);
+}
+.category-count {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: end;
+  color: var(--muted);
+}
+
+.keys {
+  padding: 1.35rem 1.1rem 1.1rem;
+}
+.keys dl {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+}
+.keys div {
+  display: grid;
+  grid-template-columns: 7ch 1fr;
+  gap: 1.5ch;
+}
+.keys dt {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.keys dd {
+  margin: 0;
+}
+
+.install {
+  padding: 1.15rem 0.5rem 0.6rem;
+}
+.install ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.install li {
+  display: flex;
+  align-items: center;
+  gap: 1.5ch;
+  padding: 0.35rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+.install li:hover {
+  background: var(--selection);
+}
+.install-label {
+  flex: none;
+  width: 9ch;
+  color: var(--folder);
+}
+.install code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: inherit;
+  color: var(--text-strong);
+  scrollbar-width: none;
+}
+
+.automation {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.automation .code-frame,
+.automation .command-line {
+  margin: 0;
+}
+
+.cta {
+  padding-block: 5rem;
+  text-align: center;
+}
+.cta > p {
+  max-width: 34rem;
+  margin: 0.85rem auto 0;
+}
+.cta-command {
+  max-width: 34rem;
+  margin: 2rem auto 0;
+  text-align: start;
+}
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+.badges img {
+  display: block;
+  width: auto;
+  height: 20px;
+}
+
+.site-footer {
+  padding-block: 0 2.5rem;
+}
+.site-footer .copyright {
+  text-align: center;
 }
