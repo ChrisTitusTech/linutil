@@ -43,6 +43,12 @@ Linutil itself does not require root to launch. Individual scripts that make sys
 curl -fsSL https://christitus.com/linux | sh
 ```
 
+With Nix flakes, you can also run it without installing anything:
+
+```bash
+nix run github:ChrisTitusTech/linutil
+```
+
 ### What's the difference between the stable and dev branch?
 
 - **Stable** (`https://christitus.com/linux`) — Tested, recommended for daily use
@@ -54,7 +60,6 @@ Yes. It's available via:
 - **AUR** (Arch): `paru -S linutil` or `paru -S linutil-bin`
 - **openSUSE**: `sudo zypper install linutil`
 - **Cargo**: `cargo install linutil_tui`
-- **Nix** (flakes): `nix run github:ChrisTitusTech/linutil`
 
 ### The TUI won't open — it says my terminal is too small
 

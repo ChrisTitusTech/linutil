@@ -67,7 +67,7 @@ cargo install linutil_tui
 
 ### Nix
 
-With flakes enabled, run it straight from the repository:
+With flakes enabled, you can run it straight from the repository. This builds and starts Linutil without adding it to your profile:
 
 ```bash
 nix run github:ChrisTitusTech/linutil
