@@ -1,3 +1,7 @@
+{{- $headings := slice }}
+{{- if ne .Params.toc false }}
+  {{- $headings = partial "toc-headings.html" .Fragments.Headings }}
+{{- end }}
 {{- $segments := split (strings.Trim .RelPermalink "/") "/" }}
 <div class="docs">
   {{- partial "sidebar.html" . }}
@@ -12,9 +16,35 @@
           <h1>{{ . }}</h1>
         {{- end }}
       </div>
+      {{- with $headings }}
+        <details class="mobile-toc panel">
+          <summary>
+            <span class="mobile-toc-label">On this page</span>
+            <span class="mobile-toc-current"></span>
+            {{- partial "icon.html" (dict "name" "right-caret" "class" "mobile-toc-caret") }}
+          </summary>
+          <ul class="mobile-toc-list">
+            {{- range . }}
+              <li><a class="toc-link toc-depth-{{ .level }}" href="#{{ .id }}">{{ .title }}</a></li>
+            {{- end }}
+          </ul>
+        </details>
+      {{- end }}
       <div class="content">
         {{ .Content }}
       </div>
     </main>
+    {{- with $headings }}
+      <aside class="toc-pane">
+        <nav class="toc panel" aria-labelledby="toc-heading">
+          <h2 class="panel-title" id="toc-heading">On this page</h2>
+          <ul>
+            {{- range . }}
+              <li><a class="toc-link toc-depth-{{ .level }}" href="#{{ .id }}">{{ .title }}</a></li>
+            {{- end }}
+          </ul>
+        </nav>
+      </aside>
+    {{- end }}
   </div>
 </div>

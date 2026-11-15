@@ -1,4 +1,4 @@
-// Site chrome: menus.
+// Site chrome: menus and the table of contents.
 (() => {
   const root = document.documentElement;
   const $ = (selector, scope = document) => scope.querySelector(selector);
@@ -57,5 +57,46 @@
     const pane = sidebarPane.getBoundingClientRect();
     const box = currentLink.getBoundingClientRect();
     if (box.bottom > pane.bottom) sidebarPane.scrollTop += box.top - pane.top - pane.height / 3;
+  }
+
+  setUpToc();
+
+  // Highlights the last heading that has scrolled past the header, in both tables of contents.
+  function setUpToc() {
+    const links = $$('.toc-link');
+    if (!links.length) return;
+    const idOf = (link) => decodeURIComponent(link.hash.slice(1));
+    const headings = [...new Set(links.map(idOf))].map((id) => document.getElementById(id)).filter(Boolean);
+    if (!headings.length) return;
+    const mobileToc = $('.mobile-toc');
+    const current = $('.mobile-toc-current');
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const line = $('.site-header').offsetHeight + (mobileToc?.offsetHeight ?? 0) + 64;
+      let active = headings[0];
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top <= line) active = heading;
+        else break;
+      }
+      // The last heading can't always scroll up to the line, so the bottom of the page counts as reaching it.
+      if (innerHeight + scrollY >= root.scrollHeight - 2) active = headings[headings.length - 1];
+      for (const link of links) {
+        if (idOf(link) === active.id) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+      if (current) current.textContent = active.textContent;
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule, { passive: true });
+
+    mobileToc?.addEventListener('click', (event) => {
+      if (event.target.closest('a')) mobileToc.open = false;
+    });
   }
 })();

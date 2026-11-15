@@ -708,6 +708,100 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
   }
 }
 
+/* ---------- Table of contents ---------- */
+.toc {
+  padding: 1.1rem 0.5rem 0.75rem;
+}
+.toc ul,
+.mobile-toc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.toc-link {
+  display: flex;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--muted);
+  text-decoration: none;
+}
+.toc-link::before {
+  content: '  ';
+  flex: none;
+  white-space: pre;
+}
+.toc-depth-3 {
+  padding-inline-start: calc(0.5rem + 2ch);
+}
+.toc-link:hover {
+  color: var(--text);
+}
+.toc-link[aria-current='true'] {
+  background: var(--selection);
+  color: var(--focus);
+}
+.toc-link[aria-current='true']::before {
+  content: '> ';
+}
+
+/* Narrow screens: "On this page" bar that sticks under the header. */
+.mobile-toc {
+  position: sticky;
+  top: calc(var(--nav-height) + 0.75rem);
+  z-index: 4;
+  margin: 0 0 1.5rem;
+}
+@media (min-width: 72rem) {
+  .mobile-toc {
+    display: none;
+  }
+}
+.mobile-toc > summary {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  height: 2.6rem;
+  padding: 0 0.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  list-style: none;
+  cursor: pointer;
+}
+.mobile-toc > summary::-webkit-details-marker {
+  display: none;
+}
+.mobile-toc-label {
+  flex: none;
+  font-weight: 700;
+  color: var(--folder);
+}
+.mobile-toc-current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+.mobile-toc-caret {
+  margin-inline-start: auto;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+.mobile-toc[open] .mobile-toc-caret {
+  transform: rotate(90deg);
+}
+.mobile-toc-list {
+  max-height: 55vh;
+  padding: 0.25rem 0.25rem 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--hairline);
+}
+.mobile-toc-list .toc-link {
+  font-size: var(--text-xs);
+}
+
 /* ---------- Page title ---------- */
 .page-title {
   margin-bottom: 2rem;
