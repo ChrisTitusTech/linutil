@@ -83,7 +83,7 @@ This depends on the script. Some changes (like installing packages) can be rever
 See the [Contributing Guide](contributing/) for full details. In short:
 
 1. Fork and clone the repo
-2. Make your changes (scripts go in the appropriate `tabs/` subdirectory)
+2. Make your changes (scripts go in the appropriate `core/tabs/` subdirectory)
 3. Test with `cargo run`
 4. Submit a pull request
 

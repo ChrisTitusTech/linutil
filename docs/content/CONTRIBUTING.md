@@ -35,7 +35,7 @@ cd linutil
 
 If you're adding a new shell script:
 
-1. Place it in the appropriate subdirectory under `tabs/`
+1. Place it in the appropriate subdirectory under `core/tabs/`
 2. Fill out **all fields** in `tab_data.toml` for your script
 3. Run `cargo xtask docgen` to regenerate the documentation
 
