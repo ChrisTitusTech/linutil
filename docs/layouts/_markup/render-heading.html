@@ -1,0 +1,4 @@
+<h{{ .Level }} id="{{ .Anchor }}">
+  {{- .Text }}
+  {{- if ge .Level 2 }}<a class="heading-anchor" href="#{{ .Anchor }}" aria-label="Link to {{ .PlainText }}"></a>{{ end -}}
+</h{{ .Level }}>

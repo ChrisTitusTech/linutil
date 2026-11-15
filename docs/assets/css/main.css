@@ -887,6 +887,24 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
   content: '### ';
   color: var(--dim);
 }
+.heading-anchor {
+  margin-inline-start: 0.5ch;
+  font-weight: 400;
+  color: var(--dim);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.heading-anchor::before {
+  content: '#';
+}
+:is(h2, h3, h4, h5, h6):hover > .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+.heading-anchor:hover {
+  color: var(--focus);
+}
 .content strong {
   font-weight: 600;
   color: var(--text-strong);
