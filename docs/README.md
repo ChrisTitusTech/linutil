@@ -90,8 +90,13 @@ Fenced code blocks get a frame and a copy button. Alerts use GitHub's syntax:
 
 `.github/workflows/docs.yaml` builds and publishes the site to GitHub Pages on
 every push to `main` that touches `docs/`. The Hugo version is pinned there.
-A catalog change reaches the homepage once `cargo xtask docgen` has regenerated
-the walkthrough, because that commit touches `docs/`.
+
+The live site shows the catalog of the latest release, which is what the
+installer downloads, not `main`. The build checks out `core/tabs` from that
+release and runs `cargo xtask docgen` before Hugo, so the homepage menu and the
+walkthrough both match it. When a release is published, or a pre-release is
+promoted, the same workflow opens a `docs-update` PR with the regenerated
+walkthrough, which `auto-merge-docs.yaml` merges, and redeploys the site.
 
 ## Credits
 
