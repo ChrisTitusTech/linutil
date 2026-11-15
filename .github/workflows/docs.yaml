@@ -23,8 +23,8 @@ defaults:
     shell: bash
 
 jobs:
-  # Brings the committed walkthrough up to date with the release, then deploys from main:
-  # a release event runs on its tag, and the github-pages environment only deploys from main.
+  # Deploys from main, then brings the committed walkthrough up to date with the release.
+  # A release event runs on its tag, and the github-pages environment only deploys from main.
   release:
     if: github.repository == 'ChrisTitusTech/linutil' && github.event_name == 'release'
     runs-on: ubuntu-latest
@@ -33,6 +33,12 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # First, so the site updates even if the walkthrough PR below can't be opened.
+      - name: Deploy the site from main
+        run: gh workflow run docs.yaml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -71,11 +77,6 @@ jobs:
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
-
-      - name: Deploy the site from main
-        run: gh workflow run docs.yaml --repo "$GITHUB_REPOSITORY" --ref main
-        env:
-          GH_TOKEN: ${{ github.token }}
 
   build:
     if: github.repository == 'ChrisTitusTech/linutil' && github.event_name != 'release'
