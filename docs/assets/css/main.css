@@ -979,6 +979,56 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
   color: var(--success);
 }
 
+/* ---------- Code blocks ---------- */
+.code-frame {
+  margin-top: 1.5rem;
+}
+.content > .code-frame {
+  margin-top: 1.5rem;
+}
+.code-frame pre {
+  margin: 0;
+  padding: 1.1rem 1.1rem 0.9rem;
+  overflow-x: auto;
+  background: none !important;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.code-frame code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+  color: var(--text);
+}
+.code-copy.is-copied {
+  color: var(--success);
+}
+
+/* Chroma tokens in the TUI palette. */
+.chroma :is(.c, .c1, .ch, .cm, .cs, .cp, .cpf) {
+  color: var(--muted);
+  font-style: italic;
+}
+.chroma :is(.k, .kc, .kd, .kn, .kp, .kr, .kt, .ow) {
+  color: var(--flag);
+}
+.chroma :is(.s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss) {
+  color: var(--success);
+}
+.chroma :is(.nf, .fm, .nb, .bp, .nc) {
+  color: var(--focus);
+}
+.chroma :is(.m, .mb, .mf, .mh, .mi, .mo, .il) {
+  color: var(--folder);
+}
+.chroma :is(.nv, .vc, .vg, .vi, .no, .na, .nt) {
+  color: var(--folder);
+}
+.chroma :is(.o, .p) {
+  color: var(--info);
+}
+
 /* ---------- Docs footer ---------- */
 .docs-footer {
   display: flex;

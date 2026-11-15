@@ -1,4 +1,4 @@
-// Site chrome: menus and the table of contents.
+// Site chrome: menus, table of contents, and code copy buttons.
 (() => {
   const root = document.documentElement;
   const $ = (selector, scope = document) => scope.querySelector(selector);
@@ -60,6 +60,24 @@
   }
 
   setUpToc();
+
+  // Copy buttons: code blocks copy their code, the rest carry the text in data-copy.
+  document.addEventListener('click', async (event) => {
+    const button = event.target.closest('.code-copy, .copy-button');
+    if (!button) return;
+    const text = button.dataset.copy ?? $('pre code', button.parentElement).innerText.replace(/\n$/, '');
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = '[copied]';
+    } catch {
+      button.textContent = '[failed]';
+    }
+    button.classList.add('is-copied');
+    setTimeout(() => {
+      button.textContent = '[copy]';
+      button.classList.remove('is-copied');
+    }, 2000);
+  });
 
   // Highlights the last heading that has scrolled past the header, in both tables of contents.
   function setUpToc() {

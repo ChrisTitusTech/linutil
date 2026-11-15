@@ -134,3 +134,5 @@ editURL = "https://github.com/ChrisTitusTech/linutil/edit/main/docs/content/"
       useEmbedded = "fallback"
     [markup.goldmark.renderHooks.image]
       useEmbedded = "fallback"
+  [markup.highlight]
+    noClasses = false
