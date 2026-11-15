@@ -1,0 +1,20 @@
+{{- $index := .Site.Home.OutputFormats.Get "json" }}
+<dialog class="search" aria-label="Search the docs" data-index="{{ $index.RelPermalink }}">
+  <div class="search-panel panel">
+    <p class="panel-title">Search</p>
+    <div class="search-field">
+      {{- partial "icon.html" "magnifier" }}
+      <input type="search" placeholder="Type to search" aria-label="Search the docs" role="combobox"
+        aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="search-body">
+      <p class="search-note" role="status">Search guides, scripts, and FAQs.</p>
+      <ul class="search-results" id="search-results" role="listbox" hidden></ul>
+    </div>
+    <div class="search-footer" aria-hidden="true">
+      <span><kbd>up/down</kbd> move</span>
+      <span><kbd>enter</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
+</dialog>
