@@ -100,10 +100,12 @@ task_list = "I"
 
 Preconditions hide an entry on systems where it can't work. Every precondition on an entry has to pass for it to show up, and `matches = false` flips the check.
 
+The header follows where the entry sits in `tab_data.toml`. `[[data.preconditions]]` applies to a top-level item and everything inside it, while `[[data.entries.preconditions]]` applies to one entry inside a folder. The examples below use the entry form.
+
 Only show the entry when `pacman` is available:
 
 ```toml
-[[data.preconditions]]
+[[data.entries.preconditions]]
 matches = true
 data = "command_exists"
 values = ["pacman"]
@@ -112,7 +114,7 @@ values = ["pacman"]
 Hide the entry on Alpine:
 
 ```toml
-[[data.preconditions]]
+[[data.entries.preconditions]]
 matches = false
 data = "command_exists"
 values = ["apk"]
