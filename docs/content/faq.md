@@ -27,7 +27,7 @@ Linutil is distro-agnostic. Most scripts work with any of these package managers
 | `xbps-install` | Void |
 | `eopkg` | Solus |
 
-Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine) and are only shown on that distro. Linutil runs on x86_64 and aarch64.
+Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine) and are hidden on systems they don't support. The Debian and Ubuntu folders check `/etc/os-release`. The Arch, Fedora and Alpine folders check for `pacman`, `dnf` or `apk`, so they also show up on other distros that use that package manager. Linutil runs on x86_64 and aarch64.
 
 ### Does Linutil require root/sudo?
 

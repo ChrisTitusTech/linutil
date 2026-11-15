@@ -7,7 +7,7 @@ The **System Setup** section contains distro-specific and general configuration 
 
 ## Distro-Specific Setup
 
-There are folders for Arch, Fedora, Debian, Ubuntu and Alpine. Each folder only appears on that distro and holds scripts that only make sense there, such as AUR helpers and extra repositories on Arch, or RPM Fusion and release upgrades on Fedora.
+There are folders for Arch, Fedora, Debian, Ubuntu and Alpine, with scripts that only make sense on that distro, such as AUR helpers and extra repositories on Arch, or RPM Fusion and release upgrades on Fedora. Each folder is hidden on systems it doesn't support. The Arch, Fedora and Alpine folders show up wherever `pacman`, `dnf` or `apk` is installed, which includes distros based on them, while the Debian and Ubuntu folders check `/etc/os-release`.
 
 ## Desktop Environment Setup
 
