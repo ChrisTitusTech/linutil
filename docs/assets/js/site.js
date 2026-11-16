@@ -10,7 +10,7 @@
     if (event.ctrlKey || event.metaKey || event.altKey || typing(event.target) || $('dialog[open]')) return;
     // The homepage menu takes its own keys while it has focus.
     if (event.target.closest?.('.tui')) return;
-    $(`[data-key="${event.key}"]`)?.click();
+    if (event.key === 'p' || event.key === 'n') $(`[data-key="${event.key}"]`)?.click();
   });
 
   // Status bar: how far down the page you are, the way a terminal editor shows it.
