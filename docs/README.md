@@ -56,9 +56,9 @@ search with `/` or Ctrl K.
 
 **Homepage menu.** The browsable menu, the category panels and the script count
 are built from `core/tabs`, which `hugo.toml` mounts as `data/tabs`. The Flags
-and Quick Help panels are copied from `tui/src/dashboard.rs` into the front
-matter of `content/_index.md`. Update them there when the TUI's flags or keys
-change.
+panel is copied from `tui/src/dashboard.rs` into the front matter of
+`content/_index.md`, so update it there when the TUI's flags change. Quick Help
+lists the keys the preview itself answers to.
 
 **Keyboard.** `/` opens search, and `p` and `n` go to the previous and next
 docs page. On the homepage the menu takes the arrow keys, `j`/`k`, Enter, Esc
@@ -117,8 +117,8 @@ These need a person:
   go live from `main` as soon as they merge, so update them in the same change
   as the behavior they describe, including command-line flags, shortcuts and
   config options.
-- The homepage Flags and Quick Help panels, copied from `tui/src/dashboard.rs`
-  into `content/_index.md`.
+- The homepage Flags panel, copied from `tui/src/dashboard.rs` into
+  `content/_index.md`.
 
 The `docs-update` PR needs an `AUTO_MERGE` secret in the repository. Without
 it the site still updates on release, but the walkthrough file in the

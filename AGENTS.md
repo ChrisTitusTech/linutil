@@ -201,9 +201,9 @@ is put together.
   does not change the site.
 - Hand-written pages are not generated. They go live from `main` as soon as
   they merge, so update them in the same change as the behavior they describe.
-- The homepage Flags and Quick Help panels are copied from
-  `tui/src/dashboard.rs` into the front matter of `docs/content/_index.md`.
-  Update them when the TUI's flags or keys change.
+- The homepage Flags panel is copied from `tui/src/dashboard.rs` into the front
+  matter of `docs/content/_index.md`. Update it when the TUI's flags change.
+  Quick Help lists the keys the menu preview answers to, not the TUI's.
 
 ## Completion criteria
 

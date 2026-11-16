@@ -21,12 +21,12 @@ badges:
   - src: https://dcbadge.limes.pink/api/server/https://discord.gg/RUbZUZyByQ?style=flat
     alt: Discord community server
     link: https://discord.gg/RUbZUZyByQ
-# Linutil's own key list and flag legend, as the TUI shows them in its Quick Help and Flags panels.
+# Quick Help lists the keys the menu preview answers to. The flag legend is the TUI's, from tui/src/dashboard.rs.
 keys:
   - key: k/j/up/down
     text: Move selection
   - key: enter/right
-    text: Open/run
+    text: Open
   - key: h/left/esc
     text: Parent directory
   - key: 1-5
