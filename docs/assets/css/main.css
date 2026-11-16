@@ -806,6 +806,12 @@ body[data-menu-open] .menu-toggle .menu-close-icon {
     display: none;
   }
 }
+/* Jumping to a heading has to clear the bar as well as the header. */
+@media (max-width: 71.99rem) {
+  html:has(.mobile-toc) {
+    scroll-padding-top: calc(var(--nav-height) + 4.5rem);
+  }
+}
 .mobile-toc > summary {
   display: flex;
   align-items: center;
