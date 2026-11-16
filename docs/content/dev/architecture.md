@@ -47,7 +47,7 @@ Cargo's task runner extension. Run with:
 cargo xtask docgen
 ```
 
-This reads all `tab_data.toml` files and generates `docs/content/userguide/userguide.md` — the auto-generated walkthrough page. **Always run this after adding or editing a script entry.**
+This reads all `tab_data.toml` files and generates `docs/content/userguide/walkthrough.md` — the auto-generated walkthrough page. **Always run this after adding or editing a script entry.**
 
 ---
 
@@ -148,7 +148,7 @@ task_list = "MP"
 
 ### Task List Flags
 
-Flags shown to the right of each command name, defined in `state.rs`:
+Flags shown to the right of each command name, defined in `dashboard.rs`:
 
 | Flag | Meaning |
 |------|---------|
@@ -161,6 +161,8 @@ Flags shown to the right of each command name, defined in `state.rs`:
 | `SI` | Full system installation |
 | `SS` | Systemd actions (privileged) |
 | `RP` | Package removal |
+
+A `P` in front of a flag marks that action as privileged, for example `PFM` for a file change that needs root.
 
 ---
 

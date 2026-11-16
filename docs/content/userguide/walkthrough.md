@@ -3,6 +3,24 @@
 
 ## Applications Setup
 
+- **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
+- **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
+- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
+- **Dank Shell**: DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop
+- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
+- **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
+- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
+- **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
+- **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
+- **Linutil Installer**: Installs a distro-specific Linutil package locally.
+- **Linutil Updater**: Updates your local Linutil crate installation.
+- **Noctalia Shell**: Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI.
+- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
+- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
+- **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
+- **Shelly**: Shelly is a modern, visual, and intuitive interface for your Arch Linux system. Not just a wrapper, but a native ground-up experience.
+- **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
 
 ### Communication Apps
 
@@ -53,9 +71,17 @@ https://github.com/ChrisTitusTech/neovim
 
 ### Office Suites
 
+- **FreeOffice**
+- **LibreOffice**
+- **OnlyOffice**
+- **WPS Office**
 
 ### PDF Suites
 
+- **Evince**
+- **Okular**
+- **PDF Studio**
+- **PDF Studio Viewer**
 
 ### Web Browsers
 
@@ -63,6 +89,7 @@ https://github.com/ChrisTitusTech/neovim
 - **Brave Origin**: Brave Origin is a minimalist version of Brave that strips out optional features like VPN, crypto wallet, Rewards, and Leo AI, keeping only core privacy protections and ad blocking.
 - **Chromium**: Chromium is an open-source web browser project started by Google, to provide the source code for the proprietary Google Chrome browser.
 - **Google Chrome**: Google Chrome is a fast, secure, and free web browser, built for the modern web.
+- **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
 - **LibreWolf**: LibreWolf is a fork of Firefox, focused on privacy, security, and freedom.
 - **Lynx**: Lynx is a highly configurable text-based web browser for use on cursor-addressable character cell terminals.
 - **Mozilla Firefox**: Mozilla Firefox is a free and open-source web browser developed by the Mozilla Foundation.
@@ -71,38 +98,23 @@ https://github.com/ChrisTitusTech/neovim
 - **Vivaldi**: Vivaldi is a freeware, cross-platform web browser developed by Vivaldi Technologies.
 - **waterfox**: Waterfox is the privacy-focused web browser engineered to give you speed, control, and peace of mind on the internet.
 - **Zen Browser**: Zen Browser is a privacy-focused web browser designed for enhanced security and a seamless browsing experience.
-- **Helium Browser**: Helium Browser is a free, privacy-focused and open-source chromium-based browser designed for enhanced security and a seamless browsing experience.
-- **Alacritty**: Alacritty is a modern terminal emulator that comes with sensible defaults, but allows for extensive configuration. By integrating with other applications, rather than reimplementing their functionality, it manages to provide a flexible set of features with high performance. The supported platforms currently consist of BSD, Linux, macOS and Windows. This command installs and configures alacritty terminal emulator.
-- **Android Debloater**: Universal Android Debloater (UAD) is a tool designed to help users remove bloatware and unnecessary pre-installed applications from Android devices, enhancing performance and user experience.
-- **Bash Prompt**: The .bashrc file is a script that runs every time a new terminal session is started in Unix-like operating systems. It is used to configure the shell session, set up aliases, define functions, and more, making the terminal easier to use and more powerful. This command configures the key sections and functionalities defined in the .bashrc file from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
-- **Dank Shell**: DankMaterialShell is a complete desktop shell for niri, Hyprland, MangoWC, Sway, labwc, Scroll, Miracle WM, and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop
-- **Docker**: Docker is an open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Fastfetch**: Fastfetch is a neofetch-like tool for fetching system information and displaying it prettily. It is written mainly in C, with performance and customizability in mind. This command installs fastfetch and configures from CTT's mybash repository. https://github.com/ChrisTitusTech/mybash
-- **Flatpak / Flathub**: Flatpak is a universal application sandbox for Linux that uses isolated packages from Flathub to prevent conflicts and system alterations, while alleviating dependency concerns. This command installs Flatpak and adds the Flathub repository
-- **Ghostty**: Ghostty is a terminal emulator that has embedded web technologies, allowing for a highly customizable and visually appealing terminal experience.
-- **Grub Theme**: Installs ChrisTitusTech's Top 5 Bootloader Themes script to allow for easy customization of GRUB.
-- **Kitty**: kitty is a free and open-source GPU-accelerated terminal emulator for Linux, macOS, and some BSD distributions, focused on performance and features. kitty is written in a mix of C and Python programming languages. This command installs and configures kitty.
-- **Linutil Installer**: Installs a distro-specific Linutil package locally.
-- **Linutil Updater**: Updates your local Linutil crate installation.
-- **Noctalia Shell**: Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching together a separate bar, launcher, notification daemon, lock screen, wallpaper tool, and settings UI.
-- **Podman**: Podman is a daemon-less open platform that uses OS-level virtualization to deliver software in packages called containers.
-- **Podman-compose**: Podman Compose is a tool for defining and running multi-container applications using Podman.
-- **Rofi**: Rofi is a window switcher, run dialog, ssh-launcher and dmenu replacement that started as a clone of simpleswitcher, written by Sean Pringle and later expanded by Dave Davenport. This command installs and configures rofi with configuration from CTT's DWM repo. https://github.com/ChrisTitusTech/dwm-titus
-- **Shelly**: Shelly is a modern, visual, and intuitive interface for your Arch Linux system. Not just a wrapper, but a native ground-up experience.
-- **ZSH Prompt**: The Z shell is a Unix shell that can be used as an interactive login shell and as a command interpreter for shell scripting. Zsh is an extended Bourne shell with many improvements, including some features of Bash, ksh, and tcsh. This command installs ZSH prompt and provides basic configuration.
 
 ## Gaming
 
+- **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
+- **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
+- **EverQuest Legends MIDI Fix**: Configures native Lutris to start a stable FluidSynth MIDI device, maps Wine to it, and loads the SC-55 SoundCanvas bank for EverQuest Legends music. Downloads a verified 177 MiB SoundFont and preserves the original Lutris and Wine registry configuration.
+- **Fallout 76 INI and Mods**: Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks.
+- **Starfield Titus INI and Mods**: Installs custom Starfield mods from ChrisTitusTech/starfield-config via steam.
 
 ### Emulators
 
-
-### Multi-System Emulators
+#### Multi-System Emulators
 
 - **RetroArch Game Emulator**: Frontend for emulators, game engines and media players. NO Games or Bios' are included
 - **RetroArch Cores**: Install core packages for an existing native RetroArch installation.
 
-### Nintendo Emulators
+#### Nintendo Emulators
 
 - **bsnes**: Super Nintendo Emulator. NO Games are included
 - **Dolphin Emulator**: GameCube and Wii Emulator. NO Games are included
@@ -113,19 +125,19 @@ https://github.com/ChrisTitusTech/neovim
 - **Ryujinx**: Nintendo Switch emulator. NO Games are included
 - **snes9x**: Super Nintendo Emulator. NO Games are included
 
-### PlayStation Emulators
+#### PlayStation Emulators
 
 - **PCSX2**: A Playstation 2 emulator. NO Games or Bios' are included
 - **Play!**: An Experimental Playstation 2 emulator. NO Games or Bios' are included
 - **RPCS3**: A Playstation 3 emulator. NO Games or Bios' are included
 
-### Sega Emulators
+#### Sega Emulators
 
 - **Blastem**: A Genesis emulator. NO Games are included
 - **Flycast**: A Dreamcast emulator. NO Games are included
 - **Kronos**: A Sega Saturn emulator. NO Games are included
 
-### Xbox Emulators
+#### Xbox Emulators
 
 - **XEMU**: An Original Xbox emulator. NO Games or Bios' are included
 - **Xenia**: An Experimental Xbox 360 emulator. NO Games or Bios' are included
@@ -149,11 +161,6 @@ https://github.com/AdnanHodzic/auto-cpufreq
 - **ProtonPlus**: Manage ProtonPlus installation with native packages first and Flatpak fallback.
 - **ProtonUp-Qt**: Manage ProtonUp-Qt installation with native packages first and Flatpak fallback.
 - **Waydroid**: Waydroid is an emulator that allows you to run Android apps and games on Linux.
-- **Arc Raiders Titus Mods**: Applies optimized game configuration files from ChrisTitusTech/arc-raiders. Sets Engine.ini to read-only to prevent the game from overwriting the settings, disables motion blur, and enables VRR optimizations.
-- **Diablo II Resurrected Loot Filter**: Installs a loot filter for Diablo II Resurrected from ChrisTitusTech/d2r-loot-filter. Highlights high runes and other valuable items. Works on Battle.net and single player. After install, add launch option: -mod lootfilter -txt
-- **EverQuest Legends MIDI Fix**: Configures native Lutris to start a stable FluidSynth MIDI device, maps Wine to it, and loads the SC-55 SoundCanvas bank for EverQuest Legends music. Downloads a verified 177 MiB SoundFont and preserves the original Lutris and Wine registry configuration.
-- **Fallout 76 INI and Mods**: Installs a custom Fallout76Custom.ini and mods from ChrisTitusTech/fallout76-configs via Steam. Improves performance and stability with quality of life tweaks.
-- **Starfield Titus INI and Mods**: Installs custom Starfield mods from ChrisTitusTech/starfield-config via steam.
 
 ## Security
 
@@ -164,6 +171,16 @@ https://github.com/AdnanHodzic/auto-cpufreq
 
 ## System Setup
 
+- **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
+- **Enable SSD TRIM**: Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM
+- **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
+- **Full System Update**: This command updates your system to the latest packages available for your distro
+- **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
+- **Global Theme**: This script is designed to handle the installation and configuration of global theming
+- **PipeWire Audio**: Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio).
+- **Remove Snaps**: This script is designed to remove snap
+- **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
+- **Zram Swap**: Configures compressed RAM swap via zram-generator with zstd algorithm.
 
 ### Alpine
 
@@ -214,19 +231,24 @@ https://github.com/ChrisTitusTech/dwm-titus
 ### Ubuntu
 
 - **Hyprland JaKooLit**: Install JaKooLit's Hyprland configuration
-- **Build Prerequisites**: This script is designed to handle the installation of various software dependencies across different Linux distributions
-- **Enable SSD TRIM**: Enable weekly SSD TRIM through systemd's fstrim.timer and run an initial trim. This is the recommended alternative to mounting with the continuous discard option. For more information visit: https://wiki.archlinux.org/title/Solid_state_drive#TRIM
-- **Full System Cleanup**: This script is designed to remove unnecessary packages, clean old cache files, remove temporary files, and to empty the trash.
-- **Full System Update**: This command updates your system to the latest packages available for your distro
-- **Full System Update (Topgrade)**: This command uses topgrade to update your system packages, configs, and more from various sources
-- **Global Theme**: This script is designed to handle the installation and configuration of global theming
-- **PipeWire Audio**: Installs PipeWire with WirePlumber session manager for audio (replaces PulseAudio).
-- **Remove Snaps**: This script is designed to remove snap
-- **TTY Fonts**: This Script will set the default TTY font to Terminus size 32 Bold
-- **Zram Swap**: Configures compressed RAM swap via zram-generator with zstd algorithm.
 
 ## Utilities
 
+- **Auto Login**
+- **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
+- **Bootable USB Creator**
+- **Crypto tool**
+- **Locale Setup**: This allows the user to set their locale
+- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
+- **Ollama**: This utility is designed to manage ollama in your system
+- **Ramalama**: Install Ramalama to run AI models locally.
+- **Ramalama Model Manager**: List, inspect, create, run, and remove Ramalama models.
+- **Service Manager**: This utility is designed to manage services in your system
+- **SSH Commands**
+- **SSH Samba**
+- **Timeshift Backup**
+- **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
+- **WiFi Manager**: This utility is designed to manage wifi in your system
 
 ### Monitor Control
 
@@ -251,12 +273,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ### User Account Manager
 
-- **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Locale Setup**: This allows the user to set their locale
-- **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
-- **Ollama**: This utility is designed to manage ollama in your system
-- **Ramalama**: Install Ramalama to run AI models locally.
-- **Ramalama Model Manager**: List, inspect, create, run, and remove Ramalama models.
-- **Service Manager**: This utility is designed to manage services in your system
-- **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
-- **WiFi Manager**: This utility is designed to manage wifi in your system
+- **Add User**
+- **Add User To Groups**
+- **Change Password**
+- **Delete User**
+- **Remove User From Groups**

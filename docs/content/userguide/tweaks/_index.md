@@ -7,57 +7,7 @@ The **System Setup** section contains distro-specific and general configuration 
 
 ## Distro-Specific Setup
 
-### Arch Linux
-
-| Script | Description |
-|--------|-------------|
-| Arch Server Setup | Minimal Arch server install in under 5 minutes |
-| Hyprland (JaKooLit) | Install JaKooLit's Hyprland configuration |
-| Paru AUR Helper | Install the `paru` AUR helper |
-| Yay AUR Helper | Install the `yay` AUR helper |
-| Install Chaotic-AUR | Add the Chaotic-AUR repo for prebuilt AUR packages |
-| Nvidia Drivers + HW Accel | Install and configure Nvidia drivers with hardware acceleration |
-| Omarchy Rice by DHH | Simplified Hyprland config by DHH |
-| Linux Neptune (SteamDeck) | Valve's fork of the Linux kernel for Steam Deck |
-| Virtualization | Install QEMU, Libvirt, and Virt-Manager |
-
-### Fedora
-
-| Script | Description |
-|--------|-------------|
-| Configure DNF | Optimize DNF for parallel downloads |
-| RPM Fusion | Add RPM Fusion free and non-free repositories |
-| Multimedia Codecs | Install multimedia codecs with RPM Fusion |
-| Nvidia Proprietary Drivers | Install proprietary Nvidia drivers |
-| Hyprland (JaKooLit) | Install JaKooLit's Hyprland configuration |
-| Virtualization | Enable virtualization via DNF |
-| Btrfs Assistant + Snapper | Btrfs snapshots with grub-btrfs integration |
-| Upgrade Fedora Release | Upgrade system to the next Fedora release |
-
-### Debian
-
-| Script | Description |
-|--------|-------------|
-| Hyprland (JaKooLit) | Install JaKooLit's Hyprland configuration |
-
-### Ubuntu
-
-| Script | Description |
-|--------|-------------|
-| Hyprland (JaKooLit) | Install JaKooLit's Hyprland configuration |
-| Full System Cleanup | Remove unused packages, clear cache, empty trash |
-| Full System Update | Update all packages to the latest available |
-| Gaming Dependencies | Install gaming runtime dependencies across distros |
-| Global Theme | Install and configure a global desktop theme |
-| Remove Snaps | Remove Snap and prevent it from reinstalling |
-| Build Prerequisites | Install software build dependencies |
-| TTY Fonts | Set the default TTY font to Terminus 32 Bold |
-
-### Alpine
-
-| Script | Description |
-|--------|-------------|
-| Alpine Update | Upgrade Alpine to the latest stable or edge release |
+There are folders for Arch, Fedora, Debian, Ubuntu and Alpine, with scripts that only make sense on that distro, such as AUR helpers and extra repositories on Arch, or RPM Fusion and release upgrades on Fedora. Each folder is hidden on systems it doesn't support. The Arch, Fedora and Alpine folders show up wherever `pacman`, `dnf` or `apk` is installed, which includes distros based on them, while the Debian and Ubuntu folders check `/etc/os-release`.
 
 ## Desktop Environment Setup
 
@@ -77,14 +27,9 @@ The reverse operation — interactively select which DE or WM to remove.
 
 ## General System Scripts
 
-These scripts work across all distributions:
+Scripts outside the distro folders aren't tied to one distro. They cover system updates and cleanup, audio, swap, SSD trim, fonts and theming.
 
-| Script | Description |
-|--------|-------------|
-| Full System Update | Update all packages using your distro's package manager |
-| Full System Cleanup | Clear package caches, temp files, and trash |
-| Gaming Dependencies | Install runtime dependencies needed for gaming on Linux |
-| Build Prerequisites | Install common software build dependencies |
+For every script in this section and what it does, see the [Walkthrough](../walkthrough/#system-setup).
 
 > [!TIP]
 > Always run a **Full System Update** before installing new software or applying major configuration changes.

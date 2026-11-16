@@ -10,4 +10,5 @@ toc: false
 ## Architecture
 
 - [Architecture & Design](architecture/) - Code structure, data flow, and how Linutil works internally
+- [Writing a Script](scripts/) - Script conventions, shared helpers, catalog entries and preconditions
 

@@ -26,6 +26,10 @@ sudo ufw status verbose
 
 An alternative to UFW, FirewallD is the default firewall manager on Fedora and RHEL-based systems. This script configures FirewallD with CTT's recommended rules.
 
+### Security Audits
+
+**Lynis** and **rkhunter** run a system security audit and a rootkit scan. Each installs its tool if needed and offers to remove it again afterwards.
+
 ## Gaming
 
 ### Gaming Dependencies
@@ -56,68 +60,20 @@ On NixOS, these entries print declarative configuration guidance instead of modi
 
 ### Emulators
 
-| Emulator | Console |
-|----------|---------|
-| RetroArch | Multi-system frontend |
-| Dolphin | GameCube / Wii |
-| PCSX2 | PlayStation 2 |
-| RPCS3 | PlayStation 3 |
-| Ryujinx | Nintendo Switch |
-| mGBA | Game Boy Advance |
-| MelonDS | Nintendo DS / DSi |
-| bsnes / snes9x | Super Nintendo |
-| Mupen64Plus / Gopher64 | Nintendo 64 |
-| Flycast | Sega Dreamcast |
-| Kronos | Sega Saturn |
-| XEMU | Original Xbox |
-| Blastem | Sega Genesis |
+Emulators are grouped by console maker: multi-system (RetroArch), Nintendo, PlayStation, Sega and Xbox.
 
 > [!NOTE]
 > No game ROMs or BIOS files are included. You must supply your own legally obtained files.
 
 ### Game-Specific Configs
 
-- **Diablo II Resurrected — Loot Filter**: Highlights high-value drops for Battle.net and single player
-- **Fallout 76 — INI & Mods**: Performance and stability improvements
-- **Arc Raiders — Match Optimizations**: Shorter transition videos and optimized config for VRR
+**Tools and Setups** also has config files and mods for a few specific games. See the [Walkthrough](../walkthrough/#tools-and-setups) for the current list.
 
 ## Utilities
 
-### Monitor Control
+The Utilities tab covers monitor control (resolution, scaling, brightness, arrangement), printer drivers, and managers for Bluetooth, WiFi, services, locales and local AI models.
 
-| Script | Description |
-|--------|-------------|
-| Auto Detect Displays | Detect and apply recommended monitor config |
-| Set Resolution | Change the resolution of a connected monitor |
-| Set Brightness | Adjust monitor brightness |
-| Change Orientation | Rotate a monitor |
-| Scale Monitors | Change display scaling |
-| Set Primary Monitor | Designate the primary display |
-| Extend Displays | Extend across multiple monitors |
-| Duplicate Displays | Mirror displays |
-| Disable / Enable Monitor | Toggle a monitor on or off |
-| Manage Arrangement | Set the physical arrangement of monitors |
-| Reset Scaling | Revert scaling to default |
-
-### Printers
-
-| Script | Description |
-|--------|-------------|
-| CUPS | Install the CUPS printing system |
-| Epson Drivers | Install Epson printer drivers |
-| HP Drivers | Install HP printer drivers |
-
-### System Utilities
-
-| Script | Description |
-|--------|-------------|
-| Bluetooth Manager | Manage Bluetooth devices |
-| WiFi Manager | Manage wireless connections |
-| Service Manager | Enable, disable, and manage systemd services |
-| Numlock on Startup | Enable Num Lock at boot |
-| Auto Mount Drive | Automate mounting a drive at startup |
-| Ollama | Manage Ollama (local AI model runner) |
-| US Locale Setup | Fix US UTF-8 locale and folder listings |
+For every script and what it does, see the [Walkthrough](../walkthrough/#utilities).
 
 ## Themes
 

@@ -9,6 +9,9 @@ executes selected commands inside a pseudo-terminal.
 
 Read `SPEC.md` before making architectural or behavior changes.
 
+`CLAUDE.md`, `GEMINI.md`, and `.github/copilot-instructions.md` only point to
+this file. Put new instructions here, not in them.
+
 ## Repository layout
 
 - `core/`: Backend library, menu data model, TOML parsing, platform
@@ -147,6 +150,32 @@ documentation.
 - Keep tab data consistently ordered. Use `sort-tomlfiles.sh` when the change
   requires catalog sorting.
 
+## Documentation
+
+`docs/` is a Hugo site. `docs/content/userguide/walkthrough.md` is generated
+from the catalog by `cargo xtask docgen` and must not be edited by hand. Commit
+the regenerated file with the catalog change.
+
+The other pages are hand-written. They describe categories and behavior and
+link to the walkthrough rather than listing every script, so adding a script
+only needs docgen. Do not add per-script tables to them.
+
+Update the matching pages in the same change when you change:
+
+- CLI flags in `tui/src/cli.rs`: the options table in
+  `docs/content/userguide/getting-started/_index.md` and `man/linutil.1`.
+- Keyboard shortcuts: the shortcut table in the same getting-started page.
+- Config fields in `core/src/config.rs`:
+  `docs/content/userguide/automation/_index.md`.
+- Task flags, preconditions, or the TOML schema: `SPEC.md`,
+  `docs/content/dev/architecture.md`, and `docs/content/dev/scripts.md`.
+- Shared helpers or shell conventions: `docs/content/dev/scripts.md`.
+- Package managers detected by `common-script.sh`: the distro table in
+  `docs/content/faq.md`.
+
+Only document behavior confirmed in the code. Do not describe flags, commands,
+or options that do not exist.
+
 ## Validation
 
 Run the smallest relevant checks, then broaden them for cross-cutting changes.
@@ -175,6 +204,13 @@ For catalog or documentation changes:
 cargo test --no-fail-fast --package linutil_core
 cargo xtask docgen
 git diff --check
+```
+
+For changes under `docs/`, also build the site to an output directory outside
+the repository:
+
+```bash
+hugo build --source docs --destination /tmp/linutil-docs
 ```
 
 For TUI behavior, also run:

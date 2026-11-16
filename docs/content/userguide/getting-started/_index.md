@@ -11,7 +11,8 @@ Linutil is a distro-agnostic Linux toolbox built in Rust. It provides an interac
 
 Before running Linutil, ensure your system meets these requirements:
 
-- **Operating System**: Any modern Linux distribution (Arch, Fedora, Debian, Ubuntu, openSUSE, etc.)
+- **Operating System**: Any modern Linux distribution (Arch, Fedora, Debian, Ubuntu, openSUSE, Alpine, Void, Solus, etc.)
+- **Architecture**: x86_64 or aarch64
 - **Shell**: Bash or a compatible POSIX shell
 - **Internet Connection**: Required for downloading applications and scripts
 - **curl**: Pre-installed on most distributions
@@ -64,6 +65,14 @@ sudo zypper install linutil
 cargo install linutil_tui
 ```
 
+### Nix
+
+With flakes enabled, you can run it straight from the repository. This builds and starts Linutil without adding it to your profile:
+
+```bash
+nix run github:ChrisTitusTech/linutil
+```
+
 > [!NOTE]
 > Cargo installs require manual updates via `cargo install --force linutil_tui`, or use the built-in **Linutil Updater** script inside the tool.
 
@@ -75,13 +84,23 @@ View all available options:
 linutil --help
 ```
 
-### Common Options
+### Options
 
 | Flag | Description |
 |------|-------------|
-| `--config` / `-c` | Path to a TOML config file |
-| `--skip-confirmation` | Skip confirmation prompts |
-| `--size-bypass` | Bypass terminal size requirements |
+| `-c`, `--config <path>` | Path to a TOML config file (see [Automation](../automation/)) |
+| `-t`, `--theme <theme>` | Theme to start with: `default`, `compatible`, `nord`, `tokyo-night`, `one-dark`, `monochrome`, `lucent-orng`, `github`, `material` or `flexoki` |
+| `-y`, `--skip-confirmation` | Skip the confirmation prompt before running commands |
+| `-s`, `--size-bypass` | Bypass the minimum terminal size check |
+| `-m`, `--mouse` | Enable mouse interaction |
+| `-r`, `--bypass-root` | Don't show the warning when Linutil is run as root |
+| `-u`, `--override-validation` | Show every entry, even ones that aren't supported on your system (unsafe) |
+
+When using the curl command, pass flags after `sh -s --`:
+
+```bash
+curl -fsSL https://christitus.com/linux | sh -s -- --theme nord
+```
 
 ## Navigating the TUI
 
@@ -150,7 +169,7 @@ Here are recommended actions for new users:
 If the curl command fails, check your internet connection or try:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ChrisTitusTech/linutil/main/linutil.sh | sh
+curl -fsSL https://github.com/ChrisTitusTech/linutil/releases/latest/download/start.sh | sh
 ```
 
 ### Permission Errors

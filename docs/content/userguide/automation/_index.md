@@ -52,9 +52,11 @@ linutil --skip-confirmation --size-bypass
 
 | Flag | Description |
 |------|-------------|
-| `--config` / `-c` | Path to TOML config file |
-| `--skip-confirmation` | Skip all confirmation prompts |
-| `--size-bypass` | Bypass minimum terminal size check |
+| `-c`, `--config <path>` | Path to TOML config file |
+| `-y`, `--skip-confirmation` | Skip all confirmation prompts |
+| `-s`, `--size-bypass` | Bypass minimum terminal size check |
+
+See [Getting Started](../getting-started/#options) for the full list of flags.
 
 ## Use Cases
 
@@ -91,6 +93,10 @@ skip_confirmation = true
 ### Finding Script Names
 
 Script names in `auto_execute` must match exactly as they appear in the Linutil TUI. Browse the TUI to find the exact name, or check the auto-generated [Walkthrough](../walkthrough/) page for a complete list.
+
+A name that doesn't match a command is skipped without a warning. This includes folder names, misspelled names, and commands that are hidden because your system doesn't support them. If a script didn't run, check its name first.
+
+Unknown options in the config file are an error: Linutil prints the problem and exits instead of starting.
 
 > [!TIP]
 > Use `--skip-confirmation` together with `auto_execute` for fully unattended runs. Without it, Linutil will still pause and ask before executing each script.

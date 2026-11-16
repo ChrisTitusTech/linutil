@@ -63,11 +63,7 @@ curl -fsSL https://christitus.com/linuxdev | sh
 
 ## Checking the Current Version
 
-After installing Linutil locally, you can check the version with:
-
-```bash
-linutil --version
-```
+The version is shown under the logo in the TUI, as `Linutil v<version>`.
 
 ## Release Notes
 

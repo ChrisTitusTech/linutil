@@ -15,7 +15,19 @@ Yes. All scripts are open source and available on [GitHub](https://github.com/Ch
 
 ### What Linux distributions does Linutil support?
 
-Linutil is distro-agnostic — it runs on any modern Linux distribution. Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine), while others work across all distros.
+Linutil is distro-agnostic. Most scripts work with any of these package managers:
+
+| Package manager | Distros |
+|-----------------|---------|
+| `apt-get` / `nala` | Debian, Ubuntu and derivatives |
+| `dnf` | Fedora and RHEL-based distros |
+| `pacman` | Arch and derivatives |
+| `zypper` | openSUSE |
+| `apk` | Alpine |
+| `xbps-install` | Void |
+| `eopkg` | Solus |
+
+Some scripts are distro-specific (Arch, Fedora, Debian, Ubuntu, Alpine) and are hidden on systems they don't support. The Debian and Ubuntu folders check `/etc/os-release`. The Arch, Fedora and Alpine folders check for `pacman`, `dnf` or `apk`, so they also show up on other distros that use that package manager. Linutil runs on x86_64 and aarch64.
 
 ### Does Linutil require root/sudo?
 
@@ -29,6 +41,12 @@ Linutil itself does not require root to launch. Individual scripts that make sys
 
 ```bash
 curl -fsSL https://christitus.com/linux | sh
+```
+
+With Nix flakes, you can also run it without installing anything:
+
+```bash
+nix run github:ChrisTitusTech/linutil
 ```
 
 ### What's the difference between the stable and dev branch?
@@ -83,7 +101,7 @@ This depends on the script. Some changes (like installing packages) can be rever
 See the [Contributing Guide](contributing/) for full details. In short:
 
 1. Fork and clone the repo
-2. Make your changes (scripts go in the appropriate `tabs/` subdirectory)
+2. Make your changes (scripts go in the appropriate `core/tabs/` subdirectory)
 3. Test with `cargo run`
 4. Submit a pull request
 
@@ -108,9 +126,7 @@ Open an issue on [GitHub](https://github.com/ChrisTitusTech/linutil/issues). Inc
 
 ### How do I check what version I'm running?
 
-```bash
-linutil --version
-```
+The version is shown under the logo in the TUI, as `Linutil v<version>`.
 
 ### Where can I see release notes?
 
