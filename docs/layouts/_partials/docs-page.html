@@ -1,0 +1,51 @@
+{{- $headings := slice }}
+{{- if ne .Params.toc false }}
+  {{- $headings = partial "toc-headings.html" .Fragments.Headings }}
+{{- end }}
+{{- $segments := split (strings.Trim .RelPermalink "/") "/" }}
+<div class="docs">
+  {{- partial "sidebar.html" . }}
+  <div class="docs-main">
+    <main class="docs-article">
+      <div class="page-title" id="_top" tabindex="-1">
+        <p class="page-path">
+          <span class="prompt">~</span>
+          {{- range $i, $segment := $segments }}/{{ if eq (add $i 1) (len $segments) }}<b>{{ . }}</b>{{ else }}{{ . }}{{ end }}{{ end -}}
+        </p>
+        {{- with .Title }}
+          <h1>{{ . }}</h1>
+        {{- end }}
+      </div>
+      {{- with $headings }}
+        <details class="mobile-toc panel">
+          <summary>
+            <span class="mobile-toc-label">On this page</span>
+            <span class="mobile-toc-current"></span>
+            {{- partial "icon.html" (dict "name" "right-caret" "class" "mobile-toc-caret") }}
+          </summary>
+          <ul class="mobile-toc-list">
+            {{- range . }}
+              <li><a class="toc-link toc-depth-{{ .level }}" href="#{{ .id }}">{{ .title }}</a></li>
+            {{- end }}
+          </ul>
+        </details>
+      {{- end }}
+      <div class="content">
+        {{ .Content }}
+      </div>
+      {{- partial "docs-footer.html" . }}
+    </main>
+    {{- with $headings }}
+      <aside class="toc-pane">
+        <nav class="toc panel" aria-labelledby="toc-heading">
+          <h2 class="panel-title" id="toc-heading">On this page</h2>
+          <ul>
+            {{- range . }}
+              <li><a class="toc-link toc-depth-{{ .level }}" href="#{{ .id }}">{{ .title }}</a></li>
+            {{- end }}
+          </ul>
+        </nav>
+      </aside>
+    {{- end }}
+  </div>
+</div>

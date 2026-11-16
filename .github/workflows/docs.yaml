@@ -6,12 +6,13 @@ on:
       - main
     paths:
       - "docs/**"
+  # A release reaching the installer changes what people can run, so the docs follow it.
+  release:
+    types: [released]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -22,65 +23,112 @@ defaults:
     shell: bash
 
 jobs:
+  # Deploys from main, then brings the committed walkthrough up to date with the release.
+  # A release event runs on its tag, and the github-pages environment only deploys from main.
+  release:
+    if: github.repository == 'ChrisTitusTech/linutil' && github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      # First, so the site updates even if the walkthrough PR below can't be opened.
+      - name: Deploy the site from main
+        run: gh workflow run docs.yaml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # The latest release, as the deploy uses, even when this event is for one that wasn't marked latest.
+      - name: Generate the walkthrough for the latest release
+        run: |
+          git checkout "$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)" -- core/tabs
+          cargo xtask docgen
+          git checkout HEAD -- core/tabs
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Create Pull Request for the updated walkthrough
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.AUTO_MERGE }}
+          commit-message: 'chore(docs): update the generated walkthrough'
+          title: 'chore(docs): update the generated walkthrough'
+          body: 'Automated update of the walkthrough for the latest release, so the docs match the scripts people can run.'
+          branch: docs-update
+          delete-branch: true
+          add-paths: |
+            docs/content/userguide/walkthrough.md
+          labels: |
+            documentation
+            skip-changelog
+
+      - name: Check outputs
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
   build:
-    if: github.repository == 'ChrisTitusTech/linutil'
+    if: github.repository == 'ChrisTitusTech/linutil' && github.event_name != 'release'
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.156.0
+      HUGO_VERSION: 0.170.0
       HUGO_ENVIRONMENT: production
       TZ: America/Chicago
     steps:
       - name: Install Hugo CLI
         run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
+          wget -O "${{ runner.temp }}/hugo.deb" "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "${{ runner.temp }}/hugo.deb"
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          submodules: recursive
           fetch-depth: 0
           persist-credentials: false
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v6
-        
-      - name: Install Node.js dependencies
-        run: "cd docs && [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
-      - name: Cache Restore
-        id: cache-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            ${{ runner.temp }}/hugo_cache
-          key: hugo-${{ github.run_id }}
-          restore-keys: hugo-
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # The homepage menu and the walkthrough show the latest release, which is what the installer
+      # downloads, rather than whatever has landed on main since.
+      - name: Use the catalog from the latest release
+        run: git checkout "$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)" -- core/tabs
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Generate the walkthrough
+        run: cargo xtask docgen
+
       - name: Build with Hugo
-        run: |
-          hugo \
-            --gc \
-            --minify \
-            --cleanDestinationDir \
-            --source docs \
-            --cacheDir "${{ runner.temp }}/hugo_cache"
-      - name: Cache Save
-        id: cache-save
-        uses: actions/cache/save@v6
-        with:
-          path: |
-            ${{ runner.temp }}/hugo_cache
-          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+        run: hugo --gc --minify --source docs
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs/public
 
   deploy:
-    if: github.repository == 'ChrisTitusTech/linutil'
+    if: github.repository == 'ChrisTitusTech/linutil' && github.event_name != 'release'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

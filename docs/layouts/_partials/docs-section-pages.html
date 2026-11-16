@@ -1,0 +1,11 @@
+{{- $pages := slice . }}
+{{- range .Pages.ByWeight }}
+  {{- if and .IsSection .Pages }}
+    {{- range partial "docs-section-pages.html" . }}
+      {{- $pages = $pages | append . }}
+    {{- end }}
+  {{- else }}
+    {{- $pages = $pages | append . }}
+  {{- end }}
+{{- end }}
+{{- return $pages -}}

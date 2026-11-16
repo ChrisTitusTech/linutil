@@ -1,0 +1,11 @@
+{{- /* Flattens a .Fragments.Headings tree into the h2 and h3 entries the table of contents lists. */ -}}
+{{- $items := slice }}
+{{- range . }}
+  {{- if and .ID (in (slice 2 3) .Level) }}
+    {{- $items = $items | append (dict "id" .ID "title" (.Title | plainify | htmlUnescape) "level" .Level) }}
+  {{- end }}
+  {{- range partial "toc-headings.html" .Headings }}
+    {{- $items = $items | append . }}
+  {{- end }}
+{{- end }}
+{{- return $items -}}

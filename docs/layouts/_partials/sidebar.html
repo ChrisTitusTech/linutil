@@ -1,0 +1,38 @@
+<div class="sidebar-pane" id="sidebar-pane">
+  <nav class="sidebar panel" aria-label="Docs">
+    <p class="panel-title">Docs</p>
+    <ul class="sidebar-list sidebar-top">
+      {{- range site.Menus.sidebar }}
+        <li>
+          <details class="sidebar-group sidebar-group--top" open>
+            <summary>{{ .Name }}{{ partial "icon.html" (dict "name" "right-caret" "class" "sidebar-caret") }}</summary>
+            <ul class="sidebar-list">
+              {{- if .HasChildren }}
+                {{- range .Children }}
+                  <li>
+                    {{- if .Page }}
+                      {{- partial "sidebar-link.html" (dict "page" .Page "label" .Name "current" $) }}
+                    {{- else }}
+                      <a class="sidebar-link" href="{{ .URL }}" target="_blank" rel="noreferrer">
+                        {{- .Name }}{{ partial "icon.html" (dict "name" "external" "class" "sidebar-external") -}}
+                      </a>
+                    {{- end }}
+                  </li>
+                {{- end }}
+              {{- else if .Page }}
+                <li>{{ partial "sidebar-link.html" (dict "page" .Page "label" "Overview" "current" $) }}</li>
+                {{- partial "sidebar-pages.html" (dict "section" .Page "current" $) }}
+              {{- end }}
+            </ul>
+          </details>
+        </li>
+      {{- end }}
+    </ul>
+    <p class="sidebar-count">{{ len (partialCached "docs-pages.html" . "docs") }} pages</p>
+  </nav>
+  <div class="sidebar-footer">
+    {{- range site.Params.social }}
+      <a class="icon-button" href="{{ .url }}" rel="me" aria-label="{{ .name }}">{{ partial "icon.html" .icon }}</a>
+    {{- end }}
+  </div>
+</div>

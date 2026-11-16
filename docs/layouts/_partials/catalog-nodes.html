@@ -1,0 +1,9 @@
+{{- $nodes := slice }}
+{{- range . }}
+  {{- $node := dict "name" .name "description" (.description | default "") "flags" (.task_list | default "") }}
+  {{- with .entries }}
+    {{- $node = merge $node (dict "entries" (partial "catalog-nodes.html" .)) }}
+  {{- end }}
+  {{- $nodes = $nodes | append $node }}
+{{- end }}
+{{- return $nodes -}}

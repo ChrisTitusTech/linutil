@@ -1,0 +1,579 @@
+/* Homepage and 404: the hero with the menu preview, then the catalog, safety, install and automation sections. */
+
+.landing {
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+.landing h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-strong);
+  text-wrap: balance;
+}
+.landing h2::before {
+  content: '## ';
+  color: var(--folder);
+}
+@media (min-width: 50em) {
+  .landing h2 {
+    font-size: 2.0625rem;
+  }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  padding-block: 3rem 3.5rem;
+}
+@media (min-width: 66em) {
+  .hero {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    align-items: start;
+    gap: 3.5rem;
+    padding-block: 4.5rem 4.5rem;
+  }
+}
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.0625rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+@media (min-width: 50em) {
+  .hero h1 {
+    font-size: 2.75rem;
+  }
+}
+.hero h1:focus {
+  outline: none;
+}
+.cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.95em;
+  margin-inline-start: 0.12em;
+  vertical-align: -0.1em;
+  background: var(--focus);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cursor {
+    animation: blink 1.1s steps(1) infinite;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.hero-tagline {
+  max-width: 34rem;
+  margin: 1.25rem 0 0;
+  font-size: var(--text-lg);
+  color: var(--text);
+}
+
+.command-line {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  margin-top: 1.75rem;
+  padding: 0.65rem 0.6rem 0.65rem 1rem;
+}
+.command-line code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-strong);
+  scrollbar-width: none;
+}
+.command-line .prompt {
+  color: var(--success);
+}
+.copy-button {
+  flex: none;
+  padding: 0 0.5ch;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--muted);
+  cursor: pointer;
+}
+.copy-button:hover {
+  color: var(--focus);
+}
+.copy-button.is-copied {
+  color: var(--success);
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.facts {
+  display: grid;
+  gap: 0.3rem;
+  margin: 2.25rem 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+.facts div {
+  display: grid;
+  grid-template-columns: 9ch 1fr;
+  gap: 1ch;
+}
+.facts dt {
+  color: var(--folder);
+}
+.facts dd {
+  margin: 0;
+  color: var(--text);
+}
+
+/* ---------- Menu preview ---------- */
+.tui {
+  padding: 1.35rem 0.9rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.tui:has(.tui-rows:focus-visible) {
+  box-shadow: 0 0 0 1px var(--focus);
+}
+.tui-tabs {
+  display: flex;
+  gap: 1ch;
+  margin-bottom: 1.1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tui-tab {
+  flex: none;
+  padding: 0 1ch;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tui-tab:hover {
+  color: var(--text);
+}
+.tui-tab[aria-selected='true'] {
+  background: var(--selection);
+  color: var(--text-strong);
+}
+.tui-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+}
+@media (min-width: 46em) {
+  .tui-body {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+}
+.tui-list {
+  display: flex;
+  flex-direction: column;
+  height: 27rem;
+  padding: 1rem 0.4rem 0.5rem;
+}
+.tui:not(:focus-within) .tui-list {
+  border-color: var(--border);
+}
+.tui:focus-within .tui-list {
+  border-color: var(--focus);
+}
+.tui-hint,
+.tui-flags-head,
+.tui-footer {
+  margin: 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.tui-hint kbd {
+  color: var(--flag);
+}
+.tui-flags-head {
+  margin-top: 0.4rem;
+  text-align: end;
+}
+/* Focus shows as the ring around the whole menu instead of an outline here. */
+.tui-rows {
+  position: relative;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim) transparent;
+}
+.tui-row {
+  display: flex;
+  gap: 1ch;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  color: var(--text);
+  cursor: pointer;
+}
+.tui-row::before {
+  content: '  ';
+  flex: none;
+  white-space: pre;
+}
+.tui-row.is-dir {
+  font-weight: 700;
+  color: var(--folder);
+}
+.tui-row[aria-selected='true'] {
+  background: var(--selection);
+  color: var(--focus);
+}
+.tui-row[aria-selected='true']::before {
+  content: '> ';
+}
+.tui-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tui-flag {
+  flex: none;
+  font-weight: 400;
+  color: var(--flag);
+}
+.tui-footer {
+  margin-top: 0.4rem;
+  text-align: end;
+}
+.tui-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+}
+.tui-details {
+  min-height: 9.5rem;
+  padding: 1.05rem 1rem 0.8rem;
+}
+.tui-details p {
+  margin: 0;
+}
+.tui-details .tui-details-name {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.tui-details .tui-details-text {
+  margin-top: 0.35rem;
+  color: var(--text);
+}
+.tui-details .tui-details-flags {
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
+.tui-details-flags b {
+  font-weight: 400;
+  color: var(--flag);
+}
+.tui-details a {
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+.tui-legend {
+  display: none;
+  padding: 1rem 1rem 0.7rem;
+  font-size: 0.75rem;
+}
+@media (min-width: 46em) {
+  .tui-legend {
+    display: block;
+  }
+}
+.tui-legend dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  column-gap: 2ch;
+  margin: 0;
+}
+.tui-legend div {
+  display: flex;
+  gap: 1ch;
+}
+.tui-legend dt {
+  flex: none;
+  color: var(--flag);
+}
+.tui-legend--flags dt {
+  width: 3ch;
+}
+.tui-legend--keys dt {
+  width: 12ch;
+}
+.tui-legend dd {
+  margin: 0;
+  color: var(--muted);
+}
+.tui-caption {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---------- Sections ---------- */
+.section {
+  padding-block: 4rem;
+  border-top: 1px dashed var(--hairline);
+}
+.section-head p {
+  max-width: 40rem;
+  margin: 0.85rem 0 0;
+  color: var(--text);
+}
+.section-head a {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+.section-head a:hover {
+  text-decoration: underline;
+}
+@media (min-width: 60em) {
+  .section--split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 3.5rem;
+  }
+}
+.section--split > :last-child {
+  margin-top: 2.25rem;
+}
+@media (min-width: 60em) {
+  .section--split > :last-child {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Category panels, one per TUI tab. */
+.category-grid {
+  display: grid;
+  gap: 2rem 1.25rem;
+  margin-top: 2.5rem;
+}
+@media (min-width: 40em) {
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Three across, then the rest share the next row. */
+@media (min-width: 60em) {
+  .category-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .category {
+    grid-column: span 2;
+  }
+  .category:nth-child(n + 4) {
+    grid-column: span 3;
+  }
+}
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.3rem 1rem 0.8rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.category:hover {
+  border-color: var(--focus);
+}
+.category-text {
+  font-size: var(--text-sm);
+}
+.category-rows {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+.category-rows span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.category-rows .is-dir {
+  font-weight: 700;
+  color: var(--folder);
+}
+.category-rows .category-more {
+  color: var(--muted);
+}
+.category-count {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: end;
+  color: var(--muted);
+}
+
+.keys {
+  padding: 1.35rem 1.1rem 1.1rem;
+}
+.keys dl {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+}
+.keys div {
+  display: grid;
+  grid-template-columns: 7ch 1fr;
+  gap: 1.5ch;
+}
+.keys dt {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.keys dd {
+  margin: 0;
+}
+
+.install {
+  padding: 1.15rem 0.5rem 0.6rem;
+}
+.install ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.install li {
+  display: flex;
+  align-items: center;
+  gap: 1.5ch;
+  padding: 0.35rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+.install li:hover {
+  background: var(--selection);
+}
+.install-label {
+  flex: none;
+  width: 9ch;
+  color: var(--folder);
+}
+.install code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: inherit;
+  color: var(--text-strong);
+  scrollbar-width: none;
+}
+
+.automation {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.automation .code-frame,
+.automation .command-line {
+  margin: 0;
+}
+
+.cta {
+  padding-block: 5rem;
+  text-align: center;
+}
+.cta > p {
+  max-width: 34rem;
+  margin: 0.85rem auto 0;
+}
+.cta-command {
+  max-width: 34rem;
+  margin: 2rem auto 0;
+  text-align: start;
+}
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+.badges img {
+  display: block;
+  width: auto;
+  height: 20px;
+}
+
+.site-footer {
+  padding-block: 0 2.5rem;
+}
+.site-footer .copyright {
+  text-align: center;
+}
+
+/* ---------- 404 ---------- */
+.notfound {
+  display: grid;
+  place-items: center;
+  min-height: calc(100svh - var(--nav-height) - var(--status-height));
+  padding-block: 3rem;
+}
+.notfound-terminal {
+  width: min(40rem, 100%);
+  padding: 1.5rem 1.25rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+.notfound-terminal p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.notfound-terminal .prompt {
+  color: var(--success);
+}
+.notfound-terminal .notfound-error {
+  margin-top: 0.25rem;
+  color: var(--fail);
+}
+.notfound-terminal h1 {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display);
+  font-size: 2.0625rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+.notfound-terminal h1:focus {
+  outline: none;
+}
+.notfound-terminal .notfound-text {
+  margin-top: 0.5rem;
+  font-family: var(--font);
+  color: var(--text);
+}
+.notfound .hero-actions {
+  margin-top: 1.5rem;
+}

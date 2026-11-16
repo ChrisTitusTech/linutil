@@ -1,0 +1,9 @@
+{{- $count := 0 }}
+{{- range . }}
+  {{- if .entries }}
+    {{- $count = add $count (partial "catalog-count.html" .entries) }}
+  {{- else }}
+    {{- $count = add $count 1 }}
+  {{- end }}
+{{- end }}
+{{- return $count -}}

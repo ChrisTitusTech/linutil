@@ -1,0 +1,9 @@
+{{- $lang := .lang | default "text" }}
+{{- $title := .title | default (cond (eq $lang "text") "" $lang) }}
+<div class="code-frame panel">
+  {{- with $title }}
+    <span class="panel-title">{{ . }}</span>
+  {{- end }}
+  <button type="button" class="panel-action code-copy" aria-label="Copy code">[copy]</button>
+  {{- transform.Highlight .code $lang (.options | default dict) }}
+</div>

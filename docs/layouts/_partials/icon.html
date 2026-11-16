@@ -1,0 +1,14 @@
+{{- /* Inline SVG from assets/icons, so it picks up the surrounding text colour. Takes a name or (dict "name" "class"). */ -}}
+{{- $name := . -}}
+{{- $class := "" -}}
+{{- if reflect.IsMap . }}
+  {{- $name = .name }}
+  {{- $class = .class | default "" }}
+{{- end }}
+{{- with resources.Get (printf "icons/%s.svg" $name) }}
+  {{- $svg := .Content | replaceRE `<!--[\s\S]*?-->\s*` "" | strings.TrimSpace }}
+  {{- $attrs := printf `class="icon%s" width="1em" height="1em" aria-hidden="true" ` (cond (eq $class "") "" (print " " $class)) }}
+  {{- replace $svg "<svg " (print "<svg " $attrs) | safeHTML }}
+{{- else }}
+  {{- errorf "icon %q not found in assets/icons" $name }}
+{{- end -}}

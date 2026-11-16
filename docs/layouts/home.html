@@ -1,0 +1,193 @@
+{{ define "main" }}
+{{- $p := .Params }}
+{{- $catalog := partial "catalog.html" . }}
+{{- $walkthrough := site.GetPage "/userguide/walkthrough" }}
+{{- $total := 0 }}
+{{- range $catalog }}{{ $total = add $total .count }}{{ end }}
+<main class="landing">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1 id="_top" tabindex="-1">{{ $p.hero.title }}<span class="cursor" aria-hidden="true"></span></h1>
+      <p class="hero-tagline">{{ $p.hero.tagline }}</p>
+      {{- partial "command-line.html" (dict "command" $p.hero.command "class" "hero-command") }}
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{ "/userguide/getting-started/" | relURL }}">Get started -&gt;</a>
+        <a class="btn" href="https://github.com/ChrisTitusTech/linutil">{{ partial "icon.html" "github" }}GitHub</a>
+      </div>
+      <dl class="facts">
+        <div><dt>scripts</dt><dd>{{ $total }} in {{ len $catalog }} categories</dd></div>
+        {{- range $p.facts }}
+          <div><dt>{{ .key }}</dt><dd>{{ .value }}</dd></div>
+        {{- end }}
+      </dl>
+    </div>
+
+    {{- /* The menu, as the TUI draws it. landing.js makes it browsable from the JSON below. */}}
+    <div class="hero-menu">
+      <div class="tui panel" role="group" aria-label="Linutil menu preview">
+        <p class="panel-title">linutil</p>
+        <div class="tui-tabs" role="tablist">
+          {{- range $i, $tab := $catalog }}
+            <button type="button" class="tui-tab" role="tab" tabindex="-1" data-tab="{{ $i }}"
+              aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}">{{ add $i 1 }} {{ .name }}</button>
+          {{- end }}
+        </div>
+        <div class="tui-body">
+          <div class="tui-list panel is-focused">
+            <p class="panel-title">Directories &amp; Commands</p>
+            <p class="tui-hint"><kbd>up</kbd>/<kbd>down</kbd> move, <kbd>enter</kbd> open, <kbd>esc</kbd> back</p>
+            <p class="tui-flags-head" aria-hidden="true">Flags</p>
+            <ul class="tui-rows" role="listbox" tabindex="0" aria-label="Entries. Use the arrow keys to browse.">
+              {{- range $i, $node := (index $catalog 0).entries }}
+                <li class="tui-row{{ if .entries }} is-dir{{ end }}" role="option"
+                  aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}">
+                  <span class="tui-name">{{ if .entries }}[D]{{ else }}[*]{{ end }} {{ .name }}</span>
+                  <span class="tui-flag">{{ .flags }}</span>
+                </li>
+              {{- end }}
+            </ul>
+            <p class="tui-footer">{{ len (index $catalog 0).entries }} entries &middot; {{ (index $catalog 0).name }}</p>
+          </div>
+          <div class="tui-side">
+            <div class="tui-details panel">
+              <p class="panel-title">Details</p>
+              {{- with index (index $catalog 0).entries 0 }}
+                <p class="tui-details-name">{{ .name }}</p>
+                <p class="tui-details-text">{{ .description | default "Open this category to browse its commands." }}</p>
+              {{- end }}
+            </div>
+            <div class="tui-legend tui-legend--flags panel">
+              <p class="panel-title">Flags</p>
+              <dl>
+                {{- range $p.flags }}
+                  <div><dt>{{ .key }}</dt><dd>{{ .text }}</dd></div>
+                {{- end }}
+              </dl>
+            </div>
+            <div class="tui-legend tui-legend--keys panel">
+              <p class="panel-title">Quick Help</p>
+              <dl>
+                {{- range $p.keys }}
+                  <div><dt>{{ .key }}</dt><dd>{{ .text }}</dd></div>
+                {{- end }}
+              </dl>
+            </div>
+          </div>
+        </div>
+        {{- $data := slice }}
+        {{- range $tab := $catalog }}
+          {{- $link := "" }}
+          {{- with $walkthrough }}{{ $link = printf "%s#%s" .RelPermalink (anchorize $tab.name) }}{{ end }}
+          {{- $data = $data | append (dict "name" .name "link" $link "entries" .entries) }}
+        {{- end }}
+        <script type="application/json" class="tui-data">{{ $data | jsonify | safeJS }}</script>
+      </div>
+      <p class="tui-caption">A copy of the menu, built from the catalog the TUI loads. It doesn't run anything.</p>
+    </div>
+  </section>
+
+  {{- with $p.catalog }}
+    <section class="section">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="category-grid">
+        {{- range $i, $tab := $catalog }}
+          {{- $link := "" }}
+          {{- with $walkthrough }}{{ $link = printf "%s#%s" .RelPermalink (anchorize $tab.name) }}{{ end }}
+          <a class="category panel" href="{{ $link }}">
+            <span class="panel-title">{{ add $i 1 }} {{ .name }}</span>
+            <span class="category-text">{{ index $p.catalog.tabs .dir }}</span>
+            <span class="category-rows">
+              {{- range first 6 .entries }}
+                <span{{ if .entries }} class="is-dir"{{ end }}>{{ if .entries }}[D]{{ else }}[*]{{ end }} {{ .name }}</span>
+              {{- end }}
+              {{- with sub (len .entries) 6 }}{{ if gt . 0 }}<span class="category-more">+ {{ . }} more</span>{{ end }}{{ end }}
+            </span>
+            <span class="category-count">{{ .count }} scripts</span>
+          </a>
+        {{- end }}
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.safety }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="keys panel">
+        <p class="panel-title">Before anything runs</p>
+        <dl>
+          {{- range .keys }}
+            <div><dt><kbd>{{ .key }}</kbd></dt><dd>{{ .text }}</dd></div>
+          {{- end }}
+        </dl>
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.install }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+      </div>
+      <div class="install panel">
+        <p class="panel-title">Install</p>
+        <ul>
+          {{- range .rows }}
+            <li>
+              <span class="install-label">{{ .label }}</span>
+              <code>{{ .command }}</code>
+              <button type="button" class="copy-button" data-copy="{{ .command }}" aria-label="Copy {{ .label }} command">[copy]</button>
+            </li>
+          {{- end }}
+        </ul>
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.automation }}
+    <section class="section section--split">
+      <div class="section-head">
+        <h2>{{ .title }}</h2>
+        <p>{{ .text }}</p>
+        <p><a href="{{ "/userguide/automation/" | relURL }}">Read the automation guide -&gt;</a></p>
+      </div>
+      <div class="automation">
+        {{- partial "code-frame.html" (dict "code" .config "lang" "toml" "title" .file) }}
+        {{- partial "command-line.html" (dict "command" .command) }}
+      </div>
+    </section>
+  {{- end }}
+
+  {{- with $p.cta }}
+    <section class="section cta">
+      <h2>{{ .title }}</h2>
+      <p>{{ .text }}</p>
+      {{- partial "command-line.html" (dict "command" $p.hero.command "class" "cta-command") }}
+      <div class="badges">
+        {{- range $p.badges }}
+          {{- if .link }}
+            <a href="{{ .link }}"><img src="{{ .src }}" alt="{{ .alt }}" height="20"></a>
+          {{- else }}
+            <img src="{{ .src }}" alt="{{ .alt }}" height="20">
+          {{- end }}
+        {{- end }}
+      </div>
+    </section>
+  {{- end }}
+
+  <footer class="site-footer">
+    <p class="copyright">&copy; {{ now.Year }} <a href="https://christitus.com">Chris Titus Tech</a>. All rights reserved.</p>
+  </footer>
+</main>
+{{ end }}
+
+{{ define "scripts" }}
+  {{- $js := resources.Get "js/landing.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{ end }}

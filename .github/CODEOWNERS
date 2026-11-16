@@ -3,6 +3,10 @@
 
 # Nix stuff
 # We want the whole `nix` directory here in case we add custom tests/script later
-*.nix      @koibtw
-flake.lock @koibtw
-/nix/      @koibtw
+*.nix      @ChrisTitusTech @koibtw
+flake.lock @ChrisTitusTech @koibtw
+/nix/      @ChrisTitusTech @koibtw
+
+# Seanh1917 (ANGRYxScotsmans) is the docs guy
+docs/      @ChrisTitusTech @seanh1995
+xtask/src/docgen.rs  @ChrisTitusTech @seanh1995

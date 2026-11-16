@@ -1,0 +1,63 @@
+{{- $docs := not (or .IsHome (eq .Kind "404")) }}
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="site-title" href="{{ "/" | relURL }}">
+      <img src="{{ "apple-touch-icon.png" | relURL }}" alt="" width="26" height="26">
+      <span>linutil</span>
+    </a>
+    <div class="header-actions">
+      <button type="button" class="search-trigger" data-search-open aria-label="Search the docs">
+        {{- partial "icon.html" "magnifier" }}
+        <span class="search-trigger-label">Search docs</span>
+        <kbd class="search-trigger-kbd">/</kbd>
+      </button>
+      <nav class="site-nav" aria-label="Top">
+        {{- range $i, $item := site.Menus.main }}
+          {{- if .HasChildren }}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link" aria-expanded="false">
+                <span class="nav-number">{{ add $i 1 }}</span>{{ .Name }}
+                {{- partial "icon.html" (dict "name" "down-caret" "class" "nav-caret") -}}
+              </button>
+              <div class="nav-menu panel">
+                <p class="panel-title">{{ .Name }}</p>
+                {{- range .Children }}
+                  {{- partial "nav-link.html" . }}
+                {{- end }}
+              </div>
+            </div>
+          {{- else }}
+            <a class="nav-link" href="{{ .URL }}"><span class="nav-number">{{ add $i 1 }}</span>{{ .Name }}</a>
+          {{- end }}
+        {{- end }}
+      </nav>
+      <div class="social">
+        {{- range site.Params.social }}
+          <a class="icon-button" href="{{ .url }}" rel="me" aria-label="{{ .name }}">{{ partial "icon.html" .icon }}</a>
+        {{- end }}
+      </div>
+      <button type="button" class="icon-button menu-toggle" aria-expanded="false"
+        aria-controls="{{ if $docs }}sidebar-pane{{ else }}nav-panel{{ end }}" aria-label="Menu">
+        {{- partial "icon.html" (dict "name" "bars" "class" "menu-open-icon") }}
+        {{- partial "icon.html" (dict "name" "close" "class" "menu-close-icon") -}}
+      </button>
+    </div>
+  </div>
+  {{- if not $docs }}
+    <div class="nav-panel" id="nav-panel">
+      {{- range site.Menus.main }}
+        <div class="nav-panel-group">
+          <p>{{ .Name }}</p>
+          {{- range .Children }}
+            {{- partial "nav-link.html" . }}
+          {{- end }}
+        </div>
+      {{- end }}
+      <div class="social">
+        {{- range site.Params.social }}
+          <a class="icon-button" href="{{ .url }}" rel="me" aria-label="{{ .name }}">{{ partial "icon.html" .icon }}</a>
+        {{- end }}
+      </div>
+    </div>
+  {{- end }}
+</header>

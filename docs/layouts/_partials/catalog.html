@@ -1,0 +1,9 @@
+{{- /* The TUI catalog from core/tabs, in tab order: name, directory, entry tree and script count for each tab. */ -}}
+{{- $tabs := slice }}
+{{- range $dir := hugo.Data.tabs.tabs.directories }}
+  {{- with index hugo.Data.tabs $dir }}
+    {{- $nodes := partial "catalog-nodes.html" .tab_data.data }}
+    {{- $tabs = $tabs | append (dict "name" .tab_data.name "dir" $dir "entries" $nodes "count" (partial "catalog-count.html" $nodes)) }}
+  {{- end }}
+{{- end }}
+{{- return $tabs -}}

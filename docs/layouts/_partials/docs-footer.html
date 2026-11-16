@@ -1,0 +1,38 @@
+{{- $pages := partialCached "docs-pages.html" . "docs" }}
+{{- $prev := false }}
+{{- $next := false }}
+{{- range $i, $page := $pages }}
+  {{- if eq $page $ }}
+    {{- if gt $i 0 }}{{ $prev = index $pages (sub $i 1) }}{{ end }}
+    {{- if lt (add $i 1) (len $pages) }}{{ $next = index $pages (add $i 1) }}{{ end }}
+  {{- end }}
+{{- end }}
+<footer class="docs-footer">
+  <div class="docs-meta">
+    {{- with .File }}
+      <a class="edit-link" href="{{ site.Params.editURL }}{{ path.Clean .Path }}">edit this page -&gt;</a>
+    {{- end }}
+    {{- if not .Lastmod.IsZero }}
+      <p>updated <time datetime="{{ .Lastmod.Format "2006-01-02" }}">{{ .Lastmod.Format "2006-01-02" }}</time></p>
+    {{- end }}
+  </div>
+  {{- if or $prev $next }}
+    <nav class="pagination" aria-label="Pagination">
+      {{- with $prev }}
+        <a class="pagination-link pagination-prev panel" href="{{ .RelPermalink }}" rel="prev" data-key="p">
+          <span class="panel-title"><kbd>p</kbd> Previous</span>
+          {{- partial "title.html" . -}}
+        </a>
+      {{- else }}
+        <span></span>
+      {{- end }}
+      {{- with $next }}
+        <a class="pagination-link pagination-next panel" href="{{ .RelPermalink }}" rel="next" data-key="n">
+          <span class="panel-title">Next <kbd>n</kbd></span>
+          {{- partial "title.html" . -}}
+        </a>
+      {{- end }}
+    </nav>
+  {{- end }}
+  <p class="copyright">&copy; {{ now.Year }} <a href="https://christitus.com">Chris Titus Tech</a>. All rights reserved.</p>
+</footer>
