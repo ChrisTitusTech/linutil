@@ -148,10 +148,8 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   line-height: 1.6;
-  outline: none;
 }
-.tui:focus-visible {
-  border-color: var(--focus);
+.tui:has(.tui-rows:focus-visible) {
   box-shadow: 0 0 0 1px var(--focus);
 }
 .tui-tabs {
@@ -213,11 +211,13 @@
   margin-top: 0.4rem;
   text-align: end;
 }
+/* Focus shows as the ring around the whole menu instead of an outline here. */
 .tui-rows {
   position: relative;
   flex: 1;
   margin: 0;
   padding: 0;
+  outline: none;
   overflow-y: auto;
   list-style: none;
   scrollbar-width: thin;

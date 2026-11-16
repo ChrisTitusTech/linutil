@@ -24,7 +24,7 @@
 
     {{- /* The menu, as the TUI draws it. landing.js makes it browsable from the JSON below. */}}
     <div class="hero-menu">
-      <div class="tui panel" tabindex="0" role="group" aria-label="Linutil menu preview. Use the arrow keys to browse.">
+      <div class="tui panel" role="group" aria-label="Linutil menu preview">
         <p class="panel-title">linutil</p>
         <div class="tui-tabs" role="tablist">
           {{- range $i, $tab := $catalog }}
@@ -37,7 +37,7 @@
             <p class="panel-title">Directories &amp; Commands</p>
             <p class="tui-hint"><kbd>up</kbd>/<kbd>down</kbd> move, <kbd>enter</kbd> open, <kbd>esc</kbd> back</p>
             <p class="tui-flags-head" aria-hidden="true">Flags</p>
-            <ul class="tui-rows" role="listbox" aria-label="Entries">
+            <ul class="tui-rows" role="listbox" tabindex="0" aria-label="Entries. Use the arrow keys to browse.">
               {{- range $i, $node := (index $catalog 0).entries }}
                 <li class="tui-row{{ if .entries }} is-dir{{ end }}" role="option"
                   aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}">

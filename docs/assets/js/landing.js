@@ -136,7 +136,7 @@
   tabButtons.forEach((button, i) =>
     button.addEventListener('click', () => {
       setTab(i);
-      tui.focus({ preventScroll: true });
+      rows.focus({ preventScroll: true });
     })
   );
 
