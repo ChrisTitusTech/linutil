@@ -49,13 +49,14 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Generate the walkthrough for the release
+      # The latest release, as the deploy uses, even when this event is for one that wasn't marked latest.
+      - name: Generate the walkthrough for the latest release
         run: |
-          git checkout "$TAG" -- core/tabs
+          git checkout "$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)" -- core/tabs
           cargo xtask docgen
           git checkout HEAD -- core/tabs
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create Pull Request for the updated walkthrough
         id: cpr
