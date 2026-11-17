@@ -276,5 +276,5 @@ https://github.com/ChrisTitusTech/dwm-titus
 - **Add User**: Creates a new user account on the system.
 - **Add User To Groups**: Adds an existing user to one or more groups.
 - **Change Password**: Changes the password for a user account.
-- **Delete User**: Removes a user account from the system.
+- **Delete User**: Removes a user account, their home directory, and mail spool from the system.
 - **Remove User From Groups**: Removes a user from one or more groups.

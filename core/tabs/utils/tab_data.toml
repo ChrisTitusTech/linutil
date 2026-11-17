@@ -117,7 +117,7 @@ script = "user-account-manager/change_password.sh"
 
 [[data.entries]]
 name = "Delete User"
-description = "Removes a user account from the system."
+description = "Removes a user account, their home directory, and mail spool from the system."
 script = "user-account-manager/delete_user.sh"
 
 [[data.entries]]
