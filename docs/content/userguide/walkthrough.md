@@ -234,19 +234,19 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ## Utilities
 
-- **Auto Login**
+- **Auto Login**: Configures automatic login for a user at boot.
 - **Bluetooth Manager**: This utility is designed to manage bluetooth in your system
-- **Bootable USB Creator**
-- **Crypto tool**
+- **Bootable USB Creator**: Creates a bootable USB drive from an ISO image.
+- **Crypto tool**: Encrypts and decrypts files and directories.
 - **Locale Setup**: This allows the user to set their locale
 - **Numlock on Startup**: This utility is designed to enable Num Lock at boot, rather than within desktop environments like KDE or GNOME
 - **Ollama**: This utility is designed to manage ollama in your system
 - **Ramalama**: Install Ramalama to run AI models locally.
 - **Ramalama Model Manager**: List, inspect, create, run, and remove Ramalama models.
 - **Service Manager**: This utility is designed to manage services in your system
-- **SSH Commands**
-- **SSH Samba**
-- **Timeshift Backup**
+- **SSH Commands**: Runs SSH-related setup and management commands.
+- **SSH Samba**: Sets up SSH and Samba separately.
+- **Timeshift Backup**: Creates and manages system backups using Timeshift.
 - **US Locale Setup**: This fixes US UTF-8 Locale and Folder listings
 - **WiFi Manager**: This utility is designed to manage wifi in your system
 
@@ -273,8 +273,8 @@ https://github.com/ChrisTitusTech/dwm-titus
 
 ### User Account Manager
 
-- **Add User**
-- **Add User To Groups**
-- **Change Password**
-- **Delete User**
-- **Remove User From Groups**
+- **Add User**: Creates a new user account on the system.
+- **Add User To Groups**: Adds an existing user to one or more groups.
+- **Change Password**: Changes the password for a user account.
+- **Delete User**: Removes a user account, their home directory, and mail spool from the system.
+- **Remove User From Groups**: Removes a user from one or more groups.

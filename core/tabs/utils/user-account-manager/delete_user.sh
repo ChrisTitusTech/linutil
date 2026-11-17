@@ -13,7 +13,7 @@ deleteUser() {
     read -r username
 
     if id "$username" > /dev/null 2>&1; then
-        printf "%b" "${YELLOW}Are you sure you want to delete user ""$username""? [Y/n]: ${RC}"
+        printf "%b" "${YELLOW}Are you sure you want to delete user ""$username""? This deletes their home directory and mail spool. [Y/n]: ${RC}"
         read -r _
         confirmAction || exit 1
 

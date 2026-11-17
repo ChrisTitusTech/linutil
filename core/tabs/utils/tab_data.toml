@@ -102,26 +102,32 @@ multi_select = false
 
 [[data.entries]]
 name = "Add User"
+description = "Creates a new user account on the system."
 script = "user-account-manager/add_user.sh"
 
 [[data.entries]]
 name = "Add User To Groups"
+description = "Adds an existing user to one or more groups."
 script = "user-account-manager/add_to_group.sh"
 
 [[data.entries]]
 name = "Change Password"
+description = "Changes the password for a user account."
 script = "user-account-manager/change_password.sh"
 
 [[data.entries]]
 name = "Delete User"
+description = "Removes a user account, their home directory, and mail spool from the system."
 script = "user-account-manager/delete_user.sh"
 
 [[data.entries]]
 name = "Remove User From Groups"
+description = "Removes a user from one or more groups."
 script = "user-account-manager/remove_from_group.sh"
 
 [[data]]
 name = "Auto Login"
+description = "Configures automatic login for a user at boot."
 script = "auto-login.sh"
 task_list = "DE setup"
 
@@ -134,11 +140,13 @@ multi_select = false
 
 [[data]]
 name = "Bootable USB Creator"
+description = "Creates a bootable USB drive from an ISO image."
 script = "create-bootable-usb.sh"
 task_list = "D"
 
 [[data]]
 name = "Crypto tool"
+description = "Encrypts and decrypts files and directories."
 script = "encrypt_decrypt_tool.sh"
 task_list = "I FM"
 
@@ -185,16 +193,19 @@ task_list = "I PFM SS"
 
 [[data]]
 name = "SSH Commands"
+description = "Runs SSH-related setup and management commands."
 script = "ssh.sh"
 task_list = "I FM SS"
 
 [[data]]
 name = "SSH Samba"
+description = "Sets up SSH and Samba separately."
 script = "samba-ssh-setup.sh"
 task_list = "I SS PFM"
 
 [[data]]
 name = "Timeshift Backup"
+description = "Creates and manages system backups using Timeshift."
 script = "timeshift.sh"
 task_list = "I"
 
