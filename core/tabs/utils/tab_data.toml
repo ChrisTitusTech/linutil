@@ -199,7 +199,7 @@ task_list = "I FM SS"
 
 [[data]]
 name = "SSH Samba"
-description = "Configures Samba file sharing over SSH."
+description = "Sets up SSH and Samba separately."
 script = "samba-ssh-setup.sh"
 task_list = "I SS PFM"
 
