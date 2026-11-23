@@ -170,6 +170,7 @@ installWindowManager() {
     bspwm) install_packages "$PACKAGER" bspwm sxhkd ;;
     openbox) install_packages "$PACKAGER" openbox ;;
     fluxbox) install_packages "$PACKAGER" fluxbox ;;
+    miracle-wm) install_packages "$PACKAGER" miracle-wm ;;
     oxwm) installOxwmFromSource ;;
     *)
       printf "%s\n" "$RED Unsupported window manager: $1 "
