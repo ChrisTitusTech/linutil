@@ -93,6 +93,51 @@ installDesktopEnvironment() {
   esac
 }
 
+installOxwmFromSource() {
+  if ! command_exists zig; then
+    printf "%s\n" "$RED OXWM source installation requires Zig 0.16.0 or newer. Install a suitable Zig compiler and try again. "
+    exit 1
+  fi
+
+  zig_version=$(zig version)
+  oldest_version=$(printf "%s\n" "$zig_version" "0.16.0" | sort -V | head -n 1)
+  if [ "$oldest_version" != "0.16.0" ]; then
+    printf "%s\n" "$RED OXWM requires Zig 0.16.0 or newer; found $zig_version. "
+    exit 1
+  fi
+
+  case "$PACKAGER" in
+  apt-get | nala)
+    install_packages "$PACKAGER" git libx11-dev libxft-dev libfreetype-dev libfontconfig1-dev libxinerama-dev libinput-dev libsystemd-dev
+    ;;
+  dnf)
+    install_packages "$PACKAGER" git libX11-devel libXft-devel freetype-devel fontconfig-devel libXinerama-devel libinput-devel systemd-devel
+    ;;
+  zypper)
+    install_packages "$PACKAGER" git libX11-devel libXft-devel freetype2-devel fontconfig-devel libXinerama-devel libinput-devel systemd-devel
+    ;;
+  *)
+    printf "%s\n" "$RED OXWM source installation is unsupported for package manager: $PACKAGER "
+    exit 1
+    ;;
+  esac
+
+  OXWM_BUILD_DIR=$(mktemp -d)
+  trap 'rm -rf "$OXWM_BUILD_DIR"' 0
+  git clone --depth 1 --branch v0.13.0 https://github.com/tonybanters/oxwm.git "$OXWM_BUILD_DIR/oxwm"
+  cd "$OXWM_BUILD_DIR/oxwm"
+  zig build -Doptimize=ReleaseSmall --prefix "$OXWM_BUILD_DIR/stage"
+
+  if [ ! -x "$OXWM_BUILD_DIR/stage/bin/oxwm" ]; then
+    printf "%s\n" "$RED OXWM build succeeded but did not produce the expected binary. "
+    exit 1
+  fi
+
+  printf "%s\n" "[Desktop Entry]" "Name=OXWM" "Comment=OXWM window manager" "Exec=oxwm" "Type=Application" > "$OXWM_BUILD_DIR/oxwm.desktop"
+  "$ESCALATION_TOOL" install -D -m 755 "$OXWM_BUILD_DIR/stage/bin/oxwm" /usr/bin/oxwm
+  "$ESCALATION_TOOL" install -D -m 644 "$OXWM_BUILD_DIR/oxwm.desktop" /usr/share/xsessions/oxwm.desktop
+}
+
 installWindowManager() {
   printf "%s\n" " Installing Window Manager... "
   case "$PACKAGER" in
