@@ -109,6 +109,7 @@ installWindowManager() {
     river) install_packages "$AUR_HELPER" river ;;
     hyde) install_packages "$AUR_HELPER" hyde ;;
     miracle-wm) install_packages "$AUR_HELPER" miracle-wm ;;
+    oxwm) install_packages "$AUR_HELPER" oxwm-git ;;
     *)
       printf "%s\n" "$RED Unsupported window manager: $1 "
       exit 1
@@ -124,6 +125,7 @@ installWindowManager() {
     bspwm) install_packages "$PACKAGER" bspwm sxhkd ;;
     openbox) install_packages "$PACKAGER" openbox ;;
     fluxbox) install_packages "$PACKAGER" fluxbox ;;
+    oxwm) installOxwmFromSource ;;
     *)
       printf "%s\n" "$RED Unsupported window manager: $1 "
       exit 1
@@ -182,7 +184,9 @@ main() {
     printf "%s\n" " 7. Fluxbox "
     printf "%s\n" " 8. Niri "
     printf "%s\n" " 9. HyDE "
-    printf "%s" " Please select a window manager (1-9): "
+    printf "%s\n" " 10. Miracle-WM "
+    printf "%s\n" " 11. OXWM "
+    printf "%s" " Please select a window manager (1-11): "
     read -r wm_choice
     case "$wm_choice" in
     1) installWindowManager i3 ;;
@@ -194,6 +198,8 @@ main() {
     7) installWindowManager fluxbox ;;
     8) installWindowManager niri ;;
     9) installWindowManager hyde ;;
+    10) installWindowManager miracle-wm ;;
+    11) installWindowManager oxwm ;;
     *) printf "%s\n" "$RED Invalid selection " ;;
     esac
     ;;
@@ -205,6 +211,7 @@ main() {
     ;;
   esac
 }
+
 
 checkEnv
 main
