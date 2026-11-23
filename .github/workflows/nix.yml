@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: set up nix
-        uses: cachix/install-nix-action@v31
+        uses: cachix/install-nix-action@v32
 
       - name: check formatting
         run: |
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: set up nix
-        uses: cachix/install-nix-action@v31
+        uses: cachix/install-nix-action@v32
 
       - name: update flake inputs
         run: nix flake update
