@@ -1,0 +1,77 @@
+{{- /* Schema.org data for search engines: the site and app on the homepage, an article and breadcrumbs on docs pages. */ -}}
+{{- $page := .page }}
+{{- $home := site.Home.Permalink }}
+{{- $org := dict
+  "@type" "Organization"
+  "name" "Chris Titus Tech"
+  "url" "https://christitus.com/"
+  "logo" ("android-chrome-512x512.png" | absURL)
+}}
+{{- $website := dict
+  "@type" "WebSite"
+  "@id" (printf "%s#website" $home)
+  "name" "Linutil"
+  "alternateName" site.Title
+  "url" $home
+  "description" site.Params.description
+  "inLanguage" "en-US"
+  "publisher" $org
+}}
+{{- $graph := slice }}
+
+{{- if $page.IsHome }}
+  {{- $app := dict
+    "@type" "SoftwareApplication"
+    "name" "Linutil"
+    "description" .description
+    "url" $home
+    "applicationCategory" "UtilitiesApplication"
+    "operatingSystem" "Linux"
+    "downloadUrl" "https://github.com/ChrisTitusTech/linutil/releases/latest"
+    "codeRepository" "https://github.com/ChrisTitusTech/linutil"
+    "license" "https://github.com/ChrisTitusTech/linutil/blob/main/LICENSE"
+    "image" .image
+    "author" $org
+    "offers" (dict "@type" "Offer" "price" "0" "priceCurrency" "USD")
+  }}
+  {{- $graph = slice $website $app }}
+
+{{- else if ne $page.Kind "404" }}
+  {{- $article := dict
+    "@type" "TechArticle"
+    "headline" .title
+    "description" .description
+    "url" $page.Permalink
+    "image" .image
+    "inLanguage" "en-US"
+    "isPartOf" (dict "@id" (printf "%s#website" $home))
+    "publisher" $org
+  }}
+  {{- with $page.Lastmod }}
+    {{- if not .IsZero }}
+      {{- $article = merge $article (dict "dateModified" (.Format "2006-01-02T15:04:05Z07:00")) }}
+    {{- end }}
+  {{- end }}
+
+  {{- /* Breadcrumbs run from the homepage down through each section, then end on this page with the head's title. */ -}}
+  {{- $crumbs := slice }}
+  {{- range $i, $p := $page.Ancestors.Reverse }}
+    {{- $crumbs = $crumbs | append (dict
+      "@type" "ListItem"
+      "position" (add $i 1)
+      "name" (cond $p.IsHome "Home" $p.LinkTitle)
+      "item" $p.Permalink
+    ) }}
+  {{- end }}
+  {{- $crumbs = $crumbs | append (dict
+    "@type" "ListItem"
+    "position" (add (len $crumbs) 1)
+    "name" .title
+    "item" $page.Permalink
+  ) }}
+  {{- $graph = slice $website $article (dict "@type" "BreadcrumbList" "itemListElement" $crumbs) }}
+{{- end }}
+
+{{- with $graph }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@graph" . }}</script>
+{{- end }}

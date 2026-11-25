@@ -33,13 +33,14 @@ hugo build --source docs --destination /tmp/linutil-docs
 | `layouts/home.json` | The search index, published as `/index.json`. |
 | `layouts/single.html`, `list.html` | Docs pages. Both use `_partials/docs-page.html`. |
 | `layouts/404.html` | The not found page. |
-| `layouts/_partials/` | Header, sidebar, footer, search dialog, status bar and the smaller pieces they use. |
+| `layouts/_partials/` | Head tags and structured data, header, sidebar, footer, search dialog, status bar and the smaller pieces they use. |
 | `layouts/_markup/` | Render hooks for headings, code blocks and alerts. |
 | `layouts/_shortcodes/` | Shortcodes for use in content. |
 | `assets/css/` | `main.css` for every page, `landing.css` for the homepage and 404. |
 | `assets/js/` | `site.js` for menus, search, shortcuts and copy buttons. `landing.js` for the homepage menu. |
 | `assets/icons/` | SVG icons, inlined with `partial "icon.html" "name"`. |
-| `static/` | Favicons, fonts and their licences, and `CNAME`. |
+| `layouts/robots.txt` | The robots file, which points crawlers at the sitemap Hugo generates. |
+| `static/` | Favicons, the `og-image.png` link preview, fonts and their licences, and `CNAME`. |
 
 ## How it fits together
 
@@ -75,6 +76,11 @@ title: Updating Linutil
 weight: 5
 ---
 ```
+
+The link preview tags are in `layouts/_partials/head.html` and the schema.org
+data for search engines is in `layouts/_partials/structured-data.html`. Both
+use the page's title and description, and the image in `params.seo_image` in
+`hugo.toml`.
 
 New pages in `userguide/` or `dev/` show up in the sidebar on their own.
 Fenced code blocks get a frame and a copy button. Alerts use GitHub's syntax:
