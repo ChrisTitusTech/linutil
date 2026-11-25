@@ -299,3 +299,43 @@ name = "Zram Swap"
 description = "Configures compressed RAM swap via zram-generator with zstd algorithm."
 script = "zram-setup.sh"
 task_list = "PFM"
+
+[[data]]
+name = "Gentoo Portage"
+
+[[data.preconditions]]
+matches = true
+data = { containing_file = "/etc/os-release" }
+values = ["ID=gentoo"]
+
+[[data.preconditions]]
+matches = true
+data = "command_exists"
+values = ["emerge"]
+
+[[data.entries]]
+name = "Search Packages"
+description = "Search Gentoo packages with eix when available, falling back to emerge --search."
+script = "gentoo/portage-search.sh"
+multi_select = false
+
+[[data.entries]]
+name = "Install Package"
+description = "Install a Gentoo package atom. Portage displays the merge plan and asks before proceeding."
+script = "gentoo/portage-install.sh"
+task_list = "P MP"
+multi_select = false
+
+[[data.entries]]
+name = "Remove Package"
+description = "Unmerge a selected Gentoo package. Portage displays the removal plan and asks before proceeding."
+script = "gentoo/portage-remove.sh"
+task_list = "P MP RP"
+multi_select = false
+
+[[data.entries]]
+name = "Preview World Update"
+description = "Preview a deep @world update with USE flag changes. This does not sync repositories or modify installed packages."
+script = "gentoo/world-update-preview.sh"
+task_list = "MP"
+multi_select = false
