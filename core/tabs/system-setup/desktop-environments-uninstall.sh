@@ -11,6 +11,12 @@ is_installed() {
   bin)
     command -v "$value" >/dev/null 2>&1 && return 0 || return 1
     ;;
+  miracle)
+    if [ -f /var/lib/linutil/miracle-wm/source-install ]; then
+      return 0
+    fi
+    command -v "$value" >/dev/null 2>&1 && return 0 || return 1
+    ;;
   pkg)
     case $pkg_manager in
     apt-get | nala)
@@ -60,6 +66,7 @@ uninstall_desktop() {
   packages=""
   config_dirs=""
   system_files=""
+  source_install=0
 
   case $desktop in
   "GNOME")
@@ -368,10 +375,14 @@ uninstall_desktop() {
     esac
     config_dirs="$HOME/.config/hyde"
     ;;
-  "miracle-wm")
+  "Miracle-WM")
     case $pkg_manager in
     "apt-get" | "nala")
-      packages="miracle-wm"
+      if [ -f /var/lib/linutil/miracle-wm/source-install ]; then
+        source_install=1
+      else
+        packages="miracle-wm"
+      fi
       ;;
     "pacman")
       packages="miracle-wm"
@@ -383,7 +394,7 @@ uninstall_desktop() {
       packages="miracle-wm"
       ;;
     esac
-    config_dirs="$HOME/.config/hyde"
+    config_dirs=""
     ;;
   "OXWM")
     case $pkg_manager in
@@ -403,7 +414,16 @@ uninstall_desktop() {
   esac
 
   echo "Uninstalling $desktop..."
-  if [ -n "$packages" ]; then
+  if [ "$source_install" = 1 ]; then
+    echo "Removing Miracle-WM source files..."
+    "$ESCALATION_TOOL" rm -rf /opt/linutil/miracle-wm /var/lib/linutil/miracle-wm
+    "$ESCALATION_TOOL" rm -f /etc/ld.so.conf.d/linutil-miracle-wm.conf \
+      /usr/share/wayland-sessions/linutil-miracle-wm.desktop \
+      /usr/local/lib/systemd/user/miracle-wm-session.target \
+      /usr/local/lib/systemd/user/miracle-wm-session-shutdown.target \
+      /usr/local/lib/systemd/user/miracle-wm-xdg-autostart.target
+    "$ESCALATION_TOOL" ldconfig
+  elif [ -n "$packages" ]; then
     echo "Removing packages..."
     uninstall_packages "$pkg_manager" "$packages"
   fi
@@ -452,7 +472,7 @@ main() {
 
   # List of DEs/WMs and their detection methods
   # Format: NAME|TYPE|VALUE
-  DE_LIST="GNOME|bin|gnome-shell KDE|bin|startplasma-x11 XFCE|bin|xfce4-session Cinnamon|bin|cinnamon-session MATE|bin|mate-session Budgie|bin|budgie-desktop LXQt|bin|lxqt-session LXDE|bin|lxsession i3|bin|i3 Sway|bin|sway DWM|bin|dwm Awesome|bin|awesome BSPWM|bin|bspwm Openbox|bin|openbox Fluxbox|bin|fluxbox OXWM|bin|oxwm"
+  DE_LIST="GNOME|bin|gnome-shell KDE|bin|startplasma-x11 XFCE|bin|xfce4-session Cinnamon|bin|cinnamon-session MATE|bin|mate-session Budgie|bin|budgie-desktop LXQt|bin|lxqt-session LXDE|bin|lxsession i3|bin|i3 Sway|bin|sway DWM|bin|dwm Awesome|bin|awesome BSPWM|bin|bspwm Openbox|bin|openbox Fluxbox|bin|fluxbox Miracle-WM|miracle|miracle-wm OXWM|bin|oxwm"
 
   INSTALLED_DESKTOPS=""
   for entry in $DE_LIST; do

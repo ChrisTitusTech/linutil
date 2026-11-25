@@ -63,6 +63,26 @@ impl Callbacks for CursorPositionQueries {
     }
 }
 
+fn answer_cursor_position_queries<W: Write>(
+    writer: &mut W,
+    cursor_queries: &[(u16, u16)],
+    cursor_query_count: &mut usize,
+) {
+    let total = cursor_queries.len();
+    for &(row, col) in cursor_queries.iter().skip(*cursor_query_count) {
+        let response = format!("\x1b[{};{}R", row + 1, col + 1);
+        if let Err(error) = writer
+            .write_all(response.as_bytes())
+            .and_then(|()| writer.flush())
+        {
+            eprintln!("Failed to answer terminal cursor-position request: {error}");
+            *cursor_query_count = total;
+            break;
+        }
+        *cursor_query_count += 1;
+    }
+}
+
 pub struct RunningCommand {
     /// A buffer to save all the command output (accumulates, until the command exits)
     buffer: Arc<Mutex<Vec<u8>>>,
@@ -682,19 +702,11 @@ impl RunningCommand {
         }
         // The child PTY is rendered by our own parser rather than the host
         // terminal, so answer cursor-position queries on the child's behalf.
-        let cursor_queries = parser.callbacks().0.clone();
-        for &(row, col) in cursor_queries.iter().skip(self.cursor_query_count) {
-            let response = format!("\x1b[{};{}R", row + 1, col + 1);
-            if let Err(error) = self
-                .writer
-                .write_all(response.as_bytes())
-                .and_then(|()| self.writer.flush())
-            {
-                eprintln!("Failed to answer terminal cursor-position request: {error}");
-                break;
-            }
-            self.cursor_query_count += 1;
-        }
+        answer_cursor_position_queries(
+            &mut self.writer,
+            &parser.callbacks().0,
+            &mut self.cursor_query_count,
+        );
         // Adjust the screen content based on the scroll offset
         parser.screen_mut().set_scrollback(self.scroll_offset);
         self.scroll_offset = parser.screen().scrollback();
@@ -929,6 +941,7 @@ impl Drop for RunningCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io;
 
     fn ctrl_c() -> KeyEvent {
         KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)
@@ -1031,6 +1044,37 @@ mod tests {
         let output = running.screen(SCREEN).contents();
         assert!(running.get_exit_status().success());
         assert!(output.contains("1b 5b 31 3b 31 52"), "{output}");
+    }
+
+    struct FailingWriter {
+        writes: usize,
+    }
+
+    impl Write for FailingWriter {
+        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+            self.writes += 1;
+            Err(io::Error::new(
+                io::ErrorKind::BrokenPipe,
+                "writer is closed",
+            ))
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn failed_cursor_reply_is_not_retried() {
+        let mut writer = FailingWriter { writes: 0 };
+        let mut handled = 0;
+        let queries = [(0, 0), (1, 2)];
+
+        answer_cursor_position_queries(&mut writer, &queries, &mut handled);
+        answer_cursor_position_queries(&mut writer, &queries, &mut handled);
+
+        assert_eq!(handled, queries.len());
+        assert_eq!(writer.writes, 1);
     }
 
     #[test]

@@ -38,6 +38,27 @@ uninstall_desktop "$MANAGER" OXWM
     return result
 
 
+def run_source_miracle_uninstaller(marker):
+    source = function("uninstall_desktop").replace(
+        "/var/lib/linutil/miracle-wm/source-install",
+        str(marker),
+    )
+    harness = source + r"""
+uninstall_packages() { printf 'PACKAGE_REMOVE:%s\n' "$*"; }
+mock_escalate() { printf 'ESCALATE:%s\n' "$*"; }
+ESCALATION_TOOL=mock_escalate
+AUR_HELPER=mock_aur
+uninstall_desktop apt-get Miracle-WM
+"""
+    return subprocess.run(
+        ["sh", "-e", "-c", harness],
+        capture_output=True,
+        text=True,
+        timeout=5,
+        env={"PATH": "/usr/bin:/bin", "HOME": str(marker.parent)},
+    )
+
+
 class OxwmUninstallerTests(unittest.TestCase):
     def test_source_installs_remove_only_oxwm_files(self):
         for manager in ("apt-get", "nala", "dnf", "zypper"):
@@ -78,6 +99,24 @@ main
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("1) OXWM", result.stdout)
         self.assertIn("UNINSTALL:apt-get:OXWM", result.stdout)
+
+    def test_source_miracle_wm_installation_removes_only_its_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / "source-install"
+            marker.touch()
+            result = run_source_miracle_uninstaller(marker)
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(
+            "ESCALATE:rm -rf /opt/linutil/miracle-wm /var/lib/linutil/miracle-wm",
+            result.stdout,
+        )
+        self.assertIn(
+            "usr/local/lib/systemd/user/miracle-wm-session.target",
+            result.stdout,
+        )
+        self.assertIn("ESCALATE:ldconfig", result.stdout)
+        self.assertNotIn("PACKAGE_REMOVE:", result.stdout)
 
 
 if __name__ == "__main__":
