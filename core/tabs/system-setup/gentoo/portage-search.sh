@@ -9,10 +9,12 @@ if ! readMenuChoice search_term; then
     exit 1
 fi
 
-if [ -z "$search_term" ]; then
-    printf "%b\n" "${YELLOW}No search term entered.${RC}"
-    exit 1
-fi
+case "$search_term" in
+    ""|-*)
+        printf "%b\n" "${YELLOW}Enter a non-empty search term that does not start with a dash.${RC}"
+        exit 1
+        ;;
+esac
 
 if command_exists eix; then
     eix "$search_term"
