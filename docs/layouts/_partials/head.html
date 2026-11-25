@@ -31,6 +31,7 @@
 <meta name="twitter:description" content="{{ $description }}">
 <meta name="twitter:image" content="{{ $image }}">
 <meta name="twitter:image:alt" content="{{ $imageAlt }}">
+{{- partial "structured-data.html" (dict "page" . "title" $title "description" $description "image" $image) }}
 
 <link rel="icon" href="{{ "favicon.ico" | relURL }}" sizes="32x32">
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
