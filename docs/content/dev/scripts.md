@@ -1,5 +1,6 @@
 ---
 title: Writing a Script
+description: "How to write a Linutil script: where it goes, the shared helpers, the tab_data.toml entry, preconditions and checks before a PR."
 weight: 2
 toc: true
 ---

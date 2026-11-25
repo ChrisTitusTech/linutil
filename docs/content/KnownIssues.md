@@ -1,5 +1,6 @@
 ---
 title: Known Issues
+description: Known Linutil issues and workarounds, including terminal size and rendering problems, unsupported distros and Nvidia drivers.
 toc: true
 ---
 

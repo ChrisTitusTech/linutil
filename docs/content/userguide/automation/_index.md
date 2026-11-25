@@ -1,5 +1,6 @@
 ---
 title: Automation
+description: Automate Linutil with a TOML config file that runs scripts on launch, for provisioning new machines and setting up servers.
 weight: 6
 ---
 

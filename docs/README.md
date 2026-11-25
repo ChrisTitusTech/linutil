@@ -66,12 +66,15 @@ and `1`-`5` while it has focus.
 
 ## Writing pages
 
-A page needs a `title`. Add a `weight` to place it in the sidebar, and
-`toc: false` to hide the table of contents.
+A page needs a `title` and a `description`. The description is what search
+engines and link previews show, so keep it to one sentence of about 150
+characters, and quote it if it has a colon. Add a `weight` to place it in the
+sidebar, and `toc: false` to hide the table of contents.
 
 ```md
 ---
 title: Updating Linutil
+description: Keep Linutil up to date, whether you run it with curl or installed it from Cargo, the AUR or openSUSE.
 weight: 5
 ---
 ```

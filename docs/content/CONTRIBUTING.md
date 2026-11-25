@@ -1,5 +1,6 @@
 ---
 title: Contributing Guide
+description: "How to contribute to Linutil: set up Rust, fork the repo, add a script, write good commits and get your pull request reviewed."
 toc: true
 ---
 
