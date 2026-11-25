@@ -53,16 +53,22 @@
     {{- end }}
   {{- end }}
 
-  {{- /* Breadcrumbs run from the homepage down through each section to this page. */ -}}
+  {{- /* Breadcrumbs run from the homepage down through each section, then end on this page with the head's title. */ -}}
   {{- $crumbs := slice }}
-  {{- range $i, $p := $page.Ancestors.Reverse | append $page }}
+  {{- range $i, $p := $page.Ancestors.Reverse }}
     {{- $crumbs = $crumbs | append (dict
       "@type" "ListItem"
       "position" (add $i 1)
-      "name" (cond $p.IsHome "Home" (partial "title.html" $p))
+      "name" (cond $p.IsHome "Home" $p.LinkTitle)
       "item" $p.Permalink
     ) }}
   {{- end }}
+  {{- $crumbs = $crumbs | append (dict
+    "@type" "ListItem"
+    "position" (add (len $crumbs) 1)
+    "name" .title
+    "item" $page.Permalink
+  ) }}
   {{- $graph = slice $website $article (dict "@type" "BreadcrumbList" "itemListElement" $crumbs) }}
 {{- end }}
 
