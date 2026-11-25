@@ -39,6 +39,7 @@ hugo build --source docs --destination /tmp/linutil-docs
 | `assets/css/` | `main.css` for every page, `landing.css` for the homepage and 404. |
 | `assets/js/` | `site.js` for menus, search, shortcuts and copy buttons. `landing.js` for the homepage menu. |
 | `assets/icons/` | SVG icons, inlined with `partial "icon.html" "name"`. |
+| `layouts/robots.txt` | The robots file, which points crawlers at the sitemap Hugo generates. |
 | `static/` | Favicons, the `og-image.png` link preview, fonts and their licences, and `CNAME`. |
 
 ## How it fits together

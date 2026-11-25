@@ -4,6 +4,7 @@ title = "Linutil Documentation"
 enableGitInfo = true
 canonifyURLs = true
 disableKinds = ["taxonomy", "term", "rss"]
+enableRobotsTXT = true
 
 [outputs]
 home = ["html", "json"]
