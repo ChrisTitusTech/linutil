@@ -225,6 +225,9 @@ The shared environment is responsible for detecting or defining:
 - Current-directory writability.
 - Arch User Repository helper where relevant.
 
+A script that never uses the Arch User Repository helper may call
+`checkEnv --no-aur` to skip detecting or installing one.
+
 Scripts must still validate feature-specific requirements and unsupported
 states.
 
