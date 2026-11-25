@@ -35,7 +35,7 @@ gentoo_read_atom() {
     esac
 
     case "$GENTOO_ATOM" in
-        ""|-*|*[!A-Za-z0-9_+./:@-]*)
+        ""|/*|*/|*//*|-*|*[!A-Za-z0-9_+./:@-]*)
             printf "%b\n" "${RED}Invalid package atom. Only letters, numbers, and _ + . / : @ - are accepted.${RC}"
             exit 1
             ;;
