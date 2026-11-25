@@ -68,5 +68,5 @@ setLocale() {
     fi
 }
 
-checkEnv
+checkEnv --no-aur
 setLocale

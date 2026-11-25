@@ -225,5 +225,9 @@ checkEnv() {
     checkCurrentDirectoryWritable
     checkSuperUser
     checkDistro
-    checkAURHelper
+    # Scripts that never use AUR_HELPER pass --no-aur so that pacman
+    # systems without yay or paru are not made to install one.
+    if [ "${1:-}" != "--no-aur" ]; then
+        checkAURHelper
+    fi
 }

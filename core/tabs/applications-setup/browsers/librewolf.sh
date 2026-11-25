@@ -12,7 +12,7 @@ installLibreWolf() {
                 "$ESCALATION_TOOL" "$PACKAGER" update && "$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
                 ;;
             dnf)
-                curl -fsSL https://rpm.librewolf.net/librewolf-repo.repo | pkexec tee /etc/yum.repos.d/librewolf.repo > /dev/null
+                curl -fsSL https://rpm.librewolf.net/librewolf-repo.repo | "$ESCALATION_TOOL" tee /etc/yum.repos.d/librewolf.repo > /dev/null
                 "$ESCALATION_TOOL" "$PACKAGER" install -y librewolf
                 ;;
             zypper)

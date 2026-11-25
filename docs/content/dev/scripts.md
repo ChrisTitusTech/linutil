@@ -70,7 +70,7 @@ A few rules this follows:
 
 | Helper | Use |
 |--------|-----|
-| `checkEnv` | Detects the architecture, package manager, distro and escalation tool, and checks basic requirements |
+| `checkEnv` | Detects the architecture, package manager, distro and escalation tool, and checks basic requirements. On Arch it also makes sure an AUR helper is available; scripts that never use `AUR_HELPER` can call `checkEnv --no-aur` to skip that |
 | `command_exists` | Checks whether a command is on `PATH` |
 | `checkFlatpak` | Makes sure Flatpak and Flathub are set up |
 | `checkAURHelper` | Makes sure an AUR helper is available on Arch |
