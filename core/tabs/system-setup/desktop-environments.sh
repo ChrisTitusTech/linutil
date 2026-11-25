@@ -138,6 +138,47 @@ installOxwmFromSource() {
   "$ESCALATION_TOOL" install -D -m 644 "$OXWM_BUILD_DIR/oxwm.desktop" /usr/share/xsessions/oxwm.desktop
 }
 
+installSomewmFromSource() {
+  case "$PACKAGER" in
+  apt-get | nala)
+    install_packages "$PACKAGER" build-essential git meson ninja-build pkg-config \
+      luajit libluajit-5.1-dev lua-lgi libcairo2-dev libpango1.0-dev \
+      libgdk-pixbuf-2.0-dev librsvg2-dev libglib2.0-dev libdbus-1-dev \
+      libwayland-dev libwayland-bin wayland-protocols libdrm-dev \
+      libinput-dev libxkbcommon-dev libgbm-dev libegl-dev libgles-dev \
+      libpixman-1-dev libudev-dev libseat-dev libdisplay-info-dev \
+      libliftoff-dev liblcms2-dev hwdata libffi-dev libexpat1-dev \
+      xwayland libxcb1-dev libxcb-util-dev libxcb-icccm4-dev \
+      libxcb-composite0-dev libxcb-ewmh-dev libxcb-res0-dev \
+      libxcb-render0-dev libxcb-render-util0-dev libxcb-errors-dev \
+      libxcb-xfixes0-dev libxcb-xinput-dev libxcb-dri3-dev \
+      libxcb-present-dev libxcb-shm0-dev
+    ;;
+  dnf)
+    install_packages "$PACKAGER" gcc make git meson ninja-build pkgconf-pkg-config \
+      luajit luajit-devel lua-lgi cairo-devel pango-devel gdk-pixbuf2-devel \
+      librsvg2-devel glib2-devel dbus-devel wayland-devel wayland-protocols-devel \
+      libdrm-devel libinput-devel libxkbcommon-devel mesa-libgbm-devel \
+      libglvnd-egl-devel libglvnd-gles-devel pixman-devel systemd-devel \
+      libseat-devel libdisplay-info-devel libliftoff-devel lcms2-devel hwdata \
+      xorg-x11-server-Xwayland xorg-x11-server-Xwayland-devel \
+      libxcb-devel xcb-util-devel xcb-util-wm-devel \
+      xcb-util-renderutil-devel xcb-util-errors-devel
+    ;;
+  *)
+    printf "%s\n" "$RED SomeWM source installation is unsupported for package manager: $PACKAGER "
+    exit 1
+    ;;
+  esac
+
+  SOMEWM_BUILD_DIR=$(mktemp -d)
+  trap 'rm -rf "$SOMEWM_BUILD_DIR"' 0
+  git clone --depth 1 --branch v2.1.0 https://github.com/trip-zip/somewm.git "$SOMEWM_BUILD_DIR/somewm"
+  cd "$SOMEWM_BUILD_DIR/somewm"
+  MESON_OPTS=-Dprefix=/usr make
+  "$ESCALATION_TOOL" make install
+}
+
 installWindowManager() {
   printf "%s\n" " Installing Window Manager... "
   case "$PACKAGER" in
@@ -155,6 +196,7 @@ installWindowManager() {
     hyde) install_packages "$AUR_HELPER" hyde ;;
     miracle-wm) install_packages "$AUR_HELPER" miracle-wm ;;
     oxwm) install_packages "$AUR_HELPER" oxwm-git ;;
+    somewm) install_packages "$AUR_HELPER" somewm ;;
     *)
       printf "%s\n" "$RED Unsupported window manager: $1 "
       exit 1
@@ -172,6 +214,8 @@ installWindowManager() {
     fluxbox) install_packages "$PACKAGER" fluxbox ;;
     miracle-wm) install_packages "$PACKAGER" miracle-wm ;;
     oxwm) installOxwmFromSource ;;
+    # must build from source on debian
+    somewm) installSomewmFromSource ;;
     *)
       printf "%s\n" "$RED Unsupported window manager: $1 "
       exit 1
@@ -206,7 +250,8 @@ main() {
     printf "%s\n" " 7. LXQt "
     printf "%s\n" " 8. LXDE "
     printf "%s" " Please select a desktop environment (1-8): "
-    read -r de_choice
+    de_choice=''
+    readMenuChoice de_choice
     case "$de_choice" in
     1) installDesktopEnvironment gnome ;;
     2) installDesktopEnvironment kde ;;
@@ -232,8 +277,10 @@ main() {
     printf "%s\n" " 9. HyDE "
     printf "%s\n" " 10. Miracle-WM "
     printf "%s\n" " 11. OXWM "
-    printf "%s" " Please select a window manager (1-11): "
-    read -r wm_choice
+    printf "%s\n" " 12. SomeWM "
+    printf "%s" " Please select a window manager (1-12): "
+    wm_choice=''
+    readMenuChoice wm_choice
     case "$wm_choice" in
     1) installWindowManager i3 ;;
     2) installWindowManager sway ;;
@@ -246,6 +293,7 @@ main() {
     9) installWindowManager hyde ;;
     10) installWindowManager miracle-wm ;;
     11) installWindowManager oxwm ;;
+    12) installWindowManager somewm ;;
     *) printf "%s\n" "$RED Invalid selection " ;;
     esac
     ;;
