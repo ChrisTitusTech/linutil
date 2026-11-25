@@ -12,7 +12,7 @@ values = ["apk"]
 name = "Alpine Update"
 description = "Upgrades Alpine Linux to either latest stable or edge repositories"
 script = "alpine/alpine-upgrade.sh"
-task_list = "P MP"
+task_list = "PMP"
 multi_select = false
 
 [[data]]
@@ -330,7 +330,7 @@ multi_select = false
 name = "Remove Package"
 description = "Unmerge a selected Gentoo package. Portage displays the removal plan and asks before proceeding."
 script = "gentoo/portage-remove.sh"
-task_list = "P MP RP"
+task_list = "PMP RP"
 multi_select = false
 
 [[data.entries]]
