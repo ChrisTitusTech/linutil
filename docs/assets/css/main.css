@@ -286,12 +286,15 @@ kbd {
 }
 .site-title {
   display: flex;
-  flex-shrink: 0;
+  min-width: 0;
   align-items: center;
 }
+/* The logo scales down rather than pushing the menu button off narrow screens with large text. */
 .site-title img {
   width: auto;
-  height: 2rem;
+  max-width: 100%;
+  height: auto;
+  max-height: 2rem;
 }
 .header-actions {
   display: flex;
