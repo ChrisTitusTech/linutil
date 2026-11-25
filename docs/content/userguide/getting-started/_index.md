@@ -1,5 +1,6 @@
 ---
 title: Getting Started with Linutil
+description: Run Linutil with one curl command or install it from the AUR, openSUSE, Cargo or Nix, then learn its CLI flags and shortcuts.
 weight: 1
 ---
 

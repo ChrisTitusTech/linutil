@@ -1,5 +1,6 @@
 ---
 title: Updating Linutil
+description: Keep Linutil up to date, whether you run it with curl or installed it from Cargo, the AUR or openSUSE, and check your version.
 weight: 5
 ---
 

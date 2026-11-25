@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{{- $title := partial "title.html" . }}
+{{- $title := .LinkTitle }}
 <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ $title }} | Linutil{{ end }}</title>
 {{- $description := .Description | default site.Params.description }}
 <meta name="description" content="{{ $description }}">

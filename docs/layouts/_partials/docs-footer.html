@@ -21,7 +21,7 @@
       {{- with $prev }}
         <a class="pagination-link pagination-prev panel" href="{{ .RelPermalink }}" rel="prev" data-key="p">
           <span class="panel-title"><kbd>p</kbd> Previous</span>
-          {{- partial "title.html" . -}}
+          {{- .LinkTitle -}}
         </a>
       {{- else }}
         <span></span>
@@ -29,7 +29,7 @@
       {{- with $next }}
         <a class="pagination-link pagination-next panel" href="{{ .RelPermalink }}" rel="next" data-key="n">
           <span class="panel-title">Next <kbd>n</kbd></span>
-          {{- partial "title.html" . -}}
+          {{- .LinkTitle -}}
         </a>
       {{- end }}
     </nav>

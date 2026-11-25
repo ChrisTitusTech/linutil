@@ -1,5 +1,6 @@
 ---
 title: Features & Utilities
+description: "Linutil's security, gaming and utility scripts: firewall baselines, security audits, Proton, game launchers, emulators and themes."
 weight: 4
 ---
 

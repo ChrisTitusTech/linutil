@@ -9,7 +9,7 @@
         </ul>
       </details>
     {{- else }}
-      {{- partial "sidebar-link.html" (dict "page" . "label" (partial "title.html" .) "current" $.current) }}
+      {{- partial "sidebar-link.html" (dict "page" . "label" .LinkTitle "current" $.current) }}
     {{- end }}
   </li>
 {{- end }}

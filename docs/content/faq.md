@@ -1,5 +1,6 @@
 ---
 title: Frequently Asked Questions
+description: "Answers to common Linutil questions: supported distros, safety, root access, stable and dev branches, and running scripts."
 toc: true
 ---
 

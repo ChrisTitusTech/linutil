@@ -2,7 +2,7 @@
 {{- $entries := slice }}
 {{- range where site.Pages "Kind" "in" (slice "page" "section") }}
   {{- $page := . }}
-  {{- $title := partial "title.html" . }}
+  {{- $title := .LinkTitle }}
   {{- $html := .Content | replaceRE `<h([23]) id=` "<!--section--><h$1 id=" }}
   {{- range split $html "<!--section-->" }}
     {{- $id := "" }}

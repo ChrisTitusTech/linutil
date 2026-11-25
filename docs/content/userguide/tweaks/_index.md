@@ -1,5 +1,6 @@
 ---
 title: System Setup
+description: "Set up your Linux system with Linutil: distro-specific scripts for Arch, Fedora, Debian, Ubuntu and Alpine, and desktop environments."
 weight: 3
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Architecture & Design
+description: "How Linutil works inside: the Cargo workspace, the menu data model, tab_data.toml, preconditions, script embedding and the TUI."
 weight: 1
 toc: true
 ---

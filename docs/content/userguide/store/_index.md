@@ -1,5 +1,6 @@
 ---
 title: Application Setup
+description: Install popular Linux apps with Linutil. Find an app with search, run its install script, and browse every app category.
 weight: 2
 ---
 

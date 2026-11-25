@@ -1,5 +1,6 @@
 ---
 title: User Guide
+description: "The Linutil user guide: what Linutil is, who it's for, how to run it, and what's in each of its main categories."
 weight: 2
 ---
 
