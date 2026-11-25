@@ -39,7 +39,7 @@ hugo build --source docs --destination /tmp/linutil-docs
 | `assets/css/` | `main.css` for every page, `landing.css` for the homepage and 404. |
 | `assets/js/` | `site.js` for menus, search, shortcuts and copy buttons. `landing.js` for the homepage menu. |
 | `assets/icons/` | SVG icons, inlined with `partial "icon.html" "name"`. |
-| `static/` | Favicons, fonts and their licences, and `CNAME`. |
+| `static/` | Favicons, the `og-image.png` link preview, fonts and their licences, and `CNAME`. |
 
 ## How it fits together
 
@@ -75,6 +75,9 @@ title: Updating Linutil
 weight: 5
 ---
 ```
+
+The link preview tags are in `layouts/_partials/head.html`. They use the page's
+title and description, and the image in `params.seo_image` in `hugo.toml`.
 
 New pages in `userguide/` or `dev/` show up in the sidebar on their own.
 Fenced code blocks get a frame and a copy button. Alerts use GitHub's syntax:

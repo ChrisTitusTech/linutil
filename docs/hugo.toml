@@ -123,6 +123,8 @@ parent = "help"
 
 [params]
 description = "Chris Titus Tech's Linux Utility - Install Programs, Tweaks, Fixes, and Updates"
+# Image used for link previews and search engine data on every page.
+seo_image = "og-image.png"
 editURL = "https://github.com/ChrisTitusTech/linutil/edit/main/docs/content/"
 
   [[params.social]]

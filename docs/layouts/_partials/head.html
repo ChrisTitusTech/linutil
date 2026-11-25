@@ -5,10 +5,28 @@
 {{- $description := .Description | default site.Params.description }}
 <meta name="description" content="{{ $description }}">
 <link rel="canonical" href="{{ .Permalink }}">
-<meta property="og:type" content="website">
+
+<meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+<meta property="og:site_name" content="Linutil">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ $title }} | Linutil{{ end }}">
 <meta property="og:description" content="{{ $description }}">
 <meta property="og:url" content="{{ .Permalink }}">
+{{- $image := site.Params.seo_image | absURL }}
+{{- $imageAlt := "Chris Titus Tech Linutil Docs: set up any Linux distro from one terminal" }}
+<meta property="og:image" content="{{ $image }}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ $imageAlt }}">
+{{- if and (not .IsHome) (not .Lastmod.IsZero) }}
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ if .IsHome }}{{ site.Title }}{{ else }}{{ $title }} | Linutil{{ end }}">
+<meta name="twitter:description" content="{{ $description }}">
+<meta name="twitter:image" content="{{ $image }}">
+<meta name="twitter:image:alt" content="{{ $imageAlt }}">
 
 <link rel="icon" href="{{ "favicon.ico" | relURL }}" sizes="32x32">
 <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
