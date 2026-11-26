@@ -416,13 +416,14 @@ uninstall_desktop() {
   echo "Uninstalling $desktop..."
   if [ "$source_install" = 1 ]; then
     echo "Removing Miracle-WM source files..."
-    "$ESCALATION_TOOL" rm -rf /opt/linutil/miracle-wm /var/lib/linutil/miracle-wm
+    "$ESCALATION_TOOL" rm -rf /opt/linutil/miracle-wm
     "$ESCALATION_TOOL" rm -f /etc/ld.so.conf.d/linutil-miracle-wm.conf \
       /usr/share/wayland-sessions/linutil-miracle-wm.desktop \
       /usr/local/lib/systemd/user/miracle-wm-session.target \
       /usr/local/lib/systemd/user/miracle-wm-session-shutdown.target \
       /usr/local/lib/systemd/user/miracle-wm-xdg-autostart.target
     "$ESCALATION_TOOL" ldconfig
+    "$ESCALATION_TOOL" rm -rf /var/lib/linutil/miracle-wm
   elif [ -n "$packages" ]; then
     echo "Removing packages..."
     uninstall_packages "$pkg_manager" "$packages"

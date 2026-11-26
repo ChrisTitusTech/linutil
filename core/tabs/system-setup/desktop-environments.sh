@@ -163,8 +163,10 @@ installMiracleWmFromPpa() {
 cleanupMiracleWmSourceInstall() {
   MIRACLE_BUILD_STATUS=$?
   if [ "$MIRACLE_BUILD_STATUS" -ne 0 ] && [ "$MIRACLE_INSTALL_STARTED" = 1 ]; then
-    if ! "$ESCALATION_TOOL" rm -rf /opt/linutil/miracle-wm /var/lib/linutil/miracle-wm; then
+    MIRACLE_CLEANUP_FAILED=0
+    if ! "$ESCALATION_TOOL" rm -rf "$MIRACLE_PREFIX"; then
       printf "%s\n" "$RED Failed to remove the partial Miracle-WM source installation. "
+      MIRACLE_CLEANUP_FAILED=1
     fi
     if ! "$ESCALATION_TOOL" rm -f /etc/ld.so.conf.d/linutil-miracle-wm.conf \
       /usr/share/wayland-sessions/linutil-miracle-wm.desktop \
@@ -172,9 +174,15 @@ cleanupMiracleWmSourceInstall() {
       /usr/local/lib/systemd/user/miracle-wm-session-shutdown.target \
       /usr/local/lib/systemd/user/miracle-wm-xdg-autostart.target; then
       printf "%s\n" "$RED Failed to remove partial Miracle-WM system integration files. "
+      MIRACLE_CLEANUP_FAILED=1
     fi
     if ! "$ESCALATION_TOOL" ldconfig; then
       printf "%s\n" "$RED Failed to refresh the dynamic linker cache after rollback. "
+      MIRACLE_CLEANUP_FAILED=1
+    fi
+    if [ "$MIRACLE_CLEANUP_FAILED" = 0 ] &&
+      ! "$ESCALATION_TOOL" rm -rf "$MIRACLE_STATE_DIR"; then
+      printf "%s\n" "$RED Failed to remove the Miracle-WM source installation marker. "
     fi
   fi
   rm -rf "$MIRACLE_BUILD_DIR"
@@ -209,7 +217,7 @@ installMiracleWmFromSource() {
   MIRACLE_SOURCE_DIR="$MIRACLE_BUILD_DIR/miracle-wm"
   MIRACLE_CMAKE_BUILD_DIR="$MIRACLE_BUILD_DIR/miracle-wm-build"
   MIRACLE_PKGCONFIG_DIR="$MIRACLE_BUILD_DIR/mir-pkgconfig"
-  git clone --depth 1 --branch v2.18.0 https://github.com/canonical/mir.git "$MIR_SOURCE_DIR"
+  git clone --depth 1 --branch v2.21.0 https://github.com/canonical/mir.git "$MIR_SOURCE_DIR"
   git clone --depth 1 --branch v0.11.2 https://github.com/miracle-wm-org/miracle-wm.git "$MIRACLE_SOURCE_DIR"
 
   cd "$MIR_SOURCE_DIR"
@@ -254,8 +262,25 @@ installMiracleWmFromSource() {
     exit 1
   fi
 
+  MIRACLE_SESSION_WRAPPER="$MIRACLE_PREFIX/bin/linutil-miracle-wm-session"
+  printf "%s\n" '#!/bin/sh' \
+    "PATH=\"$MIRACLE_PREFIX/bin:\$PATH\"" \
+    "export PATH" \
+    "exec \"$MIRACLE_PREFIX/bin/miracle-wm-session\" \"\$@\"" \
+    > "$MIRACLE_BUILD_DIR/session-wrapper"
+  install -D -m 755 "$MIRACLE_BUILD_DIR/session-wrapper" \
+    "$MIRACLE_STAGE$MIRACLE_SESSION_WRAPPER"
+  if ! grep -q '^Exec=' "$MIRACLE_STAGE$MIRACLE_PREFIX/share/wayland-sessions/miracle-wm.desktop"; then
+    printf "%s\n" "$RED Miracle-WM source build produced a session file without an Exec entry. "
+    exit 1
+  fi
+  sed "s|^Exec=.*|Exec=$MIRACLE_SESSION_WRAPPER|" \
+    "$MIRACLE_STAGE$MIRACLE_PREFIX/share/wayland-sessions/miracle-wm.desktop" \
+    > "$MIRACLE_BUILD_DIR/session.desktop"
+
   printf "%s\n" "$MIRACLE_PREFIX/lib" > "$MIRACLE_BUILD_DIR/ld.so.conf"
-  printf "%s\n" "Miracle-WM source build v0.11.2 with Mir v2.18.0" > "$MIRACLE_BUILD_DIR/source-install"
+  printf "%s\n" "Miracle-WM source build v0.11.2 with Mir v2.21.0 (MirAL 5.4.0)" \
+    > "$MIRACLE_BUILD_DIR/source-install"
   MIRACLE_INSTALL_STARTED=1
   "$ESCALATION_TOOL" install -d "$MIRACLE_PREFIX" "$MIRACLE_STATE_DIR"
   "$ESCALATION_TOOL" install -D -m 644 "$MIRACLE_BUILD_DIR/source-install" \
@@ -263,7 +288,7 @@ installMiracleWmFromSource() {
   "$ESCALATION_TOOL" cp -a "$MIRACLE_STAGE$MIRACLE_PREFIX/." "$MIRACLE_PREFIX/"
   "$ESCALATION_TOOL" install -D -m 644 "$MIRACLE_BUILD_DIR/ld.so.conf" /etc/ld.so.conf.d/linutil-miracle-wm.conf
   "$ESCALATION_TOOL" install -D -m 644 \
-    "$MIRACLE_STAGE$MIRACLE_PREFIX/share/wayland-sessions/miracle-wm.desktop" \
+    "$MIRACLE_BUILD_DIR/session.desktop" \
     /usr/share/wayland-sessions/linutil-miracle-wm.desktop
   for systemd_target in miracle-wm-session.target miracle-wm-session-shutdown.target miracle-wm-xdg-autostart.target; do
     "$ESCALATION_TOOL" install -D -m 644 \
