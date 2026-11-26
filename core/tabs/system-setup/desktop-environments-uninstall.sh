@@ -11,6 +11,12 @@ is_installed() {
   bin)
     command -v "$value" >/dev/null 2>&1 && return 0 || return 1
     ;;
+  miracle)
+    if [ -f /var/lib/linutil/miracle-wm/source-install ]; then
+      return 0
+    fi
+    command -v "$value" >/dev/null 2>&1 && return 0 || return 1
+    ;;
   pkg)
     case $pkg_manager in
     apt-get | nala)
@@ -59,6 +65,8 @@ uninstall_desktop() {
   desktop=$2
   packages=""
   config_dirs=""
+  system_files=""
+  source_install=0
 
   case $desktop in
   "GNOME")
@@ -367,10 +375,14 @@ uninstall_desktop() {
     esac
     config_dirs="$HOME/.config/hyde"
     ;;
-  "miracle-wm")
+  "Miracle-WM")
     case $pkg_manager in
     "apt-get" | "nala")
-      packages="miracle-wm"
+      if [ -f /var/lib/linutil/miracle-wm/source-install ]; then
+        source_install=1
+      else
+        packages="miracle-wm"
+      fi
       ;;
     "pacman")
       packages="miracle-wm"
@@ -382,7 +394,18 @@ uninstall_desktop() {
       packages="miracle-wm"
       ;;
     esac
-    config_dirs="$HOME/.config/hyde"
+    config_dirs=""
+    ;;
+  "OXWM")
+    case $pkg_manager in
+    "pacman")
+      packages="oxwm-git"
+      ;;
+    "apt-get" | "nala" | "dnf" | "zypper")
+      system_files="/usr/bin/oxwm /usr/share/xsessions/oxwm.desktop"
+      ;;
+    esac
+    config_dirs="$HOME/.config/oxwm"
     ;;
   *)
     echo "Unsupported desktop environment: $desktop"
@@ -391,8 +414,25 @@ uninstall_desktop() {
   esac
 
   echo "Uninstalling $desktop..."
-  echo "Removing packages..."
-  uninstall_packages "$pkg_manager" "$packages"
+  if [ "$source_install" = 1 ]; then
+    echo "Removing Miracle-WM source files..."
+    "$ESCALATION_TOOL" rm -rf /opt/linutil/miracle-wm
+    "$ESCALATION_TOOL" rm -f /etc/ld.so.conf.d/linutil-miracle-wm.conf \
+      /usr/share/wayland-sessions/linutil-miracle-wm.desktop \
+      /usr/local/lib/systemd/user/miracle-wm-session.target \
+      /usr/local/lib/systemd/user/miracle-wm-session-shutdown.target \
+      /usr/local/lib/systemd/user/miracle-wm-xdg-autostart.target
+    "$ESCALATION_TOOL" ldconfig
+    "$ESCALATION_TOOL" rm -rf /var/lib/linutil/miracle-wm
+  elif [ -n "$packages" ]; then
+    echo "Removing packages..."
+    uninstall_packages "$pkg_manager" "$packages"
+  fi
+
+  for file in $system_files; do
+    echo "Removing $file"
+    "$ESCALATION_TOOL" rm -f "$file"
+  done
 
   echo "Cleaning up configuration files..."
   for dir in $config_dirs; do
@@ -402,23 +442,25 @@ uninstall_desktop() {
     fi
   done
 
-  # Additional cleanup for specific package managers
-  case $pkg_manager in
-  "apt-get" | "nala")
-    $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
-    $ESCALATION_TOOL "$pkg_manager" clean || true
-    ;;
-  "pacman")
-    $ESCALATION_TOOL "$AUR_HELPER" -Scc --noconfirm || true
-    ;;
-  "dnf")
-    $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
-    $ESCALATION_TOOL "$pkg_manager" clean all || true
-    ;;
-  "zypper")
-    $ESCALATION_TOOL "$pkg_manager" clean || true
-    ;;
-  esac
+  if [ -n "$packages" ]; then
+    # Additional cleanup for specific package managers
+    case $pkg_manager in
+    "apt-get" | "nala")
+      $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
+      $ESCALATION_TOOL "$pkg_manager" clean || true
+      ;;
+    "pacman")
+      $ESCALATION_TOOL "$AUR_HELPER" -Scc --noconfirm || true
+      ;;
+    "dnf")
+      $ESCALATION_TOOL "$pkg_manager" autoremove -y || true
+      $ESCALATION_TOOL "$pkg_manager" clean all || true
+      ;;
+    "zypper")
+      $ESCALATION_TOOL "$pkg_manager" clean || true
+      ;;
+    esac
+  fi
 
   echo "Uninstallation of $desktop completed."
 }
@@ -431,7 +473,7 @@ main() {
 
   # List of DEs/WMs and their detection methods
   # Format: NAME|TYPE|VALUE
-  DE_LIST="GNOME|bin|gnome-shell KDE|bin|startplasma-x11 XFCE|bin|xfce4-session Cinnamon|bin|cinnamon-session MATE|bin|mate-session Budgie|bin|budgie-desktop LXQt|bin|lxqt-session LXDE|bin|lxsession i3|bin|i3 Sway|bin|sway DWM|bin|dwm Awesome|bin|awesome BSPWM|bin|bspwm Openbox|bin|openbox Fluxbox|bin|fluxbox"
+  DE_LIST="GNOME|bin|gnome-shell KDE|bin|startplasma-x11 XFCE|bin|xfce4-session Cinnamon|bin|cinnamon-session MATE|bin|mate-session Budgie|bin|budgie-desktop LXQt|bin|lxqt-session LXDE|bin|lxsession i3|bin|i3 Sway|bin|sway DWM|bin|dwm Awesome|bin|awesome BSPWM|bin|bspwm Openbox|bin|openbox Fluxbox|bin|fluxbox Miracle-WM|miracle|miracle-wm OXWM|bin|oxwm"
 
   INSTALLED_DESKTOPS=""
   for entry in $DE_LIST; do
@@ -439,12 +481,15 @@ main() {
     type=$(echo "$entry" | cut -d'|' -f2)
     value=$(echo "$entry" | cut -d'|' -f3)
     if is_installed "$PACKAGER" "$type" "$value"; then
-      INSTALLED_DESKTOPS="$INSTALLED_DESKTOPS $name"
+      if [ -n "$INSTALLED_DESKTOPS" ]; then
+        INSTALLED_DESKTOPS="$INSTALLED_DESKTOPS $name"
+      else
+        INSTALLED_DESKTOPS=$name
+      fi
     fi
   done
 
-  set -- "$INSTALLED_DESKTOPS"
-  if [ $# -eq 0 ]; then
+  if [ -z "$INSTALLED_DESKTOPS" ]; then
     echo "No supported desktop environments or window managers detected as installed."
     exit 0
   fi
@@ -472,8 +517,7 @@ main() {
     fi
     ;;
   *)
-    set -- "$INSTALLED_DESKTOPS"
-    selected_de=$(printf "%s\n" "$@" | sed -n "${choice}p")
+    selected_de=$(printf "%s\n" "$INSTALLED_DESKTOPS" | tr ' ' '\n' | sed -n "${choice}p")
     if [ -n "$selected_de" ]; then
       uninstall_desktop "$PACKAGER" "$selected_de"
       echo "Uninstallation complete. You may need to reboot your system."

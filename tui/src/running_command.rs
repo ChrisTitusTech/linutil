@@ -20,7 +20,7 @@ use std::{
 };
 use time::{macros::format_description, OffsetDateTime};
 use tui_term::widget::PseudoTerminal;
-use vt100_ctt::{Parser, Screen};
+use vt100_ctt::{Callbacks, Parser, Screen};
 
 #[cfg(unix)]
 use nix::{
@@ -37,6 +37,50 @@ use std::os::fd::{AsFd, BorrowedFd};
 struct StartupCancellation {
     pending: usize,
     error: Option<&'static str>,
+}
+
+#[derive(Default)]
+struct CursorPositionQueries(Vec<(u16, u16)>);
+
+impl Callbacks for CursorPositionQueries {
+    fn unhandled_csi(
+        &mut self,
+        screen: &mut Screen,
+        first_intermediate: Option<u8>,
+        second_intermediate: Option<u8>,
+        params: &[&[u16]],
+        command: char,
+    ) {
+        if first_intermediate.is_none()
+            && second_intermediate.is_none()
+            && command == 'n'
+            && params.len() == 1
+            && params[0].len() == 1
+            && params[0][0] == 6
+        {
+            self.0.push(screen.cursor_position());
+        }
+    }
+}
+
+fn answer_cursor_position_queries<W: Write>(
+    writer: &mut W,
+    cursor_queries: &[(u16, u16)],
+    cursor_query_count: &mut usize,
+) {
+    let total = cursor_queries.len();
+    for &(row, col) in cursor_queries.iter().skip(*cursor_query_count) {
+        let response = format!("\x1b[{};{}R", row + 1, col + 1);
+        if let Err(error) = writer
+            .write_all(response.as_bytes())
+            .and_then(|()| writer.flush())
+        {
+            eprintln!("Failed to answer terminal cursor-position request: {error}");
+            *cursor_query_count = total;
+            break;
+        }
+        *cursor_query_count += 1;
+    }
 }
 
 pub struct RunningCommand {
@@ -56,6 +100,7 @@ pub struct RunningCommand {
     kill_count: usize,
     menu_consumed: usize,
     menu_back: bool,
+    cursor_query_count: usize,
     /// Why the last kill_child could not signal every process
     cancel_error: Option<&'static str>,
     /// A join handle for the thread that reads command output and sends it to the main thread
@@ -516,6 +561,7 @@ impl RunningCommand {
             kill_count: 0,
             menu_consumed: 0,
             menu_back: false,
+            cursor_query_count: 0,
             cancel_error: None,
             reader_thread: Some(reader_handle),
             reader_stop,
@@ -643,10 +689,24 @@ impl RunningCommand {
         // Process the buffer with a parser with the current screen size
         // We don't actually need to create a new parser every time, but it is so much easier this
         // way, and doesn't cost that much
-        let mut parser = Parser::new(size.height, size.width, 1000);
-        let mutex = self.buffer.lock();
-        let buffer = mutex.as_ref().unwrap();
-        parser.process(buffer);
+        let mut parser = Parser::new_with_callbacks(
+            size.height,
+            size.width,
+            1000,
+            CursorPositionQueries::default(),
+        );
+        {
+            let mutex = self.buffer.lock();
+            let buffer = mutex.as_ref().unwrap();
+            parser.process(buffer);
+        }
+        // The child PTY is rendered by our own parser rather than the host
+        // terminal, so answer cursor-position queries on the child's behalf.
+        answer_cursor_position_queries(
+            &mut self.writer,
+            &parser.callbacks().0,
+            &mut self.cursor_query_count,
+        );
         // Adjust the screen content based on the scroll offset
         parser.screen_mut().set_scrollback(self.scroll_offset);
         self.scroll_offset = parser.screen().scrollback();
@@ -881,6 +941,7 @@ impl Drop for RunningCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io;
 
     fn ctrl_c() -> KeyEvent {
         KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)
@@ -965,6 +1026,55 @@ mod tests {
         assert!(output.contains("1b"), "{output}");
         assert!(!output.contains("777;linutil"), "{output}");
         assert!(!running.should_close());
+    }
+
+    #[test]
+    fn answers_child_cursor_position_queries() {
+        let command = Command::Raw(
+            r"stty -echo -icanon min 1 time 0; printf '\033[6n'; dd bs=1 count=6 2>/dev/null | od -An -tx1"
+                .into(),
+        );
+        let mut running = RunningCommand::new(&[&command]);
+
+        wait_until(|| {
+            let _ = running.screen(SCREEN);
+            running.is_finished()
+        });
+
+        let output = running.screen(SCREEN).contents();
+        assert!(running.get_exit_status().success());
+        assert!(output.contains("1b 5b 31 3b 31 52"), "{output}");
+    }
+
+    struct FailingWriter {
+        writes: usize,
+    }
+
+    impl Write for FailingWriter {
+        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+            self.writes += 1;
+            Err(io::Error::new(
+                io::ErrorKind::BrokenPipe,
+                "writer is closed",
+            ))
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn failed_cursor_reply_is_not_retried() {
+        let mut writer = FailingWriter { writes: 0 };
+        let mut handled = 0;
+        let queries = [(0, 0), (1, 2)];
+
+        answer_cursor_position_queries(&mut writer, &queries, &mut handled);
+        answer_cursor_position_queries(&mut writer, &queries, &mut handled);
+
+        assert_eq!(handled, queries.len());
+        assert_eq!(writer.writes, 1);
     }
 
     #[test]
